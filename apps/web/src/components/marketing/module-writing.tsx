@@ -23,7 +23,12 @@ export function ModuleWriting({ className }: { className?: string }) {
     >
       <div className="flex items-baseline justify-between font-mono text-[0.625rem] tracking-[0.18em] uppercase">
         <span className="shrink-0">{writingSample.task}</span>
-        <span className="text-slate truncate pl-3">{writingSample.prompt}</span>
+        {/* min-w-0 is required: truncate sets white-space:nowrap, so without it
+            this flex item reports the full string as its min-content and
+            widens the whole panel instead of truncating. */}
+        <span className="text-slate min-w-0 truncate pl-3">
+          {writingSample.prompt}
+        </span>
       </div>
 
       <p className="mt-5 text-sm leading-loose">

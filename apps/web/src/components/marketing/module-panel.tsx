@@ -22,7 +22,11 @@ export function ModulePanel({
   return (
     <article
       className={cn(
-        'bz-reveal border-ink group bg-paper relative isolate flex flex-col overflow-clip border',
+        // min-w-0: as a grid item this defaults to min-width:auto, so the
+        // auto-sized column would stretch to the panel's min-content
+        // (a nowrap child reports its full string) instead of the
+        // container width, widening the whole page on mobile.
+        'bz-reveal border-ink group bg-paper relative isolate flex min-w-0 flex-col overflow-clip border',
         className,
       )}
     >
