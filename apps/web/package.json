@@ -1,5 +1,5 @@
 {
-  "name": "@bandzen/web",
+  "name": "web",
   "version": "0.1.0",
   "private": true,
   "scripts": {
@@ -10,6 +10,7 @@
     "typecheck": "next typegen && tsc --noEmit"
   },
   "dependencies": {
+    "@bandzen/ui": "workspace:*",
     "next": "16.3.3",
     "react": "19.2.8",
     "react-dom": "19.2.8"

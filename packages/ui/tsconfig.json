@@ -1,0 +1,10 @@
+{
+  "extends": "@bandzen/tsconfig/base.json",
+  "compilerOptions": {
+    "paths": {
+      "@bandzen/ui/*": ["./src/*"]
+    }
+  },
+  "include": ["src/**/*.ts", "src/**/*.tsx"],
+  "exclude": ["node_modules"]
+}
