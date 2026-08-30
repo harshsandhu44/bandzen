@@ -10,7 +10,7 @@ apps/
   docs/                @bandzen/ui reference + integration test (port 3001)
 packages/
   ui/                  shared shadcn design system (@bandzen/ui)
-  eslint-config/       shared ESLint config (@bandzen/eslint-config)
+  eslint-config/       shared ESLint configs (@bandzen/eslint-config)
   tsconfig/            shared TypeScript configs (@bandzen/tsconfig)
 ```
 
@@ -23,12 +23,30 @@ packages in parallel and caches the results.
 | ---------------- | --------------------------------------------------------- |
 | `pnpm dev`       | Starts every app's dev server (web → :3000, docs → :3001) |
 | `pnpm build`     | Builds every app                                          |
-| `pnpm lint`      | Lints every app against the shared config                 |
+| `pnpm lint`      | Lints every app and package                               |
 | `pnpm typecheck` | Type-checks every package                                 |
 | `pnpm format`    | Prettier across the whole repo                            |
 
 Install once at the root (`pnpm install`) — never inside an app. There is a
 single lockfile and a single `node_modules` store for the whole workspace.
+
+## Linting
+
+`packages/eslint-config` ships two entry points. Each consumer's
+`eslint.config.mjs` is a one-line re-export:
+
+| Export                        | For               | Rules                                             |
+| ----------------------------- | ----------------- | ------------------------------------------------- |
+| `@bandzen/eslint-config/next` | Next.js apps      | `eslint-config-next` core-web-vitals + typescript |
+| `@bandzen/eslint-config/base` | React/TS packages | `@eslint/js`, `typescript-eslint`, `react-hooks`  |
+
+```js
+// packages/ui/eslint.config.mjs
+export { default } from '@bandzen/eslint-config/base';
+```
+
+Add a rule for everyone by editing the shared config; add one for a single
+package by spreading the shared export and appending to it locally.
 
 ## Design system
 
