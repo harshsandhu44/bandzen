@@ -132,13 +132,19 @@ export function Navbar() {
             <Sheet>
               <SheetTrigger
                 render={
-                  <Button variant="ghost" size="icon-lg" aria-label="Open menu">
+                  <Button
+                    variant="ghost"
+                    size="icon-lg"
+                    aria-label="Open menu"
+                    className="size-11"
+                  >
                     <Menu />
                   </Button>
                 }
               />
               <SheetContent
                 side="right"
+                showCloseButton={false}
                 className="bg-ink text-paper border-none p-0"
               >
                 <SheetTitle className="sr-only">Menu</SheetTitle>
@@ -154,7 +160,7 @@ export function Navbar() {
                         variant="ghost"
                         size="icon-lg"
                         aria-label="Close menu"
-                        className="text-paper hover:bg-paper/10 hover:text-paper"
+                        className="text-paper hover:bg-paper/10 hover:text-paper size-11"
                       >
                         <X />
                       </Button>
