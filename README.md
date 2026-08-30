@@ -10,6 +10,7 @@ apps/
   docs/                @bandzen/ui reference + integration test (port 3001)
 packages/
   ui/                  shared shadcn design system (@bandzen/ui)
+  eslint-config/       shared ESLint config (@bandzen/eslint-config)
   tsconfig/            shared TypeScript configs (@bandzen/tsconfig)
 ```
 
@@ -22,7 +23,7 @@ packages in parallel and caches the results.
 | ---------------- | --------------------------------------------------------- |
 | `pnpm dev`       | Starts every app's dev server (web → :3000, docs → :3001) |
 | `pnpm build`     | Builds every app                                          |
-| `pnpm lint`      | Runs each package's own ESLint config                     |
+| `pnpm lint`      | Lints every app against the shared config                 |
 | `pnpm typecheck` | Type-checks every package                                 |
 | `pnpm format`    | Prettier across the whole repo                            |
 
@@ -77,8 +78,11 @@ same components in a different theme than `apps/web`.
 1. `pnpm create next-app@latest apps/<name>` (delete the lockfile,
    `pnpm-workspace.yaml`, `node_modules`, and `.gitignore` it generates — the
    root owns those).
-2. Point its `tsconfig.json` at `@bandzen/tsconfig/nextjs.json`.
-3. Add `@bandzen/ui` and `@bandzen/tsconfig` as `workspace:*` dependencies.
+2. Point its `tsconfig.json` at `@bandzen/tsconfig/nextjs.json`, and make its
+   `eslint.config.mjs` a one-line
+   `export { default } from '@bandzen/eslint-config/next';`.
+3. Add `@bandzen/ui`, `@bandzen/tsconfig`, and `@bandzen/eslint-config` as
+   `workspace:*` dependencies.
 4. Give it `lint`, `build`, `dev`, and `typecheck` scripts so the root tasks
    pick it up.
 5. Pass `--port` to its `dev` script — `pnpm dev` starts all apps at once and

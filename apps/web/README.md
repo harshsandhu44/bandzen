@@ -5,13 +5,13 @@ Next.js 16 (App Router, React 19, React Compiler, Tailwind v4).
 Run it from the repo root — `pnpm dev` starts this app on
 http://localhost:3000. `pnpm --filter web <script>` targets it directly.
 
-| Script      |                                                              |
-| ----------- | ------------------------------------------------------------ |
-| `dev`       | Next dev server                                              |
-| `build`     | Production build                                             |
-| `start`     | Serves the production build                                  |
-| `lint`      | ESLint (`eslint-config-next`, config in `eslint.config.mjs`) |
-| `typecheck` | `next typegen && tsc --noEmit`                               |
+| Script      |                                                      |
+| ----------- | ---------------------------------------------------- |
+| `dev`       | Next dev server                                      |
+| `build`     | Production build                                     |
+| `start`     | Serves the production build                          |
+| `lint`      | ESLint — rules live in `@bandzen/eslint-config/next` |
+| `typecheck` | `next typegen && tsc --noEmit`                       |
 
 `next typegen` has to run first: Next 16 generates `LayoutProps`/`PageProps`
 into `.next/types`, so a bare `tsc` fails on a clean checkout.
