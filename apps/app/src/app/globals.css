@@ -1,0 +1,25 @@
+@import '@bandzen/ui/globals.css';
+
+/* Product app. Deliberately thin: the shared design system is the whole
+   theme, and none of the marketing layer comes along. No display scale
+   (apps/web owns --text-display-*), no bz-* scroll choreography, no smooth
+   scrolling — a timed exam surface should not animate under the candidate.
+
+   Only additions belong here, and only ones the product actually needs. */
+
+@theme {
+  /* Instrumentation type. Band scores, timers, criterion labels and counters
+     are set in mono at fixed sizes so a ticking clock never reflows its row. */
+  --text-metric-lg: 2.25rem;
+  --text-metric: 1.5rem;
+  --text-metric-sm: 0.875rem;
+}
+
+@layer base {
+  /* Tabular figures everywhere a number changes in place. */
+  .font-metric {
+    font-family: var(--font-mono);
+    font-variant-numeric: tabular-nums;
+    letter-spacing: -0.01em;
+  }
+}
