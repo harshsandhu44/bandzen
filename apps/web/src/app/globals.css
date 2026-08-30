@@ -1,5 +1,162 @@
 @import '@bandzen/ui/globals.css';
 
-/* App-specific token overrides go here. They come after the shared design
-   system, so anything redefined below wins. Example:
-   :root { --primary: oklch(0.55 0.2 265); --radius: 0.25rem; } */
+/* Marketing-only. The product app will never need 12rem headlines, so the
+   display scale and the scroll choreography stay here rather than in the
+   shared design system. */
+
+@theme {
+  --text-display-1: clamp(2.5rem, 5.6vw, 5.75rem);
+  --text-display-2: clamp(2rem, 4.5vw, 4.5rem);
+  --text-display-3: clamp(1.5rem, 3vw, 2.75rem);
+  --tracking-display: -0.04em;
+}
+
+@layer base {
+  /* Archivo's width axis. Set once so display type can be widened without
+     every headline repeating the font-variation-settings incantation. */
+  .font-display {
+    font-family: var(--font-heading);
+    font-variation-settings: 'wdth' 112;
+    letter-spacing: var(--tracking-display);
+    line-height: 0.95;
+    text-wrap: balance;
+  }
+}
+
+/* ---------------------------------------------------------------------------
+   Motion.
+
+   Tier 1 — native scroll-driven animation (Chrome/Edge 115+, Safari 26+).
+   Tier 2 — IntersectionObserver fallback for reveals only (Firefox).
+
+   Every rule below is double-guarded. The state OUTSIDE the guards is always
+   the FINISHED state, so a browser with neither path renders a correct static
+   page rather than invisible content.
+   --------------------------------------------------------------------------- */
+
+@keyframes bz-reveal {
+  from {
+    opacity: 0;
+    transform: translateY(1.75rem);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes bz-drift {
+  to {
+    transform: translateY(var(--bz-drift, -5rem));
+  }
+}
+
+@keyframes bz-slide-x {
+  to {
+    transform: translateX(var(--bz-slide, -12rem));
+  }
+}
+
+@keyframes bz-fill {
+  from {
+    transform: scaleX(0);
+  }
+  to {
+    transform: scaleX(1);
+  }
+}
+
+@keyframes bz-marquee {
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  @supports (animation-timeline: view()) {
+    .bz-reveal {
+      animation: bz-reveal linear both;
+      animation-timeline: view();
+      animation-range: entry 5% cover 30%;
+    }
+
+    /* Parallax layers. Only transform is animated. */
+    .bz-drift {
+      animation: bz-drift linear both;
+      animation-timeline: view();
+      animation-range: cover;
+      will-change: transform;
+    }
+
+    /* For layers that are already in view on load (the hero). Progress is 0
+       at scroll top, so the resting composition is the designed one. */
+    .bz-drift-scroll {
+      animation: bz-drift linear both;
+      animation-timeline: scroll(root block);
+      animation-range: 0 100vh;
+      will-change: transform;
+    }
+
+    .bz-slide-x {
+      animation: bz-slide-x linear both;
+      animation-timeline: view();
+      animation-range: cover;
+      will-change: transform;
+    }
+
+    .bz-fill {
+      animation: bz-fill linear both;
+      animation-timeline: view();
+      animation-range: entry 20% cover 45%;
+      transform-origin: left center;
+    }
+  }
+
+  /* Tier 2. `.js-reveal` is set on <html> by useReveal only when the native
+     path is unavailable, so content is never hidden unless JS is definitely
+     going to bring it back. */
+  @supports not (animation-timeline: view()) {
+    .js-reveal .bz-reveal {
+      opacity: 0;
+      transform: translateY(1.75rem);
+      transition:
+        opacity 0.7s cubic-bezier(0.22, 1, 0.36, 1),
+        transform 0.7s cubic-bezier(0.22, 1, 0.36, 1);
+    }
+
+    .js-reveal .bz-reveal[data-revealed] {
+      opacity: 1;
+      transform: none;
+    }
+  }
+
+  .bz-marquee {
+    animation: bz-marquee 42s linear infinite;
+  }
+
+  .bz-marquee-group:hover .bz-marquee {
+    animation-play-state: paused;
+  }
+}
+
+/* Stagger children of a revealed group. Pure CSS, no per-item JS. */
+.bz-stagger > * {
+  animation-delay: calc(var(--bz-i, 0) * 70ms);
+  transition-delay: calc(var(--bz-i, 0) * 70ms);
+}
+
+/* Anchor scrolling has to clear the floating navbar. */
+:target,
+[id] {
+  scroll-margin-top: 6rem;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+}
