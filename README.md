@@ -6,7 +6,8 @@ pnpm workspaces + Turborepo monorepo.
 
 ```
 apps/
-  web/                 Next.js 16 app
+  web/                 Next.js 16 app (port 3000)
+  docs/                @bandzen/ui reference + integration test (port 3001)
 packages/
   ui/                  shared shadcn design system (@bandzen/ui)
   tsconfig/            shared TypeScript configs (@bandzen/tsconfig)
@@ -17,13 +18,13 @@ packages/
 Run everything from the repo root — Turborepo fans each task out across
 packages in parallel and caches the results.
 
-| Command          | What it does                                                |
-| ---------------- | ----------------------------------------------------------- |
-| `pnpm dev`       | Starts every app's dev server (web → http://localhost:3000) |
-| `pnpm build`     | Builds every app                                            |
-| `pnpm lint`      | Runs each package's own ESLint config                       |
-| `pnpm typecheck` | Type-checks every package                                   |
-| `pnpm format`    | Prettier across the whole repo                              |
+| Command          | What it does                                              |
+| ---------------- | --------------------------------------------------------- |
+| `pnpm dev`       | Starts every app's dev server (web → :3000, docs → :3001) |
+| `pnpm build`     | Builds every app                                          |
+| `pnpm lint`      | Runs each package's own ESLint config                     |
+| `pnpm typecheck` | Type-checks every package                                 |
+| `pnpm format`    | Prettier across the whole repo                            |
 
 Install once at the root (`pnpm install`) — never inside an app. There is a
 single lockfile and a single `node_modules` store for the whole workspace.
@@ -68,7 +69,8 @@ declarations win, so no build tooling is involved:
 ```
 
 Only override what differs. Everything left alone stays in sync with the
-shared system.
+shared system — `apps/docs` does exactly this, which is why it renders the
+same components in a different theme than `apps/web`.
 
 ## Adding an app
 
