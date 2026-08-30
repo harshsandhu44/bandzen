@@ -1,0 +1,8 @@
+@import '@bandzen/ui/globals.css';
+
+/* Docs-only token overrides. These come after the shared design system, so
+   they win — everything not listed here stays in sync with @bandzen/ui. */
+:root {
+  --primary: oklch(0.55 0.2 265);
+  --radius: 0.25rem;
+}
