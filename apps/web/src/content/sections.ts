@@ -26,11 +26,17 @@ export const nav = [
   { label: 'Pricing', href: '#pricing' },
 ] as const;
 
+/**
+ * The product app is a separate deployment on its own subdomain, so every
+ * CTA leaves this site. Override for local work against apps/app on :3002.
+ */
+const APP_URL = process.env.NEXT_PUBLIC_APP_URL ?? 'https://app.bandzen.com';
+
 export const cta = {
-  primary: { label: 'Start preparing free', href: '/signup' },
-  secondary: { label: 'Take a diagnostic test', href: '/diagnostic' },
-  signIn: { label: 'Sign in', href: '/sign-in' },
-  nav: { label: 'Start preparing', href: '/signup' },
+  primary: { label: 'Start preparing free', href: `${APP_URL}/signup` },
+  secondary: { label: 'Take a diagnostic test', href: `${APP_URL}/diagnostic` },
+  signIn: { label: 'Sign in', href: `${APP_URL}/sign-in` },
+  nav: { label: 'Start preparing', href: `${APP_URL}/signup` },
 } as const;
 
 export const hero = {
@@ -304,7 +310,7 @@ export const diagnostic = {
   headline: ["Don't know your IELTS level?", 'Find out.'],
   support:
     'Take a short diagnostic assessment and get your estimated band, strongest skills, weakest areas, and a personalised preparation plan.',
-  cta: { label: 'Take the free diagnostic', href: '/diagnostic' },
+  cta: { label: 'Take the free diagnostic', href: `${APP_URL}/diagnostic` },
   result: 6.5,
 } as const;
 
