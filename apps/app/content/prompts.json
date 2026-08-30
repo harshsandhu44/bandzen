@@ -1,0 +1,17 @@
+[
+  {
+    "slug": "task2-remote-work",
+    "task": 2,
+    "promptText": "Some people believe that allowing employees to work from home permanently benefits both companies and workers. Others argue that it weakens teams and harms younger employees in particular.\n\nDiscuss both these views and give your own opinion.\n\nGive reasons for your answer and include any relevant examples from your own knowledge or experience. Write at least 250 words."
+  },
+  {
+    "slug": "task2-museums-free",
+    "task": 2,
+    "promptText": "In some countries, entry to national museums and galleries is free of charge. In others, visitors are expected to pay.\n\nDo the advantages of free entry outweigh the disadvantages?\n\nGive reasons for your answer and include any relevant examples from your own knowledge or experience. Write at least 250 words."
+  },
+  {
+    "slug": "task2-university-subjects",
+    "task": 2,
+    "promptText": "Some people think universities should only offer subjects that are useful in the future job market, such as those related to science and technology. Others believe that subjects like history, philosophy and literature remain essential.\n\nDiscuss both views and give your own opinion.\n\nGive reasons for your answer and include any relevant examples from your own knowledge or experience. Write at least 250 words."
+  }
+]

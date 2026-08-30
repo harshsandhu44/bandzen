@@ -1,0 +1,150 @@
+{
+  "slug": "fungi-beneath-city-trees",
+  "title": "Fungi Beneath City Trees",
+  "topic": "Urban ecology and mycorrhizal fungi",
+  "difficulty": 3,
+  "body": "A\nUrban trees are often presented as simple objects of beautification, yet many cities now treat them as a form of living infrastructure. Their crowns intercept rain, moderate heat and filter pollutants, while their roots help hold soil in place during storms. The services provided by mature street trees influence municipal budgets indirectly, because cooler pavements last longer, shaded buildings require less energy, and healthier neighbourhoods can reduce public health costs. However, the survival of urban trees depends on processes that occur largely out of sight. Among the most important of these processes are the relationships between roots and fungi, which can determine how well a tree obtains nutrients and tolerates stress.\n\nB\nMycorrhizae are partnerships in which fungi receive sugars made by photosynthesis and, in return, improve the plant’s access to water and mineral nutrients. Two broad types are especially relevant to urban forestry. In ectomycorrhizal associations, fungal tissue forms a sheath around young roots and extends as threads into the surrounding soil. These fungi are common on oaks, pines and beeches, and some produce familiar mushrooms. Arbuscular mycorrhizal fungi enter root cells and are common in maples, planes and many tropical street trees; they do not produce conspicuous mushrooms at the soil surface. Although the exchange seems straightforward, it is regulated by chemical signals and by the relative scarcity of nutrients. When phosphorus or nitrogen is difficult for roots to reach, the fungal partner may become particularly valuable.\n\nC\nUrban conditions can weaken these alliances. In paved streets, tree roots often occupy narrow pits surrounded by compacted subsoil, concrete and buried pipes. Compaction reduces pore spaces, making it harder for fungal filaments to spread and for oxygen to reach roots. De-icing salts, heavy metals from traffic and repeated excavation for utilities can also alter the soil community. Heat adds another pressure: soil under dark asphalt may remain warmer at night than soil in a park, changing the balance among fungal species. The result is not simply fewer fungi, but a community that may be less suited to supporting long-lived trees.\n\nD\nUntil recently, the underground nature of mycorrhizae made them difficult to study in streets and plazas. Researchers relied on root samples and microscopic inspection, methods that were slow and could miss species that were not actively colonising roots at the moment of sampling. Newer studies combine DNA sequencing with measurements of soil chemistry, allowing scientists to identify fungi from tiny fragments in the soil. Some experiments use stable isotope labels to trace whether carbon moves from a tree into fungal tissue or whether nutrients move in the opposite direction. A survey published in 2021 of street trees in Melbourne found that fungal species richness was lowest where soil had high bulk density and low organic matter. Such findings do not reveal every exchange, but they help explain why two trees of the same species can perform very differently on neighbouring streets.\n\nE\nThe most persuasive recommendations are not to add fungi indiscriminately, but to improve the habitat in which useful fungi already live. In nurseries, seedlings can be grown in soils that encourage appropriate mycorrhizal partners before the trees are planted. After planting, structural soils and suspended pavements can provide larger rooting volumes without sacrificing pedestrian surfaces. Municipal crews can also protect existing networks by leaving leaf litter under tree crowns, limiting fungicide use and designing continuous soil trenches beneath pavements. Commercial inoculants are sometimes helpful, especially where soil has been imported or sterilised, but their effects are inconsistent. An introduced strain may fail to establish or may compete with fungi already adapted to the site. For this reason, many urban ecologists argue that fungal management should begin with reducing disturbance and increasing organic matter.\n\nF\nMycorrhizal research has nevertheless encouraged a broader view of what counts as tree care. Watering and pruning are visible tasks, whereas maintaining soil biology is less obvious and harder to specify in contracts. The economic returns of mycorrhizal management are difficult to calculate, in part because fungal contributions are indirect and interact with irrigation, pruning and the genetics of the tree. There are also equity issues: wealthier districts usually have older trees, larger planting beds and more frequent maintenance, all of which favour healthier soil communities. If cities want the benefits of mature canopies to be distributed fairly, they may need to invest not only in planting new trees but also in the hidden fungal networks that help those trees persist.",
+  "headings": [
+    "The basic forms of a root-fungus partnership",
+    "Urban stresses that damage underground alliances",
+    "Techniques for making fungal activity visible",
+    "Management practices that favour fungal communities",
+    "Why trees are increasingly valued as infrastructure",
+    "Uncertainties in calculating financial benefits",
+    "The importance of equal access to healthy canopies",
+    "The visible tasks of tree maintenance"
+  ],
+  "questions": [
+    {
+      "idx": 1,
+      "kind": "matching_headings",
+      "prompt": "Choose the correct heading for Paragraph B from the list of headings.",
+      "options": null,
+      "answer": ["The basic forms of a root-fungus partnership"],
+      "evidence": "Two broad types are especially relevant to urban forestry.",
+      "explanation": "Paragraph B explains the two main kinds of mycorrhizal relationship found in urban trees."
+    },
+    {
+      "idx": 2,
+      "kind": "matching_headings",
+      "prompt": "Choose the correct heading for Paragraph C from the list of headings.",
+      "options": null,
+      "answer": ["Urban stresses that damage underground alliances"],
+      "evidence": "Urban conditions can weaken these alliances.",
+      "explanation": "Paragraph C describes compaction, salts, metals, excavation and heat as factors that harm root-fungus relationships."
+    },
+    {
+      "idx": 3,
+      "kind": "matching_headings",
+      "prompt": "Choose the correct heading for Paragraph D from the list of headings.",
+      "options": null,
+      "answer": ["Techniques for making fungal activity visible"],
+      "evidence": "Newer studies combine DNA sequencing with measurements of soil chemistry, allowing scientists to identify fungi from tiny fragments in the soil.",
+      "explanation": "Paragraph D focuses on research methods used to study fungi that are normally hidden underground."
+    },
+    {
+      "idx": 4,
+      "kind": "matching_headings",
+      "prompt": "Choose the correct heading for Paragraph E from the list of headings.",
+      "options": null,
+      "answer": ["Management practices that favour fungal communities"],
+      "evidence": "The most persuasive recommendations are not to add fungi indiscriminately, but to improve the habitat in which useful fungi already live.",
+      "explanation": "Paragraph E discusses practical ways to protect or encourage beneficial fungi in urban soils."
+    },
+    {
+      "idx": 5,
+      "kind": "sentence_completion",
+      "prompt": "Complete the sentence below. Write NO MORE THAN TWO WORDS from the passage. In paved streets, tree roots often occupy __________ surrounded by compacted subsoil, concrete and buried pipes.",
+      "options": null,
+      "answer": ["narrow pits"],
+      "evidence": "In paved streets, tree roots often occupy narrow pits surrounded by compacted subsoil, concrete and buried pipes.",
+      "explanation": "The missing words are taken directly from the sentence in Paragraph C."
+    },
+    {
+      "idx": 6,
+      "kind": "sentence_completion",
+      "prompt": "Complete the sentence below. Write NO MORE THAN TWO WORDS from the passage. In ectomycorrhizal associations, fungal tissue forms a sheath around __________.",
+      "options": null,
+      "answer": ["young roots"],
+      "evidence": "In ectomycorrhizal associations, fungal tissue forms a sheath around young roots and extends as threads into the surrounding soil.",
+      "explanation": "The passage states that the sheath forms around young roots."
+    },
+    {
+      "idx": 7,
+      "kind": "sentence_completion",
+      "prompt": "Complete the sentence below. Write NO MORE THAN TWO WORDS from the passage. The Melbourne survey found fungal species richness was lowest where soil had high __________.",
+      "options": null,
+      "answer": ["bulk density"],
+      "evidence": "A survey published in 2021 of street trees in Melbourne found that fungal species richness was lowest where soil had high bulk density and low organic matter.",
+      "explanation": "The exact phrase describing the soil condition is “bulk density”."
+    },
+    {
+      "idx": 8,
+      "kind": "sentence_completion",
+      "prompt": "Complete the sentence below. Write NO MORE THAN TWO WORDS from the passage. Municipal crews can protect existing networks by leaving __________ under tree crowns.",
+      "options": null,
+      "answer": ["leaf litter"],
+      "evidence": "Municipal crews can also protect existing networks by leaving leaf litter under tree crowns, limiting fungicide use and designing continuous soil trenches beneath pavements.",
+      "explanation": "The passage identifies leaf litter as something crews can leave under tree crowns."
+    },
+    {
+      "idx": 9,
+      "kind": "true_false_not_given",
+      "prompt": "Do the following statement agree with the information in the passage? Mature street trees can affect municipal budgets in indirect ways.",
+      "options": null,
+      "answer": ["TRUE"],
+      "evidence": "The services provided by mature street trees influence municipal budgets indirectly, because cooler pavements last longer, shaded buildings require less energy, and healthier neighbourhoods can reduce public health costs.",
+      "explanation": "The statement matches the passage exactly: mature trees influence municipal budgets indirectly."
+    },
+    {
+      "idx": 10,
+      "kind": "true_false_not_given",
+      "prompt": "Do the following statement agree with the information in the passage? Arbuscular mycorrhizal fungi can be recognised by conspicuous mushrooms at the soil surface.",
+      "options": null,
+      "answer": ["FALSE"],
+      "evidence": "Arbuscular mycorrhizal fungi enter root cells and are common in maples, planes and many tropical street trees; they do not produce conspicuous mushrooms at the soil surface.",
+      "explanation": "The passage says these fungi do not produce conspicuous mushrooms, so the statement is false."
+    },
+    {
+      "idx": 11,
+      "kind": "true_false_not_given",
+      "prompt": "Do the following statement agree with the information in the passage? The Melbourne survey was carried out entirely during summer.",
+      "options": null,
+      "answer": ["NOT GIVEN"],
+      "evidence": "A survey published in 2021 of street trees in Melbourne found that fungal species richness was lowest where soil had high bulk density and low organic matter.",
+      "explanation": "The passage gives the publication year and findings of the survey, but it does not state the season in which the survey was conducted."
+    },
+    {
+      "idx": 12,
+      "kind": "multiple_choice",
+      "prompt": "According to the passage, why should commercial fungal inoculants be used cautiously?",
+      "options": [
+        "They usually prevent seedlings from growing in nursery soils.",
+        "They may increase the temperature of soil beneath asphalt.",
+        "An introduced strain may fail to establish or may compete with fungi already adapted to the site.",
+        "They make it impossible to measure soil chemistry accurately."
+      ],
+      "answer": [
+        "An introduced strain may fail to establish or may compete with fungi already adapted to the site."
+      ],
+      "evidence": "An introduced strain may fail to establish or may compete with fungi already adapted to the site.",
+      "explanation": "This sentence gives the passage’s reason for caution about introduced fungal strains."
+    },
+    {
+      "idx": 13,
+      "kind": "multiple_choice",
+      "prompt": "Why are the economic returns of mycorrhizal management difficult to calculate?",
+      "options": [
+        "Because fungal contributions are indirect and interact with irrigation, pruning and the genetics of the tree.",
+        "Because most cities refuse to record the cost of watering street trees.",
+        "Because DNA sequencing cannot identify fungi from soil fragments.",
+        "Because mature canopies have no measurable effect on public health costs."
+      ],
+      "answer": [
+        "Because fungal contributions are indirect and interact with irrigation, pruning and the genetics of the tree."
+      ],
+      "evidence": "The economic returns of mycorrhizal management are difficult to calculate, in part because fungal contributions are indirect and interact with irrigation, pruning and the genetics of the tree.",
+      "explanation": "The correct option closely follows the explanation in Paragraph F."
+    }
+  ]
+}

@@ -1,0 +1,156 @@
+{
+  "slug": "the-invention-of-clock-time",
+  "title": "The Invention of Clock Time",
+  "topic": "history of technology",
+  "difficulty": 2,
+  "headings": [
+    "Why local solar time went unquestioned",
+    "The timetable problem the railways created",
+    "Britain adopts a single railway time",
+    "Competing company clocks in North America",
+    "Reaching international agreement on a prime meridian",
+    "A change in where the authority over time resided",
+    "Legal recognition lagging behind common practice"
+  ],
+  "body": "A\nFor most of recorded history, time was a local matter. A town set its clocks by the sun: noon was the moment the sun stood highest over that particular place, and a settlement a hundred miles to the east reached that moment several minutes earlier. The discrepancy troubled almost nobody. A traveller moving by horse or on foot took days to cover a distance over which the difference amounted to a few minutes, and no institution required the two towns to agree.\n\nB\nThe railway destroyed this arrangement. A train could cross in hours a distance that had previously taken days, and it ran to a printed timetable that assumed a single shared reckoning of the hour. When each station along a line kept its own solar time, a timetable became a document that was accurate nowhere. Worse, two trains sharing a single track and relying on scheduled passing points could be separated by a margin no greater than the disagreement between their station clocks.\n\nC\nBritain, with the densest early network, moved first. The Great Western Railway instructed its stations to keep London time from 1840, and other companies followed within a decade. The practice acquired a name of its own: railway time. Adoption beyond the stations was uneven and sometimes resented, since a town asked to abandon its own noon was being asked to accept that a distant capital defined its day. Some public clocks were fitted with two minute hands for a period, one showing local time and one showing London time. By 1855 the great majority of British public clocks had nevertheless been set to Greenwich Mean Time, though the change did not become a matter of law until the Statutes (Definition of Time) Act of 1880.\n\nD\nThe problem was more severe in North America, where the continent spanned a far greater range of longitude and the railways were operated by many competing companies. Each railroad tended to keep the time of its own headquarters city, so a single station serving several lines might display several clocks, each correct for a different company. The Canadian engineer Sandford Fleming became a prominent advocate for a systematic solution, proposing that the world be divided into standard zones of one hour each. The North American railroads acted before any government did: on 18 November 1883 they adopted a scheme of standard time zones, and in the cities affected the clocks were reset at midday, producing what contemporaries called the day of two noons.\n\nE\nInternational agreement followed the next year. The International Meridian Conference, held in Washington in October 1884, resolved that the meridian passing through the observatory at Greenwich should serve as the world's prime meridian, from which longitude and a universal day would be reckoned. The choice was practical rather than symbolic: a substantial majority of the world's shipping already used charts based on Greenwich, and no rival meridian could claim comparable use. The conference did not, however, compel any country to adopt standard time internally, and national adoption continued piecemeal for decades.\n\nF\nWhat had changed was less the measurement of time than its authority. Before the railways, the sun over a town was the final arbiter of the hour, and a clock that disagreed with it was simply wrong. Afterwards the authority lay with a signal transmitted from elsewhere, and a clock was correct precisely insofar as it agreed with that signal, whatever the sun appeared to say. The modern experience of time as something received rather than observed begins here.",
+  "questions": [
+    {
+      "idx": 1,
+      "kind": "true_false_not_given",
+      "prompt": "Before the railways, differences in time between nearby towns caused serious practical problems.",
+      "options": null,
+      "answer": ["FALSE"],
+      "evidence": "The discrepancy troubled almost nobody.",
+      "explanation": "The passage states the discrepancy troubled almost nobody, which contradicts the claim."
+    },
+    {
+      "idx": 2,
+      "kind": "true_false_not_given",
+      "prompt": "Railway timetables assumed that all stations used the same reckoning of the hour.",
+      "options": null,
+      "answer": ["TRUE"],
+      "evidence": "and it ran to a printed timetable that assumed a single shared reckoning of the hour.",
+      "explanation": "Stated directly in paragraph B."
+    },
+    {
+      "idx": 3,
+      "kind": "true_false_not_given",
+      "prompt": "More people died in railway collisions caused by clock discrepancies than by any other cause.",
+      "options": null,
+      "answer": ["NOT GIVEN"],
+      "evidence": "Worse, two trains sharing a single track and relying on scheduled passing points could be separated by a margin no greater than the disagreement between their station clocks.",
+      "explanation": "The passage raises the safety risk but never compares causes of death, or gives any figures. This is not given."
+    },
+    {
+      "idx": 4,
+      "kind": "true_false_not_given",
+      "prompt": "Some British towns resisted the adoption of London time.",
+      "options": null,
+      "answer": ["TRUE"],
+      "evidence": "Adoption beyond the stations was uneven and sometimes resented, since a town asked to abandon its own noon was being asked to accept that a distant capital defined its day.",
+      "explanation": "Resentment and uneven adoption are stated in paragraph C."
+    },
+    {
+      "idx": 5,
+      "kind": "true_false_not_given",
+      "prompt": "Greenwich Mean Time became legally binding in Britain at the same time as most public clocks adopted it.",
+      "options": null,
+      "answer": ["FALSE"],
+      "evidence": "By 1855 the great majority of British public clocks had nevertheless been set to Greenwich Mean Time, though the change did not become a matter of law until the Statutes (Definition of Time) Act of 1880.",
+      "explanation": "The clocks changed by 1855; the law followed in 1880. The two were not simultaneous."
+    },
+    {
+      "idx": 6,
+      "kind": "multiple_choice",
+      "prompt": "According to the passage, why was the timekeeping problem worse in North America than in Britain?",
+      "options": [
+        "The continent covered a greater range of longitude and had many competing railway companies",
+        "North American trains travelled considerably faster",
+        "There were no observatories capable of determining accurate time",
+        "American passengers were less willing to accept printed timetables"
+      ],
+      "answer": [
+        "The continent covered a greater range of longitude and had many competing railway companies"
+      ],
+      "evidence": "The problem was more severe in North America, where the continent spanned a far greater range of longitude and the railways were operated by many competing companies.",
+      "explanation": "Paragraph D names exactly these two reasons."
+    },
+    {
+      "idx": 7,
+      "kind": "multiple_choice",
+      "prompt": "The phrase 'the day of two noons' refers to",
+      "options": [
+        "the resetting of clocks at midday when standard time zones were adopted",
+        "a proposal by Sandford Fleming that was ultimately rejected",
+        "the two minute hands fitted to some British public clocks",
+        "the decision of the International Meridian Conference"
+      ],
+      "answer": [
+        "the resetting of clocks at midday when standard time zones were adopted"
+      ],
+      "evidence": "on 18 November 1883 they adopted a scheme of standard time zones, and in the cities affected the clocks were reset at midday, producing what contemporaries called the day of two noons.",
+      "explanation": "Stated directly in paragraph D."
+    },
+    {
+      "idx": 8,
+      "kind": "multiple_choice",
+      "prompt": "Why was Greenwich chosen as the prime meridian?",
+      "options": [
+        "Most of the world's shipping already used charts based on it",
+        "Britain had the densest railway network in the world",
+        "It was the only observatory represented at the conference",
+        "Sandford Fleming had recommended it specifically"
+      ],
+      "answer": [
+        "Most of the world's shipping already used charts based on it"
+      ],
+      "evidence": "The choice was practical rather than symbolic: a substantial majority of the world's shipping already used charts based on Greenwich, and no rival meridian could claim comparable use.",
+      "explanation": "Paragraph E gives the practical reason explicitly."
+    },
+    {
+      "idx": 9,
+      "kind": "sentence_completion",
+      "prompt": "The practice of railway companies keeping a single shared time acquired the name ................ . (TWO WORDS)",
+      "options": null,
+      "answer": ["railway time"],
+      "evidence": "The practice acquired a name of its own: railway time.",
+      "explanation": "Lifted verbatim from paragraph C."
+    },
+    {
+      "idx": 10,
+      "kind": "sentence_completion",
+      "prompt": "The Great Western Railway told its stations to keep London time from the year ................ . (ONE NUMBER)",
+      "options": null,
+      "answer": ["1840"],
+      "evidence": "The Great Western Railway instructed its stations to keep London time from 1840, and other companies followed within a decade.",
+      "explanation": "Stated in paragraph C."
+    },
+    {
+      "idx": 11,
+      "kind": "sentence_completion",
+      "prompt": "During the transition, some British public clocks were fitted with two ................ . (TWO WORDS)",
+      "options": null,
+      "answer": ["minute hands"],
+      "evidence": "Some public clocks were fitted with two minute hands for a period, one showing local time and one showing London time.",
+      "explanation": "Lifted verbatim from paragraph C."
+    },
+    {
+      "idx": 12,
+      "kind": "matching_headings",
+      "prompt": "Choose the most suitable heading for paragraph F.",
+      "options": null,
+      "answer": ["A change in where the authority over time resided"],
+      "evidence": "What had changed was less the measurement of time than its authority.",
+      "explanation": "Paragraph F is explicitly about authority shifting from the sun to a transmitted signal."
+    },
+    {
+      "idx": 13,
+      "kind": "matching_headings",
+      "prompt": "Choose the most suitable heading for paragraph E.",
+      "options": null,
+      "answer": ["Reaching international agreement on a prime meridian"],
+      "evidence": "International agreement followed the next year.",
+      "explanation": "Paragraph E covers the 1884 Washington conference and the choice of Greenwich."
+    }
+  ]
+}
