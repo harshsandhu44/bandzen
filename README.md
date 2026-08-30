@@ -82,10 +82,14 @@ declarations win, so no build tooling is involved:
 @import '@bandzen/ui/globals.css';
 
 :root {
-  --primary: oklch(0.55 0.2 265);
-  --radius: 0.25rem;
+  --primary: oklch(0.45 0.11 165);
+  --radius: 0.75rem;
 }
 ```
+
+Pick values that visibly differ from the shared theme. An override that
+happens to match what `@bandzen/ui` already ships is indistinguishable from
+no override at all.
 
 Only override what differs. Everything left alone stays in sync with the
 shared system — `apps/docs` does exactly this, which is why it renders the
