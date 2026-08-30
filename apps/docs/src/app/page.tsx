@@ -18,10 +18,9 @@ export default function Home() {
         <h1 className="text-3xl font-heading">@bandzen/ui</h1>
         <p className="text-muted-foreground text-sm">
           Every component here is imported from the shared package. This app
-          overrides <code className="font-mono">--primary</code> and{' '}
-          <code className="font-mono">--radius</code> in its own{' '}
+          overrides <code className="font-mono">--primary</code> in its own{' '}
           <code className="font-mono">globals.css</code>, so it renders the same
-          components with a different theme than web.
+          components in a different theme than web.
         </p>
       </header>
 

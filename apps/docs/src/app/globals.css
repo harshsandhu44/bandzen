@@ -1,8 +1,13 @@
 @import '@bandzen/ui/globals.css';
 
 /* Docs-only token overrides. These come after the shared design system, so
-   they win — everything not listed here stays in sync with @bandzen/ui. */
+   they win — everything not listed here stays in sync with @bandzen/ui.
+   The hue is deliberately far from the Bandzen brand (cobalt, hue 264): the
+   job of this file is to make the override mechanism visible at a glance, so
+   a value that merely echoes the shared theme would prove nothing.
+   --radius is not overridden here on purpose — every component this app
+   currently renders is a Button, and base-lyra Buttons are rounded-none, so
+   the change would be invisible. */
 :root {
-  --primary: oklch(0.55 0.2 265);
-  --radius: 0.25rem;
+  --primary: oklch(0.45 0.11 165);
 }
