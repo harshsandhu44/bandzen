@@ -7,11 +7,28 @@
 @custom-variant dark (&:is(.dark *));
 
 @theme inline {
+  --color-ink: var(--ink);
+  --color-paper: var(--paper);
+  --color-cobalt: var(--cobalt);
+  --color-chrome: var(--chrome);
+  --color-slate: var(--slate);
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-sans);
-  --font-mono: var(--font-geist-mono);
-  --font-heading: var(--font-sans);
+  --font-sans: var(
+    --font-inter,
+    var(--font-geist-sans, ui-sans-serif, system-ui, sans-serif)
+  );
+  --font-mono: var(
+    --font-plex-mono,
+    var(--font-geist-mono, ui-monospace, monospace)
+  );
+  --font-heading: var(
+    --font-archivo,
+    var(
+      --font-inter,
+      var(--font-geist-sans, ui-sans-serif, system-ui, sans-serif)
+    )
+  );
   --color-sidebar-ring: var(--sidebar-ring);
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
@@ -51,72 +68,89 @@
 }
 
 :root {
-  --background: oklch(1 0 0);
-  --foreground: oklch(0.147 0.004 49.3);
-  --card: oklch(1 0 0);
-  --card-foreground: oklch(0.147 0.004 49.3);
-  --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.147 0.004 49.3);
-  --primary: oklch(0.214 0.009 43.1);
-  --primary-foreground: oklch(0.986 0.002 67.8);
-  --secondary: oklch(0.96 0.002 17.2);
-  --secondary-foreground: oklch(0.214 0.009 43.1);
-  --muted: oklch(0.96 0.002 17.2);
-  --muted-foreground: oklch(0.547 0.021 43.1);
-  --accent: oklch(0.96 0.002 17.2);
-  --accent-foreground: oklch(0.214 0.009 43.1);
-  --destructive: oklch(0.577 0.245 27.325);
-  --border: oklch(0.922 0.005 34.3);
-  --input: oklch(0.922 0.005 34.3);
-  --ring: oklch(0.714 0.014 41.2);
-  --chart-1: oklch(0.868 0.007 39.5);
-  --chart-2: oklch(0.547 0.021 43.1);
-  --chart-3: oklch(0.438 0.017 39.3);
-  --chart-4: oklch(0.367 0.016 35.7);
-  --chart-5: oklch(0.268 0.011 36.5);
-  --radius: 0.625rem;
-  --sidebar: oklch(0.986 0.002 67.8);
-  --sidebar-foreground: oklch(0.147 0.004 49.3);
-  --sidebar-primary: oklch(0.214 0.009 43.1);
-  --sidebar-primary-foreground: oklch(0.986 0.002 67.8);
-  --sidebar-accent: oklch(0.96 0.002 17.2);
-  --sidebar-accent-foreground: oklch(0.214 0.009 43.1);
-  --sidebar-border: oklch(0.922 0.005 34.3);
-  --sidebar-ring: oklch(0.714 0.014 41.2);
+  /* Bandzen brand — Cobalt & Chrome. Light-first; ink sections carry the rhythm. */
+  --ink: oklch(0.145 0.012 285);
+  --paper: oklch(1 0 0);
+  --cobalt: oklch(0.505 0.272 264);
+  --chrome: oklch(0.845 0.157 82);
+  --slate: oklch(0.5 0.025 264);
+
+  --background: var(--paper);
+  --foreground: var(--ink);
+  --card: var(--paper);
+  --card-foreground: var(--ink);
+  --popover: var(--paper);
+  --popover-foreground: var(--ink);
+  --primary: var(--cobalt);
+  --primary-foreground: oklch(0.99 0 0);
+  --secondary: oklch(0.968 0.003 264);
+  --secondary-foreground: var(--ink);
+  --muted: oklch(0.968 0.003 264);
+  --muted-foreground: var(--slate);
+  /* shadcn's `accent` is the subtle hover surface, not the brand accent.
+     The brand accent is --chrome, used deliberately and never as a hover. */
+  --accent: oklch(0.968 0.003 264);
+  --accent-foreground: var(--ink);
+  --destructive: oklch(0.505 0.216 27.3);
+  --border: oklch(0.918 0.006 264);
+  --input: oklch(0.918 0.006 264);
+  --ring: var(--cobalt);
+  --chart-1: var(--cobalt);
+  --chart-2: var(--chrome);
+  --chart-3: oklch(0.646 0.162 264);
+  --chart-4: oklch(0.769 0.093 264);
+  --chart-5: var(--slate);
+  --radius: 0.25rem;
+  --sidebar: var(--paper);
+  --sidebar-foreground: var(--ink);
+  --sidebar-primary: var(--cobalt);
+  --sidebar-primary-foreground: oklch(0.99 0 0);
+  --sidebar-accent: oklch(0.968 0.003 264);
+  --sidebar-accent-foreground: var(--ink);
+  --sidebar-border: oklch(0.918 0.006 264);
+  --sidebar-ring: var(--cobalt);
 }
 
 .dark {
-  --background: oklch(0.147 0.004 49.3);
-  --foreground: oklch(0.986 0.002 67.8);
-  --card: oklch(0.214 0.009 43.1);
-  --card-foreground: oklch(0.986 0.002 67.8);
-  --popover: oklch(0.214 0.009 43.1);
-  --popover-foreground: oklch(0.986 0.002 67.8);
-  --primary: oklch(0.922 0.005 34.3);
-  --primary-foreground: oklch(0.214 0.009 43.1);
-  --secondary: oklch(0.268 0.011 36.5);
-  --secondary-foreground: oklch(0.986 0.002 67.8);
-  --muted: oklch(0.268 0.011 36.5);
-  --muted-foreground: oklch(0.714 0.014 41.2);
-  --accent: oklch(0.268 0.011 36.5);
-  --accent-foreground: oklch(0.986 0.002 67.8);
+  /* Authored and AA-checked, but nothing sets `.dark` yet — the landing page ships
+     light-only. Wire up a theme provider when the product app needs the toggle. */
+  --ink: oklch(0.99 0 0);
+  --paper: oklch(0.145 0.012 285);
+  --cobalt: oklch(0.66 0.22 264);
+  --chrome: oklch(0.88 0.16 88);
+  --slate: oklch(0.708 0.02 264);
+
+  --background: var(--paper);
+  --foreground: var(--ink);
+  --card: oklch(0.196 0.012 285);
+  --card-foreground: var(--ink);
+  --popover: oklch(0.196 0.012 285);
+  --popover-foreground: var(--ink);
+  --primary: var(--cobalt);
+  --primary-foreground: oklch(0.145 0.012 285);
+  --secondary: oklch(0.253 0.012 285);
+  --secondary-foreground: var(--ink);
+  --muted: oklch(0.253 0.012 285);
+  --muted-foreground: var(--slate);
+  --accent: oklch(0.253 0.012 285);
+  --accent-foreground: var(--ink);
   --destructive: oklch(0.704 0.191 22.216);
   --border: oklch(1 0 0 / 10%);
   --input: oklch(1 0 0 / 15%);
-  --ring: oklch(0.547 0.021 43.1);
-  --chart-1: oklch(0.868 0.007 39.5);
-  --chart-2: oklch(0.547 0.021 43.1);
-  --chart-3: oklch(0.438 0.017 39.3);
-  --chart-4: oklch(0.367 0.016 35.7);
-  --chart-5: oklch(0.268 0.011 36.5);
-  --sidebar: oklch(0.214 0.009 43.1);
-  --sidebar-foreground: oklch(0.986 0.002 67.8);
-  --sidebar-primary: oklch(0.488 0.243 264.376);
-  --sidebar-primary-foreground: oklch(0.986 0.002 67.8);
-  --sidebar-accent: oklch(0.268 0.011 36.5);
-  --sidebar-accent-foreground: oklch(0.986 0.002 67.8);
+  --ring: var(--cobalt);
+  --chart-1: var(--cobalt);
+  --chart-2: var(--chrome);
+  --chart-3: oklch(0.646 0.162 264);
+  --chart-4: oklch(0.769 0.093 264);
+  --chart-5: var(--slate);
+  --sidebar: oklch(0.196 0.012 285);
+  --sidebar-foreground: var(--ink);
+  --sidebar-primary: var(--cobalt);
+  --sidebar-primary-foreground: oklch(0.145 0.012 285);
+  --sidebar-accent: oklch(0.253 0.012 285);
+  --sidebar-accent-foreground: var(--ink);
   --sidebar-border: oklch(1 0 0 / 10%);
-  --sidebar-ring: oklch(0.547 0.021 43.1);
+  --sidebar-ring: var(--cobalt);
 }
 
 @layer base {
