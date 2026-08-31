@@ -29,10 +29,16 @@ export async function capture(
   event: AnalyticsEvent,
   properties: Record<string, string | number | boolean | null> = {},
 ): Promise<void> {
-  const apiKey = process.env.POSTHOG_API_KEY;
+  // NEXT_PUBLIC_, even though this only ever runs on the server: a PostHog
+  // project token is public by design — it is what browser SDKs ship — so one
+  // variable serves both, and adding client-side capture later needs no second
+  // name. Next only inlines a NEXT_PUBLIC_ value where it is referenced, and
+  // nothing in the client bundle references this.
+  const apiKey = process.env.NEXT_PUBLIC_POSTHOG_PROJECT_TOKEN;
   if (!apiKey) return;
 
-  const host = process.env.POSTHOG_HOST ?? 'https://us.i.posthog.com';
+  const host =
+    process.env.NEXT_PUBLIC_POSTHOG_HOST ?? 'https://us.i.posthog.com';
 
   try {
     await fetch(`${host}/i/v0/e`, {
