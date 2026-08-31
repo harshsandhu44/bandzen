@@ -19,29 +19,16 @@ import {
 } from 'node:fs';
 import { join } from 'node:path';
 import OpenAI from 'openai';
+import {
+  generatedPassageSchema,
+  type GeneratedPassage as Passage,
+} from '../src/lib/ai/schemas.ts';
+import { parseStructured, strictJsonSchema } from '../src/lib/ai/structured.ts';
 
 const SEED_DIR = join(import.meta.dirname, '..', 'content', 'passages');
 const PROMPTS_FILE = join(import.meta.dirname, '..', 'content', 'prompts.json');
 const SQL_OUT = join(import.meta.dirname, '..', 'content', 'seed.sql');
 const MODEL = process.env.OPENAI_CONTENT_MODEL ?? 'gpt-5.5';
-
-const QUESTION_KINDS = [
-  'true_false_not_given',
-  'yes_no_not_given',
-  'multiple_choice',
-  'matching_headings',
-  'sentence_completion',
-] as const;
-
-type Question = {
-  idx: number;
-  kind: (typeof QUESTION_KINDS)[number];
-  prompt: string;
-  options: string[] | null;
-  answer: string[];
-  evidence: string;
-  explanation: string;
-};
 
 type Prompt = {
   slug: string;
@@ -49,89 +36,7 @@ type Prompt = {
   promptText: string;
 };
 
-type Passage = {
-  slug: string;
-  title: string;
-  topic: string;
-  difficulty: number;
-  body: string;
-  /** Shared list for every matching_headings question. Always longer than
-      the number of such questions, so some headings are distractors. */
-  headings: string[];
-  questions: Question[];
-};
-
-const PASSAGE_SCHEMA = {
-  type: 'object',
-  additionalProperties: false,
-  required: [
-    'slug',
-    'title',
-    'topic',
-    'difficulty',
-    'body',
-    'headings',
-    'questions',
-  ],
-  properties: {
-    slug: { type: 'string', description: 'kebab-case, unique' },
-    title: { type: 'string' },
-    topic: { type: 'string' },
-    difficulty: { type: 'integer', minimum: 1, maximum: 5 },
-    body: {
-      type: 'string',
-      description:
-        '700-900 words of academic prose, split into paragraphs each prefixed with a capital letter label and a newline, e.g. "A\\nThe first paragraph...".',
-    },
-    headings: {
-      type: 'array',
-      items: { type: 'string' },
-      description:
-        'One shared list of candidate headings covering every matching_headings question, with at least three MORE headings than there are such questions. Every heading must be a plausible summary of some part of this passage.',
-    },
-    questions: {
-      type: 'array',
-      items: {
-        type: 'object',
-        additionalProperties: false,
-        required: [
-          'idx',
-          'kind',
-          'prompt',
-          'options',
-          'answer',
-          'evidence',
-          'explanation',
-        ],
-        properties: {
-          idx: { type: 'integer' },
-          kind: { type: 'string', enum: QUESTION_KINDS as unknown as string[] },
-          prompt: { type: 'string' },
-          options: {
-            anyOf: [
-              { type: 'array', items: { type: 'string' } },
-              { type: 'null' },
-            ],
-            description:
-              'Choices for multiple_choice ONLY. Must be null for matching_headings, which draws from the passage-level headings list.',
-          },
-          answer: {
-            type: 'array',
-            items: { type: 'string' },
-            description:
-              'Accepted answers. One entry normally; more only where the passage genuinely supports a synonym.',
-          },
-          evidence: {
-            type: 'string',
-            description:
-              'The exact sentence from body that justifies the answer, verbatim.',
-          },
-          explanation: { type: 'string' },
-        },
-      },
-    },
-  },
-} as const;
+const PASSAGE_SCHEMA = strictJsonSchema(generatedPassageSchema);
 
 const SYSTEM = `You write IELTS Academic Reading practice material.
 
@@ -184,10 +89,7 @@ async function generate(count: number) {
       },
     });
 
-    const raw = response.choices[0]?.message.content;
-    if (!raw) throw new Error('Model returned no content');
-
-    const passage = JSON.parse(raw) as Passage;
+    const passage = parseStructured(response, generatedPassageSchema);
     const problems = validate(passage);
     if (problems.length) {
       console.warn(`  ⚠ ${passage.slug}: ${problems.join('; ')}`);

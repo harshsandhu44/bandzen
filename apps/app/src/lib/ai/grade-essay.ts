@@ -5,66 +5,13 @@ import {
   markGradingFailed,
   writeReport,
 } from '@/lib/db/queries';
-import type { Annotation, Criterion } from '@/lib/db/schema';
 import { openai } from './client';
 import { GRADER_MODEL } from './models';
 import { WRITING_RUBRIC } from './rubric';
+import { writingEvaluationSchema } from './schemas';
+import { parseStructured, strictJsonSchema } from './structured';
 
-const REPORT_SCHEMA = {
-  type: 'object',
-  additionalProperties: false,
-  required: ['band', 'criteria', 'annotations', 'strengths', 'weaknesses'],
-  properties: {
-    band: { type: 'number', description: 'Overall band, 0-9, whole or half.' },
-    criteria: {
-      type: 'array',
-      items: {
-        type: 'object',
-        additionalProperties: false,
-        required: ['name', 'band', 'comment'],
-        properties: {
-          name: {
-            type: 'string',
-            enum: [
-              'Task Response',
-              'Coherence and Cohesion',
-              'Lexical Resource',
-              'Grammatical Range and Accuracy',
-            ],
-          },
-          band: { type: 'number' },
-          comment: { type: 'string' },
-        },
-      },
-    },
-    annotations: {
-      type: 'array',
-      items: {
-        type: 'object',
-        additionalProperties: false,
-        required: ['quote', 'kind', 'comment'],
-        properties: {
-          quote: {
-            type: 'string',
-            description: 'Verbatim extract from the response.',
-          },
-          kind: { type: 'string', enum: ['good', 'grammar', 'development'] },
-          comment: { type: 'string' },
-        },
-      },
-    },
-    strengths: { type: 'array', items: { type: 'string' } },
-    weaknesses: { type: 'array', items: { type: 'string' } },
-  },
-} as const;
-
-type GradedReport = {
-  band: number;
-  criteria: Criterion[];
-  annotations: Annotation[];
-  strengths: string[];
-  weaknesses: string[];
-};
+const REPORT_SCHEMA = strictJsonSchema(writingEvaluationSchema);
 
 /** Half-band rounding, and never outside the scale whatever the model says. */
 const toBand = (n: number) => Math.min(9, Math.max(0, Math.round(n * 2) / 2));
@@ -104,10 +51,7 @@ export async function gradeEssay(attemptId: string) {
       },
     });
 
-    const raw = response.choices[0]?.message.content;
-    if (!raw) throw new Error('Grader returned no content');
-
-    const parsed = JSON.parse(raw) as GradedReport;
+    const parsed = parseStructured(response, writingEvaluationSchema);
 
     // Drop annotations the model did not actually lift from the essay -- a
     // quote that isn't in the text cannot be highlighted, and a fabricated
