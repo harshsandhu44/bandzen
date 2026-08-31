@@ -1,0 +1,246 @@
+import Link from 'next/link';
+import { BandScale } from '@bandzen/ui/components/band-scale';
+import { BandTrend } from '@bandzen/ui/components/band-trend';
+import { Button } from '@bandzen/ui/components/button';
+import {
+  EmptyState,
+  Metric,
+  PageHeader,
+  SectionHeader,
+} from '@/components/app/primitives';
+import {
+  LockedModule,
+  SkillStatus,
+  toSkillLevel,
+} from '@/components/app/status';
+import { requireUserId } from '@/lib/auth';
+import {
+  accuracyByQuestionKind,
+  activitySummary,
+  bandHistory,
+  getProfile,
+  listLessonProgress,
+} from '@/lib/db/queries';
+import { MODULE_LABEL, QUESTION_KIND_LABEL } from '@/lib/modules';
+import type { Skill } from '@/lib/db/schema';
+
+export const dynamic = 'force-dynamic';
+
+export const metadata = { title: 'Progress' };
+
+const DATE = new Intl.DateTimeFormat('en-GB', {
+  day: 'numeric',
+  month: 'short',
+});
+
+const mean = (a: number, b: number) => Math.round(((a + b) / 2) * 2) / 2;
+
+export default async function ProgressPage() {
+  const userId = await requireUserId();
+
+  const [profile, history, accuracy, activity, lessons] = await Promise.all([
+    getProfile(userId),
+    bandHistory(userId),
+    accuracyByQuestionKind(userId),
+    activitySummary(userId),
+    listLessonProgress(userId),
+  ]);
+
+  const points = history
+    .filter((h) => h.band != null && h.submittedAt != null)
+    .map((h) => ({
+      value: h.band!,
+      label: `${MODULE_LABEL[h.module]} ${DATE.format(h.submittedAt!)}`,
+      module: h.module,
+    }));
+
+  const byModule = (module: Skill) => points.filter((p) => p.module === module);
+  const latest = (module: Skill) => byModule(module).at(-1)?.value ?? null;
+
+  const reading = latest('reading');
+  const writing = latest('writing');
+  const overall =
+    reading != null && writing != null
+      ? mean(reading, writing)
+      : (reading ?? writing);
+
+  if (!points.length) {
+    return (
+      <div className="max-w-3xl space-y-8">
+        <PageHeader eyebrow="Progress" title="Your progression" />
+        <EmptyState
+          title="No results yet"
+          description="Progress is measured from completed attempts. Take the diagnostic and this page starts filling in."
+          action={
+            <Button
+              size="sm"
+              nativeButton={false}
+              render={<Link href="/diagnostic" />}
+            >
+              Take the diagnostic
+            </Button>
+          }
+        />
+      </div>
+    );
+  }
+
+  return (
+    <div className="max-w-3xl space-y-10">
+      <PageHeader
+        eyebrow="Progress"
+        title="Your progression"
+        description="Every figure here is measured from attempts you have completed. Nothing is projected."
+      />
+
+      <section aria-labelledby="overall-heading" className="space-y-4">
+        <SectionHeader as="h2">
+          <span id="overall-heading">Estimated Band over time</span>
+        </SectionHeader>
+
+        <div className="flex flex-wrap gap-x-10 gap-y-4">
+          <Metric
+            label="Estimated Band"
+            value={overall != null ? overall.toFixed(1) : '—'}
+            size="lg"
+            hint="An estimate produced by Bandzen, not an official IELTS score."
+          />
+          {profile?.targetBand != null ? (
+            <Metric label="Target" value={profile.targetBand.toFixed(1)} />
+          ) : null}
+        </div>
+
+        <BandTrend
+          points={points}
+          target={profile?.targetBand ?? undefined}
+          caption="All attempts, oldest first"
+        />
+      </section>
+
+      <section aria-labelledby="modules-heading" className="space-y-4">
+        <SectionHeader as="h2">
+          <span id="modules-heading">By module</span>
+        </SectionHeader>
+
+        {(['reading', 'writing'] as const).map((module) => {
+          const modulePoints = byModule(module);
+          if (!modulePoints.length) {
+            return (
+              <div
+                key={module}
+                className="flex items-baseline justify-between gap-4 border-b border-border pb-3"
+              >
+                <p className="text-sm">{MODULE_LABEL[module]}</p>
+                <p className="font-mono text-[0.625rem] tracking-[0.2em] text-muted-foreground uppercase">
+                  Not measured
+                </p>
+              </div>
+            );
+          }
+          return (
+            <div key={module} className="space-y-3">
+              <BandScale
+                value={modulePoints.at(-1)!.value}
+                target={profile?.targetBand ?? undefined}
+                label={MODULE_LABEL[module]}
+              />
+              {modulePoints.length > 1 ? (
+                <BandTrend
+                  points={modulePoints}
+                  target={profile?.targetBand ?? undefined}
+                  caption={`${MODULE_LABEL[module]} attempts`}
+                />
+              ) : null}
+            </div>
+          );
+        })}
+
+        <LockedModule module="listening" />
+        <LockedModule module="speaking" />
+      </section>
+
+      {accuracy.length ? (
+        <section aria-labelledby="matrix-heading" className="space-y-3">
+          <SectionHeader as="h2">
+            <span id="matrix-heading">Reading skill matrix</span>
+          </SectionHeader>
+
+          <table className="w-full">
+            <caption className="sr-only">
+              Accuracy by reading question type
+            </caption>
+            <thead>
+              <tr className="border-b border-border">
+                <th
+                  scope="col"
+                  className="py-2 text-left font-mono text-[0.625rem] tracking-[0.2em] text-muted-foreground uppercase"
+                >
+                  Question type
+                </th>
+                <th
+                  scope="col"
+                  className="py-2 text-right font-mono text-[0.625rem] tracking-[0.2em] text-muted-foreground uppercase"
+                >
+                  Correct
+                </th>
+                <th
+                  scope="col"
+                  className="py-2 text-right font-mono text-[0.625rem] tracking-[0.2em] text-muted-foreground uppercase"
+                >
+                  Status
+                </th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-border">
+              {[...accuracy]
+                .sort((a, b) => a.accuracy - b.accuracy)
+                .map((k) => (
+                  <tr key={k.kind}>
+                    <th
+                      scope="row"
+                      className="py-2.5 text-left text-sm font-normal"
+                    >
+                      {QUESTION_KIND_LABEL[
+                        k.kind as keyof typeof QUESTION_KIND_LABEL
+                      ] ?? k.kind}
+                    </th>
+                    <td className="py-2.5 text-right font-metric text-metric-sm">
+                      {k.correct}/{k.total}
+                    </td>
+                    <td className="py-2.5 text-right">
+                      {k.total >= 5 ? (
+                        <SkillStatus level={toSkillLevel(k.accuracy)} />
+                      ) : (
+                        <span className="font-mono text-[0.625rem] tracking-[0.2em] text-muted-foreground uppercase">
+                          Too few
+                        </span>
+                      )}
+                    </td>
+                  </tr>
+                ))}
+            </tbody>
+          </table>
+        </section>
+      ) : null}
+
+      <section aria-labelledby="activity-heading" className="space-y-3">
+        <SectionHeader as="h2">
+          <span id="activity-heading">Activity</span>
+        </SectionHeader>
+
+        <div className="grid grid-cols-2 gap-x-6 gap-y-5 sm:grid-cols-4">
+          <Metric label="Tests completed" value={activity.attempts} />
+          <Metric label="Questions attempted" value={activity.questions} />
+          <Metric label="Minutes in tests" value={activity.minutes} />
+          <Metric label="Lessons finished" value={lessons.length} />
+        </div>
+
+        <p className="max-w-prose text-xs text-muted-foreground">
+          Minutes count time spent inside timed attempts only. We do not track
+          how long you spend reading a lesson, so it is not included rather than
+          estimated.
+        </p>
+      </section>
+    </div>
+  );
+}
