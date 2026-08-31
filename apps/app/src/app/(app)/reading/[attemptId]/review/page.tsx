@@ -1,14 +1,21 @@
 import Link from 'next/link';
 import { notFound, redirect } from 'next/navigation';
-import { Check, X } from 'lucide-react';
+import { ArrowRight, Check, Repeat, X } from 'lucide-react';
 import { BandScale } from '@bandzen/ui/components/band-scale';
+import { Button } from '@bandzen/ui/components/button';
 import { cn } from '@bandzen/ui/lib/utils';
+import { SectionHeader } from '@/components/app/primitives';
 import { requireUserId } from '@/lib/auth';
 import {
+  accuracyByQuestionKind,
   getAttempt,
   getReadingReview,
   isAnswerCorrect,
 } from '@/lib/db/queries';
+import { QUESTION_KIND_LABEL } from '@/lib/modules';
+
+/** Below this, a run of wrong answers is a bad day rather than a pattern. */
+const MIN_ATTEMPTED = 5;
 
 export const metadata = { title: 'Review' };
 
@@ -24,6 +31,29 @@ export default async function ReviewPage({
 
   const data = await getReadingReview(userId, attemptId);
   if (!data) notFound();
+
+  // Accuracy across every attempt, so a mistake made here can be named as a
+  // recurring one -- or not named at all, when the history is too thin.
+  const history = await accuracyByQuestionKind(userId);
+  const byKind = new Map(history.map((k) => [k.kind, k]));
+
+  const label = (kind: string) =>
+    QUESTION_KIND_LABEL[kind as keyof typeof QUESTION_KIND_LABEL] ?? kind;
+
+  const missedKinds = [
+    ...new Set(
+      data.rows
+        .filter((q) => !isAnswerCorrect(q.answer, q.given))
+        .map((q) => q.kind),
+    ),
+  ];
+
+  const patterns = missedKinds
+    .map((kind) => ({ kind, stats: byKind.get(kind) }))
+    .filter(
+      (p) =>
+        p.stats && p.stats.total >= MIN_ATTEMPTED && p.stats.accuracy < 0.75,
+    );
 
   return (
     <div className="max-w-3xl space-y-10">
@@ -73,6 +103,10 @@ export default async function ReviewPage({
                     {q.prompt}
                   </p>
 
+                  <p className="font-mono text-[0.625rem] tracking-[0.2em] text-muted-foreground uppercase">
+                    {label(q.kind)}
+                  </p>
+
                   <p className="font-mono text-xs">
                     <span className="text-muted-foreground">Your answer </span>
                     <span className={correct ? '' : 'text-destructive'}>
@@ -95,9 +129,14 @@ export default async function ReviewPage({
                     </blockquote>
                   ) : null}
                   {!correct && q.explanation ? (
-                    <p className="text-xs leading-6 text-muted-foreground">
-                      {q.explanation}
-                    </p>
+                    <div className="space-y-1">
+                      <p className="font-mono text-[0.625rem] tracking-[0.2em] text-muted-foreground uppercase">
+                        Why
+                      </p>
+                      <p className="text-xs leading-6 text-muted-foreground">
+                        {q.explanation}
+                      </p>
+                    </div>
                   ) : null}
                 </div>
               </div>
@@ -106,12 +145,68 @@ export default async function ReviewPage({
         })}
       </ol>
 
-      <Link
-        href="/reading"
-        className="inline-block font-mono text-xs tracking-widest text-muted-foreground uppercase underline underline-offset-4 hover:text-foreground"
-      >
-        Back to passages
-      </Link>
+      {patterns.length ? (
+        <section aria-labelledby="patterns-heading" className="space-y-3">
+          <SectionHeader as="h2">
+            <span id="patterns-heading">Pattern detected</span>
+          </SectionHeader>
+
+          <ul className="space-y-3">
+            {patterns.map(({ kind, stats }) => (
+              <li
+                key={kind}
+                className="flex items-start gap-3 border-l-2 border-chrome py-3 pr-4 pl-4"
+              >
+                <Repeat
+                  className="mt-0.5 size-3.5 shrink-0 text-muted-foreground"
+                  aria-hidden
+                />
+                <div className="min-w-0 flex-1 space-y-1">
+                  <p className="text-sm">
+                    You have missed{' '}
+                    <strong className="font-medium">
+                      {stats!.total - stats!.correct} of {stats!.total}
+                    </strong>{' '}
+                    {label(kind)} questions across every attempt so far. This
+                    one was not a one-off.
+                  </p>
+                  <Link
+                    href={`/reading?kind=${kind}`}
+                    className="inline-flex items-center gap-1 font-mono text-[0.625rem] tracking-[0.2em] uppercase underline-offset-4 hover:underline"
+                  >
+                    Practise {label(kind)}
+                    <ArrowRight className="size-3" aria-hidden />
+                  </Link>
+                </div>
+              </li>
+            ))}
+          </ul>
+        </section>
+      ) : null}
+
+      <div className="flex flex-wrap items-center gap-3 border-t border-border pt-6">
+        <Button
+          nativeButton={false}
+          render={
+            <Link
+              href={
+                patterns[0] ? `/reading?kind=${patterns[0].kind}` : '/reading'
+              }
+            />
+          }
+        >
+          {patterns[0]
+            ? `Practise ${label(patterns[0].kind)}`
+            : 'Practise another passage'}
+          <ArrowRight />
+        </Button>
+        <Link
+          href="/review"
+          className="font-mono text-xs tracking-widest text-muted-foreground uppercase underline underline-offset-4 hover:text-foreground"
+        >
+          All reviews
+        </Link>
+      </div>
     </div>
   );
 }
