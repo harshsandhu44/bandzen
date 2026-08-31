@@ -58,14 +58,14 @@ export default async function ReviewPage({
   return (
     <div className="max-w-3xl space-y-10">
       <header className="space-y-4">
-        <p className="font-mono text-xs tracking-widest text-muted-foreground uppercase">
+        <p className="font-mono text-[0.6875rem] tracking-[0.18em] text-muted-foreground uppercase">
           Review · {data.passage.title}
         </p>
         <div className="flex items-baseline gap-4">
           <span className="font-metric text-metric-lg">
             {attempt.band?.toFixed(1)}
           </span>
-          <span className="font-mono text-xs tracking-widest text-muted-foreground uppercase">
+          <span className="font-mono text-[0.6875rem] tracking-[0.18em] text-muted-foreground uppercase">
             {attempt.rawScore}/{attempt.total} correct · estimate, not an
             official score
           </span>
@@ -103,7 +103,7 @@ export default async function ReviewPage({
                     {q.prompt}
                   </p>
 
-                  <p className="font-mono text-[0.625rem] tracking-[0.2em] text-muted-foreground uppercase">
+                  <p className="font-mono text-[0.6875rem] tracking-[0.18em] text-muted-foreground uppercase">
                     {label(q.kind)}
                   </p>
 
@@ -130,7 +130,7 @@ export default async function ReviewPage({
                   ) : null}
                   {!correct && q.explanation ? (
                     <div className="space-y-1">
-                      <p className="font-mono text-[0.625rem] tracking-[0.2em] text-muted-foreground uppercase">
+                      <p className="font-mono text-[0.6875rem] tracking-[0.18em] text-muted-foreground uppercase">
                         Why
                       </p>
                       <p className="text-xs leading-6 text-muted-foreground">
@@ -172,7 +172,7 @@ export default async function ReviewPage({
                   </p>
                   <Link
                     href={`/reading?kind=${kind}`}
-                    className="inline-flex items-center gap-1 font-mono text-[0.625rem] tracking-[0.2em] uppercase underline-offset-4 hover:underline"
+                    className="inline-flex items-center gap-1 text-xs underline-offset-4 hover:underline"
                   >
                     Practise {label(kind)}
                     <ArrowRight className="size-3" aria-hidden />
@@ -201,8 +201,8 @@ export default async function ReviewPage({
           <ArrowRight />
         </Button>
         <Link
-          href="/review"
-          className="font-mono text-xs tracking-widest text-muted-foreground uppercase underline underline-offset-4 hover:text-foreground"
+          href="/progress"
+          className="font-mono text-[0.6875rem] tracking-[0.18em] text-muted-foreground uppercase underline underline-offset-4 hover:text-foreground"
         >
           All reviews
         </Link>

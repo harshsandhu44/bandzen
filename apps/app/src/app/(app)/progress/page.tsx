@@ -1,9 +1,11 @@
 import Link from 'next/link';
+import { ArrowRight } from 'lucide-react';
 import { BandScale } from '@bandzen/ui/components/band-scale';
 import { BandTrend } from '@bandzen/ui/components/band-trend';
 import { Button } from '@bandzen/ui/components/button';
 import {
   EmptyState,
+  Eyebrow,
   Metric,
   PageHeader,
   SectionHeader,
@@ -19,9 +21,11 @@ import {
   activitySummary,
   bandHistory,
   getProfile,
+  listCompletedAttempts,
   listLessonProgress,
 } from '@/lib/db/queries';
 import { MODULE_LABEL, QUESTION_KIND_LABEL } from '@/lib/modules';
+import { meanBand } from '@/lib/plan-data';
 import type { Skill } from '@/lib/db/schema';
 
 export const dynamic = 'force-dynamic';
@@ -33,18 +37,26 @@ const DATE = new Intl.DateTimeFormat('en-GB', {
   month: 'short',
 });
 
-const mean = (a: number, b: number) => Math.round(((a + b) / 2) * 2) / 2;
+/** Below this an accuracy rate is noise, not a pattern. */
+const MIN_ATTEMPTED = 5;
 
 export default async function ProgressPage() {
   const userId = await requireUserId();
 
-  const [profile, history, accuracy, activity, lessons] = await Promise.all([
-    getProfile(userId),
-    bandHistory(userId),
-    accuracyByQuestionKind(userId),
-    activitySummary(userId),
-    listLessonProgress(userId),
-  ]);
+  const [profile, history, accuracy, activity, lessons, attempts] =
+    await Promise.all([
+      getProfile(userId),
+      bandHistory(userId),
+      accuracyByQuestionKind(userId),
+      activitySummary(userId),
+      listLessonProgress(userId),
+      listCompletedAttempts(userId, 50),
+    ]);
+
+  // Below MIN_ATTEMPTED a rate is noise, so it cannot name a pattern.
+  const ranked = accuracy
+    .filter((k) => k.total >= MIN_ATTEMPTED)
+    .sort((a, b) => a.accuracy - b.accuracy);
 
   const points = history
     .filter((h) => h.band != null && h.submittedAt != null)
@@ -61,12 +73,12 @@ export default async function ProgressPage() {
   const writing = latest('writing');
   const overall =
     reading != null && writing != null
-      ? mean(reading, writing)
+      ? meanBand(reading, writing)
       : (reading ?? writing);
 
   if (!points.length) {
     return (
-      <div className="max-w-3xl space-y-8">
+      <div className="max-w-5xl space-y-8">
         <PageHeader eyebrow="Progress" title="Your progression" />
         <EmptyState
           title="No results yet"
@@ -86,7 +98,7 @@ export default async function ProgressPage() {
   }
 
   return (
-    <div className="max-w-3xl space-y-10">
+    <div className="max-w-5xl space-y-10">
       <PageHeader
         eyebrow="Progress"
         title="Your progression"
@@ -131,9 +143,7 @@ export default async function ProgressPage() {
                 className="flex items-baseline justify-between gap-4 border-b border-border pb-3"
               >
                 <p className="text-sm">{MODULE_LABEL[module]}</p>
-                <p className="font-mono text-[0.625rem] tracking-[0.2em] text-muted-foreground uppercase">
-                  Not measured
-                </p>
+                <Eyebrow>Not measured</Eyebrow>
               </div>
             );
           }
@@ -171,23 +181,14 @@ export default async function ProgressPage() {
             </caption>
             <thead>
               <tr className="border-b border-border">
-                <th
-                  scope="col"
-                  className="py-2 text-left font-mono text-[0.625rem] tracking-[0.2em] text-muted-foreground uppercase"
-                >
-                  Question type
+                <th scope="col" className="py-2 text-left">
+                  <Eyebrow as="span">Question type</Eyebrow>
                 </th>
-                <th
-                  scope="col"
-                  className="py-2 text-right font-mono text-[0.625rem] tracking-[0.2em] text-muted-foreground uppercase"
-                >
-                  Correct
+                <th scope="col" className="py-2 text-right">
+                  <Eyebrow as="span">Correct</Eyebrow>
                 </th>
-                <th
-                  scope="col"
-                  className="py-2 text-right font-mono text-[0.625rem] tracking-[0.2em] text-muted-foreground uppercase"
-                >
-                  Status
+                <th scope="col" className="py-2 text-right">
+                  <Eyebrow as="span">Status</Eyebrow>
                 </th>
               </tr>
             </thead>
@@ -208,12 +209,10 @@ export default async function ProgressPage() {
                       {k.correct}/{k.total}
                     </td>
                     <td className="py-2.5 text-right">
-                      {k.total >= 5 ? (
+                      {k.total >= MIN_ATTEMPTED ? (
                         <SkillStatus level={toSkillLevel(k.accuracy)} />
                       ) : (
-                        <span className="font-mono text-[0.625rem] tracking-[0.2em] text-muted-foreground uppercase">
-                          Too few
-                        </span>
+                        <Eyebrow as="span">Too few</Eyebrow>
                       )}
                     </td>
                   </tr>
@@ -222,6 +221,97 @@ export default async function ProgressPage() {
           </table>
         </section>
       ) : null}
+
+      {ranked.length ? (
+        <section aria-labelledby="patterns-heading" className="space-y-3">
+          <SectionHeader as="h2">
+            <span id="patterns-heading">Patterns across your attempts</span>
+          </SectionHeader>
+          <ul className="divide-y divide-border border-y border-border">
+            {ranked.map((k) => {
+              const label =
+                QUESTION_KIND_LABEL[
+                  k.kind as keyof typeof QUESTION_KIND_LABEL
+                ] ?? k.kind;
+              return (
+                <li
+                  key={k.kind}
+                  className="flex items-center justify-between gap-4 py-3"
+                >
+                  <div className="min-w-0">
+                    <p className="text-sm">{label}</p>
+                    <p className="text-xs text-muted-foreground tabular-nums">
+                      {k.total - k.correct} wrong of {k.total} attempted
+                    </p>
+                  </div>
+                  <span className="flex shrink-0 items-center gap-4">
+                    <SkillStatus level={toSkillLevel(k.accuracy)} />
+                    <Link
+                      href={`/reading?kind=${k.kind}`}
+                      className="text-xs underline-offset-4 hover:underline"
+                    >
+                      Practise
+                    </Link>
+                  </span>
+                </li>
+              );
+            })}
+          </ul>
+        </section>
+      ) : null}
+
+      <section aria-labelledby="attempts-heading" className="space-y-3">
+        <SectionHeader as="h2">
+          <span id="attempts-heading">Marked attempts</span>
+        </SectionHeader>
+
+        {attempts.length ? (
+          <ul className="divide-y divide-border border-y border-border">
+            {attempts.map((a) => (
+              <li
+                key={a.id}
+                className="flex items-center justify-between gap-4 py-3"
+              >
+                <div>
+                  <p className="text-sm">
+                    {MODULE_LABEL[a.module]}
+                    {a.kind !== 'practice' ? ` · ${a.kind}` : ''}
+                  </p>
+                  <p className="text-xs text-muted-foreground tabular-nums">
+                    {a.submittedAt ? DATE.format(a.submittedAt) : ''}
+                  </p>
+                </div>
+                <span className="flex items-center gap-5">
+                  <span className="font-metric text-metric-sm">
+                    {a.band?.toFixed(1) ?? '—'}
+                  </span>
+                  <Link
+                    href={`/review/${a.id}`}
+                    className="inline-flex items-center gap-1 text-xs underline-offset-4 hover:underline"
+                  >
+                    Review
+                    <ArrowRight className="size-3" aria-hidden />
+                  </Link>
+                </span>
+              </li>
+            ))}
+          </ul>
+        ) : (
+          <EmptyState
+            title="Nothing to review yet"
+            description="Your reviewed mistakes will appear here once you have finished a test."
+            action={
+              <Button
+                size="sm"
+                nativeButton={false}
+                render={<Link href="/diagnostic" />}
+              >
+                Start the diagnostic
+              </Button>
+            }
+          />
+        )}
+      </section>
 
       <section aria-labelledby="activity-heading" className="space-y-3">
         <SectionHeader as="h2">
