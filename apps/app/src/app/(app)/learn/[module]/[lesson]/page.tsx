@@ -47,18 +47,16 @@ export default async function LessonPage({
       <header className="space-y-3">
         <Link
           href={`/learn/${lesson.module}`}
-          className="inline-flex items-center gap-1.5 font-mono text-xs tracking-widest text-muted-foreground uppercase underline-offset-4 hover:underline"
+          className="inline-flex items-center gap-1.5 text-xs underline-offset-4 hover:underline"
         >
           <ArrowLeft className="size-3" aria-hidden />
           {MODULE_LABEL[lesson.module]}
         </Link>
-        <h1 className="text-2xl font-medium tracking-tight text-balance">
-          {lesson.title}
-        </h1>
+        <h1 className="font-title text-title-lg">{lesson.title}</h1>
         <p className="max-w-prose text-sm text-muted-foreground text-pretty">
           {lesson.summary}
         </p>
-        <p className="font-mono text-[0.625rem] tracking-[0.2em] text-muted-foreground uppercase tabular-nums">
+        <p className="font-mono text-[0.6875rem] tracking-[0.18em] text-muted-foreground uppercase tabular-nums">
           {lesson.minutes} min
           {lesson.questionKind
             ? ` · ${QUESTION_KIND_LABEL[lesson.questionKind]}`
@@ -72,9 +70,7 @@ export default async function LessonPage({
             <span className="font-mono text-xs text-muted-foreground tabular-nums">
               {String(i + 1).padStart(2, '0')}
             </span>
-            <SectionHeader as="h2" className="[&]:text-foreground">
-              {STAGE_TITLE[stage.id]}
-            </SectionHeader>
+            <SectionHeader as="h2">{STAGE_TITLE[stage.id]}</SectionHeader>
           </div>
 
           <div className="space-y-4">
@@ -114,7 +110,7 @@ export default async function LessonPage({
         {next ? (
           <Link
             href={`/learn/${lesson.module}/${next.id}`}
-            className="inline-flex items-center gap-1.5 font-mono text-xs tracking-widest uppercase underline-offset-4 hover:underline"
+            className="inline-flex items-center gap-1.5 text-xs underline-offset-4 hover:underline"
           >
             {next.title}
             <ArrowRight className="size-3" aria-hidden />

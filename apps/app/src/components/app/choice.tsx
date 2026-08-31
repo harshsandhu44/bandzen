@@ -31,7 +31,7 @@ export function ChoiceGroup({
 }) {
   return (
     <fieldset className="space-y-2">
-      <legend className="font-mono text-xs tracking-widest text-muted-foreground uppercase">
+      <legend className="font-mono text-[0.6875rem] tracking-[0.18em] text-muted-foreground uppercase">
         {legend}
       </legend>
       {description ? (

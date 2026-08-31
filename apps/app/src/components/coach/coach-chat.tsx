@@ -115,7 +115,7 @@ export function CoachChat({ prompts }: { prompts: readonly string[] }) {
                 message.role === 'user' && 'border-l-2 border-primary pl-4',
               )}
             >
-              <p className="font-mono text-[0.625rem] tracking-[0.2em] text-muted-foreground uppercase">
+              <p className="font-mono text-[0.6875rem] tracking-[0.18em] text-muted-foreground uppercase">
                 {message.role === 'user' ? 'You' : 'Bandzen Coach'}
               </p>
               {message.content ? (

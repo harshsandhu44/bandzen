@@ -84,7 +84,7 @@ export function SettingsForm(props: Props) {
 
       <div className="space-y-2">
         <Label htmlFor="testDate">
-          <span className="font-mono text-xs tracking-widest text-muted-foreground uppercase">
+          <span className="font-mono text-[0.6875rem] tracking-[0.18em] text-muted-foreground uppercase">
             Exam date
           </span>
         </Label>
