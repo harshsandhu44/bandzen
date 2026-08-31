@@ -11,7 +11,7 @@ export default function AppNotFound() {
       <p className="text-sm text-muted-foreground">
         This page does not exist, or it belongs to a different account.
       </p>
-      <Button nativeButton={false} render={<Link href="/dashboard" />}>
+      <Button nativeButton={false} render={<Link href="/" />}>
         Back to your dashboard
       </Button>
     </div>

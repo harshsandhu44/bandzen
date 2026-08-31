@@ -11,7 +11,7 @@ export default async function OnboardingPage() {
   const profile = await getProfile(userId);
 
   // Finished already? Nothing here to do. Settings is where this gets edited.
-  if (profile?.onboardingCompletedAt) redirect('/dashboard');
+  if (profile?.onboardingCompletedAt) redirect('/');
 
   return (
     <div className="max-w-2xl space-y-8">
