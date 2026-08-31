@@ -23,6 +23,11 @@ point at the product app through `NEXT_PUBLIC_APP_URL`.
 one candidate's data away from another's. Read
 [`apps/app/README.md`](apps/app/README.md) before touching it.
 
+Pricing tiers, the access limits behind them, and the Razorpay build are
+specified in [`PRICING.md`](PRICING.md). It sits at the root because it spans
+both deployments — the tier copy lives in `apps/web`, everything it gates
+lives in `apps/app`.
+
 ## Commands
 
 Run everything from the repo root — Turborepo fans each task out across
