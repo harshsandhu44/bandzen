@@ -24,29 +24,61 @@ implied otherwise would be a lie to someone paying for practice.
 4. `pnpm db:migrate` to create the schema.
 5. `pnpm content:generate` → review the JSON in `content/passages/` by hand →
    `pnpm content:sql` → `pnpm db:seed`.
-6. `pnpm dev` from the repo root.
+6. In Razorpay: create four plans (founding and standard × monthly and
+   quarterly — a plan's amount is fixed at creation, so a price change is a new
+   plan), then add a webhook pointing at `/api/razorpay` subscribed to
+   `subscription.activated`, `.charged`, `.pending`, `.halted`, `.cancelled`
+   and `.completed`. Put the ids and both secrets in `.env.local`.
+7. `pnpm dev` from the repo root.
 
-| Command                 | What it does                                   |
-| ----------------------- | ---------------------------------------------- |
-| `pnpm db:generate`      | Write a migration from schema changes          |
-| `pnpm db:migrate`       | Apply pending migrations                       |
-| `pnpm db:push`          | Push schema without a migration (local only)   |
-| `pnpm db:studio`        | Browse the database                            |
-| `pnpm db:seed`          | Load `content/seed.sql`                        |
-| `pnpm content:generate` | Generate reviewable passage JSON (costs money) |
-| `pnpm content:sql`      | Build `content/seed.sql` from that JSON        |
-| `pnpm test`             | Grading, study plan, insight, model output     |
+| Command                  | What it does                                      |
+| ------------------------ | ------------------------------------------------- |
+| `pnpm db:generate`       | Write a migration from schema changes             |
+| `pnpm db:migrate`        | Apply pending migrations                          |
+| `pnpm db:push`           | Push schema without a migration (local only)      |
+| `pnpm db:studio`         | Browse the database                               |
+| `pnpm db:seed`           | Load `content/seed.sql`                           |
+| `pnpm db:grant-founding` | Comp the beta cohort 90 days (dry run; `--apply`) |
+| `pnpm content:generate`  | Generate reviewable passage JSON (costs money)    |
+| `pnpm content:sql`       | Build `content/seed.sql` from that JSON           |
+| `pnpm test`              | Grading, study plan, insight, entitlements        |
 
 ## Access model
 
-Closed beta, so there is no billing and no quota logic — the Clerk invite list
-is the cap.
+Clerk's invite list is still the gate on who can sign up. What they get once in
+is decided by `subscriptions`: **`isPro` is `current_period_end > now()`**, one
+date comparison, and everything falls out of it. A cancellation keeps the period
+already paid for because cancelling does not move the date; a failed renewal
+simply never extends it, so Razorpay's retry window is a grace period at no
+cost; and a comped account — the founding cohort, a new candidate's seven-day
+trial — is a row with a future date and no Razorpay id, needing no special case
+anywhere. Razorpay's `status` is stored but never consulted for access; it is
+there to render a banner.
+
+Free is metered on the two things that cost money to serve: **2 marked essays
+and 10 Coach messages per rolling seven days**, plus one diagnostic. Reading,
+lessons and resources are unlimited, because `grading.ts` is pure and marking a
+reading attempt costs nothing — capping it would throttle the habit that
+produces a paying candidate.
+
+The rules live in `src/lib/entitlements.ts`, pure and tested like the engines.
+The enforcement lives in exactly three places, beside `requireUserId()`:
+`startWritingAttempt`, `startDiagnostic`, and `POST /api/coach`. A disabled
+button is decoration. **Never gate autosave** — a quota check that throws in
+`saveEssay` makes `useAutosave` burn its retries and show `Not saved`, which is
+the bug that hook exists to have fixed — and never gate `submitEssay`: an
+attempt that exists is always graded, because the mark was charged when it was
+created.
+
+See [`PRICING.md`](../../PRICING.md) for why each of those numbers is what it
+is.
 
 `src/proxy.ts` hydrates the session and deliberately does **not** gate routes.
 Clerk dropped `createRouteMatcher` because middleware protection relies on path
 matching, which can diverge from how Next actually routes a request and leave a
 protected resource reachable. So the gate is at each resource instead: every
-page calls `requireUserId()`, and `/api/coach` calls `auth()`.
+page calls `requireUserId()`, `/api/coach` calls `auth()`, and `/api/razorpay`
+verifies an HMAC because its caller is Razorpay rather than a person.
 
 `(app)/layout.tsx` calls `requireUserId()` too, but that is a data read — it
 needs the profile for the target and countdown in the sidebar — not a second
@@ -96,6 +128,15 @@ So before adding `skill_progress`, `band_history` or `study_plan_tasks`: the
 figure you want is almost certainly a query away, and the table would be a
 second source of truth that goes stale silently. Add one only when a candidate
 records something the attempts genuinely do not capture.
+
+Two tables clear that bar, and it is worth saying why:
+
+- **`subscriptions`** mirrors state that belongs to Razorpay. There is no
+  attempt behind it and nothing to derive it from.
+- **`coach_messages`** exists because the chat is not persisted — an essay
+  leaves an `attempts` row behind, a Coach message left nothing to count. It
+  stores a user id and a timestamp and deliberately not the text, because the
+  only question ever asked of it is how many in the last seven days.
 
 The engines live in pure, tested modules for the same reason — `grading.ts`,
 `study-plan.ts` and `insight.ts` take their inputs as arguments and touch no
@@ -185,12 +226,25 @@ the exam screens are full-bleed `lg:h-svh` surfaces with their own
 offset or forces their pane height to be coupled to the shell's. Desktop
 toggling is the rail at the sidebar's edge, or Cmd/Ctrl+B.
 
-## Server actions, and the one route handler
+## Server actions, and the two route handlers
 
 Every write and almost every read is a server action called from a server
-component. There is exactly one route handler in the app, `POST /api/coach`,
-and it exists because streaming genuinely needs it — a server action resolves
-to a value, so a chat built on one sits silent and then appears all at once.
+component. There are exactly two route handlers, and each is a specific
+exception rather than a precedent:
+
+- **`POST /api/coach`**, because streaming genuinely needs one — a server action
+  resolves to a value, so a chat built on one sits silent and then appears all
+  at once.
+- **`POST /api/razorpay`**, because the caller is Razorpay rather than a
+  signed-in person. There is no session to read, and the webhook signature is
+  over the raw request body, which a server action never receives. It
+  authenticates by HMAC and resolves the user from `notes.userId` — a value we
+  set ourselves when the subscription was created, never one the payload is
+  trusted to assert.
+
+Checkout deliberately did **not** add a third. Razorpay's subscription API has
+no `callback_url`, so the payment happens in Checkout's modal and its `handler`
+passes the result to a server action.
 
 It is not a precedent. It authenticates itself with `auth()` like every page
 does, and it assembles what the model is told about the candidate server-side

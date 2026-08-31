@@ -37,19 +37,22 @@ months, so it would exist only to make the middle option look cheap.
 `apps/web/src/content/sections.ts` currently prices in `$` with a placeholder
 badge. Both go when payments flip on.
 
-### Checkout, and why there is no client-side checkout
+### Checkout, and the decision that did not survive the API
 
-A server action creates the subscription with `notes: { userId }` and redirects
-to `subscription.short_url`. Razorpay hosts the payment page.
+The plan was a hosted payment link and no client JavaScript. It does not work:
+`POST /v1/subscriptions` accepts only `plan_id`, `total_count`, `quantity`,
+`start_at`, `expire_by`, `customer_notify`, `addons`, `offer_id` and `notes` —
+there is **no `callback_url`**. A hosted `short_url` therefore cannot return
+anyone here with a signature; they finish on Razorpay's own success page.
 
-This app is server components almost end to end, and `checkout.js` would be the
-first significant client bundle in it — a script tag, a client component and a
-handler callback whose success still cannot be trusted until the webhook lands.
-The hosted page also fails in fewer in-app browsers, and because attribution
-rides in `notes.userId`, it never depends on the browser coming back.
+So checkout is Checkout.js with `subscription_id`, and its `handler` callback
+hands the three returned ids to a **server action** rather than to a
+`callback_url`. That is what keeps the Razorpay webhook the only new route
+handler. The cost is one client component and a CDN script tag, loaded on first
+press rather than on page load.
 
-If drop-off between "checkout started" and `subscription.activated` turns out to
-be real, the modal is the fix. Measure before building it.
+Attribution still rides in `notes: { userId }`, so it never depends on the
+browser coming back.
 
 ### Activation happens twice, on purpose
 
@@ -151,8 +154,19 @@ sits behind the fade.
 
 ### The rolling window
 
-Seven days, rolling — `submitted_at > now() - interval '7 days'`. No reset job,
-no stored anchor, one `COUNT` per check.
+Seven days, rolling — one query per check, no reset job, no stored anchor:
+
+```
+module = 'writing' AND kind <> 'diagnostic' AND status <> 'failed'
+AND started_at > now() - interval '7 days'
+```
+
+**Started, not submitted.** The mark is charged when the attempt is created, so
+counting completions would let someone open unlimited attempts before any of
+them finished — and every one of those still costs a grading call. `failed` is
+excluded because a model or infrastructure failure is ours, not theirs, and a
+diagnostic's writing half is excluded because the first diagnostic is free and
+off-quota.
 
 Rolling was chosen over a calendar month because a user who exhausts a monthly
 allowance on the 3rd has twenty-seven dead days, which is long enough to forget
