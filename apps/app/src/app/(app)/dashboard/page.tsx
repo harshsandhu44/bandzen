@@ -1,43 +1,33 @@
 import Link from 'next/link';
 import { redirect } from 'next/navigation';
 import { currentUser } from '@clerk/nextjs/server';
-import { Button } from '@bandzen/ui/components/button';
-import { EmptyState, SectionHeader } from '@/components/app/primitives';
+import { SectionHeader } from '@/components/app/primitives';
 import { BandOverview } from '@/components/dashboard/band-overview';
+import { ComingUp } from '@/components/dashboard/coming-up';
 import { ContinuePlan } from '@/components/dashboard/continue-plan';
-import { DashboardHeader } from '@/components/dashboard/dashboard-header';
+import {
+  DashboardHeader,
+  GreetingRow,
+} from '@/components/dashboard/dashboard-header';
+import { FirstRun } from '@/components/dashboard/first-run';
 import { PerformanceInsight } from '@/components/dashboard/performance-insight';
 import { TodaysPlan } from '@/components/dashboard/todays-plan';
-import { LESSON_FOR_KIND } from '@/content/lessons';
 import { requireUserId } from '@/lib/auth';
-import { dayBounds, daysUntil, todayIso } from '@/lib/dates';
-import {
-  accuracyByQuestionKind,
-  attemptsSubmittedOn,
-  getProfile,
-  latestBand,
-  latestReport,
-  listCompletedAttempts,
-  listLessonProgress,
-  listPassages,
-  listWritingPrompts,
-} from '@/lib/db/queries';
+import { daysUntil, todayIso } from '@/lib/dates';
+import { getProfile, listCompletedAttempts } from '@/lib/db/queries';
+import { MODULE_LABEL } from '@/lib/modules';
 import { buildInsight } from '@/lib/insight';
-import {
-  buildPlan,
-  derivePlanState,
-  nextAction,
-  tasksOn,
-} from '@/lib/study-plan';
+import { loadPlanData } from '@/lib/plan-data';
+import { nextAction } from '@/lib/study-plan';
 
-export const metadata = { title: 'Dashboard' };
-
-const mean = (a: number, b: number) => Math.round(((a + b) / 2) * 2) / 2;
+export const metadata = { title: 'Today' };
 
 /**
- * The dashboard. A fetch-and-compose shell: every decision it makes is either
- * a pure function from `lib/` or a component below it, so this file stays
- * readable as the page grows.
+ * Today. The app's home, and since /plan folded in here, the whole plan too.
+ *
+ * A fetch-and-compose shell: every decision it makes is either a pure function
+ * from `lib/` or a component below it, so this file stays readable as the page
+ * grows.
  */
 export default async function DashboardPage() {
   const userId = await requireUserId();
@@ -48,125 +38,69 @@ export default async function DashboardPage() {
   if (!profile?.onboardingCompletedAt) redirect('/onboarding');
 
   const today = todayIso(profile.timezone);
-  const { start, end } = dayBounds(today, profile.timezone);
 
-  const [
-    user,
-    attempts,
-    readingBand,
-    writingBand,
-    report,
-    kindAccuracy,
-    doneToday,
-    lessons,
-    passages,
-    prompts,
-  ] = await Promise.all([
+  const [user, attempts, data] = await Promise.all([
     currentUser(),
     listCompletedAttempts(userId, 8),
-    latestBand(userId, 'reading'),
-    latestBand(userId, 'writing'),
-    latestReport(userId),
-    accuracyByQuestionKind(userId),
-    attemptsSubmittedOn(userId, start, end),
-    listLessonProgress(userId),
-    listPassages(),
-    listWritingPrompts(),
+    loadPlanData(userId, profile, today),
   ]);
 
-  const estimated =
-    readingBand != null && writingBand != null
-      ? mean(readingBand, writingBand)
-      : (readingBand ?? writingBand);
+  const {
+    planInput,
+    plan,
+    progress,
+    estimated,
+    measured,
+    report,
+    kindAccuracy,
+  } = data;
 
-  const planInput = {
-    readingBand,
-    writingBand,
-    targetBand: profile.targetBand,
-    testDate: profile.testDate,
-    weaknesses: report?.weaknesses ?? undefined,
-    weakKinds: [...kindAccuracy]
-      .sort((a, b) => a.accuracy - b.accuracy)
-      .map((k) => k.kind),
-    catalogue: {
-      passageIds: passages.map((p) => p.id),
-      promptIds: prompts.map((p) => p.id),
-      lessonForKind: LESSON_FOR_KIND,
-      completedLessonIds: lessons.map((l) => l.lessonId),
-    },
-  };
-
-  const plan = buildPlan(planInput);
-  const progress = derivePlanState(
-    tasksOn(plan, today),
-    {
-      modulesCompletedToday: doneToday.map((a) => a.module),
-      completedLessonIds: lessons.map((l) => l.lessonId),
-    },
-    profile.studyMinutes,
-  );
-
+  const days = profile.testDate ? daysUntil(profile.testDate, today) : null;
   const next = progress.tasks.find((t) => t.status !== 'completed');
-  const measured = readingBand != null || writingBand != null;
+
+  // Nothing measured means nothing to analyse. Showing the analytics anyway is
+  // how this page became a stack of empty states.
+  if (!measured) {
+    return (
+      <div className="max-w-5xl space-y-10">
+        <GreetingRow
+          firstName={user?.firstName ?? null}
+          timezone={profile.timezone}
+        />
+        <FirstRun profile={profile} daysUntilTest={days} />
+      </div>
+    );
+  }
 
   const insight = buildInsight({
-    readingBand,
-    writingBand,
+    readingBand: data.readingBand,
+    writingBand: data.writingBand,
     criteria: report?.criteria ?? null,
     kindAccuracy,
   });
 
   return (
-    <div className="max-w-3xl space-y-10">
+    <div className="max-w-5xl space-y-10">
       <DashboardHeader
         firstName={user?.firstName ?? null}
         timezone={profile.timezone}
         estimated={estimated}
         target={profile.targetBand}
-        daysUntilTest={
-          profile.testDate ? daysUntil(profile.testDate, today) : null
-        }
+        daysUntilTest={days}
       />
-
-      {!measured ? (
-        <EmptyState
-          title="Nothing measured yet"
-          description="A diagnostic takes one reading passage and one essay. It is what turns the plan below from a default into yours."
-          action={
-            <Button
-              size="lg"
-              nativeButton={false}
-              render={<Link href="/diagnostic" />}
-            >
-              Take the diagnostic
-            </Button>
-          }
-        />
-      ) : null}
 
       {next ? <ContinuePlan task={next} /> : null}
 
-      {/* nextAction's no-estimate line repeats the empty state above it word
-          for word, so it only earns its place once something is measured. */}
-      {measured ? <p className="text-sm">{nextAction(planInput)}</p> : null}
+      <p className="text-sm">{nextAction(planInput)}</p>
 
-      {progress.tasks.length ? (
-        <TodaysPlan progress={progress} />
-      ) : (
-        <EmptyState
-          title="No tasks scheduled today"
-          description={
-            profile.testDate
-              ? 'Your exam date has passed. Update it in Settings to start a new plan.'
-              : 'Add a target band in Settings to generate a plan.'
-          }
-        />
-      )}
+      {progress.tasks.length ? <TodaysPlan progress={progress} /> : null}
+
+      <ComingUp plan={plan} today={today} />
 
       <PerformanceInsight insight={insight} />
 
       <BandOverview
-        bands={{ reading: readingBand, writing: writingBand }}
+        bands={{ reading: data.readingBand, writing: data.writingBand }}
         target={profile.targetBand}
       />
 
@@ -185,9 +119,9 @@ export default async function DashboardPage() {
                       ? `/reading/${a.id}/review`
                       : `/writing/${a.id}/report`
                   }
-                  className="font-mono text-xs tracking-widest uppercase underline-offset-4 hover:underline"
+                  className="text-sm underline-offset-4 hover:underline"
                 >
-                  {a.module}
+                  {MODULE_LABEL[a.module]}
                   {a.kind === 'diagnostic' ? ' · diagnostic' : ''}
                 </Link>
                 <span className="font-metric text-metric-sm">
