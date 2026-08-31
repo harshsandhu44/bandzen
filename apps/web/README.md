@@ -1,9 +1,19 @@
 # web
 
-Next.js 16 (App Router, React 19, React Compiler, Tailwind v4).
+The marketing site. Next.js 16 (App Router, React 19, React Compiler,
+Tailwind v4), deployed separately from the product app on the apex domain.
 
 Run it from the repo root — `pnpm dev` starts this app on
 http://localhost:3000. `pnpm --filter web <script>` targets it directly.
+
+Every call to action points at `apps/app` through `NEXT_PUBLIC_APP_URL`
+(`/signup`, `/diagnostic`, `/sign-in`), so the two deployments stay
+independent. Copy lives in `src/content/sections.ts`, which carries its own
+honesty rules — anything not yet real is marked `placeholder: true`, and the
+IELTS non-affiliation disclaimer sits there too.
+
+Note the site advertises all four modules. `apps/app` only has engines for
+Reading and Writing, and shows honest locked states for the other two.
 
 | Script      |                                                      |
 | ----------- | ---------------------------------------------------- |

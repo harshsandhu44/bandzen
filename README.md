@@ -6,26 +6,40 @@ pnpm workspaces + Turborepo monorepo.
 
 ```
 apps/
-  web/                 Next.js 16 app (port 3000)
+  web/                 marketing site (port 3000)
   docs/                @bandzen/ui reference + integration test (port 3001)
+  app/                 the product: Clerk + Neon + OpenAI (port 3002)
 packages/
   ui/                  shared shadcn design system (@bandzen/ui)
   eslint-config/       shared ESLint configs (@bandzen/eslint-config)
   tsconfig/            shared TypeScript configs (@bandzen/tsconfig)
 ```
 
+`apps/web` and `apps/app` deploy separately — a static marketing site on the
+apex domain, the signed-in product on `app.bandzen.com`. The marketing CTAs
+point at the product app through `NEXT_PUBLIC_APP_URL`.
+
+**`apps/app` carries rules the other two do not**, including the one that keeps
+one candidate's data away from another's. Read
+[`apps/app/README.md`](apps/app/README.md) before touching it.
+
 ## Commands
 
 Run everything from the repo root — Turborepo fans each task out across
 packages in parallel and caches the results.
 
-| Command          | What it does                                              |
-| ---------------- | --------------------------------------------------------- |
-| `pnpm dev`       | Starts every app's dev server (web → :3000, docs → :3001) |
-| `pnpm build`     | Builds every app                                          |
-| `pnpm lint`      | Lints every app and package                               |
-| `pnpm typecheck` | Type-checks every package                                 |
-| `pnpm format`    | Prettier across the whole repo                            |
+| Command          | What it does                                        |
+| ---------------- | --------------------------------------------------- |
+| `pnpm dev`       | Every dev server (web :3000, docs :3001, app :3002) |
+| `pnpm build`     | Builds every app                                    |
+| `pnpm lint`      | Lints every app and package                         |
+| `pnpm typecheck` | Type-checks every package                           |
+| `pnpm test`      | Runs every package's tests                          |
+| `pnpm format`    | Prettier across the whole repo                      |
+
+`apps/app` also owns database and content commands (`db:migrate`,
+`content:generate`, and the rest) — they are listed in its own README because
+they only make sense there.
 
 Install once at the root (`pnpm install`) — never inside an app. There is a
 single lockfile and a single `node_modules` store for the whole workspace.
@@ -72,6 +86,16 @@ Keep `style`, `baseColor`, and `iconLibrary` identical in
 `apps/*/components.json` and `packages/ui/components.json`, or the CLI will
 generate mismatched components.
 
+Note the primitives are built on **Base UI**, not Radix — polymorphism is
+`render={<Link />}` rather than `asChild`, and a `Button` rendering anything
+other than a real `<button>` also needs `nativeButton={false}` or it claims
+button semantics it does not have.
+
+Not everything in `packages/ui` comes from the CLI. `band-scale` and
+`band-trend` are hand-written server components that draw the 0–9 IELTS ruler,
+and they are the whole data-visualisation surface — there is no chart library
+in this repo, deliberately. Extend them rather than adding one.
+
 ### Overriding tokens for one app
 
 `packages/ui/src/styles/globals.css` holds the shared theme. An app's
@@ -105,7 +129,7 @@ same components in a different theme than `apps/web`.
    `export { default } from '@bandzen/eslint-config/next';`.
 3. Add `@bandzen/ui`, `@bandzen/tsconfig`, and `@bandzen/eslint-config` as
    `workspace:*` dependencies.
-4. Give it `lint`, `build`, `dev`, and `typecheck` scripts so the root tasks
-   pick it up.
+4. Give it `lint`, `build`, `dev`, `typecheck`, and `test` scripts so the root
+   tasks pick it up.
 5. Pass `--port` to its `dev` script — `pnpm dev` starts all apps at once and
    they will otherwise collide on 3000.
