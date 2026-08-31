@@ -1,10 +1,7 @@
 import {
   BookOpen,
-  CalendarRange,
-  ClipboardList,
   GraduationCap,
   LayoutDashboard,
-  LibraryBig,
   LineChart,
   MessageSquare,
   Settings,
@@ -16,59 +13,57 @@ export type NavLink = {
   label: string;
   Icon: LucideIcon;
   /**
-   * Extra path prefixes this link owns. The module engines keep their original
-   * flat URLs, so /reading has to light up "Practice" rather than nothing.
+   * Extra path prefixes this link owns. Two reasons a link needs these:
+   * the module engines keep their original flat URLs, so /reading has to light
+   * up "Practice" rather than nothing; and the routes folded into another page
+   * still exist as redirects, so /review has to light up "Progress".
    */
   owns?: readonly string[];
 };
 
-export type NavGroup = { heading: string; links: readonly NavLink[] };
-
-export const NAV_GROUPS: readonly NavGroup[] = [
+/**
+ * The whole navigation, in one flat list.
+ *
+ * Five destinations, one per job a candidate has: see today, read about it,
+ * attempt it, look back, ask. Sitting a timed test is a kind of attempting, so
+ * it lives under Practice rather than beside it -- /tests owned no content of
+ * its own beyond the diagnostic.
+ *
+ * Five is also what a phone can hold, and `mobile-nav.tsx` renders exactly
+ * this list as its tab bar: adding a sixth destination here costs a tab there.
+ */
+export const NAV_LINKS: readonly NavLink[] = [
   {
-    heading: 'Home',
-    links: [{ href: '/dashboard', label: 'Home', Icon: LayoutDashboard }],
+    href: '/dashboard',
+    label: 'Today',
+    Icon: LayoutDashboard,
+    owns: ['/plan'],
   },
+  { href: '/learn', label: 'Learn', Icon: GraduationCap, owns: ['/resources'] },
   {
-    heading: 'Prepare',
-    links: [
-      { href: '/plan', label: 'Study Plan', Icon: CalendarRange },
-      { href: '/learn', label: 'Learn', Icon: GraduationCap },
-      {
-        href: '/practice',
-        label: 'Practice',
-        Icon: BookOpen,
-        owns: ['/reading', '/writing'],
-      },
-      {
-        href: '/tests',
-        label: 'Mock Tests',
-        Icon: ClipboardList,
-        owns: ['/diagnostic'],
-      },
-    ],
+    href: '/practice',
+    label: 'Practice',
+    Icon: BookOpen,
+    owns: ['/reading', '/writing', '/tests', '/diagnostic'],
   },
-  {
-    heading: 'Improve',
-    links: [
-      { href: '/review', label: 'Review', Icon: LibraryBig },
-      { href: '/coach', label: 'Bandzen Coach', Icon: MessageSquare },
-      { href: '/progress', label: 'Progress', Icon: LineChart },
-      { href: '/resources', label: 'Resources', Icon: BookOpen },
-    ],
-  },
+  { href: '/progress', label: 'Progress', Icon: LineChart, owns: ['/review'] },
+  { href: '/coach', label: 'Coach', Icon: MessageSquare },
 ];
 
+/**
+ * Settings, kept out of NAV_LINKS on purpose.
+ *
+ * The one destination people open rarely and deliberately. It sits below the
+ * separator in the sidebar, and on a phone -- where there are only five tabs --
+ * behind the gear on Today rather than spending one.
+ */
 export const SETTINGS_LINK: NavLink = {
   href: '/settings',
   label: 'Settings',
   Icon: Settings,
 };
 
-export const ALL_LINKS: readonly NavLink[] = [
-  ...NAV_GROUPS.flatMap((g) => g.links),
-  SETTINGS_LINK,
-];
+export const ALL_LINKS: readonly NavLink[] = [...NAV_LINKS, SETTINGS_LINK];
 
 /** Whether a link owns the current path. Longest match wins, so /learn does
  *  not stay lit while the reader is on /learn/reading/skimming's sibling. */
