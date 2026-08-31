@@ -6,12 +6,35 @@ import type { Skill } from '@/lib/db/schema';
  * per user and is the same answer every time for the same inputs.
  */
 
+/**
+ * What a task actually opens. Without this a plan is a list of advice; with it
+ * the dashboard's Continue button has somewhere to go.
+ */
+export type PlanTarget =
+  | { kind: 'reading'; passageId: string }
+  | { kind: 'writing'; promptId: string }
+  | { kind: 'lesson'; lessonId: string };
+
 export type PlanTask = {
   day: number;
   date: string;
   skill: Skill;
   label: string;
   minutes: number;
+  /** Null when nothing in the catalogue can satisfy this task. */
+  target: PlanTarget | null;
+};
+
+/**
+ * What the plan is allowed to point at. Passed in rather than queried so this
+ * module stays pure and the engine stays testable without a database.
+ */
+export type PlanCatalogue = {
+  passageIds?: readonly string[];
+  promptIds?: readonly string[];
+  /** Lesson slug that teaches a question kind, from src/content/lessons.ts. */
+  lessonForKind?: Readonly<Record<string, string>>;
+  completedLessonIds?: readonly string[];
 };
 
 export type PlanInput = {
@@ -22,6 +45,9 @@ export type PlanInput = {
   testDate: string | null;
   /** Weakness phrases from the most recent writing report, most severe first. */
   weaknesses?: string[];
+  /** Reading question kinds with the worst accuracy, worst first. */
+  weakKinds?: readonly string[];
+  catalogue?: PlanCatalogue;
   /** Injected so the output is testable. */
   today?: Date;
 };
@@ -65,6 +91,35 @@ function weakerShare(reading: number | null, writing: number | null) {
   return gap > 0 ? ('writing' as const) : ('reading' as const);
 }
 
+/**
+ * Rotate through what is available so two consecutive reading days do not hand
+ * back the same passage. An empty catalogue yields null, and the task renders
+ * without a Continue button rather than with one that goes nowhere.
+ */
+function pick<T>(items: readonly T[] | undefined, cursor: number): T | null {
+  if (!items?.length) return null;
+  return items[cursor % items.length]!;
+}
+
+/**
+ * The lesson a candidate should read before drilling their weakest question
+ * kind, if there is one and they have not read it. This is the LEARN → PRACTICE
+ * half of the loop: sending someone to drill a technique nobody has taught them
+ * yet produces a worse score and no understanding of why.
+ */
+function lessonFirst(input: PlanInput): PlanTarget | null {
+  const { lessonForKind, completedLessonIds } = input.catalogue ?? {};
+  if (!lessonForKind) return null;
+
+  for (const kind of input.weakKinds ?? []) {
+    const lessonId = lessonForKind[kind];
+    if (lessonId && !completedLessonIds?.includes(lessonId)) {
+      return { kind: 'lesson', lessonId };
+    }
+  }
+  return null;
+}
+
 export function buildPlan(input: PlanInput): PlanTask[] {
   const today = input.today ?? new Date();
 
@@ -79,6 +134,9 @@ export function buildPlan(input: PlanInput): PlanTask[] {
 
   let readingCursor = 0;
   let writingCursor = 0;
+
+  // Spent on the first reading day only; after that the drills take over.
+  let pendingLesson = lessonFirst(input);
 
   for (let day = 1; day <= horizon; day += 1) {
     // With a clear gap the weaker skill takes two days in three; otherwise
@@ -100,7 +158,36 @@ export function buildPlan(input: PlanInput): PlanTask[] {
         ? READING_DRILLS[readingCursor++ % READING_DRILLS.length]!
         : WRITING_DRILLS[writingCursor++ % WRITING_DRILLS.length]!;
 
-    const date = new Date(today.getTime() + day * DAY_MS);
+    // Day 1 is today, not tomorrow. A plan whose first task lands tomorrow
+    // leaves the dashboard with nothing to put under "Today".
+    const date = new Date(today.getTime() + (day - 1) * DAY_MS);
+
+    // The first reading slot teaches the weakest question kind rather than
+    // drilling it, when there is a lesson for it the candidate has not read.
+    if (skill === 'reading' && pendingLesson) {
+      const lesson = pendingLesson;
+      pendingLesson = null;
+      readingCursor -= 1; // The drill was not spent; keep the rotation intact.
+      tasks.push({
+        day,
+        date: iso(date),
+        skill,
+        label: 'Learn the technique before drilling it',
+        minutes: 15,
+        target: lesson,
+      });
+      continue;
+    }
+
+    // Both cursors were post-incremented above, so -1 is this task's slot.
+    let target: PlanTarget | null = null;
+    if (skill === 'reading') {
+      const passageId = pick(input.catalogue?.passageIds, readingCursor - 1);
+      if (passageId) target = { kind: 'reading', passageId };
+    } else {
+      const promptId = pick(input.catalogue?.promptIds, writingCursor - 1);
+      if (promptId) target = { kind: 'writing', promptId };
+    }
 
     tasks.push({
       day,
@@ -113,6 +200,7 @@ export function buildPlan(input: PlanInput): PlanTask[] {
           ? `${drill.label} — focus: ${input.weaknesses[0]}`
           : drill.label,
       minutes: drill.minutes,
+      target,
     });
   }
 
@@ -133,4 +221,88 @@ export function nextAction(input: PlanInput): string {
       return 'You are at your target band in practice. Keep it warm.';
   }
   return 'Both skills are close. Keep the rotation even.';
+}
+
+// ---------------------------------------------------------------------------
+// Task state — derived, never stored
+// ---------------------------------------------------------------------------
+
+export type StudyTaskStatus = 'pending' | 'active' | 'completed';
+
+export type PlanTaskState = PlanTask & { status: StudyTaskStatus };
+
+export type PlanProgress = {
+  tasks: PlanTaskState[];
+  minutesDone: number;
+  minutesGoal: number;
+};
+
+/**
+ * What the candidate has actually done, expressed as the evidence we hold
+ * rather than as a stored task status. A plan row and an attempt row cannot
+ * contradict each other if there is only ever one of them.
+ */
+export type PlanEvidence = {
+  /** One entry per completed attempt submitted today. */
+  modulesCompletedToday: readonly Skill[];
+  completedLessonIds: readonly string[];
+  /** The module of an attempt left open, if any. */
+  moduleInProgress?: Skill | null;
+};
+
+/**
+ * Label today's tasks against that evidence.
+ *
+ * A skill's Nth task today completes on its Nth attempt today, so two reading
+ * tasks need two reading attempts rather than both lighting up from one.
+ */
+export function derivePlanState(
+  tasks: PlanTask[],
+  evidence: PlanEvidence,
+  goalMinutes?: number | null,
+): PlanProgress {
+  const remaining = new Map<Skill, number>();
+  for (const skill of evidence.modulesCompletedToday) {
+    remaining.set(skill, (remaining.get(skill) ?? 0) + 1);
+  }
+
+  let activeTaken = false;
+
+  const stated = tasks.map((task): PlanTaskState => {
+    if (task.target?.kind === 'lesson') {
+      const done = evidence.completedLessonIds.includes(task.target.lessonId);
+      return { ...task, status: done ? 'completed' : 'pending' };
+    }
+
+    const left = remaining.get(task.skill) ?? 0;
+    if (left > 0) {
+      remaining.set(task.skill, left - 1);
+      return { ...task, status: 'completed' };
+    }
+
+    // Only one task is ever active: the first unfinished one, and only when a
+    // matching attempt is genuinely open.
+    if (!activeTaken && evidence.moduleInProgress === task.skill) {
+      activeTaken = true;
+      return { ...task, status: 'active' };
+    }
+    return { ...task, status: 'pending' };
+  });
+
+  const minutesDone = stated
+    .filter((t) => t.status === 'completed')
+    .reduce((sum, t) => sum + t.minutes, 0);
+
+  return {
+    tasks: stated,
+    minutesDone,
+    // Falls back to what the plan itself asks for, so the bar always has a
+    // denominator even before onboarding records a daily target.
+    minutesGoal: goalMinutes ?? stated.reduce((sum, t) => sum + t.minutes, 0),
+  };
+}
+
+/** The tasks scheduled for one calendar day. */
+export function tasksOn(tasks: PlanTask[], isoDate: string) {
+  return tasks.filter((t) => t.date === isoDate);
 }
