@@ -21,9 +21,11 @@ import {
   activitySummary,
   bandHistory,
   getProfile,
+  isPro,
   listCompletedAttempts,
   listLessonProgress,
 } from '@/lib/db/queries';
+import { ProTag } from '@/components/billing/pro';
 import { MODULE_LABEL, QUESTION_KIND_LABEL } from '@/lib/modules';
 import { meanBand } from '@/lib/plan-data';
 import type { Skill } from '@/lib/db/schema';
@@ -40,10 +42,13 @@ const DATE = new Intl.DateTimeFormat('en-GB', {
 /** Below this an accuracy rate is noise, not a pattern. */
 const MIN_ATTEMPTED = 5;
 
+/** How far back the trend goes without Pro. */
+const FREE_TREND_POINTS = 5;
+
 export default async function ProgressPage() {
   const userId = await requireUserId();
 
-  const [profile, history, accuracy, activity, lessons, attempts] =
+  const [profile, history, accuracy, activity, lessons, attempts, pro] =
     await Promise.all([
       getProfile(userId),
       bandHistory(userId),
@@ -51,6 +56,7 @@ export default async function ProgressPage() {
       activitySummary(userId),
       listLessonProgress(userId),
       listCompletedAttempts(userId, 50),
+      isPro(userId),
     ]);
 
   // Below MIN_ATTEMPTED a rate is noise, so it cannot name a pattern.
@@ -58,13 +64,23 @@ export default async function ProgressPage() {
     .filter((k) => k.total >= MIN_ATTEMPTED)
     .sort((a, b) => a.accuracy - b.accuracy);
 
-  const points = history
+  const allPoints = history
     .filter((h) => h.band != null && h.submittedAt != null)
     .map((h) => ({
       value: h.band!,
       label: `${MODULE_LABEL[h.module]} ${DATE.format(h.submittedAt!)}`,
       module: h.module,
     }));
+
+  // Free sees the recent window; Pro sees the lot. The gate is depth rather
+  // than a whole section, because the matrix and the patterns below are what
+  // tell a candidate which question type is costing them marks — gate those
+  // and free practice becomes aimless drilling, which converts nobody.
+  //
+  // It also strengthens on its own: a new candidate loses nothing, and the
+  // longer someone practises the more of their own history sits behind it.
+  const hidden = pro ? 0 : Math.max(0, allPoints.length - FREE_TREND_POINTS);
+  const points = hidden ? allPoints.slice(-FREE_TREND_POINTS) : allPoints;
 
   const byModule = (module: Skill) => points.filter((p) => p.module === module);
   const latest = (module: Skill) => byModule(module).at(-1)?.value ?? null;
@@ -125,8 +141,39 @@ export default async function ProgressPage() {
         <BandTrend
           points={points}
           target={profile?.targetBand ?? undefined}
-          caption="All attempts, oldest first"
+          caption={
+            hidden
+              ? `Your last ${FREE_TREND_POINTS} attempts, oldest first`
+              : 'All attempts, oldest first'
+          }
         />
+
+        {/* A true peek: the count is this candidate's own rows, not a
+            decoration. Nothing here is invented to make the number look
+            better. */}
+        {hidden ? (
+          <div className="relative overflow-hidden border border-border">
+            <div
+              aria-hidden
+              className="h-10 bg-gradient-to-b from-secondary/60 to-transparent"
+            />
+            <div className="flex flex-wrap items-center justify-between gap-3 px-5 pb-4">
+              <p className="flex items-center gap-2 text-sm">
+                <ProTag />
+                <span className="tabular-nums">
+                  {hidden} earlier {hidden === 1 ? 'attempt' : 'attempts'} not
+                  shown
+                </span>
+              </p>
+              <Link
+                href="/upgrade?from=progress_peek"
+                className="text-sm underline underline-offset-4"
+              >
+                See your full history
+              </Link>
+            </div>
+          </div>
+        ) : null}
       </section>
 
       <section aria-labelledby="modules-heading" className="space-y-4">

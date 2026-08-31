@@ -5,8 +5,10 @@ import { notFound, redirect } from 'next/navigation';
 import { requireUserId } from '@/lib/auth';
 import { gradeEssay } from '@/lib/ai/grade-essay';
 import {
+  claimFailedForGrading,
   claimForGrading,
   createAttempt,
+  essayAllowance,
   findInProgress,
   getAttempt,
   saveEssay,
@@ -18,8 +20,22 @@ export async function startWritingAttempt(formData: FormData) {
 
   const userId = await requireUserId();
 
+  // Resuming is always free — the mark was charged when the attempt was
+  // created, and charging again for finishing it would be charging twice.
   const existing = await findInProgress(userId, { promptId });
   if (existing) redirect(`/writing/${existing.id}`);
+
+  // The gate, and the only one on this path. Never at submit: an essay that
+  // exists is always graded, because taking forty minutes of a candidate's
+  // preparation and then refusing to mark it is the version of this that
+  // deserves a chargeback.
+  //
+  // ponytail: check-then-insert, so two tabs opened at once can both pass and
+  // spend one extra grading call. Neon is HTTP, so there is no transaction to
+  // take, and a single guarded INSERT ... SELECT would only narrow the window
+  // rather than close it. Worth revisiting if the leak ever shows up in cost.
+  const quota = await essayAllowance(userId);
+  if (!quota.allowed) redirect('/upgrade?from=writing_wall');
 
   const attempt = await createAttempt({ userId, module: 'writing', promptId });
   redirect(`/writing/${attempt.id}`);
@@ -58,6 +74,34 @@ export async function submitEssay(formData: FormData) {
 
   if (attempt.kind === 'diagnostic' && attempt.parentId) {
     redirect(`/diagnostic/${attempt.parentId}/result`);
+  }
+
+  redirect(`/writing/${attemptId}/report`);
+}
+
+/**
+ * Grade a failed attempt again.
+ *
+ * `gradeEssay` leaves `status` terminal on every exit path, so a transient
+ * model or network failure lands the row on `failed` with the essay still
+ * intact — and until now nothing could pick it back up. `findInProgress`
+ * filters on `in_progress`, so pressing Start again created a *new* empty
+ * attempt and the written response became unreachable. That was the bug the
+ * report page's "try submitting again" told candidates to walk into.
+ *
+ * Same shape as `submitEssay`: claim atomically, then grade after the response
+ * so a thirty-second model call does not hold the redirect.
+ */
+export async function retryGrading(formData: FormData) {
+  const attemptId = String(formData.get('attemptId') ?? '');
+  if (!attemptId) throw new Error('Missing attempt');
+
+  const userId = await requireUserId();
+  const attempt = await getAttempt(userId, attemptId);
+  if (!attempt) notFound();
+
+  if (await claimFailedForGrading(userId, attemptId)) {
+    after(() => gradeEssay(attemptId));
   }
 
   redirect(`/writing/${attemptId}/report`);

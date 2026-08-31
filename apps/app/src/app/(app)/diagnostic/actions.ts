@@ -4,10 +4,14 @@ import { redirect } from 'next/navigation';
 import { requireUserId } from '@/lib/auth';
 import {
   createAttempt,
+  diagnosticCount,
+  findChildAttempt,
+  isPro,
   latestDiagnostic,
   pickEasiestPassage,
   upsertProfile,
 } from '@/lib/db/queries';
+import { canStartDiagnostic } from '@/lib/entitlements';
 
 /**
  * Start the diagnostic: record the target and exam date the study plan needs,
@@ -28,9 +32,28 @@ export async function startDiagnostic(formData: FormData) {
   const userId = await requireUserId();
   await upsertProfile(userId, { targetBand, testDate: rawDate || null });
 
-  const existing = await latestDiagnostic(userId);
-  if (existing?.status === 'in_progress') redirect(`/reading/${existing.id}`);
-  if (existing) redirect(`/diagnostic/${existing.id}/result`);
+  const [existing, pro] = await Promise.all([
+    latestDiagnostic(userId),
+    isPro(userId),
+  ]);
+
+  if (existing) {
+    // Resuming, in either half. The writing branch is new: reading could be
+    // finished while the essay is still open, and sending someone to a result
+    // page they cannot complete is how an unfinished diagnostic became a dead
+    // end.
+    if (existing.status === 'in_progress') redirect(`/reading/${existing.id}`);
+    const child = await findChildAttempt(userId, existing.id);
+    if (child?.status === 'in_progress') redirect(`/writing/${child.id}`);
+
+    // Counted on sittings that produced a result, so a diagnostic that broke
+    // half way is not what locks a candidate out of the one free measurement
+    // the whole funnel points at.
+    const taken = await diagnosticCount(userId);
+    if (!canStartDiagnostic({ isPro: pro, taken })) {
+      redirect(`/diagnostic/${existing.id}/result`);
+    }
+  }
 
   // Easiest passage available: the diagnostic should measure, not exhaust.
   // Its length is stated from the engines' own rules -- see lib/timing.ts.

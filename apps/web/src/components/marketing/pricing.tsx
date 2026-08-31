@@ -1,4 +1,4 @@
-import { Check } from 'lucide-react';
+import { Check, Lock } from 'lucide-react';
 import Link from 'next/link';
 
 import { Button } from '@bandzen/ui/components/button';
@@ -38,22 +38,7 @@ export function Pricing() {
                 {tier.name}
               </h3>
 
-              {tier.placeholderPrice && (
-                <span
-                  data-placeholder="true"
-                  className="border-chrome text-chrome mt-5 self-start border px-2 py-1 font-mono text-[0.5rem] tracking-[0.18em] uppercase"
-                >
-                  Placeholder price
-                </span>
-              )}
-
-              <p
-                className={cn(
-                  'font-display flex items-baseline gap-2 text-6xl tabular-nums',
-                  tier.placeholderPrice ? 'mt-4' : 'mt-10',
-                )}
-                data-placeholder={tier.placeholderPrice ? 'true' : undefined}
-              >
+              <p className="font-display mt-10 flex items-baseline gap-2 text-6xl tabular-nums">
                 {tier.price}
                 <span
                   className={cn(
@@ -65,17 +50,60 @@ export function Pricing() {
                 </span>
               </p>
 
+              {/* The standard price, struck through, only where it is real —
+                  the founding price genuinely rises to this. */}
+              {'was' in tier && tier.was ? (
+                <p
+                  className={cn(
+                    'mt-2 font-mono text-xs tracking-[0.14em] uppercase',
+                    tier.featured ? 'text-paper/60' : 'text-slate',
+                  )}
+                >
+                  <span className="line-through">{tier.was}</span> after the
+                  founding window
+                </p>
+              ) : null}
+
+              {'alt' in tier && tier.alt ? (
+                <p
+                  className={cn(
+                    'mt-1 font-mono text-xs tracking-[0.14em] uppercase',
+                    tier.featured ? 'text-paper/60' : 'text-slate',
+                  )}
+                >
+                  {tier.alt}
+                </p>
+              ) : null}
+
               <ul className="mt-10 flex flex-1 flex-col gap-3">
                 {tier.features.map((f) => (
-                  <li key={f} className="flex items-start gap-3 text-sm">
-                    <Check
-                      className={cn(
-                        'mt-0.5 size-4 shrink-0',
-                        tier.featured ? 'text-chrome' : 'text-cobalt',
-                      )}
-                      aria-hidden
-                    />
-                    {f}
+                  <li
+                    key={f.label}
+                    className={cn(
+                      'flex items-start gap-3 text-sm',
+                      f.planned &&
+                        (tier.featured ? 'text-paper/60' : 'text-slate'),
+                    )}
+                  >
+                    {f.planned ? (
+                      <Lock className="mt-0.5 size-4 shrink-0" aria-hidden />
+                    ) : (
+                      <Check
+                        className={cn(
+                          'mt-0.5 size-4 shrink-0',
+                          tier.featured ? 'text-chrome' : 'text-cobalt',
+                        )}
+                        aria-hidden
+                      />
+                    )}
+                    <span>
+                      {f.label}
+                      {f.planned ? (
+                        <span className="ml-2 font-mono text-[0.5625rem] tracking-[0.18em] uppercase">
+                          Planned
+                        </span>
+                      ) : null}
+                    </span>
                   </li>
                 ))}
               </ul>
@@ -96,7 +124,7 @@ export function Pricing() {
         </div>
 
         <p className="text-slate mt-8 font-mono text-[0.625rem] tracking-[0.16em] uppercase">
-          Pro pricing is not final. The figure shown is a placeholder.
+          {pricing.note} Items marked planned do not work yet.
         </p>
       </Container>
     </section>

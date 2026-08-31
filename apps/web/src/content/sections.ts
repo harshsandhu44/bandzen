@@ -17,13 +17,17 @@ export const brand = {
     'Independent and not affiliated with IELTS, the British Council, IDP, or Cambridge University Press & Assessment. Band estimates are for practice, not official scores.',
 } as const;
 
+/**
+ * Root-relative rather than bare fragments, so the same header works on
+ * /privacy and /terms. A bare `#pricing` on a subpage goes nowhere.
+ */
 export const nav = [
-  { label: 'Learn', href: '#modules' },
-  { label: 'Practice', href: '#practice' },
-  { label: 'Mock Tests', href: '#mock-tests' },
-  { label: 'AI Analysis', href: '#analysis' },
-  { label: 'Resources', href: '#resources' },
-  { label: 'Pricing', href: '#pricing' },
+  { label: 'Learn', href: '/#modules' },
+  { label: 'Practice', href: '/#practice' },
+  { label: 'Mock Tests', href: '/#mock-tests' },
+  { label: 'AI Analysis', href: '/#analysis' },
+  { label: 'Resources', href: '/#resources' },
+  { label: 'Pricing', href: '/#pricing' },
 ] as const;
 
 /**
@@ -37,6 +41,22 @@ export const cta = {
   secondary: { label: 'Take a diagnostic test', href: `${APP_URL}/diagnostic` },
   signIn: { label: 'Sign in', href: `${APP_URL}/sign-in` },
   nav: { label: 'Start preparing', href: `${APP_URL}/signup` },
+} as const;
+
+/**
+ * The facts a payment processor and a customer both need.
+ *
+ * TODO: replace every bracketed value below before going live. They render
+ * verbatim on /about, /contact, /terms, /privacy and /refunds, and Razorpay's
+ * activation review checks that they are real and that the address matches
+ * your registration. Nothing else blocks on them.
+ */
+export const legal = {
+  entity: '[REGISTERED BUSINESS NAME]',
+  address: '[REGISTERED ADDRESS]',
+  email: '[CONTACT EMAIL]',
+  updated: '31 August 2026',
+  refundDays: 7,
 } as const;
 
 export const hero = {
@@ -354,36 +374,47 @@ export const testimonials = {
   ],
 } as const;
 
+/**
+ * Real prices, in the currency they are charged in.
+ *
+ * `planned: true` marks a feature that does not exist yet. It is listed rather
+ * than hidden because it is what we are building next — and it is marked
+ * rather than implied because someone paying partly for it deserves to know,
+ * which is also what makes the seven-day refund the load-bearing promise here.
+ */
 export const pricing = {
   eyebrow: 'Pricing',
   headline: 'Start free. Upgrade when practice turns serious.',
+  note: 'Founding price. Cancel any time; refund within 7 days.',
   tiers: [
     {
       name: 'Free',
-      price: '$0',
+      price: '₹0',
       period: 'forever',
-      placeholderPrice: false,
       features: [
-        'Limited practice',
-        'Diagnostic assessment',
-        'Basic study materials',
-        'Limited AI feedback',
+        { label: 'Unlimited Reading practice', planned: false },
+        { label: 'One diagnostic assessment', planned: false },
+        { label: 'All lessons and study materials', planned: false },
+        { label: '2 AI-marked essays a week', planned: false },
+        { label: '10 Bandzen Coach messages a week', planned: false },
       ],
       cta: 'Start free',
       featured: false,
     },
     {
       name: 'Pro',
-      price: '$00',
+      price: '₹599',
+      was: '₹799',
       period: 'per month',
-      placeholderPrice: true,
+      alt: 'or ₹1,499 for 3 months',
       features: [
-        'Full mock tests',
-        'Unlimited practice',
-        'AI Writing analysis',
-        'AI Speaking analysis',
-        'Personalised study plan',
-        'Advanced performance insights',
+        { label: 'Unlimited AI Writing analysis', planned: false },
+        { label: 'Unlimited Bandzen Coach', planned: false },
+        { label: 'Unlimited practice', planned: false },
+        { label: 'Retake the diagnostic any time', planned: false },
+        { label: 'Your full band history and insights', planned: false },
+        { label: 'Full mock tests', planned: true },
+        { label: 'AI Speaking analysis', planned: true },
       ],
       cta: 'Start free',
       featured: true,
@@ -421,11 +452,11 @@ export const faq = {
     },
     {
       q: 'Can Bandzen analyse Speaking?',
-      a: 'Yes. You record your answers, and Bandzen transcribes them and reports on fluency, vocabulary, grammar and pronunciation. An AI Speaking examiner for live practice is planned.',
+      a: 'Not yet. Speaking analysis needs recording and transcription we have not built, so there is nothing to try today. It is on the roadmap and it is marked as planned wherever it appears.',
     },
     {
       q: 'Can I take complete mock tests?',
-      a: 'Yes. Full-length mock tests run under realistic timing with autosave and connection recovery, followed by a complete analysis and review mode.',
+      a: 'Not a full four-skill mock — that needs Listening and Speaking, and neither has material yet. What does exist runs under realistic timing with autosave and connection recovery: a Reading and Writing diagnostic, and timed practice in both, each followed by a complete analysis and review mode.',
     },
   ],
 } as const;
@@ -467,6 +498,7 @@ export const footer = {
       links: [
         { label: 'Privacy', href: '/privacy' },
         { label: 'Terms', href: '/terms' },
+        { label: 'Refunds', href: '/refunds' },
       ],
     },
   ],

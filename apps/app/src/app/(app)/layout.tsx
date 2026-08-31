@@ -1,3 +1,4 @@
+import Link from 'next/link';
 import { cookies } from 'next/headers';
 import { SignOutButton } from '@clerk/nextjs';
 import { Button } from '@bandzen/ui/components/button';
@@ -13,10 +14,23 @@ import {
 import { Wordmark } from '@/components/app/wordmark';
 import { ThemeToggle } from '@/components/theme-toggle';
 import { requireUserId } from '@/lib/auth';
-import { getProfile } from '@/lib/db/queries';
+import { getProfile, proUntil } from '@/lib/db/queries';
+import {
+  PLANS,
+  formatInr,
+  isFoundingActive,
+  isProAt,
+  priceOf,
+} from '@/lib/entitlements';
+import { foundingEndsAt } from '@/lib/razorpay';
 import { daysUntil } from '@/lib/dates';
 import { MobileNav } from './mobile-nav';
 import { Nav } from './nav';
+
+const FOUNDING_DATE = new Intl.DateTimeFormat('en-GB', {
+  day: 'numeric',
+  month: 'short',
+});
 
 /**
  * The signed-in shell.
@@ -52,11 +66,21 @@ import { Nav } from './nav';
  */
 export default async function AppLayout({ children }: LayoutProps<'/'>) {
   const userId = await requireUserId();
-  const [profile, cookieStore] = await Promise.all([
+  const [profile, until, cookieStore] = await Promise.all([
     getProfile(userId),
+    proUntil(userId),
     cookies(),
   ]);
   const days = profile?.testDate ? daysUntil(profile.testDate) : null;
+
+  // The persistent entry point, and the only one that is always on screen.
+  // Not a sixth nav item: NAV_LINKS is rendered verbatim as the phone tab bar,
+  // so five is the ceiling. Not a banner either — that would be the header
+  // this app deliberately does not have, and the exam screens cancel the
+  // shell's padding to go full-bleed underneath one.
+  const pro = isProAt(until);
+  const foundingEnds = foundingEndsAt();
+  const founding = isFoundingActive(foundingEnds);
 
   // Read the sidebar's own cookie server-side so the first paint matches what
   // the candidate left it as, rather than flashing open then collapsing.
@@ -74,6 +98,22 @@ export default async function AppLayout({ children }: LayoutProps<'/'>) {
         </SidebarContent>
 
         <SidebarFooter className="gap-4 p-4">
+          {pro ? null : (
+            <Link
+              href="/upgrade?from=sidebar"
+              className="block border border-chrome/40 px-3 py-2.5 transition-colors hover:border-chrome"
+            >
+              <p className="font-mono text-[0.625rem] tracking-[0.16em] text-chrome uppercase">
+                {founding ? 'Founding price' : 'Bandzen Pro'}
+              </p>
+              <p className="mt-1 text-xs text-muted-foreground text-pretty">
+                {founding && foundingEnds
+                  ? `${formatInr(priceOf(PLANS[0], true))} a month until ${FOUNDING_DATE.format(foundingEnds)}. Unlimited marking and Coach.`
+                  : 'Unlimited essay marking and Coach.'}
+              </p>
+            </Link>
+          )}
+
           {profile?.targetBand != null || days != null ? (
             <dl className="space-y-1 border-t border-sidebar-border pt-4 font-mono text-[0.625rem] tracking-[0.16em] uppercase">
               {profile?.targetBand != null ? (
