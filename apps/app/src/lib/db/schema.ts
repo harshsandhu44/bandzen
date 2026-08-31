@@ -105,6 +105,77 @@ export const accessRequests = pgTable(
   (t) => [uniqueIndex('access_requests_email_key').on(t.email)],
 );
 
+/**
+ * What a candidate has paid for, mirrored from Razorpay.
+ *
+ * Razorpay owns the truth; this is a local copy the webhook keeps current, so
+ * rendering a page never depends on their API being reachable. One row per
+ * user — resubscribing reuses it.
+ *
+ * `status` is text rather than an enum on purpose: the values are Razorpay's,
+ * and a state we have not seen before should not turn into a failed insert on
+ * a webhook we cannot replay.
+ *
+ * A grant — the founding cohort, or a new candidate's trial — is a row with a
+ * future `current_period_end` and no `razorpay_subscription_id`. That is the
+ * whole mechanism, and it is why entitlement is one date comparison rather
+ * than a status matrix.
+ */
+export const subscriptions = pgTable('subscriptions', {
+  userId: text('user_id').primaryKey(),
+  /** Null for a grant; `sub_…` for anything Razorpay charged for. */
+  razorpaySubscriptionId: text('razorpay_subscription_id'),
+  /** A Razorpay plan id, or `trial` / `founding` for a grant. */
+  planId: text('plan_id').notNull(),
+  status: text('status').notNull(),
+  currentPeriodEnd: timestamp('current_period_end', {
+    withTimezone: true,
+  }).notNull(),
+  /** Which prompt earned this, from `/upgrade?from=…`. The only attribution. */
+  source: text('source'),
+  /**
+   * When Razorpay created the event this row was last written from.
+   *
+   * Razorpay delivers at-least-once and does not promise order, so a replay of
+   * an old `subscription.charged` could otherwise re-extend an account that
+   * has since been cancelled or refunded. An event older than this one is
+   * dropped. Null on a grant, which no webhook races.
+   */
+  lastEventAt: timestamp('last_event_at', { withTimezone: true }),
+  createdAt: timestamp('created_at', { withTimezone: true })
+    .notNull()
+    .defaultNow(),
+  updatedAt: timestamp('updated_at', { withTimezone: true })
+    .notNull()
+    .defaultNow(),
+});
+
+/**
+ * One row per message a candidate sends Coach.
+ *
+ * The text is deliberately not stored. The only question ever asked of this
+ * table is "how many in the last seven days" — keeping the conversation would
+ * be a transcript nobody asked for, and the chat itself is client state that
+ * a refresh already discards.
+ *
+ * It exists at all because Coach is the one metered surface with nothing else
+ * to count: an essay leaves an `attempts` row behind, a coach message left
+ * nothing.
+ */
+export const coachMessages = pgTable(
+  'coach_messages',
+  {
+    id: uuid('id').primaryKey().defaultRandom(),
+    userId: text('user_id').notNull(),
+    createdAt: timestamp('created_at', { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+  },
+  (t) => [
+    index('coach_messages_user_created_idx').on(t.userId, desc(t.createdAt)),
+  ],
+);
+
 // ---------------------------------------------------------------------------
 // Content — generated offline, immutable, identical for every student
 // ---------------------------------------------------------------------------
@@ -302,3 +373,4 @@ export type AttemptAnswer = typeof attemptAnswers.$inferSelect;
 export type Report = typeof reports.$inferSelect;
 export type Profile = typeof profiles.$inferSelect;
 export type LessonProgress = typeof lessonProgress.$inferSelect;
+export type Subscription = typeof subscriptions.$inferSelect;
