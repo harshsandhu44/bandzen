@@ -8,7 +8,14 @@ import {
 } from '@/components/app/primitives';
 import { SkillStatus, toSkillLevel } from '@/components/app/status';
 import { requireUserId } from '@/lib/auth';
-import { accuracyByQuestionKind, latestDiagnostic } from '@/lib/db/queries';
+import {
+  accuracyByQuestionKind,
+  diagnosticCount,
+  isPro,
+  latestDiagnostic,
+} from '@/lib/db/queries';
+import { canStartDiagnostic } from '@/lib/entitlements';
+import { ProTag } from '@/components/billing/pro';
 import {
   IELTS_MODULES,
   MODULE_LABEL,
@@ -45,10 +52,17 @@ const MODULE_BLURB: Record<string, string> = {
  */
 export default async function PracticePage() {
   const userId = await requireUserId();
-  const [accuracy, diagnostic] = await Promise.all([
+  const [accuracy, diagnostic, taken, pro] = await Promise.all([
     accuracyByQuestionKind(userId),
     latestDiagnostic(userId),
+    diagnosticCount(userId),
+    isPro(userId),
   ]);
+
+  // The first sitting is free and off-quota; retaking is Pro. Without this the
+  // button below said "Take another diagnostic" to everyone, and for a free
+  // candidate that was a promise the action would not keep.
+  const canRetake = canStartDiagnostic({ isPro: pro, taken });
 
   // Smart Practice names real weaknesses or it does not appear. A generated
   // session over question types nobody has attempted would be a guess dressed
@@ -211,11 +225,32 @@ export default async function PracticePage() {
             ))}
           </dl>
 
-          <div className="px-5 py-4">
-            <Button nativeButton={false} render={<Link href="/diagnostic" />}>
-              {diagnostic ? 'Take another diagnostic' : 'Start diagnostic'}
-              <ArrowRight />
-            </Button>
+          <div className="space-y-3 px-5 py-4">
+            {canRetake ? (
+              <Button nativeButton={false} render={<Link href="/diagnostic" />}>
+                {taken ? 'Take another diagnostic' : 'Start diagnostic'}
+                <ArrowRight />
+              </Button>
+            ) : (
+              <>
+                <Button variant="outline" disabled>
+                  Retake diagnostic <ProTag className="ml-2" />
+                </Button>
+                <p className="max-w-prose text-sm text-muted-foreground text-pretty">
+                  You have had your free diagnostic. Retaking it is how you find
+                  out whether you have actually moved — Pro includes as many as
+                  you want.
+                </p>
+              </>
+            )}
+            {diagnostic ? (
+              <Link
+                href={`/diagnostic/${diagnostic.id}/result`}
+                className="block text-sm underline underline-offset-4"
+              >
+                See your last result
+              </Link>
+            ) : null}
           </div>
         </article>
 

@@ -1,9 +1,12 @@
 'use client';
 
 import { useRef, useState } from 'react';
+import Link from 'next/link';
 import { ArrowUp, Square } from 'lucide-react';
 import { Button } from '@bandzen/ui/components/button';
 import { cn } from '@bandzen/ui/lib/utils';
+import { QuotaMeter, resetLabel } from '@/components/billing/pro';
+import type { Allowance } from '@/lib/entitlements';
 
 type Message = { role: 'user' | 'assistant'; content: string };
 
@@ -15,17 +18,28 @@ type Message = { role: 'user' | 'assistant'; content: string };
  * policy and a second scoped query surface, and none of that earns its keep
  * until someone asks to come back to an old answer.
  */
-export function CoachChat({ prompts }: { prompts: readonly string[] }) {
+export function CoachChat({
+  prompts,
+  quota,
+}: {
+  prompts: readonly string[];
+  quota: Allowance;
+}) {
   const [messages, setMessages] = useState<Message[]>([]);
   const [draft, setDraft] = useState('');
   const [streaming, setStreaming] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  // Counted down here as well as on the server, so the number a candidate is
+  // looking at is the number they have — a meter that only updates on refresh
+  // is worse than no meter, because it is confidently wrong.
+  const [left, setLeft] = useState(quota.remaining);
+  const [spent, setSpent] = useState(!quota.allowed);
   const abortRef = useRef<AbortController | null>(null);
   const logRef = useRef<HTMLDivElement>(null);
 
   async function send(text: string) {
     const question = text.trim();
-    if (!question || streaming) return;
+    if (!question || streaming || spent) return;
 
     const next: Message[] = [...messages, { role: 'user', content: question }];
     setMessages([...next, { role: 'assistant', content: '' }]);
@@ -44,9 +58,20 @@ export function CoachChat({ prompts }: { prompts: readonly string[] }) {
         signal: controller.signal,
       });
 
+      // 402 is the quota, and it is not a failure — it has its own answer and
+      // its own next step, so it must never fall into the generic catch below.
+      if (response.status === 402) {
+        setMessages(next.slice(0, -1));
+        setSpent(true);
+        setLeft(0);
+        return;
+      }
+
       if (!response.ok || !response.body) {
         throw new Error(`Coach responded ${response.status}`);
       }
+
+      setLeft((n) => Math.max(0, n - 1));
 
       const reader = response.body.getReader();
       const decoder = new TextDecoder();
@@ -138,54 +163,83 @@ export function CoachChat({ prompts }: { prompts: readonly string[] }) {
         ) : null}
       </div>
 
-      <form
-        onSubmit={(event) => {
-          event.preventDefault();
-          void send(draft);
-        }}
-        className="flex items-end gap-2 border-t border-border pt-4"
-      >
-        <label htmlFor="coach-input" className="sr-only">
-          Ask Bandzen Coach
-        </label>
-        <textarea
-          id="coach-input"
-          value={draft}
-          onChange={(event) => setDraft(event.target.value)}
-          onKeyDown={(event) => {
-            // Enter sends, Shift+Enter breaks the line -- the convention
-            // everyone already has in their fingers.
-            if (event.key === 'Enter' && !event.shiftKey) {
-              event.preventDefault();
-              void send(draft);
-            }
+      {/* Replaces the composer rather than disabling it. A dead input a
+          candidate can still type into is a worse answer than a sentence
+          saying what happened and when it changes. */}
+      {spent ? (
+        <div className="space-y-2 border-t border-border pt-4">
+          <p className="text-sm">
+            You have used this week&rsquo;s {quota.limit} Coach messages.
+            {quota.resetsAt ? (
+              <> Your next free message is {resetLabel(quota.resetsAt)}.</>
+            ) : null}
+          </p>
+          <Button
+            nativeButton={false}
+            render={<Link href="/upgrade?from=coach_wall" />}
+          >
+            Unlimited Coach with Pro
+            <ArrowUp className="rotate-90" />
+          </Button>
+        </div>
+      ) : (
+        <form
+          onSubmit={(event) => {
+            event.preventDefault();
+            void send(draft);
           }}
-          rows={2}
-          placeholder="Ask about your bands, a question type, or what to do next"
-          className="min-h-16 flex-1 resize-y border border-input bg-transparent px-3 py-2 text-sm focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
-        />
+          className="flex items-end gap-2 border-t border-border pt-4"
+        >
+          <label htmlFor="coach-input" className="sr-only">
+            Ask Bandzen Coach
+          </label>
+          <textarea
+            id="coach-input"
+            value={draft}
+            onChange={(event) => setDraft(event.target.value)}
+            onKeyDown={(event) => {
+              // Enter sends, Shift+Enter breaks the line -- the convention
+              // everyone already has in their fingers.
+              if (event.key === 'Enter' && !event.shiftKey) {
+                event.preventDefault();
+                void send(draft);
+              }
+            }}
+            rows={2}
+            placeholder="Ask about your bands, a question type, or what to do next"
+            className="min-h-16 flex-1 resize-y border border-input bg-transparent px-3 py-2 text-sm focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
+          />
 
-        {streaming ? (
-          <Button
-            type="button"
-            variant="outline"
-            size="icon-lg"
-            aria-label="Stop"
-            onClick={() => abortRef.current?.abort()}
-          >
-            <Square />
-          </Button>
-        ) : (
-          <Button
-            type="submit"
-            size="icon-lg"
-            aria-label="Send"
-            disabled={!draft.trim()}
-          >
-            <ArrowUp />
-          </Button>
-        )}
-      </form>
+          {streaming ? (
+            <Button
+              type="button"
+              variant="outline"
+              size="icon-lg"
+              aria-label="Stop"
+              onClick={() => abortRef.current?.abort()}
+            >
+              <Square />
+            </Button>
+          ) : (
+            <Button
+              type="submit"
+              size="icon-lg"
+              aria-label="Send"
+              disabled={!draft.trim()}
+            >
+              <ArrowUp />
+            </Button>
+          )}
+        </form>
+      )}
+
+      {quota.unlimited ? null : (
+        <QuotaMeter
+          allowance={{ ...quota, remaining: left, used: quota.limit - left }}
+          noun="Coach messages"
+          source="coach_wall"
+        />
+      )}
     </div>
   );
 }

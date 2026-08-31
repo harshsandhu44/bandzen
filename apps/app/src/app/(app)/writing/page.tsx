@@ -3,7 +3,12 @@ import { Button } from '@bandzen/ui/components/button';
 import { EmptyState, PageHeader } from '@/components/app/primitives';
 import { FilterBar } from '@/components/app/filter-bar';
 import { requireUserId } from '@/lib/auth';
-import { getProfile, listWritingPrompts } from '@/lib/db/queries';
+import {
+  essayAllowance,
+  getProfile,
+  listWritingPrompts,
+} from '@/lib/db/queries';
+import { QuotaMeter } from '@/components/billing/pro';
 import { startWritingAttempt } from './actions';
 import { taskRules } from '@/lib/timing';
 
@@ -45,9 +50,10 @@ export default async function WritingPage({
   const task = rawTask === '1' || rawTask === '2' ? Number(rawTask) : undefined;
   const promptId = one(sp.prompt);
 
-  const [profile, prompts] = await Promise.all([
+  const [profile, prompts, quota] = await Promise.all([
     getProfile(userId),
     listWritingPrompts({ task, id: promptId }),
+    essayAllowance(userId),
   ]);
 
   const examType = profile?.examType ?? 'academic';
@@ -86,6 +92,16 @@ export default async function WritingPage({
         </p>
       ) : null}
 
+      {/* Shown from the first visit, not only once it runs out: a candidate
+          who can see the budget can plan around it, where a limit that appears
+          at zero reads as the product tightening on them. */}
+      <QuotaMeter
+        id="essay-quota"
+        allowance={quota}
+        noun="essay marks"
+        source="writing_wall"
+      />
+
       {!prompts.length ? (
         task ? (
           <EmptyState
@@ -123,12 +139,26 @@ export default async function WritingPage({
                   </p>
                   <p className="mt-1 line-clamp-2 text-sm">{p.promptText}</p>
                 </div>
-                <form action={startWritingAttempt}>
-                  <input type="hidden" name="promptId" value={p.id} />
-                  <Button type="submit" variant="outline" size="sm">
+                {quota.allowed ? (
+                  <form action={startWritingAttempt}>
+                    <input type="hidden" name="promptId" value={p.id} />
+                    <Button type="submit" variant="outline" size="sm">
+                      Start
+                    </Button>
+                  </form>
+                ) : (
+                  /* Disabled and visible, not hidden. Someone who cannot see
+                     what they are missing has nothing to decide about. */
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    disabled
+                    aria-describedby="essay-quota"
+                  >
                     Start
                   </Button>
-                </form>
+                )}
               </li>
             );
           })}

@@ -1,9 +1,11 @@
-import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { BandScale } from '@bandzen/ui/components/band-scale';
 import { cn } from '@bandzen/ui/lib/utils';
 import { requireUserId } from '@/lib/auth';
-import { getReport } from '@/lib/db/queries';
+import { essayAllowance, getReport, markedEssayCount } from '@/lib/db/queries';
+import { Button } from '@bandzen/ui/components/button';
+import { UpgradePrompt, resetLabel } from '@/components/billing/pro';
+import { retryGrading } from '../../actions';
 import type { Annotation } from '@/lib/db/schema';
 import { GradingWatch } from '@/components/app/grading-watch';
 
@@ -56,18 +58,63 @@ export default async function ReportPage({
     return (
       <div className="max-w-md space-y-4">
         <h1 className="font-title text-title-lg">Marking failed</h1>
-        <p className="text-sm text-muted-foreground">
-          Your response is saved. Try submitting again from{' '}
-          <Link href="/writing" className="underline underline-offset-4">
-            Writing
-          </Link>
-          .
+        <p className="text-sm text-muted-foreground text-pretty">
+          Your response is saved and nothing has been lost. Marking it again
+          costs you nothing — a failed run has never counted against your weekly
+          marks.
         </p>
+
+        {/* This used to say "try submitting again from Writing", which created
+            a new empty attempt and stranded the essay. The retry is here now,
+            on the row that actually failed. */}
+        <form action={retryGrading}>
+          <input type="hidden" name="attemptId" value={attemptId} />
+          <Button type="submit">Mark it again</Button>
+        </form>
+
+        {essay?.body ? (
+          <details className="border-t border-border pt-4">
+            <summary className="cursor-pointer font-mono text-[0.6875rem] tracking-[0.18em] text-muted-foreground uppercase">
+              Your response · {essay.wordCount} words
+            </summary>
+            <p className="mt-4 text-sm leading-7 whitespace-pre-wrap">
+              {essay.body}
+            </p>
+          </details>
+        ) : null}
       </div>
     );
   }
 
   if (!report) notFound();
+
+  // Two moments, and only two. The first report is demonstrated value with no
+  // scarcity attached — they have just seen what Pro is. The report that
+  // empties the allowance pairs that with a real limit and a real date. The
+  // same block under every report is wallpaper by the third view, and starts
+  // making the feedback itself feel like bait.
+  const [quota, marked] = await Promise.all([
+    essayAllowance(userId),
+    markedEssayCount(userId),
+  ]);
+
+  const prompt = quota.unlimited
+    ? null
+    : !quota.allowed
+      ? {
+          eyebrow: 'That was your last mark this week',
+          title: 'Keep going without waiting',
+          meta: quota.resetsAt
+            ? `Next free mark ${resetLabel(quota.resetsAt)}`
+            : undefined,
+        }
+      : marked <= 1
+        ? {
+            eyebrow: 'Your first marked essay',
+            title: 'Every essay, marked like this',
+            meta: `${quota.remaining} of ${quota.limit} marks left this week`,
+          }
+        : null;
 
   return (
     <div className="max-w-3xl space-y-10">
@@ -143,6 +190,16 @@ export default async function ReportPage({
             ))}
           </ul>
         </section>
+      ) : null}
+
+      {prompt ? (
+        <UpgradePrompt
+          eyebrow={prompt.eyebrow}
+          title={prompt.title}
+          meta={prompt.meta}
+          source="report_moment"
+          cta="See Pro"
+        />
       ) : null}
 
       {essay ? (
