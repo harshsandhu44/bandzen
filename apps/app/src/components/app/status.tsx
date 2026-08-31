@@ -44,7 +44,7 @@ export function SkillStatus({
   return (
     <span
       className={cn(
-        'inline-flex items-center gap-1.5 font-mono text-xs tracking-widest uppercase',
+        'inline-flex items-center gap-1.5 font-mono text-[0.6875rem] tracking-[0.18em] uppercase',
         tone,
         className,
       )}
@@ -84,7 +84,7 @@ export function TaskStatus({ status }: { status: StudyTaskStatus }) {
 
 export function ModuleBadge({ module }: { module: IELTSModule }) {
   return (
-    <span className="font-mono text-[0.625rem] tracking-[0.2em] text-muted-foreground uppercase">
+    <span className="text-xs font-medium text-muted-foreground">
       {MODULE_LABEL[module]}
     </span>
   );
@@ -103,7 +103,7 @@ export function LockedModule({ module }: { module: IELTSModule }) {
         aria-hidden
       />
       <div className="space-y-0.5">
-        <p className="text-sm font-medium">{MODULE_LABEL[module]}</p>
+        <p className="font-title text-sm">{MODULE_LABEL[module]}</p>
         <p className="text-xs text-muted-foreground">
           {UNAVAILABLE_REASON[module] ?? 'Not available yet.'}
         </p>
