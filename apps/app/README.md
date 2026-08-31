@@ -57,6 +57,41 @@ Answer keys live in their own table (`question_answers`) rather than on
 it still means a careless `select *` on `questions` cannot serialise an answer
 key into a page.
 
+## Server actions, and the one route handler
+
+Every write and almost every read is a server action called from a server
+component. There is exactly one route handler in the app, `POST /api/coach`,
+and it exists because streaming genuinely needs it — a server action resolves
+to a value, so a chat built on one sits silent and then appears all at once.
+
+It is not a precedent. It authenticates itself with `auth()` like every page
+does, and it assembles what the model is told about the candidate server-side
+from their own rows, so nothing the client sends can widen what Coach sees. If
+you are about to add a second handler, check first whether an action would do.
+
+## Content: rows, or TypeScript?
+
+Both, split on who edits it and how often.
+
+| Kind                                              | Lives in                     | Why                                                                                       |
+| ------------------------------------------------- | ---------------------------- | ----------------------------------------------------------------------------------------- |
+| Passages, questions, answer keys, writing prompts | Neon, seeded from `content/` | Generated, per-attempt, and joined against in queries                                     |
+| Lessons (`src/content/lessons.ts`)                | TypeScript                   | Prose, edited far more often than added — a wording fix should be a diff, not a migration |
+| Resources (`src/content/resources.ts`)            | TypeScript                   | Same                                                                                      |
+| Lesson completion                                 | Neon (`lesson_progress`)     | It is user-owned, so it is a scoped row like everything else                              |
+
+A lesson or resource without a body is _planned and unwritten_, and the UI says
+so. Do not give one an empty body to make the list look finished — a candidate
+who opens a blank lesson has lost time they cannot get back.
+
+## Estimates, not scores
+
+Bandzen produces its own numbers. Every one of them is an **Estimated Band**,
+in the interface and in anything a model is asked to say. Never "official IELTS
+band", never a predicted test-day result, and never an AI-generated paper
+described as an official examination. `src/lib/ai/coach.ts` states this to the
+model; the UI states it to the candidate.
+
 ## Design system
 
 Tokens come entirely from `@bandzen/ui`. This app adds only an instrumentation
