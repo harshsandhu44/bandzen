@@ -50,6 +50,72 @@ const choicesFor = (q: Q) =>
       ? YNNG
       : (q.options ?? null);
 
+/**
+ * The question navigator.
+ *
+ * apps/web has advertised this since launch (see marketing/exam-window.tsx)
+ * and the real exam screen never had it, so a candidate could not see which
+ * questions were still blank without scrolling the whole column.
+ *
+ * The band scale's idiom applied to something that encodes real state: each
+ * tick IS a question. Colour is never the only channel -- a flag carries the
+ * glyph, and every cell names its own state.
+ */
+function Navigator({
+  questions,
+  answers,
+  flags,
+}: {
+  questions: Q[];
+  answers: Record<string, string>;
+  flags: Record<string, boolean>;
+}) {
+  return (
+    <div className="flex flex-wrap items-center gap-x-4 gap-y-2">
+      <ul className="flex flex-1 flex-wrap gap-1">
+        {questions.map((q) => {
+          const flagged = flags[q.id] ?? false;
+          const answered = Boolean(answers[q.id]);
+          const state = flagged
+            ? 'flagged'
+            : answered
+              ? 'answered'
+              : 'not answered';
+          return (
+            <li key={q.id}>
+              <a
+                href={`#q-${q.idx}`}
+                aria-label={`Question ${q.idx}, ${state}`}
+                className={cn(
+                  'flex size-6 items-center justify-center border font-mono text-[0.5rem] tabular-nums transition-colors',
+                  flagged
+                    ? 'border-chrome bg-chrome text-ink'
+                    : answered
+                      ? 'border-primary bg-primary text-primary-foreground'
+                      : 'border-border text-muted-foreground hover:border-foreground/40',
+                )}
+              >
+                {flagged ? <Flag className="size-2.5" aria-hidden /> : q.idx}
+              </a>
+            </li>
+          );
+        })}
+      </ul>
+
+      <p className="flex shrink-0 items-center gap-3 font-mono text-[0.5625rem] tracking-[0.14em] text-muted-foreground uppercase">
+        <span className="flex items-center gap-1.5">
+          <span aria-hidden className="size-2 bg-primary" />
+          Answered
+        </span>
+        <span className="flex items-center gap-1.5">
+          <span aria-hidden className="size-2 bg-chrome" />
+          Flagged
+        </span>
+      </p>
+    </div>
+  );
+}
+
 export function ReadingTest({
   attemptId,
   startedAt,
@@ -99,29 +165,31 @@ export function ReadingTest({
   const answered = questions.filter((q) => answers[q.id]).length;
 
   return (
-    <div className="-m-6 flex min-h-svh flex-col sm:-m-10">
-      <header className="sticky top-0 z-10 flex items-center justify-between gap-4 border-b border-border bg-background px-6 py-3">
-        <p className="font-mono text-xs tracking-widest text-muted-foreground uppercase">
-          {answered}/{questions.length} answered
-        </p>
-        <div className="flex items-center gap-4">
-          <SaveStatus status={status} onRetry={retryFailed} />
-          <Timer startedAt={startedAt} minutes={minutes} />
-          <SubmitConfirm
-            action={submitReadingAttempt}
-            attemptId={attemptId}
-            unanswered={questions.length - answered}
-            total={questions.length}
-            unsaved={status === 'failed'}
-          />
+    <div className="-m-6 flex min-h-svh flex-col sm:-m-10 lg:h-svh lg:min-h-0">
+      <header className="sticky top-0 z-10 shrink-0 space-y-3 border-b border-border bg-background px-6 py-3">
+        <div className="flex items-center justify-between gap-4">
+          <p className="font-metric text-metric-sm text-muted-foreground">
+            {answered}/{questions.length} answered
+          </p>
+          <div className="flex items-center gap-4">
+            <SaveStatus status={status} onRetry={retryFailed} />
+            <Timer startedAt={startedAt} minutes={minutes} />
+            <SubmitConfirm
+              action={submitReadingAttempt}
+              attemptId={attemptId}
+              unanswered={questions.length - answered}
+              total={questions.length}
+              unsaved={status === 'failed'}
+            />
+          </div>
         </div>
+
+        <Navigator questions={questions} answers={answers} flags={flags} />
       </header>
 
-      <div className="grid flex-1 gap-0 lg:grid-cols-2">
-        <article className="overflow-y-auto border-border p-6 lg:max-h-[calc(100svh-3.5rem)] lg:border-r">
-          <h1 className="mb-6 text-xl font-medium tracking-tight">
-            {passage.title}
-          </h1>
+      <div className="grid flex-1 gap-0 lg:min-h-0 lg:grid-cols-2">
+        <article className="border-border p-6 lg:min-h-0 lg:overflow-y-auto lg:border-r">
+          <h1 className="mb-6 font-title text-title">{passage.title}</h1>
           {passage.body.split(/\n\s*\n/).map((para, i) => (
             <p key={i} className="mb-4 text-sm leading-7 whitespace-pre-line">
               {para}
@@ -129,12 +197,10 @@ export function ReadingTest({
           ))}
         </article>
 
-        <div className="overflow-y-auto p-6 lg:max-h-[calc(100svh-3.5rem)]">
+        <div className="p-6 lg:min-h-0 lg:overflow-y-auto">
           {headings?.length ? (
             <section className="mb-8 border border-border p-4">
-              <h2 className="mb-3 font-mono text-xs tracking-widest text-muted-foreground uppercase">
-                List of headings
-              </h2>
+              <h2 className="mb-3 font-title text-title">List of headings</h2>
               <ol className="space-y-1.5">
                 {headings.map((h, i) => (
                   <li key={h} className="flex gap-3 text-sm">
@@ -153,7 +219,7 @@ export function ReadingTest({
               const choices = choicesFor(q);
               const isHeading = q.kind === 'matching_headings';
               return (
-                <li key={q.id} className="mb-8">
+                <li key={q.id} id={`q-${q.idx}`} className="mb-8 scroll-mt-6">
                   <div className="mb-2 flex items-start gap-3">
                     <span className="font-mono text-xs text-muted-foreground">
                       {String(q.idx).padStart(2, '0')}
