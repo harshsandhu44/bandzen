@@ -112,8 +112,13 @@
 }
 
 .dark {
-  /* Authored and AA-checked, but nothing sets `.dark` yet — the landing page ships
-     light-only. Wire up a theme provider when the product app needs the toggle. */
+  /* Authored and AA-checked. `apps/app` drives this via next-themes
+     (`attribute="class"`); `apps/web` ships light-only and never sets it.
+
+     Note that `--ink` and `--paper` SWAP here. `bg-ink text-paper` therefore
+     inverts under dark mode, which is fine for a marketing page that never
+     sees it and wrong for a product surface that does — see apps/app's
+     FeatureBlock for the pairing that survives both themes. */
   --ink: oklch(0.99 0 0);
   --paper: oklch(0.145 0.012 285);
   --cobalt: oklch(0.66 0.22 264);

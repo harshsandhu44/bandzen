@@ -65,7 +65,7 @@ export function LessonBlockView({ block }: { block: LessonBlock }) {
           <figcaption className="space-y-2">
             <p className="text-sm font-medium">{block.question}</p>
             <p className="text-sm">
-              <span className="font-mono text-[0.625rem] tracking-[0.2em] text-muted-foreground uppercase">
+              <span className="font-mono text-[0.6875rem] tracking-[0.18em] text-muted-foreground uppercase">
                 Answer
               </span>{' '}
               {block.answer}
@@ -89,7 +89,7 @@ export function LessonBlockView({ block }: { block: LessonBlock }) {
           {/* Native disclosure: the reader commits to an answer before
               revealing, and it costs no client JavaScript to do it. */}
           <details className="group">
-            <summary className="cursor-pointer font-mono text-[0.625rem] tracking-[0.2em] text-muted-foreground uppercase underline-offset-4 hover:underline">
+            <summary className="cursor-pointer text-xs underline-offset-4 hover:underline">
               Show the answer
             </summary>
             <div className="mt-3 space-y-1.5">

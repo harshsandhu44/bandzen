@@ -1,7 +1,7 @@
 import { notFound, redirect } from 'next/navigation';
 import { requireUserId } from '@/lib/auth';
 import { getAttempt, getReadingTest } from '@/lib/db/queries';
-import { minutesFor } from '../timing';
+import { minutesFor } from '@/lib/timing';
 import { ReadingTest } from './reading-test';
 
 export const metadata = { title: 'Reading test' };

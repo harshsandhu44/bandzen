@@ -52,7 +52,7 @@ export function PerformanceInsight({ insight }: { insight: Insight | null }) {
             {insight.evidence.map((line) => (
               <li
                 key={line}
-                className="font-mono text-[0.625rem] tracking-[0.16em] text-muted-foreground uppercase tabular-nums"
+                className="font-mono text-[0.6875rem] tracking-[0.18em] text-muted-foreground uppercase tabular-nums"
               >
                 {line}
               </li>

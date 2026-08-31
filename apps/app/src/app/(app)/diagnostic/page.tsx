@@ -3,6 +3,7 @@ import { Label } from '@bandzen/ui/components/label';
 import { Button } from '@bandzen/ui/components/button';
 import { requireUserId } from '@/lib/auth';
 import { getProfile } from '@/lib/db/queries';
+import { DIAGNOSTIC_DURATION_LABEL } from '@/lib/timing';
 import { startDiagnostic } from './actions';
 
 export const metadata = { title: 'Diagnostic' };
@@ -14,10 +15,10 @@ export default async function DiagnosticPage() {
   return (
     <div className="max-w-md space-y-8">
       <header>
-        <p className="font-mono text-xs tracking-widest text-muted-foreground uppercase">
-          Diagnostic · about 35 minutes
+        <p className="font-mono text-[0.6875rem] tracking-[0.18em] text-muted-foreground uppercase">
+          Diagnostic · {DIAGNOSTIC_DURATION_LABEL}
         </p>
-        <h1 className="mt-2 text-2xl font-medium tracking-tight">
+        <h1 className="mt-2 font-title text-title-lg">
           Find out where you actually are
         </h1>
         <p className="mt-3 text-sm leading-6 text-muted-foreground">
@@ -61,7 +62,7 @@ export default async function DiagnosticPage() {
         </Button>
       </form>
 
-      <p className="font-mono text-xs leading-5 text-muted-foreground">
+      <p className="text-xs leading-5 text-muted-foreground">
         Bands reported by Bandzen are estimates for practice, not official IELTS
         scores.
       </p>

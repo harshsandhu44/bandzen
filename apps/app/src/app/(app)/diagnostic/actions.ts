@@ -32,7 +32,8 @@ export async function startDiagnostic(formData: FormData) {
   if (existing?.status === 'in_progress') redirect(`/reading/${existing.id}`);
   if (existing) redirect(`/diagnostic/${existing.id}/result`);
 
-  // Easiest passage available keeps the diagnostic near 35 minutes total.
+  // Easiest passage available: the diagnostic should measure, not exhaust.
+  // Its length is stated from the engines' own rules -- see lib/timing.ts.
   const passage = await pickEasiestPassage();
   if (!passage) throw new Error('No passages seeded — see apps/app/README.md');
 

@@ -5,7 +5,7 @@ import { cn } from '@bandzen/ui/lib/utils';
 import { requireUserId } from '@/lib/auth';
 import { getReport } from '@/lib/db/queries';
 import type { Annotation } from '@/lib/db/schema';
-import { GradingWatch } from './grading-watch';
+import { GradingWatch } from '@/components/app/grading-watch';
 
 export const metadata = { title: 'Writing report' };
 
@@ -36,12 +36,10 @@ export default async function ReportPage({
     return (
       <div className="max-w-md space-y-4">
         <GradingWatch attemptId={attemptId} />
-        <p className="font-mono text-xs tracking-widest text-muted-foreground uppercase">
+        <p className="font-mono text-[0.6875rem] tracking-[0.18em] text-muted-foreground uppercase">
           Marking
         </p>
-        <h1 className="text-2xl font-medium tracking-tight">
-          Reading your response
-        </h1>
+        <h1 className="font-title text-title-lg">Reading your response</h1>
         <p className="text-sm text-muted-foreground">
           This takes up to a minute. You can close this tab — the report will be
           here when you come back.
@@ -57,7 +55,7 @@ export default async function ReportPage({
   if (attempt.status === 'failed') {
     return (
       <div className="max-w-md space-y-4">
-        <h1 className="text-2xl font-medium tracking-tight">Marking failed</h1>
+        <h1 className="font-title text-title-lg">Marking failed</h1>
         <p className="text-sm text-muted-foreground">
           Your response is saved. Try submitting again from{' '}
           <Link href="/writing" className="underline underline-offset-4">
@@ -74,14 +72,14 @@ export default async function ReportPage({
   return (
     <div className="max-w-3xl space-y-10">
       <header className="space-y-4">
-        <p className="font-mono text-xs tracking-widest text-muted-foreground uppercase">
+        <p className="font-mono text-[0.6875rem] tracking-[0.18em] text-muted-foreground uppercase">
           Writing report
         </p>
         <div className="flex items-baseline gap-4">
           <span className="font-metric text-metric-lg">
             {report.band.toFixed(1)}
           </span>
-          <span className="font-mono text-xs tracking-widest text-muted-foreground uppercase">
+          <span className="font-mono text-[0.6875rem] tracking-[0.18em] text-muted-foreground uppercase">
             Estimate, not an official score
           </span>
         </div>
@@ -89,9 +87,7 @@ export default async function ReportPage({
       </header>
 
       <section className="space-y-6">
-        <h2 className="font-mono text-xs tracking-widest text-muted-foreground uppercase">
-          By criterion
-        </h2>
+        <h2 className="font-title text-title">By criterion</h2>
         {report.criteria.map((c) => (
           <div key={c.name} className="space-y-2">
             <BandScale value={c.band} label={c.name} />
@@ -104,9 +100,7 @@ export default async function ReportPage({
 
       <div className="grid gap-8 sm:grid-cols-2">
         <section>
-          <h2 className="mb-3 font-mono text-xs tracking-widest text-muted-foreground uppercase">
-            Strengths
-          </h2>
+          <h2 className="mb-3 font-title text-title">Strengths</h2>
           <ul className="space-y-2 text-sm">
             {report.strengths.map((s) => (
               <li key={s} className="border-l-2 border-primary pl-3">
@@ -116,9 +110,7 @@ export default async function ReportPage({
           </ul>
         </section>
         <section>
-          <h2 className="mb-3 font-mono text-xs tracking-widest text-muted-foreground uppercase">
-            Needs work
-          </h2>
+          <h2 className="mb-3 font-title text-title">Needs work</h2>
           <ul className="space-y-2 text-sm">
             {report.weaknesses.map((w) => (
               <li key={w} className="border-l-2 border-chrome pl-3">
@@ -131,16 +123,14 @@ export default async function ReportPage({
 
       {report.annotations.length ? (
         <section>
-          <h2 className="mb-3 font-mono text-xs tracking-widest text-muted-foreground uppercase">
-            In your response
-          </h2>
+          <h2 className="mb-3 font-title text-title">In your response</h2>
           <ul className="space-y-4">
             {report.annotations.map((a, i) => (
               <li
                 key={i}
                 className={cn('border-l-2 pl-4', ANNOTATION_STYLE[a.kind])}
               >
-                <p className="font-mono text-[0.6875rem] tracking-widest text-muted-foreground uppercase">
+                <p className="font-mono text-[0.6875rem] tracking-[0.18em] text-muted-foreground uppercase">
                   {ANNOTATION_LABEL[a.kind]}
                 </p>
                 <blockquote className="mt-1 text-sm leading-6 italic">
@@ -157,7 +147,7 @@ export default async function ReportPage({
 
       {essay ? (
         <details className="border-t border-border pt-6">
-          <summary className="cursor-pointer font-mono text-xs tracking-widest text-muted-foreground uppercase">
+          <summary className="cursor-pointer font-mono text-[0.6875rem] tracking-[0.18em] text-muted-foreground uppercase">
             Your response · {essay.wordCount} words
           </summary>
           <p className="mt-4 text-sm leading-7 whitespace-pre-wrap">

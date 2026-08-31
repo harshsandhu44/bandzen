@@ -37,7 +37,7 @@ export function BandOverview({
                 className="flex items-baseline justify-between gap-4 border-b border-border pb-3"
               >
                 <p className="text-sm">{MODULE_LABEL[module]}</p>
-                <p className="font-mono text-[0.625rem] tracking-[0.2em] text-muted-foreground uppercase">
+                <p className="font-mono text-[0.6875rem] tracking-[0.18em] text-muted-foreground uppercase">
                   Not measured
                 </p>
               </div>

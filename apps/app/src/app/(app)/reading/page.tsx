@@ -136,7 +136,7 @@ export default async function ReadingPage({
             >
               <div>
                 <h2 className="font-medium">{p.title}</h2>
-                <p className="font-mono text-xs tracking-widest text-muted-foreground uppercase">
+                <p className="font-mono text-[0.6875rem] tracking-[0.18em] text-muted-foreground uppercase">
                   {p.topic} · Level {p.difficulty}
                 </p>
               </div>

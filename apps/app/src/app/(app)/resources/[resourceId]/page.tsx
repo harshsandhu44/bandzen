@@ -42,15 +42,13 @@ export default async function ResourcePage({
       <header className="space-y-3">
         <Link
           href={`/resources?category=${resource.category}`}
-          className="inline-flex items-center gap-1.5 font-mono text-xs tracking-widest text-muted-foreground uppercase underline-offset-4 hover:underline"
+          className="inline-flex items-center gap-1.5 text-sm text-muted-foreground underline-offset-4 hover:text-foreground hover:underline"
         >
           <ArrowLeft className="size-3" aria-hidden />
           {CATEGORY_TITLE[resource.category]}
         </Link>
-        <h1 className="text-2xl font-medium tracking-tight text-balance">
-          {resource.title}
-        </h1>
-        <p className="font-mono text-[0.625rem] tracking-[0.2em] text-muted-foreground uppercase tabular-nums">
+        <h1 className="font-title text-title-lg">{resource.title}</h1>
+        <p className="text-xs text-muted-foreground tabular-nums">
           {resource.minutes} min · {resource.level}
         </p>
       </header>

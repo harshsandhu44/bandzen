@@ -3,9 +3,10 @@ import { notFound } from 'next/navigation';
 import { BandScale } from '@bandzen/ui/components/band-scale';
 import { requireUserId } from '@/lib/auth';
 import { getDiagnostic, getProfile } from '@/lib/db/queries';
+import { todayIso } from '@/lib/dates';
 import { buildPlan, nextAction } from '@/lib/study-plan';
-import { GradingWatch } from '../../../writing/[attemptId]/report/grading-watch';
-import { StudyPlan } from '../../../study-plan';
+import { GradingWatch } from '@/components/app/grading-watch';
+import { ComingUp } from '@/components/dashboard/coming-up';
 
 export const metadata = { title: 'Diagnostic result' };
 
@@ -45,7 +46,7 @@ export default async function DiagnosticResultPage({
       {stillGrading && writing ? <GradingWatch attemptId={writing.id} /> : null}
 
       <header className="space-y-4">
-        <p className="font-mono text-xs tracking-widest text-muted-foreground uppercase">
+        <p className="font-mono text-[0.6875rem] tracking-[0.18em] text-muted-foreground uppercase">
           Diagnostic result
         </p>
         {overall != null ? (
@@ -53,12 +54,12 @@ export default async function DiagnosticResultPage({
             <span className="font-metric text-metric-lg">
               {overall.toFixed(1)}
             </span>
-            <span className="font-mono text-xs tracking-widest text-muted-foreground uppercase">
+            <span className="font-mono text-[0.6875rem] tracking-[0.18em] text-muted-foreground uppercase">
               Estimate, not an official score
             </span>
           </div>
         ) : (
-          <h1 className="text-2xl font-medium tracking-tight">
+          <h1 className="font-title text-title-lg">
             {stillGrading ? 'Marking your essay' : 'Diagnostic in progress'}
           </h1>
         )}
@@ -72,14 +73,12 @@ export default async function DiagnosticResultPage({
       </header>
 
       <section className="space-y-4">
-        <h2 className="font-mono text-xs tracking-widest text-muted-foreground uppercase">
-          By skill
-        </h2>
+        <h2 className="font-title text-title">By skill</h2>
 
         {readingBand != null ? (
           <div className="space-y-1">
             <BandScale value={readingBand} label="Reading" />
-            <p className="font-mono text-xs text-muted-foreground">
+            <p className="text-xs text-muted-foreground tabular-nums">
               {reading.rawScore}/{reading.total} correct ·{' '}
               <Link
                 href={`/reading/${reading.id}/review`}
@@ -94,7 +93,7 @@ export default async function DiagnosticResultPage({
         {writingBand != null && writing ? (
           <div className="space-y-1">
             <BandScale value={writingBand} label="Writing" />
-            <p className="font-mono text-xs text-muted-foreground">
+            <p className="text-xs text-muted-foreground tabular-nums">
               <Link
                 href={`/writing/${writing.id}/report`}
                 className="underline underline-offset-4"
@@ -116,11 +115,13 @@ export default async function DiagnosticResultPage({
       </section>
 
       <section className="space-y-4">
-        <h2 className="font-mono text-xs tracking-widest text-muted-foreground uppercase">
-          What to do next
-        </h2>
+        <h2 className="font-title text-title">What to do next</h2>
         <p className="text-sm">{nextAction(planInput)}</p>
-        <StudyPlan tasks={buildPlan(planInput)} />
+        <ComingUp
+          plan={buildPlan(planInput)}
+          today={todayIso(profile?.timezone)}
+          heading="Your plan from here"
+        />
       </section>
     </div>
   );

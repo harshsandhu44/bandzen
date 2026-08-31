@@ -39,7 +39,7 @@ export function FilterBar({
 
   return (
     <div className="space-y-1.5">
-      <p className="font-mono text-[0.625rem] tracking-[0.2em] text-muted-foreground uppercase">
+      <p className="font-mono text-[0.6875rem] tracking-[0.18em] text-muted-foreground uppercase">
         {legend}
       </p>
       <div className="flex flex-wrap gap-1.5">

@@ -2,7 +2,7 @@
 
 import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { gradingStatus } from '../../actions';
+import { gradingStatus } from '@/app/(app)/writing/actions';
 
 /**
  * Waits for the grader to finish.

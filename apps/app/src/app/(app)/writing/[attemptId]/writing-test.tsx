@@ -42,7 +42,7 @@ export function WritingTest({
 
   return (
     <div className="-m-6 flex min-h-svh flex-col sm:-m-10">
-      <header className="sticky top-0 z-10 flex items-center justify-between gap-4 border-b border-border bg-background px-6 py-3">
+      <header className="sticky top-0 z-10 shrink-0 flex items-center justify-between gap-4 border-b border-border bg-background px-6 py-3">
         <p
           className={cn(
             'font-metric text-metric-sm',
@@ -67,7 +67,7 @@ export function WritingTest({
 
       <div className="mx-auto flex w-full max-w-3xl flex-1 flex-col gap-6 p-6">
         <div className="border-l-2 border-chrome pl-4">
-          <p className="font-mono text-xs tracking-widest text-muted-foreground uppercase">
+          <p className="font-mono text-[0.6875rem] tracking-[0.18em] text-muted-foreground uppercase">
             Task {task}
           </p>
           <p className="mt-2 text-sm leading-7">{promptText}</p>
@@ -91,7 +91,7 @@ export function WritingTest({
         />
 
         {short ? (
-          <p className="font-mono text-xs text-muted-foreground">
+          <p className="text-xs text-muted-foreground">
             Under {minWords} words is penalised under Task Response.
           </p>
         ) : null}

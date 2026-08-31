@@ -1,7 +1,7 @@
 import { notFound, redirect } from 'next/navigation';
 import { requireUserId } from '@/lib/auth';
 import { getAttempt, getWritingTest } from '@/lib/db/queries';
-import { taskRules } from '../timing';
+import { taskRules } from '@/lib/timing';
 import { WritingTest } from './writing-test';
 
 export const metadata = { title: 'Writing task' };

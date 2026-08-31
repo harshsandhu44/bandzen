@@ -2,33 +2,52 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
+import {
+  SidebarMenu,
+  SidebarMenuButton,
+  SidebarMenuItem,
+  SidebarSeparator,
+  useSidebar,
+} from '@bandzen/ui/components/sidebar';
 import { cn } from '@bandzen/ui/lib/utils';
-import { isActive, NAV_GROUPS, SETTINGS_LINK, type NavLink } from './nav-links';
+import { isActive, NAV_LINKS, SETTINGS_LINK, type NavLink } from './nav-links';
 
 /**
- * The desktop sidebar navigation.
+ * The sidebar navigation.
  *
- * Deliberately not collapsible. Persisting a collapsed state costs a client
- * provider and a cookie to save 14rem on screens wide enough not to need it,
- * and the sidebar is hidden outright below `sm` where the space matters.
+ * Sentence case, in the body face. Mono uppercase is reserved for
+ * instrumentation -- a destination is a word you read, not a reading you take.
  */
 
 function Item({ link, pathname }: { link: NavLink; pathname: string }) {
   const active = isActive(link, pathname);
+  const { setOpenMobile } = useSidebar();
+
   return (
-    <Link
-      href={link.href}
-      aria-current={active ? 'page' : undefined}
-      className={cn(
-        'flex items-center gap-2.5 px-3 py-1.5 font-mono text-xs tracking-widest uppercase transition-colors',
-        active
-          ? 'bg-secondary text-foreground'
-          : 'text-muted-foreground hover:text-foreground',
-      )}
-    >
-      <link.Icon className="size-3.5 shrink-0" aria-hidden />
-      {link.label}
-    </Link>
+    <SidebarMenuItem>
+      <SidebarMenuButton
+        isActive={active}
+        // On a phone the nav is a sheet over the page, so it has to close
+        // itself once it has done its job.
+        onClick={() => setOpenMobile(false)}
+        className="text-sm"
+        render={
+          <Link href={link.href} aria-current={active ? 'page' : undefined} />
+        }
+      >
+        {/* The active marker is a rule as well as a fill, so it survives being
+            seen without colour. */}
+        <span
+          aria-hidden
+          className={cn(
+            'absolute inset-y-0 left-0 w-0.5',
+            active ? 'bg-sidebar-primary' : 'bg-transparent',
+          )}
+        />
+        <link.Icon aria-hidden />
+        <span>{link.label}</span>
+      </SidebarMenuButton>
+    </SidebarMenuItem>
   );
 }
 
@@ -36,20 +55,14 @@ export function Nav() {
   const pathname = usePathname();
 
   return (
-    <nav className="flex flex-col gap-5" aria-label="Main">
-      {NAV_GROUPS.map((group) => (
-        <div key={group.heading} className="flex flex-col gap-0.5">
-          <p className="px-3 pb-1 font-mono text-[0.625rem] tracking-[0.2em] text-muted-foreground/70 uppercase">
-            {group.heading}
-          </p>
-          {group.links.map((link) => (
-            <Item key={link.href} link={link} pathname={pathname} />
-          ))}
-        </div>
+    <SidebarMenu className="gap-0.5 px-2">
+      {NAV_LINKS.map((link) => (
+        <Item key={link.href} link={link} pathname={pathname} />
       ))}
-      <div className="flex flex-col gap-0.5">
-        <Item link={SETTINGS_LINK} pathname={pathname} />
-      </div>
-    </nav>
+
+      <SidebarSeparator className="my-2" />
+
+      <Item link={SETTINGS_LINK} pathname={pathname} />
+    </SidebarMenu>
   );
 }

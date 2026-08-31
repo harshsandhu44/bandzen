@@ -1,4 +1,5 @@
 import { Skeleton } from '@bandzen/ui/components/skeleton';
+import { cn } from '@bandzen/ui/lib/utils';
 
 /**
  * A page-shaped placeholder.
@@ -10,12 +11,19 @@ import { Skeleton } from '@bandzen/ui/components/skeleton';
 export function LoadingState({
   rows = 5,
   showMetrics = false,
+  width = 'default',
 }: {
   rows?: number;
   showMetrics?: boolean;
+  /** Must match the page it stands in for, or content jumps when it arrives. */
+  width?: 'default' | 'wide';
 }) {
   return (
-    <div className="max-w-3xl space-y-8" aria-busy role="status">
+    <div
+      className={cn('space-y-8', width === 'wide' ? 'max-w-5xl' : 'max-w-3xl')}
+      aria-busy
+      role="status"
+    >
       <span className="sr-only">Loading</span>
 
       <div className="space-y-3">

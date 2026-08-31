@@ -1,10 +1,14 @@
 import Link from 'next/link';
 import { ArrowRight, Lock } from 'lucide-react';
 import { Button } from '@bandzen/ui/components/button';
-import { PageHeader, SectionHeader } from '@/components/app/primitives';
+import {
+  Eyebrow,
+  PageHeader,
+  SectionHeader,
+} from '@/components/app/primitives';
 import { SkillStatus, toSkillLevel } from '@/components/app/status';
 import { requireUserId } from '@/lib/auth';
-import { accuracyByQuestionKind } from '@/lib/db/queries';
+import { accuracyByQuestionKind, latestDiagnostic } from '@/lib/db/queries';
 import {
   IELTS_MODULES,
   MODULE_LABEL,
@@ -12,6 +16,7 @@ import {
   UNAVAILABLE_REASON,
   isAvailable,
 } from '@/lib/modules';
+import { DIAGNOSTIC_DURATION_LABEL } from '@/lib/timing';
 
 export const metadata = { title: 'Practice' };
 
@@ -28,9 +33,22 @@ const MODULE_BLURB: Record<string, string> = {
   writing: 'Task 2 prompts, graded against the four IELTS criteria.',
 };
 
+/**
+ * Everything a candidate can attempt, in the order a candidate needs it:
+ * what their own results recommend, then the modules, then the heavier timed
+ * tests.
+ *
+ * /tests folded in here. Its "Section tests" tab sent people to /reading and
+ * /writing, which is what "By module" below already does, and its "Completed"
+ * tab listed the same fifty attempts as /progress. The diagnostic entry point
+ * was the only thing it owned.
+ */
 export default async function PracticePage() {
   const userId = await requireUserId();
-  const accuracy = await accuracyByQuestionKind(userId);
+  const [accuracy, diagnostic] = await Promise.all([
+    accuracyByQuestionKind(userId),
+    latestDiagnostic(userId),
+  ]);
 
   // Smart Practice names real weaknesses or it does not appear. A generated
   // session over question types nobody has attempted would be a guess dressed
@@ -45,55 +63,8 @@ export default async function PracticePage() {
       <PageHeader
         eyebrow="Practice"
         title="What do you want to practise?"
-        description="Short, focused sessions. Everything here is scored the same way the mock tests are."
+        description="Short, focused sessions and full timed tests. Everything here is scored the same way."
       />
-
-      <section aria-labelledby="modules-heading" className="space-y-3">
-        <SectionHeader as="h2">
-          <span id="modules-heading">By module</span>
-        </SectionHeader>
-
-        <div className="grid gap-3 sm:grid-cols-2">
-          {IELTS_MODULES.map((module) =>
-            isAvailable(module) ? (
-              <Link
-                key={module}
-                href={MODULE_HREF[module]!}
-                className="group flex flex-col justify-between gap-6 border border-border p-5 transition-colors hover:border-foreground/30"
-              >
-                <div className="space-y-1">
-                  <p className="text-sm font-medium">{MODULE_LABEL[module]}</p>
-                  <p className="text-sm text-muted-foreground text-pretty">
-                    {MODULE_BLURB[module]}
-                  </p>
-                </div>
-                <span className="inline-flex items-center gap-1.5 font-mono text-[0.625rem] tracking-[0.2em] uppercase">
-                  Start
-                  <ArrowRight
-                    className="size-3 transition-transform group-hover:translate-x-0.5"
-                    aria-hidden
-                  />
-                </span>
-              </Link>
-            ) : (
-              <div
-                key={module}
-                className="flex flex-col gap-6 border border-dashed border-border p-5"
-              >
-                <div className="space-y-1">
-                  <p className="flex items-center gap-2 text-sm font-medium text-muted-foreground">
-                    <Lock className="size-3.5 shrink-0" aria-hidden />
-                    {MODULE_LABEL[module]}
-                  </p>
-                  <p className="text-sm text-muted-foreground text-pretty">
-                    {UNAVAILABLE_REASON[module]}
-                  </p>
-                </div>
-              </div>
-            ),
-          )}
-        </div>
-      </section>
 
       <section aria-labelledby="smart-heading" className="space-y-3">
         <SectionHeader as="h2">
@@ -145,8 +116,8 @@ export default async function PracticePage() {
           </div>
         ) : (
           <div className="border border-dashed border-border px-6 py-8">
-            <p className="text-sm font-medium">Not enough data yet</p>
-            <p className="mt-1 max-w-prose text-sm text-muted-foreground text-pretty">
+            <p className="font-title text-title">Not enough data yet</p>
+            <p className="mt-2 max-w-prose text-sm text-muted-foreground text-pretty">
               Once you have answered at least {MIN_ATTEMPTED} questions of a
               type, we can tell a weakness from a bad day. Until then, a
               recommendation would be a guess.
@@ -162,6 +133,108 @@ export default async function PracticePage() {
             </Button>
           </div>
         )}
+      </section>
+
+      <section aria-labelledby="modules-heading" className="space-y-3">
+        <SectionHeader as="h2">
+          <span id="modules-heading">By module</span>
+        </SectionHeader>
+
+        <div className="grid gap-3 sm:grid-cols-2">
+          {IELTS_MODULES.map((module) =>
+            isAvailable(module) ? (
+              <Link
+                key={module}
+                href={MODULE_HREF[module]!}
+                className="group flex flex-col justify-between gap-6 border border-border p-5 transition-colors hover:border-foreground/30"
+              >
+                <div className="space-y-1">
+                  <p className="font-title text-sm">{MODULE_LABEL[module]}</p>
+                  <p className="text-sm text-muted-foreground text-pretty">
+                    {MODULE_BLURB[module]}
+                  </p>
+                </div>
+                <span className="inline-flex items-center gap-1.5 text-sm font-medium">
+                  Start
+                  <ArrowRight
+                    className="size-3 transition-transform group-hover:translate-x-0.5"
+                    aria-hidden
+                  />
+                </span>
+              </Link>
+            ) : (
+              <div
+                key={module}
+                className="flex flex-col gap-6 border border-dashed border-border p-5"
+              >
+                <div className="space-y-1">
+                  <p className="flex items-center gap-2 font-title text-sm text-muted-foreground">
+                    <Lock className="size-3.5 shrink-0" aria-hidden />
+                    {MODULE_LABEL[module]}
+                  </p>
+                  <p className="text-sm text-muted-foreground text-pretty">
+                    {UNAVAILABLE_REASON[module]}
+                  </p>
+                </div>
+              </div>
+            ),
+          )}
+        </div>
+      </section>
+
+      <section aria-labelledby="tests-heading" className="space-y-3">
+        <SectionHeader as="h2">
+          <span id="tests-heading">Sit a test</span>
+        </SectionHeader>
+
+        <article className="border border-border">
+          <div className="border-b border-border px-5 py-4">
+            <h3 className="font-title text-title">Diagnostic</h3>
+            <p className="mt-1 max-w-prose text-sm text-muted-foreground text-pretty">
+              One reading passage and one Task 2 essay, back to back. The
+              fastest way to get a first estimate in both skills and a plan
+              built around it.
+            </p>
+          </div>
+
+          <dl className="grid grid-cols-2 divide-x divide-y divide-border border-b border-border sm:grid-cols-4 sm:divide-y-0">
+            {[
+              ['Sections', 'Reading · Writing'],
+              ['Duration', DIAGNOSTIC_DURATION_LABEL],
+              ['Difficulty', 'Easier than exam'],
+              ['Status', diagnostic ? 'Attempted' : 'Not attempted'],
+            ].map(([label, value]) => (
+              <div key={label} className="px-5 py-3">
+                <Eyebrow as="dt">{label!}</Eyebrow>
+                <dd className="mt-0.5 text-sm tabular-nums">{value}</dd>
+              </div>
+            ))}
+          </dl>
+
+          <div className="px-5 py-4">
+            <Button nativeButton={false} render={<Link href="/diagnostic" />}>
+              {diagnostic ? 'Take another diagnostic' : 'Start diagnostic'}
+              <ArrowRight />
+            </Button>
+          </div>
+        </article>
+
+        {/* The honest state of a four-skill mock: it does not exist, and saying
+            so is better than a card that cannot be started. */}
+        <div className="flex items-start gap-3 border border-dashed border-border px-5 py-6">
+          <Lock
+            className="mt-0.5 size-4 shrink-0 text-muted-foreground"
+            aria-hidden
+          />
+          <div>
+            <p className="font-title text-sm">Full four-skill mock</p>
+            <p className="mt-1 max-w-prose text-sm text-muted-foreground text-pretty">
+              A complete mock needs Listening and Speaking, and neither has
+              material yet. Until they do, the Reading and Writing sections
+              above are the whole of what we can mark honestly.
+            </p>
+          </div>
+        </div>
       </section>
     </div>
   );

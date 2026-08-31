@@ -1,8 +1,11 @@
+import Link from 'next/link';
+import { Settings } from 'lucide-react';
 import { BandScale } from '@bandzen/ui/components/band-scale';
-import { SectionHeader } from '@/components/app/primitives';
+import { Button } from '@bandzen/ui/components/button';
+import { Eyebrow } from '@/components/app/primitives';
 
 /** Time-of-day greeting in the candidate's own zone, not the server's. */
-function greeting(timezone: string | null | undefined): string {
+export function greeting(timezone: string | null | undefined): string {
   let hour = new Date().getUTCHours();
   if (timezone) {
     try {
@@ -22,6 +25,43 @@ function greeting(timezone: string | null | undefined): string {
   return 'Good evening';
 }
 
+/**
+ * The greeting, and the only route to Settings on a phone.
+ *
+ * Settings does not get one of the five tabs -- it is opened rarely and
+ * deliberately -- so it gets the gear here instead. Hidden from `md` up, where
+ * the sidebar already lists it.
+ *
+ * Shared because the dashboard renders this row twice: once above the
+ * analytics, and once above the first-run block when nothing is measured yet.
+ */
+export function GreetingRow({
+  firstName,
+  timezone,
+}: {
+  firstName: string | null;
+  timezone: string | null;
+}) {
+  return (
+    <div className="flex items-start justify-between gap-4">
+      <h1 className="font-title text-title-lg">
+        {greeting(timezone)}
+        {firstName ? `, ${firstName}` : ''}
+      </h1>
+
+      <Button
+        variant="ghost"
+        size="icon-sm"
+        className="shrink-0 md:hidden"
+        nativeButton={false}
+        render={<Link href="/settings" aria-label="Settings" />}
+      >
+        <Settings />
+      </Button>
+    </div>
+  );
+}
+
 export function DashboardHeader({
   firstName,
   timezone,
@@ -37,17 +77,14 @@ export function DashboardHeader({
 }) {
   return (
     <header className="space-y-5">
-      <h1 className="text-2xl font-medium tracking-tight">
-        {greeting(timezone)}
-        {firstName ? `, ${firstName}` : ''}
-      </h1>
+      <GreetingRow firstName={firstName} timezone={timezone} />
 
       {/* items-start, so the three labels line up with each other. Aligning the
           bottoms instead pushes the label of the large figure out of the row. */}
       <div className="flex flex-wrap items-start gap-x-10 gap-y-4">
         <div className="space-y-1">
           {/* "Estimated" is load-bearing: Bandzen scores are ours, not IELTS's. */}
-          <SectionHeader as="p">Estimated Band</SectionHeader>
+          <Eyebrow>Estimated Band</Eyebrow>
           <p className="font-metric text-metric-lg">
             {estimated != null ? estimated.toFixed(1) : '—'}
           </p>
@@ -55,14 +92,14 @@ export function DashboardHeader({
 
         {target != null ? (
           <div className="space-y-1">
-            <SectionHeader as="p">Target</SectionHeader>
+            <Eyebrow>Target</Eyebrow>
             <p className="font-metric text-metric">{target.toFixed(1)}</p>
           </div>
         ) : null}
 
         {daysUntilTest != null ? (
           <div className="space-y-1">
-            <SectionHeader as="p">Test</SectionHeader>
+            <Eyebrow>Test</Eyebrow>
             <p className="font-metric text-metric tabular-nums">
               {daysUntilTest > 0
                 ? `${daysUntilTest} days`

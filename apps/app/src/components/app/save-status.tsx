@@ -38,7 +38,7 @@ export function SaveStatus({
   return (
     <span
       role="status"
-      className="font-mono text-xs tracking-widest text-muted-foreground uppercase"
+      className="font-mono text-[0.6875rem] tracking-[0.18em] text-muted-foreground uppercase"
     >
       {status === 'reconnecting' ? 'Reconnecting…' : 'Saving…'}
     </span>

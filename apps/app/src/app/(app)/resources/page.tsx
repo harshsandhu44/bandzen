@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import { PageHeader, SectionHeader } from '@/components/app/primitives';
 import { FilterBar } from '@/components/app/filter-bar';
+import { LearnNav } from '@/components/learning/learn-nav';
 import {
   CATEGORY_TITLE,
   RESOURCES,
@@ -10,7 +11,7 @@ import {
 import { requireUserId } from '@/lib/auth';
 import { cn } from '@bandzen/ui/lib/utils';
 
-export const metadata = { title: 'Resources' };
+export const metadata = { title: 'Guides' };
 
 const OPTIONS = [
   { value: '', label: 'All' },
@@ -43,10 +44,12 @@ export default async function ResourcesPage({
   return (
     <div className="max-w-3xl space-y-8">
       <PageHeader
-        eyebrow="Resources"
-        title="Reference material"
+        eyebrow="Learn"
+        title="Guides"
         description="Short pieces you can read between practice sessions. Each one ends by pointing at something to do."
       />
+
+      <LearnNav current="guides" />
 
       <FilterBar
         legend="Category"
@@ -81,7 +84,7 @@ export default async function ResourcesPage({
                       {resource.summary}
                     </p>
                   </div>
-                  <span className="shrink-0 font-mono text-[0.625rem] tracking-[0.2em] text-muted-foreground uppercase tabular-nums">
+                  <span className="shrink-0 text-xs text-muted-foreground tabular-nums">
                     {unwritten
                       ? 'Not written yet'
                       : `${resource.minutes} min · ${resource.level}`}

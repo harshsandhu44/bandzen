@@ -23,12 +23,10 @@ export default function AppError({
 
   return (
     <div className="max-w-md space-y-4 py-10">
-      <p className="font-mono text-xs tracking-widest text-muted-foreground uppercase">
+      <p className="font-mono text-[0.6875rem] tracking-[0.18em] text-muted-foreground uppercase">
         Something broke
       </p>
-      <h1 className="text-2xl font-medium tracking-tight">
-        This page did not load
-      </h1>
+      <h1 className="font-title text-title-lg">This page did not load</h1>
       <p className="text-sm text-muted-foreground">
         Nothing you have submitted is affected — attempts and marked work are
         saved as you go. Try again, and if it keeps happening the reference
