@@ -5,7 +5,7 @@ import { FilterBar } from '@/components/app/filter-bar';
 import { requireUserId } from '@/lib/auth';
 import { getProfile, listWritingPrompts } from '@/lib/db/queries';
 import { startWritingAttempt } from './actions';
-import { taskRules } from './timing';
+import { taskRules } from '@/lib/timing';
 
 /**
  * Content is shared and immutable, but it lives in the database and there is
@@ -118,7 +118,7 @@ export default async function WritingPage({
                 className="flex items-start justify-between gap-4 py-4"
               >
                 <div className="min-w-0">
-                  <p className="font-mono text-xs tracking-widest text-muted-foreground uppercase">
+                  <p className="font-mono text-[0.6875rem] tracking-[0.18em] text-muted-foreground uppercase">
                     Task {p.task} · {minutes} min · {minWords}+ words
                   </p>
                   <p className="mt-1 line-clamp-2 text-sm">{p.promptText}</p>
