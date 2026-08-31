@@ -106,13 +106,15 @@ learn-before-drill rule and the insight selection without a fixture.
 
 ```
 src/app/(app)/          the signed-in shell: layout, nav, mobile-nav
-  dashboard/            what to do next
+  dashboard/            today: what to do next, and the plan from here
   onboarding/           six answers, one form, one action
-  plan/ learn/ practice/ tests/ review/ coach/ progress/ resources/ settings/
+  learn/ practice/ tests/ progress/ coach/ resources/ settings/
+  plan/ review/         redirects — folded into dashboard and progress
   reading/ writing/     the engines, plus their attempt and review routes
   diagnostic/           composes the two engines via attempts.parent_id
 src/app/api/coach/      the one route handler (see below)
-src/components/app/     shared primitives: PageHeader, Metric, EmptyState, …
+src/components/app/     shared primitives: SectionHeader, Eyebrow, Metric,
+                        FeatureBlock, EmptyState, …
 src/components/…/       feature components, one directory per domain
 src/content/            authored lessons and resources (TypeScript, not rows)
 src/lib/db/             schema.ts and queries.ts — see the isolation rule above
@@ -125,6 +127,63 @@ Routes are flat rather than nested under `/dashboard/**`, and the engines keep
 the URLs they shipped with. `/practice` is a hub that links to `/reading` and
 `/writing`; `/review/[attemptId]` resolves to whichever marking screen the
 attempt needs instead of duplicating either.
+
+The sidebar lists five destinations, one per job — Today, Learn, Practice,
+Progress, Coach — plus Settings below a separator. Four routes used to have
+their own entry and no longer do:
+
+- **`/plan` → `/dashboard`.** They rendered the same `TodaysPlan` component and
+  the same Estimated/Target/Days row; only the grouped week view was unique, and
+  that moved. Kept as a redirect so a bookmark still lands somewhere.
+- **`/review` → `/progress`.** Both answered "how am I doing". `/review/[attemptId]`
+  is untouched — it is the resolver, not a page.
+- **`/tests` → `/practice`.** Its "Section tests" tab sent people to `/reading`
+  and `/writing`, which is what Practice's "By module" already does, and its
+  "Completed" tab listed the same fifty attempts as Progress. The diagnostic was
+  the only thing it owned; it is now Practice's "Sit a test" section, below
+  Smart practice and By module — a returning candidate's best next action is
+  their weakest question type, not the heaviest thing on the page.
+- **`/resources` keeps its route**, and only left the sidebar. It is categorised
+  by topic, not by module, so folding it into `/learn/[module]` would mean
+  widening that param to hold a value that is not a module. `LearnNav` puts the
+  two shelves behind one filter row instead.
+
+A link that owns a folded route declares it in `owns` in `nav-links.ts`, so
+`/review` still lights up Progress.
+
+The shell is `@bandzen/ui`'s shadcn `Sidebar`, not a hand-rolled `<aside>`. It
+replaced one because an `<aside>` in a flex row stretches to the _content_
+height — its ground stopped mid-page on a short route and ran long on
+`/progress` — and because `hidden sm:flex` meant it simply did not exist on a
+phone. `Sidebar` is `fixed inset-y-0 h-svh`, and renders as a Sheet below `md`.
+
+Two things about it are load-bearing:
+
+- **The breakpoint is `md` (768px), in three places at once**: `useIsMobile`,
+  the `md:` classes inside `sidebar.tsx`, and `mobile-nav.tsx`'s `md:hidden`.
+  Split them and there is a viewport window with two navs or none.
+- **On a phone the sidebar is not used at all.** `MobileNav` renders `NAV_LINKS`
+  directly — every destination is a tab, so there is no drawer and nothing
+  behind a "More" label. A bottom bar _and_ a drawer over the same destinations
+  is the pattern to avoid: two ways to reach one place, and the drawer is where
+  things go to be forgotten.
+
+Nothing is lost by the sidebar's absence on a phone, and that is what makes the
+above safe: the target band and countdown are already in Today's header (and in
+first run's "What you told us"), and the theme toggle and sign out already live
+on the Settings page. Settings itself is the gear in `GreetingRow` — it is
+opened rarely and deliberately, so it does not spend one of five tabs.
+
+**Five tabs is the ceiling.** `NAV_LINKS` is rendered as-is by `mobile-nav.tsx`,
+so a sixth destination in the sidebar has nowhere to go on a phone. That
+coupling is deliberate: it forces the conversation.
+
+There is deliberately **no header on any breakpoint**. One only ever existed to
+hold a drawer trigger, in the worst corner of a phone for a thumb to reach, and
+the exam screens are full-bleed `lg:h-svh` surfaces with their own
+`sticky top-0` header — anything sticky above them either fights for the same
+offset or forces their pane height to be coupled to the shell's. Desktop
+toggling is the rail at the sidebar's edge, or Cmd/Ctrl+B.
 
 ## Server actions, and the one route handler
 
@@ -187,23 +246,44 @@ model; the UI states it to the candidate.
 
 ## Design system
 
-Tokens come entirely from `@bandzen/ui`. This app adds only an instrumentation
-type scale in `src/app/globals.css`; the marketing display scale and the `bz-*`
-scroll choreography stay in `apps/web`. Dark mode is wired here and only here —
-`next-themes` with `attribute="class"`, driving the `.dark` block already
+Tokens come entirely from `@bandzen/ui`. This app adds only two type scales in
+`src/app/globals.css` — instrumentation (`--text-metric-*`, `.font-metric`) and
+titles (`--text-title-*`, `.font-title`); the marketing display scale and the
+`bz-*` scroll choreography stay in `apps/web`. Dark mode is wired here and only
+here — `next-themes` with `attribute="class"`, driving the `.dark` block already
 authored in `packages/ui`.
 
 Nothing in this app animates on scroll, deliberately: a timed exam surface
 should not move under the candidate.
 
-Two conventions worth keeping:
+Conventions worth keeping:
 
+- **Two type roles, and the split is the whole system.** `.font-title`
+  (Archivo, sentence case) names a screen or a section. Mono uppercase labels a
+  reading — a band figure, a timer, a criterion, a countdown. Mono is
+  load-bearing, not decorative: using it for headings, nav items and link text
+  as well is what flattened every screen into the same grey ribbon. When
+  everything is an eyebrow, nothing is. `SectionHeader` and `Eyebrow` in
+  `src/components/app/primitives.tsx` are the two roles; reach for one of them
+  rather than spelling out a class string.
 - **`--chrome` is the brand accent and never a hover.** It marks target bands,
   flags, and the evidence rule on a review — things that mean something. Hover
   uses `--secondary`.
 - **Status is never colour alone.** Correct/incorrect, needs-work/improving/
   strong and task states each pair a glyph and a word with their colour. On the
   screens that tell a candidate what they got wrong, this is not optional.
+- **An emphasis block is never `bg-ink text-paper`.** Those two tokens _swap_ in
+  the `.dark` block, so that pairing inverts into a white slab on a dark page.
+  `apps/web` gets away with it because it ships light-only; this app has the
+  toggle. `FeatureBlock` carries the dark-safe pairing
+  (`bg-foreground text-background dark:bg-secondary dark:text-foreground`) —
+  use it rather than re-deriving one.
 
-Lists beat cards here. `divide-y` rows carry most of the app; a bordered block
-is for something that genuinely stands apart, like Continue your plan.
+Lists beat cards here. `divide-y` rows carry most of the app. `FeatureBlock` is
+the one bordered, inverted surface, and there is at most one per screen: its
+whole job is to outrank everything else, which it cannot do twice.
+
+Page width is per job: `max-w-5xl` where figures sit beside a list (Today,
+Progress), `max-w-3xl` elsewhere, `max-w-prose` for a lesson or a guide. Set it
+on the page's own wrapper — **not** on `main` in `(app)/layout.tsx`, whose
+`p-6 sm:p-10` the exam screens cancel with `-m-6 sm:-m-10` to go full-bleed.
