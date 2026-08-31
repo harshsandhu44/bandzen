@@ -15,6 +15,13 @@
       "when": 1788108522932,
       "tag": "0001_panoramic_randall_flagg",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1788115522320,
+      "tag": "0002_plain_leech",
+      "breakpoints": true
     }
   ]
 }

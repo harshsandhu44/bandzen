@@ -58,12 +58,32 @@ export const attemptStatus = pgEnum('attempt_status', [
  */
 export const profiles = pgTable('profiles', {
   userId: text('user_id').primaryKey(),
+  /** Which exam they are sitting. Reuses the enum the content tables already use. */
+  examType: testFormat('exam_type'),
   targetBand: numeric('target_band', {
     precision: 2,
     scale: 1,
     mode: 'number',
   }),
   testDate: date('test_date'),
+  /**
+   * What the candidate says their level is at sign-up. Null is a real answer —
+   * "I don't know" is the case the diagnostic exists for — so it stays
+   * separate from the measured bands, which only ever come from attempts.
+   */
+  selfAssessedBand: numeric('self_assessed_band', {
+    precision: 2,
+    scale: 1,
+    mode: 'number',
+  }),
+  /** Minutes a day they say they can study. Drives today's goal. */
+  studyMinutes: integer('study_minutes'),
+  /** IANA zone, captured from the browser so "today" means their today. */
+  timezone: text('timezone'),
+  /** Null until onboarding is finished. The dashboard gates on this. */
+  onboardingCompletedAt: timestamp('onboarding_completed_at', {
+    withTimezone: true,
+  }),
   createdAt: timestamp('created_at', { withTimezone: true })
     .notNull()
     .defaultNow(),
@@ -249,6 +269,28 @@ export const reports = pgTable('reports', {
     .defaultNow(),
 });
 
+// ---------------------------------------------------------------------------
+// Learning
+// ---------------------------------------------------------------------------
+
+/**
+ * Which lessons a candidate has finished. Lesson bodies are authored TypeScript
+ * in `src/content/lessons.ts`, not rows — editing a sentence should be a diff a
+ * reviewer can read, not a migration. So `lessonId` is that module's slug and
+ * carries no foreign key; a lesson that is deleted leaves a harmless orphan.
+ */
+export const lessonProgress = pgTable(
+  'lesson_progress',
+  {
+    userId: text('user_id').notNull(),
+    lessonId: text('lesson_id').notNull(),
+    completedAt: timestamp('completed_at', { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+  },
+  (t) => [primaryKey({ columns: [t.userId, t.lessonId] })],
+);
+
 /** The two v1 modules, as a plain union for code that never touches the DB. */
 export type Skill = (typeof attemptModule.enumValues)[number];
 
@@ -259,3 +301,4 @@ export type Attempt = typeof attempts.$inferSelect;
 export type AttemptAnswer = typeof attemptAnswers.$inferSelect;
 export type Report = typeof reports.$inferSelect;
 export type Profile = typeof profiles.$inferSelect;
+export type LessonProgress = typeof lessonProgress.$inferSelect;
