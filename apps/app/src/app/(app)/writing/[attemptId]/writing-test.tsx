@@ -1,8 +1,10 @@
 'use client';
 
-import { useCallback, useEffect, useRef, useState } from 'react';
-import { Button } from '@bandzen/ui/components/button';
+import { useState } from 'react';
 import { cn } from '@bandzen/ui/lib/utils';
+import { SaveStatus } from '@/components/app/save-status';
+import { SubmitConfirm } from '@/components/app/submit-confirm';
+import { useAutosave } from '@/lib/use-autosave';
 import { Timer } from '../../reading/[attemptId]/timer';
 import { saveEssayDraft, submitEssay } from '../actions';
 
@@ -28,30 +30,15 @@ export function WritingTest({
   initialBody,
 }: Props) {
   const [body, setBody] = useState(initialBody);
-  const [saving, setSaving] = useState(false);
-  const timer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
+
+  // One key, because there is only one draft -- but the retry and the failure
+  // state matter more here than anywhere: this is forty minutes of writing.
+  const { status, schedule, retryFailed } = useAutosave(saveEssayDraft, {
+    delay: 900,
+  });
 
   const words = countWords(body);
   const short = words < minWords;
-
-  const persist = useCallback(
-    (next: string) => {
-      clearTimeout(timer.current);
-      setSaving(true);
-      timer.current = setTimeout(() => {
-        void saveEssayDraft({
-          attemptId,
-          body: next,
-          wordCount: countWords(next),
-        })
-          .catch(() => {})
-          .finally(() => setSaving(false));
-      }, 900);
-    },
-    [attemptId],
-  );
-
-  useEffect(() => () => clearTimeout(timer.current), []);
 
   return (
     <div className="-m-6 flex min-h-svh flex-col sm:-m-10">
@@ -64,18 +51,17 @@ export function WritingTest({
         >
           {words}
           <span className="text-muted-foreground"> / {minWords} words</span>
-          {saving ? (
-            <span className="text-muted-foreground"> · saving…</span>
-          ) : null}
         </p>
         <div className="flex items-center gap-4">
+          <SaveStatus status={status} onRetry={retryFailed} />
           <Timer startedAt={startedAt} minutes={minutes} />
-          <form action={submitEssay}>
-            <input type="hidden" name="attemptId" value={attemptId} />
-            <Button type="submit" size="sm" disabled={words === 0}>
-              Submit
-            </Button>
-          </form>
+          <SubmitConfirm
+            action={submitEssay}
+            attemptId={attemptId}
+            unsaved={status === 'failed'}
+            disabled={words === 0}
+            label="Submit"
+          />
         </div>
       </header>
 
@@ -93,7 +79,11 @@ export function WritingTest({
           value={body}
           onChange={(e) => {
             setBody(e.target.value);
-            persist(e.target.value);
+            schedule('essay', {
+              attemptId,
+              body: e.target.value,
+              wordCount: countWords(e.target.value),
+            });
           }}
           aria-label="Your response"
           spellCheck={false}

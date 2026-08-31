@@ -1,10 +1,12 @@
 'use client';
 
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useState } from 'react';
 import { Flag } from 'lucide-react';
-import { Button } from '@bandzen/ui/components/button';
 import { cn } from '@bandzen/ui/lib/utils';
+import { SaveStatus } from '@/components/app/save-status';
+import { SubmitConfirm } from '@/components/app/submit-confirm';
 import type { Question } from '@/lib/db/schema';
+import { useAutosave } from '@/lib/use-autosave';
 import { saveReadingAnswer, submitReadingAttempt } from '../actions';
 import { Timer } from './timer';
 
@@ -65,37 +67,23 @@ export function ReadingTest({
   const [flags, setFlags] = useState<Record<string, boolean>>(() =>
     Object.fromEntries(saved.map((s) => [s.questionId, s.flagged])),
   );
-  const [saving, setSaving] = useState(false);
+  // Debounced per question. A failed save is retried rather than swallowed --
+  // losing an answer silently is the worst thing this screen can do.
+  const { status, schedule, retryFailed } = useAutosave(saveReadingAnswer, {
+    delay: 700,
+  });
 
-  // Debounced per question. Each save is a server action now that the browser
-  // holds no database credentials, so the debounce is what keeps this to about
-  // one request per second rather than one per keystroke.
-  const timers = useRef<Record<string, ReturnType<typeof setTimeout>>>({});
-
-  const persist = useCallback(
-    (questionId: string, value: string | undefined, flagged: boolean) => {
-      clearTimeout(timers.current[questionId]);
-      setSaving(true);
-      timers.current[questionId] = setTimeout(() => {
-        void saveReadingAnswer({
-          attemptId,
-          questionId,
-          value: value ?? null,
-          flagged,
-        })
-          .catch(() => {})
-          .finally(() => setSaving(false));
-      }, 700);
-    },
-    [attemptId],
-  );
-
-  useEffect(() => {
-    const pending = timers.current;
-    return () => {
-      for (const t of Object.values(pending)) clearTimeout(t);
-    };
-  }, []);
+  const persist = (
+    questionId: string,
+    value: string | undefined,
+    flagged: boolean,
+  ) =>
+    schedule(questionId, {
+      attemptId,
+      questionId,
+      value: value ?? null,
+      flagged,
+    });
 
   const setAnswer = (q: Q, value: string) => {
     setAnswers((prev) => ({ ...prev, [q.id]: value }));
@@ -115,16 +103,17 @@ export function ReadingTest({
       <header className="sticky top-0 z-10 flex items-center justify-between gap-4 border-b border-border bg-background px-6 py-3">
         <p className="font-mono text-xs tracking-widest text-muted-foreground uppercase">
           {answered}/{questions.length} answered
-          {saving ? ' · saving…' : ''}
         </p>
         <div className="flex items-center gap-4">
+          <SaveStatus status={status} onRetry={retryFailed} />
           <Timer startedAt={startedAt} minutes={minutes} />
-          <form action={submitReadingAttempt}>
-            <input type="hidden" name="attemptId" value={attemptId} />
-            <Button type="submit" size="sm">
-              Submit
-            </Button>
-          </form>
+          <SubmitConfirm
+            action={submitReadingAttempt}
+            attemptId={attemptId}
+            unanswered={questions.length - answered}
+            total={questions.length}
+            unsaved={status === 'failed'}
+          />
         </div>
       </header>
 
