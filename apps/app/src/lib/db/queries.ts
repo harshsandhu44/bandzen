@@ -1,6 +1,17 @@
 import 'server-only';
 
-import { and, desc, eq, isNotNull } from 'drizzle-orm';
+import {
+  and,
+  count,
+  desc,
+  eq,
+  exists,
+  gte,
+  isNotNull,
+  lt,
+  lte,
+  sql,
+} from 'drizzle-orm';
 import { isAnswerCorrect, readingBand } from '@/lib/grading';
 import { db } from './index';
 import {
@@ -8,6 +19,7 @@ import {
   attemptAnswers,
   attempts,
   essays,
+  lessonProgress,
   passages,
   profiles,
   questionAnswers,
@@ -16,6 +28,8 @@ import {
   writingPrompts,
   type Annotation,
   type Criterion,
+  type Question,
+  type Skill,
 } from './schema';
 
 /**
@@ -44,14 +58,33 @@ export async function getProfile(userId: string) {
   return row ?? null;
 }
 
-export async function upsertProfile(
-  userId: string,
-  values: { targetBand?: number | null; testDate?: string | null },
-) {
+type ProfileValues = {
+  examType?: 'academic' | 'general' | null;
+  targetBand?: number | null;
+  testDate?: string | null;
+  selfAssessedBand?: number | null;
+  studyMinutes?: number | null;
+  timezone?: string | null;
+  onboardingCompletedAt?: Date | null;
+};
+
+export async function upsertProfile(userId: string, values: ProfileValues) {
   await db
     .insert(profiles)
     .values({ userId, ...values })
     .onConflictDoUpdate({ target: profiles.userId, set: values });
+}
+
+/**
+ * Finish onboarding. Separate from `upsertProfile` only because it is the one
+ * write that may stamp the completion time, and stamping it from a settings
+ * edit would be wrong.
+ */
+export async function completeOnboarding(
+  userId: string,
+  values: Omit<ProfileValues, 'onboardingCompletedAt'>,
+) {
+  await upsertProfile(userId, { ...values, onboardingCompletedAt: new Date() });
 }
 
 export async function recordAccessRequest(email: string) {
@@ -64,7 +97,46 @@ export async function recordAccessRequest(email: string) {
 // Content (shared, unscoped)
 // ---------------------------------------------------------------------------
 
-export function listPassages() {
+/** Difficulty bands, as the practice filters present them. */
+export const DIFFICULTY_RANGE = {
+  easy: [1, 2],
+  medium: [3, 3],
+  hard: [4, 5],
+} as const;
+
+export function listPassages(filters?: {
+  kind?: Question['kind'];
+  difficulty?: keyof typeof DIFFICULTY_RANGE;
+  id?: string;
+}) {
+  const clauses = [];
+
+  if (filters?.id) clauses.push(eq(passages.id, filters.id));
+
+  if (filters?.difficulty) {
+    const [min, max] = DIFFICULTY_RANGE[filters.difficulty];
+    clauses.push(gte(passages.difficulty, min), lte(passages.difficulty, max));
+  }
+
+  if (filters?.kind) {
+    // A passage qualifies if it carries at least one question of that kind.
+    // EXISTS rather than a join, so a passage with four matching questions
+    // still comes back once.
+    clauses.push(
+      exists(
+        db
+          .select({ one: sql`1` })
+          .from(questions)
+          .where(
+            and(
+              eq(questions.passageId, passages.id),
+              eq(questions.kind, filters.kind),
+            ),
+          ),
+      ),
+    );
+  }
+
   return db
     .select({
       id: passages.id,
@@ -73,17 +145,24 @@ export function listPassages() {
       difficulty: passages.difficulty,
     })
     .from(passages)
+    .where(clauses.length ? and(...clauses) : undefined)
     .orderBy(passages.difficulty);
 }
 
-export function listWritingPrompts() {
+export function listWritingPrompts(filters?: { task?: number; id?: string }) {
+  const clauses = [];
+  if (filters?.task) clauses.push(eq(writingPrompts.task, filters.task));
+  if (filters?.id) clauses.push(eq(writingPrompts.id, filters.id));
+
   return db
     .select({
       id: writingPrompts.id,
       task: writingPrompts.task,
+      format: writingPrompts.format,
       promptText: writingPrompts.promptText,
     })
     .from(writingPrompts)
+    .where(clauses.length ? and(...clauses) : undefined)
     .orderBy(writingPrompts.task);
 }
 
@@ -309,6 +388,7 @@ export async function getReadingReview(userId: string, attemptId: string) {
     .select({
       id: questions.id,
       idx: questions.idx,
+      kind: questions.kind,
       prompt: questions.prompt,
       evidence: questions.evidence,
       explanation: questions.explanation,
@@ -478,6 +558,162 @@ export async function pickTask2Prompt() {
       .select({ id: writingPrompts.id })
       .from(writingPrompts)
       .where(eq(writingPrompts.task, 2))
+      .limit(1),
+  );
+}
+
+// ---------------------------------------------------------------------------
+// Learning — lesson bodies are authored TypeScript; only progress is a row
+// ---------------------------------------------------------------------------
+
+export async function listLessonProgress(userId: string) {
+  return db
+    .select({
+      lessonId: lessonProgress.lessonId,
+      completedAt: lessonProgress.completedAt,
+    })
+    .from(lessonProgress)
+    .where(eq(lessonProgress.userId, userId));
+}
+
+export async function markLessonComplete(userId: string, lessonId: string) {
+  // Re-finishing a lesson is not an error and must not move the original
+  // completion time -- the plan reads "done today" off that timestamp.
+  await db
+    .insert(lessonProgress)
+    .values({ userId, lessonId })
+    .onConflictDoNothing();
+}
+
+// ---------------------------------------------------------------------------
+// Analytics — everything the progress page and the insight are derived from.
+// No summary tables: these read the attempts that already exist, so a figure
+// can never disagree with the attempt behind it.
+// ---------------------------------------------------------------------------
+
+/**
+ * Attempts this user submitted on a given calendar day, in their own zone.
+ *
+ * The comparison is done on a timestamp range rather than by casting the
+ * column to a date, so the index on (user_id, submitted_at) is still usable.
+ */
+export async function attemptsSubmittedOn(
+  userId: string,
+  dayStart: Date,
+  dayEnd: Date,
+) {
+  return db
+    .select({ id: attempts.id, module: attempts.module, kind: attempts.kind })
+    .from(attempts)
+    .where(
+      and(
+        eq(attempts.userId, userId),
+        eq(attempts.status, 'complete'),
+        gte(attempts.submittedAt, dayStart),
+        lt(attempts.submittedAt, dayEnd),
+      ),
+    );
+}
+
+/**
+ * Reading accuracy per question kind. Feeds the skill matrix, the dashboard
+ * insight and review's pattern detection -- one query, because they are three
+ * views of the same fact and should never disagree.
+ */
+export async function accuracyByQuestionKind(userId: string) {
+  const rows = await db
+    .select({
+      kind: questions.kind,
+      value: attemptAnswers.value,
+      answer: questionAnswers.answer,
+    })
+    .from(attemptAnswers)
+    .innerJoin(attempts, eq(attempts.id, attemptAnswers.attemptId))
+    .innerJoin(questions, eq(questions.id, attemptAnswers.questionId))
+    .innerJoin(questionAnswers, eq(questionAnswers.questionId, questions.id))
+    .where(and(eq(attempts.userId, userId), eq(attempts.status, 'complete')));
+
+  const byKind = new Map<string, { correct: number; total: number }>();
+  for (const row of rows) {
+    const tally = byKind.get(row.kind) ?? { correct: 0, total: 0 };
+    tally.total += 1;
+    if (isAnswerCorrect(row.answer, row.value)) tally.correct += 1;
+    byKind.set(row.kind, tally);
+  }
+
+  return [...byKind.entries()].map(([kind, t]) => ({
+    kind: kind as Question['kind'],
+    correct: t.correct,
+    total: t.total,
+    accuracy: t.total ? t.correct / t.total : 0,
+  }));
+}
+
+/** Every completed band for this user, oldest first, for the trend chart. */
+export async function bandHistory(userId: string, module?: Skill) {
+  return db
+    .select({
+      module: attempts.module,
+      band: attempts.band,
+      submittedAt: attempts.submittedAt,
+    })
+    .from(attempts)
+    .where(
+      and(
+        eq(attempts.userId, userId),
+        eq(attempts.status, 'complete'),
+        isNotNull(attempts.band),
+        isNotNull(attempts.submittedAt),
+        ...(module ? [eq(attempts.module, module)] : []),
+      ),
+    )
+    .orderBy(attempts.submittedAt);
+}
+
+/**
+ * Headline activity counts. Study minutes are the real elapsed time between
+ * starting and submitting an attempt -- we do not track time on lesson pages,
+ * so claiming a "minutes studied" figure that included them would be invented.
+ */
+export async function activitySummary(userId: string) {
+  const [totals] = await db
+    .select({
+      attemptCount: count(),
+      minutes: sql<number>`coalesce(sum(extract(epoch from (${attempts.submittedAt} - ${attempts.startedAt})) / 60), 0)::int`,
+      questions: sql<number>`coalesce(sum(${attempts.total}), 0)::int`,
+    })
+    .from(attempts)
+    .where(and(eq(attempts.userId, userId), eq(attempts.status, 'complete')));
+
+  const [lessons] = await db
+    .select({ value: count() })
+    .from(lessonProgress)
+    .where(eq(lessonProgress.userId, userId));
+
+  return {
+    attempts: totals?.attemptCount ?? 0,
+    minutes: totals?.minutes ?? 0,
+    questions: totals?.questions ?? 0,
+    lessons: lessons?.value ?? 0,
+  };
+}
+
+/** The newest writing report, for the dashboard insight. */
+export async function latestReport(userId: string) {
+  return firstRow(
+    await db
+      .select({
+        attemptId: reports.attemptId,
+        band: reports.band,
+        criteria: reports.criteria,
+        strengths: reports.strengths,
+        weaknesses: reports.weaknesses,
+        createdAt: reports.createdAt,
+      })
+      .from(reports)
+      .innerJoin(attempts, eq(attempts.id, reports.attemptId))
+      .where(eq(attempts.userId, userId))
+      .orderBy(desc(reports.createdAt))
       .limit(1),
   );
 }
