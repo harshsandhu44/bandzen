@@ -5,7 +5,6 @@ import { Button } from '@bandzen/ui/components/button';
 import { EmptyState, Metric, SectionHeader } from '@/components/app/primitives';
 import { TaskStatus } from '@/components/app/status';
 import { TodaysPlan } from '@/components/dashboard/todays-plan';
-import { targetHref } from '@/components/dashboard/continue-plan';
 import { LESSON_FOR_KIND } from '@/content/lessons';
 import { requireUserId } from '@/lib/auth';
 import { dayBounds, daysUntil, todayIso } from '@/lib/dates';
@@ -20,7 +19,12 @@ import {
   listWritingPrompts,
 } from '@/lib/db/queries';
 import { MODULE_LABEL } from '@/lib/modules';
-import { buildPlan, derivePlanState, tasksOn } from '@/lib/study-plan';
+import {
+  buildPlan,
+  derivePlanState,
+  targetHref,
+  tasksOn,
+} from '@/lib/study-plan';
 
 export const metadata = { title: 'Study plan' };
 
@@ -187,7 +191,7 @@ export default async function PlanPage() {
 
                   <ul className="divide-y divide-border border-y border-border">
                     {tasks.map((task, i) => {
-                      const href = targetHref({ ...task, status: 'pending' });
+                      const href = targetHref(task);
                       return (
                         <li
                           key={`${date}-${i}`}

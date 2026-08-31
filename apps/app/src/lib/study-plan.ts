@@ -306,3 +306,21 @@ export function derivePlanState(
 export function tasksOn(tasks: PlanTask[], isoDate: string) {
   return tasks.filter((t) => t.date === isoDate);
 }
+
+/**
+ * Where a task actually opens. Null means we have nothing real to link to --
+ * a task whose material is not seeded yet must not render a dead link.
+ */
+export function targetHref(task: PlanTask): string | null {
+  switch (task.target?.kind) {
+    case 'reading':
+      return `/reading?passage=${task.target.passageId}`;
+    case 'writing':
+      return `/writing?prompt=${task.target.promptId}`;
+    case 'lesson':
+      // Lesson routes are module-scoped, and the task's skill is that module.
+      return `/learn/${task.skill}/${task.target.lessonId}`;
+    default:
+      return null;
+  }
+}

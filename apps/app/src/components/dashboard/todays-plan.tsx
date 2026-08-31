@@ -2,8 +2,7 @@ import Link from 'next/link';
 import { SectionHeader } from '@/components/app/primitives';
 import { TaskStatus } from '@/components/app/status';
 import { MODULE_LABEL } from '@/lib/modules';
-import type { PlanProgress } from '@/lib/study-plan';
-import { targetHref } from './continue-plan';
+import { targetHref, type PlanProgress } from '@/lib/study-plan';
 
 /**
  * Today's tasks and how much of the day's goal they account for.
@@ -22,7 +21,7 @@ export function TodaysPlan({ progress }: { progress: PlanProgress }) {
   return (
     <section aria-labelledby="today-heading" className="space-y-3">
       <div className="flex items-baseline justify-between gap-4">
-        <SectionHeader as="h2" className="[&]:text-muted-foreground">
+        <SectionHeader as="h2">
           <span id="today-heading">Today</span>
         </SectionHeader>
         <p className="font-metric text-metric-sm text-muted-foreground">
@@ -61,19 +60,19 @@ export function TodaysPlan({ progress }: { progress: PlanProgress }) {
                 >
                   {task.label}
                 </p>
-                <p className="font-mono text-[0.625rem] tracking-[0.2em] text-muted-foreground uppercase tabular-nums">
+                <p className="font-mono text-[0.6875rem] tracking-[0.18em] text-muted-foreground uppercase tabular-nums">
                   {MODULE_LABEL[task.skill]} · {task.minutes} min
                 </p>
               </div>
 
               {task.status === 'completed' ? (
-                <span className="font-mono text-[0.625rem] tracking-[0.2em] text-muted-foreground uppercase">
+                <span className="font-mono text-[0.6875rem] tracking-[0.18em] text-muted-foreground uppercase">
                   Done
                 </span>
               ) : href ? (
                 <Link
                   href={href}
-                  className="font-mono text-[0.625rem] tracking-[0.2em] uppercase underline-offset-4 hover:underline"
+                  className="text-xs underline-offset-4 hover:underline"
                 >
                   {task.status === 'active' ? 'Resume' : 'Start'}
                 </Link>
