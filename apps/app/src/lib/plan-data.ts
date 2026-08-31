@@ -22,7 +22,7 @@ import {
 /**
  * Everything a screen needs to show the study plan.
  *
- * This exists because the dashboard and /plan built the same `PlanInput` from
+ * This exists because /dashboard and /plan each built the same `PlanInput` from
  * the same eight queries, in about thirty identical lines. That duplication is
  * why the two pages drifted into showing the same thing. One caller now.
  *

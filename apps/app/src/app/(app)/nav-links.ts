@@ -34,7 +34,7 @@ export type NavLink = {
  */
 export const NAV_LINKS: readonly NavLink[] = [
   {
-    href: '/',
+    href: '/dashboard',
     label: 'Today',
     Icon: LayoutDashboard,
     owns: ['/plan'],

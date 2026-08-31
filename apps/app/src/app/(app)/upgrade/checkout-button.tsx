@@ -98,7 +98,7 @@ export function CheckoutButton({
             source,
           });
           if (ok) {
-            router.push('/');
+            router.push('/dashboard');
             router.refresh();
           } else {
             // The payment itself went through — the webhook will still land,
