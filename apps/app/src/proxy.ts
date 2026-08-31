@@ -17,6 +17,10 @@ export const proxy = clerkMiddleware();
 
 export const config = {
   matcher: [
+    // The dashboard. Listed on its own because the catch-all below is parsed by
+    // path-to-regexp, whose segments must be non-empty -- it never matches '/',
+    // and auth() then throws for want of a middleware.
+    '/',
     '/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp|woff2?)$).*)',
     '/(api|trpc)(.*)',
   ],

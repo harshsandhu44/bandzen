@@ -7,7 +7,7 @@ import { cn } from '@bandzen/ui/lib/utils';
  * scale. Shared so the signed-in shell and the auth screens cannot drift.
  */
 export function Wordmark({
-  href = '/dashboard',
+  href = '/',
   className,
 }: {
   href?: string;

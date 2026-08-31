@@ -38,5 +38,5 @@ export async function saveOnboarding(
   // Someone who cannot estimate their own level is sent to measure it; anyone
   // else goes straight to the dashboard, which now has a target to plan for.
   const profile = await getProfile(userId);
-  redirect(profile?.selfAssessedBand == null ? '/diagnostic' : '/dashboard');
+  redirect(profile?.selfAssessedBand == null ? '/diagnostic' : '/');
 }
