@@ -4,6 +4,7 @@ import { Check, Circle, Lock } from 'lucide-react';
 import { PageHeader, SectionHeader } from '@/components/app/primitives';
 import { GROUP_TITLE, type LessonGroup } from '@/content/lesson-types';
 import { lessonsForModule } from '@/content/lessons';
+import { LearnNav } from '@/components/learning/learn-nav';
 import { requireUserId } from '@/lib/auth';
 import { listLessonProgress } from '@/lib/db/queries';
 import {
@@ -52,25 +53,7 @@ export default async function LearnModulePage({
         }
       />
 
-      {/* Module filter. Plain links, so the current module is in the URL and
-          the page stays a server component. */}
-      <nav aria-label="Module" className="flex flex-wrap gap-2">
-        {IELTS_MODULES.map((m) => (
-          <Link
-            key={m}
-            href={`/learn/${m}`}
-            aria-current={m === current ? 'page' : undefined}
-            className={cn(
-              'border px-3 py-1.5 font-mono text-xs tracking-widest uppercase transition-colors',
-              m === current
-                ? 'border-primary bg-primary/5 text-foreground'
-                : 'border-border text-muted-foreground hover:text-foreground',
-            )}
-          >
-            {MODULE_LABEL[m]}
-          </Link>
-        ))}
-      </nav>
+      <LearnNav current={current} />
 
       {!isAvailable(current) ? (
         <div className="flex items-start gap-3 border border-dashed border-border px-5 py-8">
@@ -79,7 +62,7 @@ export default async function LearnModulePage({
             aria-hidden
           />
           <div>
-            <p className="text-sm font-medium">
+            <p className="font-title text-title">
               No {MODULE_LABEL[current]} lessons yet
             </p>
             <p className="mt-1 max-w-prose text-sm text-muted-foreground">
@@ -127,7 +110,7 @@ export default async function LearnModulePage({
                           {lesson.summary}
                         </p>
                       </div>
-                      <span className="shrink-0 font-mono text-[0.625rem] tracking-[0.2em] text-muted-foreground uppercase tabular-nums">
+                      <span className="shrink-0 font-mono text-[0.6875rem] tracking-[0.18em] text-muted-foreground uppercase tabular-nums">
                         {unwritten
                           ? 'Not written yet'
                           : finished
