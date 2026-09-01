@@ -9,19 +9,28 @@ apps/
   web/                 marketing site (port 3000)
   docs/                @bandzen/ui reference + integration test (port 3001)
   app/                 the product: Clerk + Neon + OpenAI (port 3002)
+  admin/               the CMS: content editing behind a role gate (port 3003)
 packages/
   ui/                  shared shadcn design system (@bandzen/ui)
+  db/                  schema, Neon client, shared queries (@bandzen/db)
   eslint-config/       shared ESLint configs (@bandzen/eslint-config)
   tsconfig/            shared TypeScript configs (@bandzen/tsconfig)
 ```
 
-`apps/web` and `apps/app` deploy separately — a static marketing site on the
-apex domain, the signed-in product on `app.bandzen.com`. The marketing CTAs
-point at the product app through `NEXT_PUBLIC_APP_URL`.
+`apps/web`, `apps/app` and `apps/admin` deploy separately — a static marketing
+site on the apex domain, the signed-in product on `app.bandzen.com`, and the
+CMS on its own project. The marketing CTAs point at the product app through
+`NEXT_PUBLIC_APP_URL`. `apps/admin` is a separate deployment but not a separate
+system: it shares the product's Clerk instance and its Neon database, which is
+why a signed-in student is a real session there and has to be turned away
+rather than redirected.
 
-**`apps/app` carries rules the other two do not**, including the one that keeps
-one candidate's data away from another's. Read
-[`apps/app/README.md`](apps/app/README.md) before touching it.
+**`apps/app` and `apps/admin` carry rules the others do not.** The product's
+include the one that keeps one candidate's data away from another's; the CMS's
+include why denial must terminate instead of redirecting, and why the content
+status column defaults to `'published'`. Read
+[`apps/app/README.md`](apps/app/README.md) and
+[`apps/admin/README.md`](apps/admin/README.md) before touching either.
 
 Pricing tiers, the access limits behind them, and the Razorpay build are
 specified in [`PRICING.md`](PRICING.md). It sits at the root because it spans
@@ -33,18 +42,21 @@ lives in `apps/app`.
 Run everything from the repo root — Turborepo fans each task out across
 packages in parallel and caches the results.
 
-| Command          | What it does                                        |
-| ---------------- | --------------------------------------------------- |
-| `pnpm dev`       | Every dev server (web :3000, docs :3001, app :3002) |
-| `pnpm build`     | Builds every app                                    |
-| `pnpm lint`      | Lints every app and package                         |
-| `pnpm typecheck` | Type-checks every package                           |
-| `pnpm test`      | Runs every package's tests                          |
-| `pnpm format`    | Prettier across the whole repo                      |
+| Command          | What it does                                                     |
+| ---------------- | ---------------------------------------------------------------- |
+| `pnpm dev`       | Every dev server (web :3000, docs :3001, app :3002, admin :3003) |
+| `pnpm build`     | Builds every app                                                 |
+| `pnpm lint`      | Lints every app and package                                      |
+| `pnpm typecheck` | Type-checks every package                                        |
+| `pnpm test`      | Runs every package's tests                                       |
+| `pnpm format`    | Prettier across the whole repo                                   |
 
 `apps/app` also owns database and content commands (`db:migrate`,
 `content:generate`, and the rest) — they are listed in its own README because
-they only make sense there.
+they only make sense there. The schema itself lives in `packages/db`, but the
+migrations and `drizzle.config.ts` stay with `apps/app`: one database, one
+migration history, and the CMS is a reader of the schema rather than a second
+author of it.
 
 Install once at the root (`pnpm install`) — never inside an app. There is a
 single lockfile and a single `node_modules` store for the whole workspace.
