@@ -76,7 +76,7 @@ export function Navbar() {
             href="/"
             className="focus-visible:ring-cobalt shrink-0 focus-visible:ring-2 focus-visible:ring-offset-4 focus-visible:outline-none"
           >
-            <Wordmark />
+            <Wordmark collapse />
             <span className="sr-only">
               {brand.name} — {brand.tagline}
             </span>

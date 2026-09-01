@@ -6,12 +6,10 @@ import {
   count,
   desc,
   eq,
-  exists,
   gt,
   gte,
   isNotNull,
   lt,
-  lte,
   ne,
   sql,
 } from 'drizzle-orm';
@@ -44,6 +42,16 @@ import {
   type Skill,
 } from './schema';
 
+export {
+  DIFFICULTY_RANGE,
+  listLessonProgress,
+  listPassages,
+  listWritingPrompts,
+  markLessonComplete,
+  pickEasiestPassage,
+  pickTask2Prompt,
+} from '@bandzen/db/queries';
+
 /**
  * Every database read and write in the application.
  *
@@ -55,7 +63,8 @@ import {
  * check the whole surface at once.
  *
  * Content tables (passages, questions, writing_prompts) are shared and
- * deliberately unscoped.
+ * deliberately unscoped. Pure content/lesson-progress queries have moved to
+ * @bandzen/db/queries (re-exported above) since apps/admin needs them too.
  */
 
 // ---------------------------------------------------------------------------
@@ -343,79 +352,6 @@ export async function setSubscriptionEnd(
     .update(subscriptions)
     .set({ status, currentPeriodEnd, updatedAt: new Date() })
     .where(eq(subscriptions.userId, userId));
-}
-
-// ---------------------------------------------------------------------------
-// Content (shared, unscoped)
-// ---------------------------------------------------------------------------
-
-/** Difficulty bands, as the practice filters present them. */
-export const DIFFICULTY_RANGE = {
-  easy: [1, 2],
-  medium: [3, 3],
-  hard: [4, 5],
-} as const;
-
-export function listPassages(filters?: {
-  kind?: Question['kind'];
-  difficulty?: keyof typeof DIFFICULTY_RANGE;
-  id?: string;
-}) {
-  const clauses = [];
-
-  if (filters?.id) clauses.push(eq(passages.id, filters.id));
-
-  if (filters?.difficulty) {
-    const [min, max] = DIFFICULTY_RANGE[filters.difficulty];
-    clauses.push(gte(passages.difficulty, min), lte(passages.difficulty, max));
-  }
-
-  if (filters?.kind) {
-    // A passage qualifies if it carries at least one question of that kind.
-    // EXISTS rather than a join, so a passage with four matching questions
-    // still comes back once.
-    clauses.push(
-      exists(
-        db
-          .select({ one: sql`1` })
-          .from(questions)
-          .where(
-            and(
-              eq(questions.passageId, passages.id),
-              eq(questions.kind, filters.kind),
-            ),
-          ),
-      ),
-    );
-  }
-
-  return db
-    .select({
-      id: passages.id,
-      title: passages.title,
-      topic: passages.topic,
-      difficulty: passages.difficulty,
-    })
-    .from(passages)
-    .where(clauses.length ? and(...clauses) : undefined)
-    .orderBy(passages.difficulty);
-}
-
-export function listWritingPrompts(filters?: { task?: number; id?: string }) {
-  const clauses = [];
-  if (filters?.task) clauses.push(eq(writingPrompts.task, filters.task));
-  if (filters?.id) clauses.push(eq(writingPrompts.id, filters.id));
-
-  return db
-    .select({
-      id: writingPrompts.id,
-      task: writingPrompts.task,
-      format: writingPrompts.format,
-      promptText: writingPrompts.promptText,
-    })
-    .from(writingPrompts)
-    .where(clauses.length ? and(...clauses) : undefined)
-    .orderBy(writingPrompts.task);
 }
 
 async function firstRow<T>(rows: T[]) {
@@ -792,49 +728,6 @@ export async function findChildAttempt(userId: string, parentId: string) {
       .where(and(eq(attempts.parentId, parentId), eq(attempts.userId, userId)))
       .limit(1),
   );
-}
-
-export async function pickEasiestPassage() {
-  return firstRow(
-    await db
-      .select({ id: passages.id })
-      .from(passages)
-      .orderBy(passages.difficulty)
-      .limit(1),
-  );
-}
-
-export async function pickTask2Prompt() {
-  return firstRow(
-    await db
-      .select({ id: writingPrompts.id })
-      .from(writingPrompts)
-      .where(eq(writingPrompts.task, 2))
-      .limit(1),
-  );
-}
-
-// ---------------------------------------------------------------------------
-// Learning — lesson bodies are authored TypeScript; only progress is a row
-// ---------------------------------------------------------------------------
-
-export async function listLessonProgress(userId: string) {
-  return db
-    .select({
-      lessonId: lessonProgress.lessonId,
-      completedAt: lessonProgress.completedAt,
-    })
-    .from(lessonProgress)
-    .where(eq(lessonProgress.userId, userId));
-}
-
-export async function markLessonComplete(userId: string, lessonId: string) {
-  // Re-finishing a lesson is not an error and must not move the original
-  // completion time -- the plan reads "done today" off that timestamp.
-  await db
-    .insert(lessonProgress)
-    .values({ userId, lessonId })
-    .onConflictDoNothing();
 }
 
 // ---------------------------------------------------------------------------

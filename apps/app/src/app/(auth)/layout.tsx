@@ -1,4 +1,4 @@
-import { Wordmark } from '@/components/app/wordmark';
+import { Wordmark } from '@bandzen/ui/components/wordmark';
 
 export default function AuthLayout({ children }: LayoutProps<'/'>) {
   return (

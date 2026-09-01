@@ -6,7 +6,7 @@ import {
   FeatureBlock,
   SectionHeader,
 } from '@/components/app/primitives';
-import { LESSONS } from '@/content/lessons';
+import { firstWrittenLesson } from '@/content/lessons';
 import { DIAGNOSTIC_MINUTES } from '@/lib/timing';
 import type { Profile } from '@/lib/db/schema';
 
@@ -22,7 +22,7 @@ import type { Profile } from '@/lib/db/schema';
  * The analytics sections keep their own empty states: those are still correct
  * once one module is measured and the other is not.
  */
-export function FirstRun({
+export async function FirstRun({
   profile,
   daysUntilTest,
 }: {
@@ -30,7 +30,7 @@ export function FirstRun({
   daysUntilTest: number | null;
 }) {
   // Something to do that does not need an hour of quiet. First written lesson.
-  const lesson = LESSONS.find((l) => l.stages?.length);
+  const lesson = await firstWrittenLesson();
 
   return (
     <div className="space-y-8">

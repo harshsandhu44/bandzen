@@ -1,4 +1,4 @@
-import type { Metadata } from 'next';
+import type { Metadata, Viewport } from 'next';
 import { Archivo, IBM_Plex_Mono, Inter } from 'next/font/google';
 import { ClerkProvider } from '@clerk/nextjs';
 import { ThemeProvider } from 'next-themes';
@@ -26,6 +26,10 @@ const plexMono = IBM_Plex_Mono({
   weight: ['400', '500', '600'],
   display: 'swap',
 });
+
+export const viewport: Viewport = {
+  themeColor: '#09090f',
+};
 
 export const metadata: Metadata = {
   title: { default: 'Bandzen', template: '%s · Bandzen' },

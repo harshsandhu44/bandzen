@@ -3,6 +3,14 @@
   "tasks": {
     "build": {
       "dependsOn": ["^build"],
+      "env": [
+        "DATABASE_URL",
+        "CLERK_SECRET_KEY",
+        "ADMIN_EMAILS",
+        "OPENAI_API_KEY",
+        "RAZORPAY_*",
+        "NEXT_PUBLIC_*"
+      ],
       "outputs": ["dist/**", ".next/**", "!.next/cache/**"]
     },
     "dev": {

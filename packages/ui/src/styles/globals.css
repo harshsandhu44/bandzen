@@ -11,6 +11,7 @@
   --color-paper: var(--paper);
   --color-cobalt: var(--cobalt);
   --color-chrome: var(--chrome);
+  --color-tick: var(--tick);
   --color-slate: var(--slate);
   --color-background: var(--background);
   --color-foreground: var(--foreground);
@@ -65,6 +66,23 @@
   --radius-2xl: calc(var(--radius) * 1.8);
   --radius-3xl: calc(var(--radius) * 2.2);
   --radius-4xl: calc(var(--radius) * 2.6);
+
+  /* Product-surface type. Shared by apps/app and apps/admin, and used by the
+     primitives in ./components/primitives.tsx — which is why it lives here
+     rather than in one app's globals.css.
+
+     Deliberately an order of magnitude below apps/web's --text-display-*:
+     these head a working screen, not a billboard. The marketing display scale
+     stays in apps/web. */
+  --text-title-lg: 1.875rem;
+  --text-title: 1.25rem;
+
+  /* Instrumentation type. Band scores, timers, criterion labels, content
+     counts — set in mono at fixed sizes so a figure that changes in place
+     never reflows its row. */
+  --text-metric-lg: 2.25rem;
+  --text-metric: 1.5rem;
+  --text-metric-sm: 0.875rem;
 }
 
 :root {
@@ -74,6 +92,13 @@
   --cobalt: oklch(0.505 0.272 264);
   --chrome: oklch(0.845 0.157 82);
   --slate: oklch(0.5 0.025 264);
+
+  /* The wordmark's underline, and the only brand token an app is expected to
+     retarget. Defaults to the accent, so apps/web and apps/app are unchanged;
+     apps/admin points it at its own primary, which is what makes the CMS
+     lockup read as a different room at a glance. Resolves through var(), so
+     the .dark ramp below is inherited automatically. */
+  --tick: var(--chrome);
 
   --background: var(--paper);
   --foreground: var(--ink);
@@ -171,5 +196,24 @@
   }
   html {
     @apply font-sans;
+  }
+
+  /* Archivo, for page and section titles.
+     No font-variation-settings: the product apps load the STATIC face, so
+     widening it would render nothing. That is why apps/web's .font-display
+     cannot simply be reused here, and why an app adopting .font-title must
+     load Archivo without the wdth axis. */
+  .font-title {
+    font-family: var(--font-heading);
+    letter-spacing: -0.02em;
+    line-height: 1.15;
+    text-wrap: balance;
+  }
+
+  /* Tabular figures everywhere a number changes in place. */
+  .font-metric {
+    font-family: var(--font-mono);
+    font-variant-numeric: tabular-nums;
+    letter-spacing: -0.01em;
   }
 }

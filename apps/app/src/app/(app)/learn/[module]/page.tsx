@@ -37,7 +37,7 @@ export default async function LearnModulePage({
   const progress = await listLessonProgress(userId);
   const done = new Set(progress.map((p) => p.lessonId));
 
-  const lessons = isAvailable(current) ? lessonsForModule(current) : [];
+  const lessons = isAvailable(current) ? await lessonsForModule(current) : [];
   const written = lessons.filter((l) => l.stages).length;
   const complete = lessons.filter((l) => done.has(l.id)).length;
 

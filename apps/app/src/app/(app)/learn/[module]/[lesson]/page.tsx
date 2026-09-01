@@ -15,7 +15,7 @@ export async function generateMetadata({
   params,
 }: PageProps<'/learn/[module]/[lesson]'>) {
   const { lesson } = await params;
-  return { title: getLesson(lesson)?.title ?? 'Lesson' };
+  return { title: (await getLesson(lesson))?.title ?? 'Lesson' };
 }
 
 export default async function LessonPage({
@@ -23,7 +23,7 @@ export default async function LessonPage({
 }: PageProps<'/learn/[module]/[lesson]'>) {
   const { module, lesson: lessonId } = await params;
 
-  const lesson = getLesson(lessonId);
+  const lesson = await getLesson(lessonId);
   // An unwritten lesson has no page — the Learn list already says so, and a
   // blank page pretending otherwise is worse than a 404.
   if (!lesson?.stages || lesson.module !== module) notFound();
@@ -33,7 +33,9 @@ export default async function LessonPage({
   const finished = progress.some((p) => p.lessonId === lesson.id);
 
   // The next written lesson in the same module, for the end of the page.
-  const siblings = lessonsForModule(lesson.module).filter((l) => l.stages);
+  const siblings = (await lessonsForModule(lesson.module)).filter(
+    (l) => l.stages,
+  );
   const next = siblings[siblings.findIndex((l) => l.id === lesson.id) + 1];
 
   const practiceHref = lesson.questionKind

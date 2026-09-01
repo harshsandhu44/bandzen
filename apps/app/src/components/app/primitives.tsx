@@ -2,113 +2,19 @@ import type { ReactNode } from 'react';
 import { cn } from '@bandzen/ui/lib/utils';
 
 /**
- * The application's shared furniture.
- *
- * Two type roles, and the split between them is the whole system:
- *
- * - `SectionHeader` / `PageHeader` name a screen or a section. Archivo, sentence
- *   case, sized from `--text-title-*`. These are the headings a candidate scans.
- * - `Eyebrow` labels a piece of instrumentation — a band figure, a countdown, a
- *   criterion. Mono, uppercase, tracked out.
- *
- * Mono is load-bearing here, not decorative. Using it for headings too is what
- * flattened every screen into the same grey ribbon: when everything is an
- * eyebrow, nothing is.
+ * Eyebrow, SectionHeader, PageHeader, Metric and EmptyState now live in
+ * `@bandzen/ui/components/primitives`, shared with apps/admin. They are
+ * re-exported here so the 22 call sites in this app keep importing from one
+ * place, and so this file can stay the home of the one primitive that did NOT
+ * move.
  */
-
-/** The mono uppercase label that belongs to a number. */
-export function Eyebrow({
-  children,
-  as: As = 'p',
-  className,
-}: {
-  children: ReactNode;
-  as?: 'h2' | 'h3' | 'p' | 'span' | 'dt';
-  className?: string;
-}) {
-  return (
-    <As
-      className={cn(
-        'font-mono text-[0.6875rem] tracking-[0.18em] text-muted-foreground uppercase',
-        className,
-      )}
-    >
-      {children}
-    </As>
-  );
-}
-
-/** A section title. Archivo, so it outranks the rows beneath it. */
-export function SectionHeader({
-  children,
-  as: As = 'h2',
-  className,
-}: {
-  children: ReactNode;
-  as?: 'h2' | 'h3' | 'p';
-  className?: string;
-}) {
-  return <As className={cn('font-title text-title', className)}>{children}</As>;
-}
-
-export function PageHeader({
-  eyebrow,
-  title,
-  description,
-  action,
-}: {
-  eyebrow?: string;
-  title: string;
-  description?: ReactNode;
-  action?: ReactNode;
-}) {
-  return (
-    <header className="space-y-3">
-      {eyebrow ? <Eyebrow>{eyebrow}</Eyebrow> : null}
-      <div className="flex flex-wrap items-start justify-between gap-4">
-        <h1 className="font-title text-title-lg">{title}</h1>
-        {action}
-      </div>
-      {description ? (
-        <div className="max-w-2xl text-sm text-muted-foreground text-pretty">
-          {description}
-        </div>
-      ) : null}
-    </header>
-  );
-}
-
-/**
- * A single figure with its label. `hint` carries the qualifier that keeps a
- * number honest -- "estimate, not an official score" belongs next to the
- * number, not in a footnote.
- */
-export function Metric({
-  label,
-  value,
-  hint,
-  size = 'default',
-}: {
-  label: string;
-  value: ReactNode;
-  hint?: string;
-  size?: 'default' | 'lg';
-}) {
-  return (
-    <div className="space-y-1">
-      <Eyebrow>{label}</Eyebrow>
-      <p
-        className={cn(
-          'font-metric',
-          size === 'lg' ? 'text-metric-lg' : 'text-metric',
-        )}
-      >
-        {value}
-      </p>
-      {hint ? <p className="text-xs text-muted-foreground">{hint}</p> : null}
-    </div>
-  );
-}
+export {
+  Eyebrow,
+  EmptyState,
+  Metric,
+  PageHeader,
+  SectionHeader,
+} from '@bandzen/ui/components/primitives';
 
 /**
  * The tick rule. The band scale's idiom at block scale -- the same measured
@@ -131,7 +37,11 @@ function TickRule() {
 }
 
 /**
- * The one loud thing on a screen.
+ * The one loud thing on a screen. Deliberately NOT promoted to @bandzen/ui:
+ * it describes an exam surface -- an inverted ground, at most one per page,
+ * carrying the band-scale tick idiom -- and a CMS has none of those. Sharing
+ * it would also share the hazard in the note below, whose reasoning only makes
+ * sense if you know this app's history.
  *
  * An instrument panel rather than a card: full-bleed ruled surface, an
  * inverted ground, and a single action. At most one per page -- its whole job
@@ -189,29 +99,5 @@ export function FeatureBlock({
         {action ? <div className="shrink-0">{action}</div> : null}
       </div>
     </section>
-  );
-}
-
-/**
- * An empty screen is an invitation to act, so this always names the next step.
- * A dashed rule says "nothing here yet" without pretending to be content.
- */
-export function EmptyState({
-  title,
-  description,
-  action,
-}: {
-  title: string;
-  description: string;
-  action?: ReactNode;
-}) {
-  return (
-    <div className="border border-dashed border-border px-6 py-10 text-center">
-      <p className="font-title text-title">{title}</p>
-      <p className="mx-auto mt-2 max-w-sm text-sm text-muted-foreground text-pretty">
-        {description}
-      </p>
-      {action ? <div className="mt-5">{action}</div> : null}
-    </div>
   );
 }

@@ -12,7 +12,7 @@ export async function completeLesson(formData: FormData) {
 
   // The id comes from a form field, so it is checked against the content
   // module rather than trusted into the database.
-  const lesson = getLesson(lessonId);
+  const lesson = await getLesson(lessonId);
   if (!lesson?.stages) return;
 
   await markLessonComplete(userId, lessonId);

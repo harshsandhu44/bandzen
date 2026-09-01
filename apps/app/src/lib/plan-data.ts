@@ -1,6 +1,6 @@
 import 'server-only';
 
-import { LESSON_FOR_KIND } from '@/content/lessons';
+import { lessonForKindMap } from '@/content/lessons';
 import { dayBounds } from '@/lib/dates';
 import {
   accuracyByQuestionKind,
@@ -50,6 +50,7 @@ export async function loadPlanData(
     lessons,
     passages,
     prompts,
+    lessonForKind,
   ] = await Promise.all([
     latestBand(userId, 'reading'),
     latestBand(userId, 'writing'),
@@ -59,6 +60,7 @@ export async function loadPlanData(
     listLessonProgress(userId),
     listPassages(),
     listWritingPrompts(),
+    lessonForKindMap(),
   ]);
 
   const completedLessonIds = lessons.map((l) => l.lessonId);
@@ -75,7 +77,7 @@ export async function loadPlanData(
     catalogue: {
       passageIds: passages.map((p) => p.id),
       prompts: prompts.map((p) => ({ id: p.id, task: p.task })),
-      lessonForKind: LESSON_FOR_KIND,
+      lessonForKind,
       completedLessonIds,
     },
   };

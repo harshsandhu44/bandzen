@@ -11,8 +11,8 @@ import {
   SidebarProvider,
   SidebarRail,
 } from '@bandzen/ui/components/sidebar';
-import { Wordmark } from '@/components/app/wordmark';
-import { ThemeToggle } from '@/components/theme-toggle';
+import { Wordmark } from '@bandzen/ui/components/wordmark';
+import { ThemeToggle } from '@bandzen/ui/components/theme-toggle';
 import { requireUserId } from '@/lib/auth';
 import { getProfile, proUntil } from '@/lib/db/queries';
 import {
@@ -92,7 +92,7 @@ export default async function AppLayout({ children }: LayoutProps<'/'>) {
     <SidebarProvider defaultOpen={defaultOpen}>
       <Sidebar collapsible="offcanvas">
         <SidebarHeader className="px-4 py-3">
-          <Wordmark className="self-start" />
+          <Wordmark className="self-start" collapse />
         </SidebarHeader>
 
         <SidebarContent>
