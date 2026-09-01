@@ -522,6 +522,31 @@ export const lessonProgress = pgTable(
   (t) => [primaryKey({ columns: [t.userId, t.lessonId] })],
 );
 
+/**
+ * Awards a candidate has earned. The rule lives in `apps/app/src/lib/awards.ts`
+ * and derives from `attempts` and `lesson_progress`, so this table is the
+ * record rather than the rule — the exception the "derived, not stored" section
+ * of the app README asks for. It holds the two facts the event log cannot: that
+ * an award was earned under the rules in force at the time, so tightening one
+ * later cannot un-earn it, and whether the candidate has been told about it.
+ */
+export const awards = pgTable(
+  'awards',
+  {
+    userId: text('user_id').notNull(),
+    /** A catalogue slug, not an FK — the catalogue is code, not rows. */
+    awardId: text('award_id').notNull(),
+    earnedAt: timestamp('earned_at', { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+    /** Null until the dashboard strip has been acknowledged. */
+    notifiedAt: timestamp('notified_at', { withTimezone: true }),
+  },
+  // The composite key is what makes recording an award idempotent, which is
+  // the whole reason a missed write can heal itself on the next activity.
+  (t) => [primaryKey({ columns: [t.userId, t.awardId] })],
+);
+
 /** The two v1 modules, as a plain union for code that never touches the DB. */
 export type Skill = (typeof attemptModule.enumValues)[number];
 
@@ -533,6 +558,7 @@ export type AttemptAnswer = typeof attemptAnswers.$inferSelect;
 export type Report = typeof reports.$inferSelect;
 export type Profile = typeof profiles.$inferSelect;
 export type LessonProgress = typeof lessonProgress.$inferSelect;
+export type Award = typeof awards.$inferSelect;
 export type Subscription = typeof subscriptions.$inferSelect;
 export type Lesson = typeof lessons.$inferSelect;
 export type Resource = typeof resources.$inferSelect;
