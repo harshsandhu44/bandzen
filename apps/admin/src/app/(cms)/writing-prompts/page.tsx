@@ -18,19 +18,28 @@ export default async function WritingPromptsPage() {
         title="Writing prompts"
         description="Task 1 and Task 2 prompts. Students only ever see published ones."
         action={
-          <Button
-            nativeButton={false}
-            render={<Link href="/writing-prompts/new" />}
-          >
-            New prompt
-          </Button>
+          <div className="flex items-center gap-2">
+            <Button
+              nativeButton={false}
+              render={<Link href="/writing-prompts/import" />}
+              variant="outline"
+            >
+              Import JSON
+            </Button>
+            <Button
+              nativeButton={false}
+              render={<Link href="/writing-prompts/new" />}
+            >
+              New prompt
+            </Button>
+          </div>
         }
       />
 
       {prompts.length === 0 ? (
         <EmptyState
           title="No writing prompts yet"
-          description="Add a Task 1 or Task 2 prompt for students to practise against."
+          description="Add a Task 1 or Task 2 prompt for students to practise against. Write one by hand, or import JSON."
           action={
             <Button
               nativeButton={false}

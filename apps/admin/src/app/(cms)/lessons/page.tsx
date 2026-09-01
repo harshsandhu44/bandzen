@@ -33,16 +33,25 @@ export default async function LessonsPage() {
         title="Lessons"
         description="Grouped by module, then by section. Order within a group follows the order index."
         action={
-          <Button nativeButton={false} render={<Link href="/lessons/new" />}>
-            New lesson
-          </Button>
+          <div className="flex items-center gap-2">
+            <Button
+              nativeButton={false}
+              render={<Link href="/lessons/import" />}
+              variant="outline"
+            >
+              Import JSON
+            </Button>
+            <Button nativeButton={false} render={<Link href="/lessons/new" />}>
+              New lesson
+            </Button>
+          </div>
         }
       />
 
       {grouped.size === 0 ? (
         <EmptyState
           title="No lessons yet"
-          description="Lessons are grouped by module and section. Add the first one to start a group."
+          description="Lessons are grouped by module and section. Write one by hand, or import JSON with its stages already written."
           action={
             <Button nativeButton={false} render={<Link href="/lessons/new" />}>
               New lesson

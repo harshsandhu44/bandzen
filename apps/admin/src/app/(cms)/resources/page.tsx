@@ -19,16 +19,28 @@ export default async function ResourcesPage() {
         title="Resources"
         description="Short guides students read between practice sessions. Only published ones are visible to them."
         action={
-          <Button nativeButton={false} render={<Link href="/resources/new" />}>
-            New resource
-          </Button>
+          <div className="flex items-center gap-2">
+            <Button
+              nativeButton={false}
+              render={<Link href="/resources/import" />}
+              variant="outline"
+            >
+              Import JSON
+            </Button>
+            <Button
+              nativeButton={false}
+              render={<Link href="/resources/new" />}
+            >
+              New resource
+            </Button>
+          </div>
         }
       />
 
       {resources.length === 0 ? (
         <EmptyState
           title="No resources yet"
-          description="Guides are grouped by category. Add the first one to start a category."
+          description="Guides are grouped by category. Write one by hand, or import JSON with its paragraphs already written."
           action={
             <Button
               nativeButton={false}
