@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
+  <!-- Bandzen mark: band 9 over the scale tick. The 9 is a real Archivo
+       SemiBold outline, not a font reference — a favicon cannot load a font.
+       Regenerate rather than hand-editing the path. Bar is docs' own green (hue 165, the primary it overrides), lifted to chrome's lightness so it carries the same weight on the void tile. -->
+  <rect width="32" height="32" fill="#09090f"/>
+  <path fill="#ffffff" transform="translate(7.268 24) scale(0.030802 -0.030802)" d="M278 -12Q203 -12 156.0 16.5Q109 45 87.0 93.5Q65 142 65 202H189Q189 166 198.5 140.5Q208 115 229.0 101.5Q250 88 283 88Q332 88 356.5 114.5Q381 141 389.5 190.5Q398 240 399 307Q394 300 374.5 285.0Q355 270 323.5 258.0Q292 246 251 246Q179 246 133.0 275.5Q87 305 64.5 356.5Q42 408 42 472Q42 542 72.0 592.5Q102 643 154.0 670.5Q206 698 272 698Q331 698 378.0 681.0Q425 664 458.0 625.5Q491 587 508.0 522.5Q525 458 525 363Q525 257 508.5 184.5Q492 112 460.5 69.0Q429 26 383.0 7.0Q337 -12 278 -12ZM279 344Q317 344 342.0 360.5Q367 377 379.0 406.0Q391 435 391 472Q391 508 379.0 536.5Q367 565 342.0 581.5Q317 598 279 598Q241 598 216.5 581.0Q192 564 180.0 535.5Q168 507 168 471Q168 434 180.0 405.5Q192 377 216.5 360.5Q241 344 279 344Z"/>
+  <rect x="9.5" y="26.5" width="13" height="3" fill="#60e7b4"/>
+</svg>
