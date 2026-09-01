@@ -1,0 +1,53 @@
+@import '@bandzen/ui/globals.css';
+
+/* The CMS. The shared design system is the whole theme — same neutrals, same
+   type, same 0.25rem radius, same primitives — and the differentiation is
+   three tokens, not a second design language. It is the same product; this is
+   just the back of house.
+                                                                              */
+@theme inline {
+  --color-plum: var(--plum);
+}
+
+:root {
+  /* Hue 305, close enough to cobalt's 264 to read as a sibling in the family,
+     far enough to be unmistakable in a tab strip or a favicon.
+
+     Chosen by elimination as much as by taste. Red is out: --destructive is
+     already red and this app is full of Delete buttons. Green is out: it is
+     the colour "published" wants, and a green button next to a green status
+     would make the one distinction this tool exists to show ambiguous. Gold is
+     out as a primary because --chrome is oklch(0.845) and cannot carry white
+     text without a whole new ramp. Plum collides with nothing. */
+  --plum: oklch(0.48 0.2 305);
+
+  --primary: var(--plum);
+  --ring: var(--plum);
+  --sidebar-primary: var(--plum);
+  --sidebar-ring: var(--plum);
+
+  /* The wordmark's underline. Retargeting it is what makes the lockup read as
+     the CMS at a glance, and it hands --chrome back to the one job it has
+     here: marking a draft. See StatusBadge. */
+  --tick: var(--plum);
+
+  --chart-1: var(--plum);
+}
+
+.dark {
+  /* Lifted and desaturated the same way --cobalt is in the shared block, so
+     the plum stays AA against the dark card ground rather than vibrating. */
+  --plum: oklch(0.68 0.19 305);
+
+  /* Repeated, not redundant. @bandzen/ui's own `.dark` block declares
+     `--primary: var(--cobalt)`, and `.dark` and `:root` have identical
+     specificity — so the `:root` mapping above only wins on source order.
+     Restating them here means the CMS keeps its primary in dark mode whatever
+     order the sheets end up in. */
+  --primary: var(--plum);
+  --ring: var(--plum);
+  --sidebar-primary: var(--plum);
+  --sidebar-ring: var(--plum);
+  --tick: var(--plum);
+  --chart-1: var(--plum);
+}
