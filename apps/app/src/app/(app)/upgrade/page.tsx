@@ -72,7 +72,9 @@ export default async function UpgradePage(props: PageProps<'/upgrade'>) {
   const hasTimeLeft = isProAt(subscription?.currentPeriodEnd);
   const paying = hasTimeLeft && subscription?.razorpaySubscriptionId != null;
 
-  const days = profile?.testDate ? daysUntil(profile.testDate) : null;
+  const days = profile?.testDate
+    ? daysUntil(profile.testDate, profile.timezone)
+    : null;
   const measured = writing ?? reading;
   const gap =
     profile?.targetBand != null && measured != null

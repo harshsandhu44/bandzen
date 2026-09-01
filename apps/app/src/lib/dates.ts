@@ -22,10 +22,20 @@ export function todayIso(timezone?: string | null): string {
   }
 }
 
-/** Whole days from today until an ISO date. Negative once it has passed. */
-export function daysUntil(isoDate: string, from = todayIso()): number {
+/**
+ * Whole days from today until an ISO date, counted in the candidate's zone.
+ * Negative once it has passed.
+ *
+ * The zone is the parameter rather than a pre-computed "today" because the
+ * parameter used to be the latter and defaulted to UTC. Two of the three call
+ * sites took that default, which put "56 days" in the dashboard header and
+ * "57 DAYS" in the sidebar beside it for any candidate whose own day had
+ * already turned. A zone can be forgotten; a default that is wrong cannot be
+ * spotted.
+ */
+export function daysUntil(isoDate: string, timezone?: string | null): number {
   const target = Date.parse(`${isoDate}T00:00:00Z`);
-  const start = Date.parse(`${from}T00:00:00Z`);
+  const start = Date.parse(`${todayIso(timezone)}T00:00:00Z`);
   if (Number.isNaN(target) || Number.isNaN(start)) return 0;
   return Math.round((target - start) / DAY_MS);
 }
