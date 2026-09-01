@@ -16,22 +16,34 @@ type BandTrendProps = {
   target?: number;
   /** Names what is being tracked, for the accessible table. */
   caption: string;
+  /**
+   * Whether first -> last states a change. True only when the series measures
+   * one comparable thing: across a mixed series it subtracts one skill's band
+   * from another's and reports the difference as progress.
+   */
+  delta?: boolean;
   className?: string;
 };
 
 /**
  * Band over time. The sibling of BandScale, on the same 0–9 ruler.
  *
- * Hand-drawn SVG rather than a chart library: this is one polyline and a few
- * circles, and pulling in a client-only charting runtime for it would put the
- * app's only hydration boundary on the page that needs it least. Server
+ * Hand-drawn SVG rather than a chart library: this is one polyline and a dot
+ * per point, and pulling in a client-only charting runtime for it would put
+ * the app's only hydration boundary on the page that needs it least. Server
  * component, no JavaScript at all.
  *
  * The figures are also rendered as a real table, visually hidden. A polyline
  * with an aria-label tells a screen reader that a chart exists; a table tells
  * it what the numbers are.
  */
-function BandTrend({ points, target, caption, className }: BandTrendProps) {
+function BandTrend({
+  points,
+  target,
+  caption,
+  delta: showDelta = true,
+  className,
+}: BandTrendProps) {
   // A single measurement is a dot, not a trend -- but it still draws, because
   // "your first result" is worth showing.
   if (!points.length) return null;
@@ -99,17 +111,38 @@ function BandTrend({ points, target, caption, className }: BandTrendProps) {
           />
         ) : null}
 
+        {/* Zero-length round-capped lines, not circles.
+
+            `preserveAspectRatio="none"` is what lets the line span the full
+            width whatever the container, but it scales x and y by different
+            factors -- roughly 9x and 4x at desktop width -- and a <circle>
+            under that is drawn as an ellipse, wider the wider the viewport.
+            A round cap is stroked in screen units, so `non-scaling-stroke`
+            keeps these round at every size. Two of them make the hollow dot:
+            the wider one is the ring, the narrower one punches the middle. */}
         {points.map((p, i) => (
-          <circle
-            key={i}
-            cx={x(i)}
-            cy={y(p.value)}
-            r={1.6}
-            fill="var(--background)"
-            stroke="var(--primary)"
-            strokeWidth={1.25}
-            vectorEffect="non-scaling-stroke"
-          />
+          <g key={i}>
+            <line
+              x1={x(i)}
+              y1={y(p.value)}
+              x2={x(i)}
+              y2={y(p.value)}
+              stroke="var(--primary)"
+              strokeWidth={6}
+              strokeLinecap="round"
+              vectorEffect="non-scaling-stroke"
+            />
+            <line
+              x1={x(i)}
+              y1={y(p.value)}
+              x2={x(i)}
+              y2={y(p.value)}
+              stroke="var(--background)"
+              strokeWidth={3.5}
+              strokeLinecap="round"
+              vectorEffect="non-scaling-stroke"
+            />
+          </g>
         ))}
       </svg>
 
@@ -117,16 +150,18 @@ function BandTrend({ points, target, caption, className }: BandTrendProps) {
         <span className="font-mono text-[0.625rem] tracking-[0.2em] text-muted-foreground uppercase">
           {caption}
         </span>
-        <span className="font-mono text-[0.625rem] tracking-[0.2em] uppercase tabular-nums">
-          {first.value.toFixed(1)} → {last.value.toFixed(1)}
-          {delta !== 0 ? (
-            <span className="text-muted-foreground">
-              {' '}
-              ({delta > 0 ? '+' : ''}
-              {delta.toFixed(1)})
-            </span>
-          ) : null}
-        </span>
+        {showDelta ? (
+          <span className="font-mono text-[0.625rem] tracking-[0.2em] uppercase tabular-nums">
+            {first.value.toFixed(1)} → {last.value.toFixed(1)}
+            {delta !== 0 ? (
+              <span className="text-muted-foreground">
+                {' '}
+                ({delta > 0 ? '+' : ''}
+                {delta.toFixed(1)})
+              </span>
+            ) : null}
+          </span>
+        ) : null}
       </figcaption>
 
       {/* The numbers themselves, for anyone who cannot see the line. */}
