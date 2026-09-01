@@ -174,7 +174,11 @@ export function CoachChat({
           <p className="text-sm">
             You have used this week&rsquo;s {quota.limit} Coach messages.
             {quota.resetsAt ? (
-              <> Your next free message is {resetLabel(quota.resetsAt, timezone)}.</>
+              <>
+                {' '}
+                Your next free message is {resetLabel(quota.resetsAt, timezone)}
+                .
+              </>
             ) : null}
           </p>
           <Button
