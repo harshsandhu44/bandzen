@@ -5,36 +5,7 @@
    (apps/web owns --text-display-*), no bz-* scroll choreography, no smooth
    scrolling — a timed exam surface should not animate under the candidate.
 
-   Only additions belong here, and only ones the product actually needs. */
-
-@theme {
-  /* Instrumentation type. Band scores, timers, criterion labels and counters
-     are set in mono at fixed sizes so a ticking clock never reflows its row. */
-  --text-metric-lg: 2.25rem;
-  --text-metric: 1.5rem;
-  --text-metric-sm: 0.875rem;
-
-  /* Title type. The app's own scale, an order of magnitude below the
-     marketing display sizes: these head a working screen, not a billboard. */
-  --text-title-lg: 1.875rem;
-  --text-title: 1.25rem;
-}
-
-@layer base {
-  /* Tabular figures everywhere a number changes in place. */
-  .font-metric {
-    font-family: var(--font-mono);
-    font-variant-numeric: tabular-nums;
-    letter-spacing: -0.01em;
-  }
-
-  /* Archivo, for page and section titles. No font-variation-settings: this
-     app loads the static face, so widening it would render nothing. That is
-     why apps/web's .font-display cannot simply be imported here. */
-  .font-title {
-    font-family: var(--font-heading);
-    letter-spacing: -0.02em;
-    line-height: 1.15;
-    text-wrap: balance;
-  }
-}
+   The title and metric type scales, and .font-title / .font-metric, used to
+   live here. They moved into @bandzen/ui when apps/admin adopted the same
+   primitives, so that the components and the type they are set in ship
+   together. Nothing app-specific is left to add. */

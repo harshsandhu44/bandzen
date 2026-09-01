@@ -11,8 +11,8 @@ import {
   SidebarProvider,
   SidebarRail,
 } from '@bandzen/ui/components/sidebar';
-import { Wordmark } from '@/components/app/wordmark';
-import { ThemeToggle } from '@/components/theme-toggle';
+import { Wordmark } from '@bandzen/ui/components/wordmark';
+import { ThemeToggle } from '@bandzen/ui/components/theme-toggle';
 import { requireUserId } from '@/lib/auth';
 import { getProfile, proUntil } from '@/lib/db/queries';
 import {

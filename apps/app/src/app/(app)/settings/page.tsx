@@ -3,7 +3,7 @@ import { SignOutButton } from '@clerk/nextjs';
 import { currentUser } from '@clerk/nextjs/server';
 import { Button } from '@bandzen/ui/components/button';
 import { PageHeader, SectionHeader } from '@/components/app/primitives';
-import { ThemeToggle } from '@/components/theme-toggle';
+import { ThemeToggle } from '@bandzen/ui/components/theme-toggle';
 import { requireUserId } from '@/lib/auth';
 import { getProfile, getSubscription } from '@/lib/db/queries';
 import {
