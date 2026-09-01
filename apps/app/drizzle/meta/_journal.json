@@ -29,6 +29,34 @@
       "when": 1788178045682,
       "tag": "0003_magenta_yellowjacket",
       "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1788255826764,
+      "tag": "0004_yummy_mandroid",
+      "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1788256613654,
+      "tag": "0005_round_puff_adder",
+      "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1788256692617,
+      "tag": "0006_lesson_progress_fk",
+      "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "7",
+      "when": 1788256726585,
+      "tag": "0007_public_maximus",
+      "breakpoints": true
     }
   ]
 }
