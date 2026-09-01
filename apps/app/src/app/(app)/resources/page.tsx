@@ -4,7 +4,7 @@ import { FilterBar } from '@/components/app/filter-bar';
 import { LearnNav } from '@/components/learning/learn-nav';
 import {
   CATEGORY_TITLE,
-  RESOURCES,
+  listResources,
   RESOURCE_CATEGORIES,
   type ResourceCategory,
 } from '@/content/resources';
@@ -30,9 +30,10 @@ export default async function ResourcesPage({
       ? (raw as ResourceCategory)
       : undefined;
 
+  const allResources = await listResources();
   const shown = category
-    ? RESOURCES.filter((r) => r.category === category)
-    : RESOURCES;
+    ? allResources.filter((r) => r.category === category)
+    : allResources;
 
   // Grouped by category, in the declared order, so the page reads as an index
   // rather than a feed.

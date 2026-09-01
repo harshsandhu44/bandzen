@@ -10,7 +10,7 @@ export async function generateMetadata({
   params,
 }: PageProps<'/resources/[resourceId]'>) {
   const { resourceId } = await params;
-  return { title: getResource(resourceId)?.title ?? 'Resource' };
+  return { title: (await getResource(resourceId))?.title ?? 'Resource' };
 }
 
 export default async function ResourcePage({
@@ -19,7 +19,7 @@ export default async function ResourcePage({
   const { resourceId } = await params;
   await requireUserId();
 
-  const resource = getResource(resourceId);
+  const resource = await getResource(resourceId);
   // An unwritten resource has no page. The index already says so.
   if (!resource?.body) notFound();
 
