@@ -103,7 +103,8 @@ test('nextAction names the weaker skill', () => {
 
 const CATALOGUE = {
   passageIds: ['p1', 'p2'],
-  promptIds: ['w1'],
+  // Task 2 only, which is what is actually seeded today.
+  prompts: [{ id: 'w1', task: 2 }],
 };
 
 test('tasks resolve to something the Continue button can open', () => {
@@ -225,4 +226,45 @@ test('the goal falls back to what the plan asks for', () => {
 
   assert.equal(derivePlanState(tasks, evidence).minutesGoal, total);
   assert.equal(derivePlanState(tasks, evidence, 60).minutesGoal, 60);
+});
+
+test('a drill is not scheduled for a task with no prompts', () => {
+  const plan = buildPlan({
+    readingBand: 7,
+    writingBand: 6.5,
+    targetBand: 8,
+    testDate: null,
+    today: TODAY,
+    catalogue: CATALOGUE, // Task 2 only.
+  });
+
+  // "Task 1 summary, full timing" used to be booked against Task 2 prompts:
+  // the plan promised a chart summary and Continue opened a discursive essay.
+  assert.equal(
+    plan.some((t) => t.label.startsWith('Task 1')),
+    false,
+  );
+  assert.ok(plan.some((t) => t.skill === 'writing'));
+});
+
+test('the Task 1 drill returns once a Task 1 prompt is seeded', () => {
+  const plan = buildPlan({
+    readingBand: 7,
+    writingBand: 6.5,
+    targetBand: 8,
+    testDate: null,
+    today: TODAY,
+    catalogue: {
+      ...CATALOGUE,
+      prompts: [
+        { id: 'w1', task: 2 },
+        { id: 'w2', task: 1 },
+      ],
+    },
+  });
+
+  const taskOne = plan.find((t) => t.label.startsWith('Task 1 summary'));
+  assert.ok(taskOne, 'the Task 1 drill should be scheduled');
+  // And it opens a Task 1 prompt, not whichever prompt the rotation landed on.
+  assert.deepEqual(taskOne.target, { kind: 'writing', promptId: 'w2' });
 });

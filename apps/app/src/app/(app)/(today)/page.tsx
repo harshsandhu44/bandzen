@@ -61,7 +61,9 @@ export default async function DashboardPage() {
     kindAccuracy,
   } = data;
 
-  const days = profile.testDate ? daysUntil(profile.testDate, today) : null;
+  const days = profile.testDate
+    ? daysUntil(profile.testDate, profile.timezone)
+    : null;
   const next = progress.tasks.find((t) => t.status !== 'completed');
 
   // Nothing measured means nothing to analyse. Showing the analytics anyway is
@@ -95,7 +97,12 @@ export default async function DashboardPage() {
         daysUntilTest={days}
       />
 
-      <QuotaMeter allowance={quota} noun="essay marks" source="dashboard" />
+      <QuotaMeter
+        allowance={quota}
+        noun="essay marks"
+        source="dashboard"
+        timezone={profile.timezone}
+      />
 
       {next ? <ContinuePlan task={next} /> : null}
 

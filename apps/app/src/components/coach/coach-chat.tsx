@@ -21,9 +21,12 @@ type Message = { role: 'user' | 'assistant'; content: string };
 export function CoachChat({
   prompts,
   quota,
+  timezone,
 }: {
   prompts: readonly string[];
   quota: Allowance;
+  /** The candidate's zone: this renders in the browser, the meters do not. */
+  timezone?: string | null;
 }) {
   const [messages, setMessages] = useState<Message[]>([]);
   const [draft, setDraft] = useState('');
@@ -171,7 +174,7 @@ export function CoachChat({
           <p className="text-sm">
             You have used this week&rsquo;s {quota.limit} Coach messages.
             {quota.resetsAt ? (
-              <> Your next free message is {resetLabel(quota.resetsAt)}.</>
+              <> Your next free message is {resetLabel(quota.resetsAt, timezone)}.</>
             ) : null}
           </p>
           <Button
@@ -238,6 +241,7 @@ export function CoachChat({
           allowance={{ ...quota, remaining: left, used: quota.limit - left }}
           noun="Coach messages"
           source="coach_wall"
+          timezone={timezone}
         />
       )}
     </div>

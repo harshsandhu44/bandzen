@@ -141,6 +141,10 @@ export default async function ProgressPage() {
         <BandTrend
           points={points}
           target={profile?.targetBand ?? undefined}
+          // Reading and writing attempts share this line, so first -> last
+          // would subtract one skill's band from the other's and call the
+          // difference progress. The per-module trends below say it properly.
+          delta={new Set(points.map((p) => p.module)).size === 1}
           caption={
             hidden
               ? `Your last ${FREE_TREND_POINTS} attempts, oldest first`

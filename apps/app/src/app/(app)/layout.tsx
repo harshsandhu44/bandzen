@@ -71,7 +71,9 @@ export default async function AppLayout({ children }: LayoutProps<'/'>) {
     proUntil(userId),
     cookies(),
   ]);
-  const days = profile?.testDate ? daysUntil(profile.testDate) : null;
+  const days = profile?.testDate
+    ? daysUntil(profile.testDate, profile.timezone)
+    : null;
 
   // The persistent entry point, and the only one that is always on screen.
   // Not a sixth nav item: NAV_LINKS is rendered verbatim as the phone tab bar,

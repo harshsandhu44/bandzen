@@ -2,7 +2,12 @@ import { notFound } from 'next/navigation';
 import { BandScale } from '@bandzen/ui/components/band-scale';
 import { cn } from '@bandzen/ui/lib/utils';
 import { requireUserId } from '@/lib/auth';
-import { essayAllowance, getReport, markedEssayCount } from '@/lib/db/queries';
+import {
+  essayAllowance,
+  getProfile,
+  getReport,
+  markedEssayCount,
+} from '@/lib/db/queries';
 import { Button } from '@bandzen/ui/components/button';
 import { UpgradePrompt, resetLabel } from '@/components/billing/pro';
 import { retryGrading } from '../../actions';
@@ -93,9 +98,10 @@ export default async function ReportPage({
   // empties the allowance pairs that with a real limit and a real date. The
   // same block under every report is wallpaper by the third view, and starts
   // making the feedback itself feel like bait.
-  const [quota, marked] = await Promise.all([
+  const [quota, marked, profile] = await Promise.all([
     essayAllowance(userId),
     markedEssayCount(userId),
+    getProfile(userId),
   ]);
 
   const prompt = quota.unlimited
@@ -105,7 +111,7 @@ export default async function ReportPage({
           eyebrow: 'That was your last mark this week',
           title: 'Keep going without waiting',
           meta: quota.resetsAt
-            ? `Next free mark ${resetLabel(quota.resetsAt)}`
+            ? `Next free mark ${resetLabel(quota.resetsAt, profile?.timezone)}`
             : undefined,
         }
       : marked <= 1

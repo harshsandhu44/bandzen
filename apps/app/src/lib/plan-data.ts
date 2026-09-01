@@ -74,7 +74,7 @@ export async function loadPlanData(
       .map((k) => k.kind),
     catalogue: {
       passageIds: passages.map((p) => p.id),
-      promptIds: prompts.map((p) => p.id),
+      prompts: prompts.map((p) => ({ id: p.id, task: p.task })),
       lessonForKind: LESSON_FOR_KIND,
       completedLessonIds,
     },

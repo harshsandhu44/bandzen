@@ -31,7 +31,12 @@ export type PlanTask = {
  */
 export type PlanCatalogue = {
   passageIds?: readonly string[];
-  promptIds?: readonly string[];
+  /**
+   * Writing prompts with the task each one is for. The task matters because a
+   * drill names it ("Task 1 summary"), so a plan that knows only ids can
+   * schedule an exercise nothing in the library can satisfy.
+   */
+  prompts?: readonly { id: string; task: number }[];
   /** Lesson slug that teaches a question kind, from src/content/lessons.ts. */
   lessonForKind?: Readonly<Record<string, string>>;
   completedLessonIds?: readonly string[];
@@ -60,10 +65,14 @@ const READING_DRILLS = [
 ];
 
 const WRITING_DRILLS = [
-  { label: 'Task 2 essay, full timing', minutes: 40 },
-  { label: 'Task 2 introduction and thesis only', minutes: 15 },
-  { label: 'Paragraph development from a weak body paragraph', minutes: 25 },
-  { label: 'Task 1 summary, full timing', minutes: 20 },
+  { label: 'Task 2 essay, full timing', minutes: 40, task: 2 },
+  { label: 'Task 2 introduction and thesis only', minutes: 15, task: 2 },
+  {
+    label: 'Paragraph development from a weak body paragraph',
+    minutes: 25,
+    task: 2,
+  },
+  { label: 'Task 1 summary, full timing', minutes: 20, task: 1 },
 ];
 
 const MAX_DAYS = 14;
@@ -132,6 +141,17 @@ export function buildPlan(input: PlanInput): PlanTask[] {
   const weaker = weakerShare(input.readingBand, input.writingBand);
   const tasks: PlanTask[] = [];
 
+  // A drill may only be scheduled if a prompt exists for the task it names.
+  // Content is seeded Task 2 first, so without this the plan booked "Task 1
+  // summary, full timing" against a library of Task 2 prompts: the label
+  // promised one exercise and Continue opened another. An absent catalogue
+  // keeps every drill, so a plan built without one is unchanged.
+  const prompts = input.catalogue?.prompts;
+  const available = prompts?.length
+    ? WRITING_DRILLS.filter((d) => prompts.some((p) => p.task === d.task))
+    : WRITING_DRILLS;
+  const writingDrills = available.length ? available : WRITING_DRILLS;
+
   let readingCursor = 0;
   let writingCursor = 0;
 
@@ -153,10 +173,15 @@ export function buildPlan(input: PlanInput): PlanTask[] {
             : 'writing'
           : weaker;
 
+    // Kept separate from the reading drill because only this one carries a
+    // task, and the target below has to match it. `??` short-circuits, so the
+    // reading cursor is still only spent on a reading day.
+    const writingDrill =
+      skill === 'writing'
+        ? writingDrills[writingCursor++ % writingDrills.length]!
+        : null;
     const drill =
-      skill === 'reading'
-        ? READING_DRILLS[readingCursor++ % READING_DRILLS.length]!
-        : WRITING_DRILLS[writingCursor++ % WRITING_DRILLS.length]!;
+      writingDrill ?? READING_DRILLS[readingCursor++ % READING_DRILLS.length]!;
 
     // Day 1 is today, not tomorrow. A plan whose first task lands tomorrow
     // leaves the dashboard with nothing to put under "Today".
@@ -185,8 +210,11 @@ export function buildPlan(input: PlanInput): PlanTask[] {
       const passageId = pick(input.catalogue?.passageIds, readingCursor - 1);
       if (passageId) target = { kind: 'reading', passageId };
     } else {
-      const promptId = pick(input.catalogue?.promptIds, writingCursor - 1);
-      if (promptId) target = { kind: 'writing', promptId };
+      // Rotate within the drill's own task, so the prompt that opens is the
+      // kind of exercise the label just promised.
+      const forTask = prompts?.filter((p) => p.task === writingDrill!.task);
+      const prompt = pick(forTask, writingCursor - 1);
+      if (prompt) target = { kind: 'writing', promptId: prompt.id };
     }
 
     tasks.push({

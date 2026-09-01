@@ -1,8 +1,16 @@
+import Link from 'next/link';
 import { Input } from '@bandzen/ui/components/input';
 import { Label } from '@bandzen/ui/components/label';
 import { Button } from '@bandzen/ui/components/button';
+import { EmptyState } from '@/components/app/primitives';
 import { requireUserId } from '@/lib/auth';
-import { getProfile } from '@/lib/db/queries';
+import {
+  diagnosticCount,
+  getProfile,
+  isPro,
+  latestDiagnostic,
+} from '@/lib/db/queries';
+import { canStartDiagnostic } from '@/lib/entitlements';
 import { DIAGNOSTIC_DURATION_LABEL } from '@/lib/timing';
 import { startDiagnostic } from './actions';
 
@@ -10,7 +18,57 @@ export const metadata = { title: 'Diagnostic' };
 
 export default async function DiagnosticPage() {
   const userId = await requireUserId();
-  const profile = await getProfile(userId);
+  const [profile, existing, taken, pro] = await Promise.all([
+    getProfile(userId),
+    latestDiagnostic(userId),
+    diagnosticCount(userId),
+    isPro(userId),
+  ]);
+
+  // The page asks the question the action asks, so the two cannot disagree.
+  // It used to offer a live "Start the diagnostic" to a candidate who had
+  // already spent theirs: the action correctly refused and redirected, and
+  // from their side pressing Start silently landed them on an old result.
+  const spent = existing != null && !canStartDiagnostic({ isPro: pro, taken });
+
+  if (spent) {
+    return (
+      <div className="max-w-md space-y-8">
+        <header>
+          <p className="font-mono text-[0.6875rem] tracking-[0.18em] text-muted-foreground uppercase">
+            Diagnostic
+          </p>
+          <h1 className="mt-2 font-title text-title-lg">
+            You have already been measured
+          </h1>
+        </header>
+
+        <EmptyState
+          title="One diagnostic on Free"
+          description="Your result is still here, and every practice attempt you sit keeps your estimated band up to date. Pro re-measures whenever you want to."
+          action={
+            <div className="flex flex-wrap justify-center gap-3">
+              <Button
+                size="sm"
+                nativeButton={false}
+                render={<Link href={`/diagnostic/${existing.id}/result`} />}
+              >
+                See your result
+              </Button>
+              <Button
+                size="sm"
+                variant="outline"
+                nativeButton={false}
+                render={<Link href="/upgrade?from=diagnostic_wall" />}
+              >
+                Retake with Pro
+              </Button>
+            </div>
+          }
+        />
+      </div>
+    );
+  }
 
   return (
     <div className="max-w-md space-y-8">
