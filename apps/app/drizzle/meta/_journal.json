@@ -57,6 +57,13 @@
       "when": 1788256726585,
       "tag": "0007_public_maximus",
       "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "7",
+      "when": 1788288624086,
+      "tag": "0008_milky_puppet_master",
+      "breakpoints": true
     }
   ]
 }

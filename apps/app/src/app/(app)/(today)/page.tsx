@@ -13,13 +13,17 @@ import { FirstRun } from '@/components/dashboard/first-run';
 import { QuotaMeter } from '@/components/billing/pro';
 import { PerformanceInsight } from '@/components/dashboard/performance-insight';
 import { TodaysPlan } from '@/components/dashboard/todays-plan';
+import { AwardStrip } from '@/components/awards/award-strip';
 import { requireUserId } from '@/lib/auth';
 import { daysUntil, todayIso } from '@/lib/dates';
 import {
   essayAllowance,
   getProfile,
+  listAwards,
   listCompletedAttempts,
+  studyDays,
 } from '@/lib/db/queries';
+import { currentStreak } from '@/lib/awards';
 import { MODULE_LABEL } from '@/lib/modules';
 import { buildInsight } from '@/lib/insight';
 import { loadPlanData } from '@/lib/plan-data';
@@ -44,12 +48,17 @@ export default async function DashboardPage() {
 
   const today = todayIso(profile.timezone);
 
-  const [user, attempts, data, quota] = await Promise.all([
+  const [user, attempts, data, quota, awards, activeDays] = await Promise.all([
     currentUser(),
     listCompletedAttempts(userId, 8),
     loadPlanData(userId, profile, today),
     essayAllowance(userId),
+    listAwards(userId),
+    studyDays(userId, profile.timezone),
   ]);
+
+  // Named for what it is: `days` in this file already means days until the exam.
+  const streak = currentStreak(activeDays, today);
 
   const {
     planInput,
@@ -75,6 +84,7 @@ export default async function DashboardPage() {
           firstName={user?.firstName ?? null}
           timezone={profile.timezone}
         />
+        <AwardStrip awards={awards} />
         <FirstRun profile={profile} daysUntilTest={days} />
       </div>
     );
@@ -95,7 +105,10 @@ export default async function DashboardPage() {
         estimated={estimated}
         target={profile.targetBand}
         daysUntilTest={days}
+        streak={streak}
       />
+
+      <AwardStrip awards={awards} />
 
       <QuotaMeter
         allowance={quota}

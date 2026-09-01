@@ -31,17 +31,18 @@ implied otherwise would be a lie to someone paying for practice.
    and `.completed`. Put the ids and both secrets in `.env.local`.
 7. `pnpm dev` from the repo root.
 
-| Command                  | What it does                                      |
-| ------------------------ | ------------------------------------------------- |
-| `pnpm db:generate`       | Write a migration from schema changes             |
-| `pnpm db:migrate`        | Apply pending migrations                          |
-| `pnpm db:push`           | Push schema without a migration (local only)      |
-| `pnpm db:studio`         | Browse the database                               |
-| `pnpm db:seed`           | Load `content/seed.sql`                           |
-| `pnpm db:grant-founding` | Comp the beta cohort 90 days (dry run; `--apply`) |
-| `pnpm content:generate`  | Generate reviewable passage JSON (costs money)    |
-| `pnpm content:sql`       | Build `content/seed.sql` from that JSON           |
-| `pnpm test`              | Grading, study plan, insight, entitlements        |
+| Command                   | What it does                                      |
+| ------------------------- | ------------------------------------------------- |
+| `pnpm db:generate`        | Write a migration from schema changes             |
+| `pnpm db:migrate`         | Apply pending migrations                          |
+| `pnpm db:push`            | Push schema without a migration (local only)      |
+| `pnpm db:studio`          | Browse the database                               |
+| `pnpm db:seed`            | Load `content/seed.sql`                           |
+| `pnpm db:grant-founding`  | Comp the beta cohort 90 days (dry run; `--apply`) |
+| `pnpm db:backfill-awards` | Grant existing candidates their history's awards  |
+| `pnpm content:generate`   | Generate reviewable passage JSON (costs money)    |
+| `pnpm content:sql`        | Build `content/seed.sql` from that JSON           |
+| `pnpm test`               | Grading, study plan, insight, entitlements        |
 
 ## Access model
 
@@ -92,6 +93,35 @@ redirects to the dashboard, so that covers real entry without adding a second
 place to get auth wrong. Deep links to `/reading` still work without a profile,
 and show empty states rather than bouncing.
 
+## Awards
+
+`src/lib/awards.ts` holds the catalogue and the rules, pure and tested like the
+engines. It is code rather than CMS rows on purpose: an award is a rule, and a
+rule edited in the CMS would silently rewrite history for everyone who had
+already met the old one.
+
+**A study day is a calendar day, in `profiles.timezone`, on which an attempt was
+completed or a lesson was finished.** That is the whole unit. It falls out of
+`buildPlan` scheduling exactly one task per day, and of a past day's plan not
+being reconstructable — the plan is rebuilt from today forward on every read, so
+_which_ module a Tuesday in August asked for has no answer. Whether the
+candidate did something that day does.
+
+Streak awards read the **longest** streak ever, not the current one. Missing a
+day ends a run and never takes back an award, which matters for people sitting
+an exam on a date they cannot move — and it also makes `awardsEarned` an
+idempotent function of the entire log.
+
+That idempotence is what makes `checkAwards` safe without transactions. It runs
+in the write paths only — `completeLesson`, `submitReadingAttempt`, and
+`gradeEssay` after `writeReport`, because an essay is still `grading` when
+`submitEssay` returns and does not count as a study day yet — and it swallows
+its own errors. A failed award write costs a slightly late `earned_at` and
+nothing else: the next activity re-reads the whole log and writes with
+`onConflictDoNothing`.
+
+`checkAwards` never runs on a read path. The dashboard stays side-effect-free.
+
 ## Where isolation lives — read this before adding a query
 
 There is no row-level security. Clerk owns identity, Neon is a plain Postgres,
@@ -129,10 +159,16 @@ figure you want is almost certainly a query away, and the table would be a
 second source of truth that goes stale silently. Add one only when a candidate
 records something the attempts genuinely do not capture.
 
-Two tables clear that bar, and it is worth saying why:
+Three tables clear that bar, and it is worth saying why:
 
 - **`subscriptions`** mirrors state that belongs to Razorpay. There is no
   attempt behind it and nothing to derive it from.
+- **`awards`** records what a candidate has earned. The rule is derived and
+  pure — `src/lib/awards.ts` is a function of `attempts` and `lesson_progress`
+  and touches no database — but two facts are not in that log: that an award was
+  earned under the rules in force at the time, so tightening one later cannot
+  un-earn it, and whether we have told the candidate about it yet. The table
+  holds those and nothing else.
 - **`coach_messages`** exists because the chat is not persisted — an essay
   leaves an `attempts` row behind, a Coach message left nothing to count. It
   stores a user id and a timestamp and deliberately not the text, because the

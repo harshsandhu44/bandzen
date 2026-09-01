@@ -68,12 +68,15 @@ export function DashboardHeader({
   estimated,
   target,
   daysUntilTest,
+  streak,
 }: {
   firstName: string | null;
   timezone: string | null;
   estimated: number | null;
   target: number | null;
   daysUntilTest: number | null;
+  /** The live study-day run. Rendered only above 1 -- see below. */
+  streak: number;
 }) {
   return (
     <header className="space-y-5">
@@ -106,6 +109,17 @@ export function DashboardHeader({
                 : daysUntilTest === 0
                   ? 'Today'
                   : 'Passed'}
+            </p>
+          </div>
+        ) : null}
+        {/* Silent below two, the way SaveStatus is silent when idle. "1 day"
+            is not a streak, and a zero would announce a failure on the one
+            morning a candidate most needs a reason to start again. */}
+        {streak > 1 ? (
+          <div className="space-y-1">
+            <Eyebrow>Streak</Eyebrow>
+            <p className="font-metric text-metric tabular-nums">
+              {streak} days
             </p>
           </div>
         ) : null}

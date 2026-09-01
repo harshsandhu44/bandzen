@@ -9,6 +9,7 @@ import {
   gt,
   gte,
   isNotNull,
+  isNull,
   lt,
   ne,
   sql,
@@ -21,11 +22,13 @@ import {
   windowStart,
 } from '@/lib/entitlements';
 import { isAnswerCorrect, readingBand } from '@/lib/grading';
+import { union } from 'drizzle-orm/pg-core';
 import { db } from './index';
 import {
   accessRequests,
   attemptAnswers,
   attempts,
+  awards,
   coachMessages,
   essays,
   lessonProgress,
@@ -38,6 +41,7 @@ import {
   writingPrompts,
   type Annotation,
   type Criterion,
+  type Award,
   type Question,
   type Skill,
 } from './schema';
@@ -899,10 +903,15 @@ export async function writeReport(
     .values({ attemptId, ...values })
     .onConflictDoUpdate({ target: reports.attemptId, set: values });
 
-  await db
+  // Returns the owner because this is where a writing attempt becomes a study
+  // day -- `submitEssay` leaves it on 'grading' -- and the caller has no userId
+  // of its own to check awards with.
+  const [row] = await db
     .update(attempts)
     .set({ status: 'complete', band: values.band, submittedAt: new Date() })
-    .where(eq(attempts.id, attemptId));
+    .where(eq(attempts.id, attemptId))
+    .returning({ userId: attempts.userId });
+  return row?.userId ?? null;
 }
 
 /**
@@ -934,3 +943,97 @@ export async function markGradingFailed(attemptId: string) {
 }
 
 export { isAnswerCorrect, readingBand };
+
+// ---------------------------------------------------------------------------
+// Awards
+//
+// The rule lives in `@/lib/awards`, which is pure and knows nothing about a
+// database. These four functions are the whole data surface behind it.
+// ---------------------------------------------------------------------------
+
+/**
+ * Every calendar day the candidate did something, in their own zone.
+ *
+ * The zone conversion happens here rather than in JavaScript because the two
+ * sources have to agree on where a day begins, and doing it twice in two places
+ * is how they stop agreeing. A null zone falls back to UTC, which is the same
+ * fallback `todayIso` makes.
+ */
+export async function studyDays(
+  userId: string,
+  timezone: string | null,
+): Promise<string[]> {
+  const zone = timezone ?? 'UTC';
+  // `union` de-duplicates, which is what makes this distinct days rather than
+  // distinct events -- an attempt and a lesson on the same afternoon are one
+  // study day, not two.
+  const rows = await union(
+    db
+      .select({
+        day: sql<string>`to_char(${attempts.submittedAt} at time zone ${zone}, 'YYYY-MM-DD')`,
+      })
+      .from(attempts)
+      .where(
+        and(
+          eq(attempts.userId, userId),
+          eq(attempts.status, 'complete'),
+          isNotNull(attempts.submittedAt),
+        ),
+      ),
+    db
+      .select({
+        day: sql<string>`to_char(${lessonProgress.completedAt} at time zone ${zone}, 'YYYY-MM-DD')`,
+      })
+      .from(lessonProgress)
+      .where(eq(lessonProgress.userId, userId)),
+  );
+  return rows.map((r) => r.day);
+}
+
+/** The counts behind the "firsts". Lessons and diagnostics, nothing else. */
+export async function awardCounts(userId: string) {
+  const [lessons, diagnostics] = await Promise.all([
+    db
+      .select({ n: count() })
+      .from(lessonProgress)
+      .where(eq(lessonProgress.userId, userId)),
+    diagnosticCount(userId),
+  ]);
+  return {
+    lessonsCompleted: lessons[0]?.n ?? 0,
+    diagnosticsCompleted: diagnostics,
+  };
+}
+
+export async function listAwards(userId: string): Promise<Award[]> {
+  return db
+    .select()
+    .from(awards)
+    .where(eq(awards.userId, userId))
+    .orderBy(desc(awards.earnedAt));
+}
+
+/**
+ * Record what the candidate has earned.
+ *
+ * `onConflictDoNothing` is doing real work: the caller passes every award the
+ * log justifies, not just the new ones, so this is called with awards already
+ * held on every single activity. It also means the neon-http driver's lack of
+ * transactions costs nothing here — a write that fails is simply retried, in
+ * full, by the next thing the candidate does.
+ */
+export async function recordAwards(userId: string, awardIds: string[]) {
+  if (!awardIds.length) return;
+  await db
+    .insert(awards)
+    .values(awardIds.map((awardId) => ({ userId, awardId })))
+    .onConflictDoNothing();
+}
+
+/** Acknowledge the dashboard strip. Everything unseen becomes seen at once. */
+export async function markAwardsNotified(userId: string) {
+  await db
+    .update(awards)
+    .set({ notifiedAt: new Date() })
+    .where(and(eq(awards.userId, userId), isNull(awards.notifiedAt)));
+}

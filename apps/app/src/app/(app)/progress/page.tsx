@@ -22,9 +22,11 @@ import {
   bandHistory,
   getProfile,
   isPro,
+  listAwards,
   listCompletedAttempts,
   listLessonProgress,
 } from '@/lib/db/queries';
+import { AwardWall } from '@/components/awards/award-wall';
 import { ProTag } from '@/components/billing/pro';
 import { MODULE_LABEL, QUESTION_KIND_LABEL } from '@/lib/modules';
 import { meanBand } from '@/lib/plan-data';
@@ -48,7 +50,7 @@ const FREE_TREND_POINTS = 5;
 export default async function ProgressPage() {
   const userId = await requireUserId();
 
-  const [profile, history, accuracy, activity, lessons, attempts, pro] =
+  const [profile, history, accuracy, activity, lessons, attempts, pro, awards] =
     await Promise.all([
       getProfile(userId),
       bandHistory(userId),
@@ -57,6 +59,7 @@ export default async function ProgressPage() {
       listLessonProgress(userId),
       listCompletedAttempts(userId, 50),
       isPro(userId),
+      listAwards(userId),
     ]);
 
   // Below MIN_ATTEMPTED a rate is noise, so it cannot name a pattern.
@@ -363,6 +366,8 @@ export default async function ProgressPage() {
           />
         )}
       </section>
+
+      <AwardWall awards={awards} />
 
       <section aria-labelledby="activity-heading" className="space-y-3">
         <SectionHeader as="h2">
