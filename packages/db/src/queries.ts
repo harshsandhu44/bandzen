@@ -473,6 +473,8 @@ export async function createWritingPrompt(input: {
   task: number;
   format?: 'academic' | 'general';
   promptText: string;
+  /** The Task 1 figure. Only the JSON import sets it; no form edits it yet. */
+  chartData?: unknown;
   updatedBy: string;
 }) {
   return firstRow(
