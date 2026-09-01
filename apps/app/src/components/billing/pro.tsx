@@ -23,16 +23,42 @@ import type { Allowance } from '@/lib/entitlements';
  * checkout page and a dead end.
  */
 
-const WEEKDAY = new Intl.DateTimeFormat('en-GB', { weekday: 'long' });
-const DATE = new Intl.DateTimeFormat('en-GB', {
-  day: 'numeric',
-  month: 'short',
-});
+const WEEKDAY: Intl.DateTimeFormatOptions = { weekday: 'long' };
+const DATE: Intl.DateTimeFormatOptions = { day: 'numeric', month: 'short' };
 
-/** "Thursday" while that is unambiguous, "14 Sep" once it is not. */
-export function resetLabel(at: Date, now: Date = new Date()): string {
+function formatIn(
+  at: Date,
+  timezone: string | null | undefined,
+  options: Intl.DateTimeFormatOptions,
+): string {
+  try {
+    return new Intl.DateTimeFormat('en-GB', {
+      ...options,
+      timeZone: timezone ?? undefined,
+    }).format(at);
+  } catch {
+    // An unknown zone is not worth failing a render over, as in `todayIso`.
+    return new Intl.DateTimeFormat('en-GB', options).format(at);
+  }
+}
+
+/**
+ * "Thursday" while that is unambiguous, "14 Sep" once it is not.
+ *
+ * The zone is a parameter, and the formatters are built per call rather than
+ * hoisted, because this module renders on both sides of the boundary: the
+ * writing meter is a server component and resolves to the server's zone, while
+ * the Coach chat is `use client` and resolves to the browser's. With no
+ * `timeZone` those two disagreed — one instant labelled "7 Sept" on the
+ * writing meter and "8 Sept" in Coach, to the same candidate in the same week.
+ */
+export function resetLabel(
+  at: Date,
+  timezone?: string | null,
+  now: Date = new Date(),
+): string {
   const days = Math.ceil((at.getTime() - now.getTime()) / 86_400_000);
-  return days <= 6 ? WEEKDAY.format(at) : DATE.format(at);
+  return formatIn(at, timezone, days <= 6 ? WEEKDAY : DATE);
 }
 
 export function ProTag({ className }: { className?: string }) {
@@ -60,6 +86,7 @@ export function QuotaMeter({
   allowance,
   noun,
   source,
+  timezone,
   id,
   className,
 }: {
@@ -67,6 +94,8 @@ export function QuotaMeter({
   /** Plural, lower case: "essay marks", "Coach messages". */
   noun: string;
   source: string;
+  /** The candidate's zone, so the reset date reads the same on every surface. */
+  timezone?: string | null;
   id?: string;
   className?: string;
 }) {
@@ -90,7 +119,7 @@ export function QuotaMeter({
 
         <p className="text-xs text-muted-foreground">
           {allowance.resetsAt ? (
-            <>Next one {resetLabel(allowance.resetsAt)} · </>
+            <>Next one {resetLabel(allowance.resetsAt, timezone)} · </>
           ) : null}
           <Link
             href={`/upgrade?from=${source}`}

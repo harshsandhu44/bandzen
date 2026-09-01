@@ -97,7 +97,12 @@ export default async function DashboardPage() {
         daysUntilTest={days}
       />
 
-      <QuotaMeter allowance={quota} noun="essay marks" source="dashboard" />
+      <QuotaMeter
+        allowance={quota}
+        noun="essay marks"
+        source="dashboard"
+        timezone={profile.timezone}
+      />
 
       {next ? <ContinuePlan task={next} /> : null}
 

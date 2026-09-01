@@ -100,6 +100,7 @@ export default async function WritingPage({
         allowance={quota}
         noun="essay marks"
         source="writing_wall"
+        timezone={profile?.timezone}
       />
 
       {!prompts.length ? (
