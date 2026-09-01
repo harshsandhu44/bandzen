@@ -6,7 +6,7 @@ The Bandzen CMS (port 3003). Its own Vercel project with root directory
 on every route.
 
 **Stack:** Clerk (auth + roles in `publicMetadata`) · Neon (Postgres, via
-`@bandzen/db`) · Drizzle · Zod (the JSON import).
+`@bandzen/db`) · Drizzle · Zod (the JSON imports).
 
 It exists so passages, questions, answer keys, writing prompts, lessons and
 resources can be edited without a developer in the loop. Lessons and resources
@@ -32,6 +32,7 @@ migrations and the content pipeline; see its README.
 | `build`     | Production build                                     |
 | `start`     | Serves the production build                          |
 | `lint`      | ESLint — rules live in `@bandzen/eslint-config/next` |
+| `test`      | `node --test` over `src/**/*.test.ts`                |
 | `typecheck` | `next typegen && tsc --noEmit`                       |
 
 `experimental.authInterrupts` is on in `next.config.ts` because `forbidden()`
@@ -142,10 +143,11 @@ page. That holds here too.
 ```
 src/app/(cms)/           the signed-in shell: layout, nav, nav-links
   page.tsx               Overview — counts and what changed lately
+  import/                the shared importer: schemas, templates, registry, action, form
   passages/              list, new, [id] (+ inline questions), import
-  writing-prompts/       list, new, [id]
-  lessons/               list, new, [id] (+ the stage block editor)
-  resources/             list, new, [id]
+  writing-prompts/       list, new, [id], import
+  lessons/               list, new, [id] (+ the stage block editor), import
+  resources/             list, new, [id], import
   teachers/              admin-only: grant and revoke a role
 src/app/(auth)/          sign-in, outside the shell
 src/app/forbidden.tsx    the 403 — see the denial rule above
@@ -158,17 +160,103 @@ because a nested layout **cannot remove its parent's UI** — the sidebar had to
 move out of the root layout, not be suppressed by `(auth)/layout.tsx`, or it
 would follow the sign-in and 403 screens too.
 
-The passage importer takes a **file upload** of one reviewed JSON file from
-`apps/app/content/passages/` and creates a draft, rather than reading that
-directory server-side: this is a separate deployment with no guaranteed
-filesystem access to the other app. Its Zod schema in
-`passages/import/schema.ts` mirrors `apps/app/src/lib/ai/schemas.ts` and says
-so in a comment — that schema is not exported from a shared package, and one
-narrow consumer did not justify a new package surface.
+## The JSON import
 
-`writingPrompts.chartData` is deliberately absent from the CMS. Nothing renders
-it, no Task 1 prompt uses it, and a form field for an unbuilt feature is a
-promise the app cannot keep.
+All four kinds of content import from JSON, and all four share one
+implementation. `(cms)/import/` holds it; each entity keeps a twelve-line
+`import/page.tsx` at its own URL so `/lessons/import` stays under Lessons and
+the nav lights up without a special case.
+
+The import **uploads or pastes** rather than reading `apps/app/content/`
+server-side: this is a separate deployment with no guaranteed filesystem access
+to the other app. Pasted text wins over an attached file when both are filled.
+
+The split inside `import/` is load-bearing, not tidiness:
+
+- **`schemas.ts`** — Zod and the parse. It imports no database and no React,
+  which is the only reason the tests here can run under `node --test` without a
+  `DATABASE_URL`.
+- **`templates.ts`** — the templates, one BASE of shared rules per entity plus
+  the variants. See below.
+- **`registry.ts`** — binds each schema to its inserts and its existing slugs.
+  Keyed by route segment, so `/lessons/import` and `revalidatePath('/lessons')`
+  both fall out of the key.
+- **`actions.ts`** — one server action for all four, dispatching on a hidden
+  `entity` field. Safe to trust from the client: every branch is behind the
+  same `requireAdminOrTeacher()` and writes a draft, so naming a different key
+  escalates nothing.
+
+The passage schema mirrors `apps/app/src/lib/ai/schemas.ts` and the enum
+members are hand-copied from `packages/db`'s pgEnums — neither is exported
+across the boundary, and one narrow consumer did not justify a new package
+surface. `schemas.test.ts` parses the real files in `apps/app/content/` for
+exactly this reason: a drift fails there rather than at an upload.
+
+A file may hold one object or an array of up to 50. Nothing at all is written
+until every slug is checked against the existing rows **and** against the rest
+of the file — inserts are not transactional (neon-http), so that pre-check is
+the only thing between a half-imported file and a clean one. A failure inside
+the loop reports how far it got and names the row that stopped it.
+
+Importing never redirects. A batch has no single destination and there is no
+toast in this app for a redirect to carry a count into, so the result comes
+back as state and the page lists what it made.
+
+### Templates
+
+**Copy template** puts a ready-to-paste prompt on the clipboard: the rules plus
+one worked example. Each entity has a picker, defaulting to **General** — which
+is what the single template used to be, so importing an existing
+`apps/app/content/passages/*.json` needs nothing from the picker at all.
+
+|                 | varies by       | variants                                |
+| --------------- | --------------- | --------------------------------------- |
+| passages        | question kind   | 5                                       |
+| writing prompts | task and format | Task 1 Academic, Task 1 General, Task 2 |
+| lessons         | group           | foundations, question-types, advanced   |
+| resources       | category        | 8, listening and speaking among them    |
+
+A template is `BASE + focus + example`, so the schema rules are written once
+per entity while what reaches the clipboard is complete on its own. Passage
+variants share one body and headings skeleton and differ only in their rules
+and their example questions — five full passages would have been five copies of
+the same prose.
+
+A passage variant asks for its kind as the **dominant block**, questions 1-7,
+with the remaining six drawn from at least two other kinds. Not a single-kind
+drill: real papers group tasks, and a large matching-headings block is ordinary
+where thirteen of them is not.
+
+The examples are objects rather than text inside a string, which is what lets
+`templates.test.ts` parse all 23 against their own schemas and check each
+against its own variant — a `listening` example really is `category:
+"listening"`, every passage example's `evidence` really is verbatim in its
+body, the matching-headings example really does carry three more headings than
+it consumes. A model copies the example far more faithfully than it follows the
+rules, so a wrong example is the worst bug this directory can carry.
+
+The passage rules are the ones in `apps/app/scripts/generate-content.mts`'s
+SYSTEM prompt, copied so a passage written by hand-prompting a model meets the
+same bar as one the script generates. Both copies say so; edit them together.
+
+### Listening and speaking
+
+`resourceCategory` has carried `listening` and `speaking` since the table
+existed, so a guide for either is a row the CMS could always have written —
+there was simply no template showing how. There now is, for both.
+
+Their `module` is **null**, and the template says why in as many words:
+`attempt_module` is reading and writing only, and
+`apps/app/src/lib/modules.ts` explains that widening it would be a lie the type
+system would then help us tell. A listening resource that claimed
+`module: "listening"` would be pointing at a practice engine that does not
+exist. The templates tell the reader how to rehearse alone instead of promising
+a feature the app cannot keep.
+
+`writingPrompts.chartData` has no form field and still doesn't — nothing
+renders it, and a form field for an unbuilt feature is a promise the app cannot
+keep. The import accepts it, because the import is the only way to get one into
+the table at all and it costs an optional key.
 
 ## Design system
 
