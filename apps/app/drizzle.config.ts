@@ -6,7 +6,7 @@ import type { Config } from 'drizzle-kit';
 if (existsSync('.env.local')) process.loadEnvFile('.env.local');
 
 export default {
-  schema: './src/lib/db/schema.ts',
+  schema: '../../packages/db/src/schema.ts',
   out: './drizzle',
   dialect: 'postgresql',
   dbCredentials: { url: process.env.DATABASE_URL! },

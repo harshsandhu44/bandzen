@@ -16,9 +16,12 @@
     "db:push": "drizzle-kit push",
     "db:studio": "drizzle-kit studio",
     "db:seed": "node --env-file=.env.local scripts/seed.mts",
-    "db:grant-founding": "node --env-file=.env.local scripts/grant-founding.mts"
+    "db:grant-founding": "node --env-file=.env.local scripts/grant-founding.mts",
+    "db:backfill-content": "node --env-file=.env.local scripts/backfill-content.mts",
+    "db:backfill-lesson-progress": "node --env-file=.env.local scripts/backfill-lesson-progress.mts"
   },
   "dependencies": {
+    "@bandzen/db": "workspace:*",
     "@bandzen/ui": "workspace:*",
     "@clerk/nextjs": "^7.8.3",
     "@neondatabase/serverless": "^1.1.0",
