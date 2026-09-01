@@ -92,7 +92,7 @@ export default async function AppLayout({ children }: LayoutProps<'/'>) {
     <SidebarProvider defaultOpen={defaultOpen}>
       <Sidebar collapsible="offcanvas">
         <SidebarHeader className="px-4 py-3">
-          <Wordmark className="self-start" />
+          <Wordmark className="self-start" collapse />
         </SidebarHeader>
 
         <SidebarContent>
