@@ -1,4 +1,4 @@
-import type { Metadata } from 'next';
+import type { Metadata, Viewport } from 'next';
 import { Archivo, IBM_Plex_Mono, Inter } from 'next/font/google';
 import './globals.css';
 
@@ -27,7 +27,17 @@ const plexMono = IBM_Plex_Mono({
   display: 'swap',
 });
 
+export const viewport: Viewport = {
+  // Tints Android Chrome's address bar to the brand ground.
+  themeColor: '#09090f',
+};
+
 export const metadata: Metadata = {
+  // Required for the opengraph-image URL to resolve absolute. Without it Next
+  // emits a relative path and every unfurl silently drops the image.
+  metadataBase: new URL(
+    process.env.NEXT_PUBLIC_SITE_URL ?? 'https://bandzen.com',
+  ),
   title: {
     default: 'Bandzen — Own your band.',
     template: '%s · Bandzen',
