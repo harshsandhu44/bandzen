@@ -5,6 +5,7 @@ import {
   markGradingFailed,
   writeReport,
 } from '@/lib/db/queries';
+import { checkAwards } from '@/lib/award-check';
 import { openai } from './client';
 import { GRADER_MODEL } from './models';
 import { WRITING_RUBRIC } from './rubric';
@@ -61,7 +62,7 @@ export async function gradeEssay(attemptId: string) {
     );
     const band = toBand(parsed.band);
 
-    await writeReport(attemptId, {
+    const userId = await writeReport(attemptId, {
       band,
       criteria: parsed.criteria.map((c) => ({ ...c, band: toBand(c.band) })),
       annotations,
@@ -71,6 +72,10 @@ export async function gradeEssay(attemptId: string) {
       // model knows what produced each score.
       model: GRADER_MODEL,
     });
+
+    // An essay only becomes a study day here -- `submitEssay` leaves the row
+    // on 'grading', which `studyDays` does not count.
+    if (userId) await checkAwards(userId);
 
     const usage = response.usage;
     console.log(

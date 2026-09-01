@@ -2,6 +2,7 @@
 
 import { redirect } from 'next/navigation';
 import { requireUserId } from '@/lib/auth';
+import { checkAwards } from '@/lib/award-check';
 import {
   createAttempt,
   findChildAttempt,
@@ -55,6 +56,10 @@ export async function submitReadingAttempt(formData: FormData) {
   const userId = await requireUserId();
   const graded = await submitReading(userId, attemptId);
   if (!graded) throw new Error('Attempt not found');
+
+  // Before the redirects below, not after: `redirect` throws to unwind, so
+  // nothing past one of them ever runs.
+  await checkAwards(userId);
 
   // A diagnostic is two engines chained, not a new surface: reading hands
   // straight over to a Task 2 essay rather than stopping at review.
