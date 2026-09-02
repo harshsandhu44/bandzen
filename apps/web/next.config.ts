@@ -16,6 +16,9 @@ const DOCS_ORIGIN =
 
 const nextConfig: NextConfig = {
   reactCompiler: true,
+  // `next dev` writes AGENTS.md and CLAUDE.md into the app root otherwise.
+  // e33a0fe removed those from this app; don't regenerate them.
+  agentRules: false,
   /**
    * Multi-zone: /docs and everything under it is served by apps/docs, which
    * sets a matching `basePath: '/docs'` so its assets resolve here too. Two
