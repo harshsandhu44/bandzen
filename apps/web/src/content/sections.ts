@@ -312,6 +312,8 @@ export const resources = {
   headline: 'Not only a test engine.',
   support:
     'Strategy, language and worked examples for every part of the exam — written to be read between practice sessions, not instead of them.',
+  /** Every row is the same destination — the library itself, behind the app's sign-in. */
+  href: `${APP_URL}/resources`,
   items: [
     { title: 'IELTS strategies', kind: 'Guides', count: 'Every module' },
     { title: 'Vocabulary', kind: 'Lists', count: 'Topic + academic' },
@@ -474,19 +476,19 @@ export const footer = {
     {
       title: 'Product',
       links: [
-        { label: 'Practice', href: '#practice' },
-        { label: 'Mock Tests', href: '#mock-tests' },
-        { label: 'AI Analysis', href: '#analysis' },
-        { label: 'Study Materials', href: '#resources' },
+        { label: 'Practice', href: '/#practice' },
+        { label: 'Mock Tests', href: '/#mock-tests' },
+        { label: 'AI Analysis', href: '/#analysis' },
+        { label: 'Study Materials', href: '/#resources' },
       ],
     },
     {
       title: 'Resources',
       links: [
-        { label: 'IELTS Reading', href: '#modules' },
-        { label: 'IELTS Listening', href: '#modules' },
-        { label: 'IELTS Writing', href: '#modules' },
-        { label: 'IELTS Speaking', href: '#modules' },
+        { label: 'IELTS Reading', href: '/#modules' },
+        { label: 'IELTS Listening', href: '/#modules' },
+        { label: 'IELTS Writing', href: '/#modules' },
+        { label: 'IELTS Speaking', href: '/#modules' },
       ],
     },
     {

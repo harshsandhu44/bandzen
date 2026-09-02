@@ -32,7 +32,7 @@ export function ResourcesSection() {
               style={{ '--bz-i': i } as React.CSSProperties}
             >
               <a
-                href="#resources"
+                href={resources.href}
                 className="group/res hover:bg-ink hover:text-paper focus-visible:bg-ink focus-visible:text-paper grid grid-cols-[2.5rem_1fr_auto] items-baseline gap-4 py-6 transition-colors focus-visible:outline-none sm:grid-cols-[3.5rem_1fr_10rem_auto] sm:px-4"
               >
                 <span className="font-mono text-[0.625rem] tabular-nums opacity-50">
