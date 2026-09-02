@@ -1,4 +1,7 @@
 import { Button } from '@bandzen/ui/components/button';
+import { Version } from '@bandzen/ui/components/version';
+
+import pkg from '../../package.json';
 
 const variants = [
   'default',
@@ -22,6 +25,7 @@ export default function Home() {
           <code className="font-mono">globals.css</code>, so it renders the same
           components in a different theme than web.
         </p>
+        <Version value={pkg.version} />
       </header>
 
       <section className="flex flex-col gap-3">

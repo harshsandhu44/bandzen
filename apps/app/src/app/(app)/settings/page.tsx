@@ -4,6 +4,7 @@ import { currentUser } from '@clerk/nextjs/server';
 import { Button } from '@bandzen/ui/components/button';
 import { PageHeader, SectionHeader } from '@/components/app/primitives';
 import { ThemeToggle } from '@bandzen/ui/components/theme-toggle';
+import { Version } from '@bandzen/ui/components/version';
 import { requireUserId } from '@/lib/auth';
 import { getProfile, getSubscription } from '@/lib/db/queries';
 import {
@@ -14,6 +15,7 @@ import {
 import { ProTag } from '@/components/billing/pro';
 import { CancelPlan } from './cancel-plan';
 import { SettingsForm } from './settings-form';
+import pkg from '../../../../package.json';
 
 export const dynamic = 'force-dynamic';
 
@@ -112,6 +114,14 @@ export default async function SettingsPage() {
             <dt className="text-sm text-muted-foreground">Appearance</dt>
             <dd>
               <ThemeToggle />
+            </dd>
+          </div>
+          {/* Here rather than in the shell, because the sidebar this app's
+              version would otherwise sit in does not exist on a phone. */}
+          <div className="flex items-baseline justify-between gap-4 py-3">
+            <dt className="text-sm text-muted-foreground">Version</dt>
+            <dd>
+              <Version value={pkg.version} />
             </dd>
           </div>
         </dl>

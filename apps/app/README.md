@@ -71,8 +71,10 @@ the bug that hook exists to have fixed — and never gate `submitEssay`: an
 attempt that exists is always graded, because the mark was charged when it was
 created.
 
-See [`PRICING.md`](../../PRICING.md) for why each of those numbers is what it
-is.
+See [Pricing, tiers and access][pricing] in Notion for why each of those
+numbers is what it is.
+
+[pricing]: https://www.notion.so/3cf5047e85f78107856fe3abd65b7c14
 
 `src/proxy.ts` hydrates the session and deliberately does **not** gate routes.
 Clerk dropped `createRouteMatcher` because middleware protection relies on path
@@ -193,7 +195,7 @@ src/app/api/coach/      the one route handler (see below)
 src/components/app/     shared primitives: SectionHeader, Eyebrow, Metric,
                         FeatureBlock, EmptyState, …
 src/components/…/       feature components, one directory per domain
-src/content/            authored lessons and resources (TypeScript, not rows)
+src/content/            adapters over the lessons and resources tables
 src/lib/db/             schema.ts and queries.ts — see the isolation rule above
 src/lib/ai/             client, models, rubric, schemas, grade-essay, coach
 src/lib/                pure logic: grading, study-plan, insight, dates, profile
@@ -311,16 +313,32 @@ redirect and the candidate can close the tab. Every exit path in `gradeEssay`
 must leave `attempts.status` terminal — a row stuck on `grading` is a report
 page that polls forever.
 
-## Content: rows, or TypeScript?
+## Content is rows
 
-Both, split on who edits it and how often.
+All of it, since the CMS landed. Lessons and resources were hand-authored
+TypeScript arrays until then, on the reasoning that a wording fix should be a
+diff rather than a migration — which stopped holding the moment someone without
+a checkout needed to make one.
 
-| Kind                                              | Lives in                     | Why                                                                                       |
-| ------------------------------------------------- | ---------------------------- | ----------------------------------------------------------------------------------------- |
-| Passages, questions, answer keys, writing prompts | Neon, seeded from `content/` | Generated, per-attempt, and joined against in queries                                     |
-| Lessons (`src/content/lessons.ts`)                | TypeScript                   | Prose, edited far more often than added — a wording fix should be a diff, not a migration |
-| Resources (`src/content/resources.ts`)            | TypeScript                   | Same                                                                                      |
-| Lesson completion                                 | Neon (`lesson_progress`)     | It is user-owned, so it is a scoped row like everything else                              |
+| Kind                                              | Lives in                     | Edited by                          |
+| ------------------------------------------------- | ---------------------------- | ---------------------------------- |
+| Passages, questions, answer keys, writing prompts | Neon, seeded from `content/` | `apps/admin`, or the seed pipeline |
+| Lessons, resources                                | Neon                         | `apps/admin`                       |
+| Lesson completion                                 | Neon (`lesson_progress`)     | the candidate                      |
+
+**`src/content/lessons.ts` and `resources.ts` are adapters, not content.** They
+read published rows through `@bandzen/db/queries` and map them to the shape the
+app was built against — a row's `slug` becomes the `id` the call sites already
+used — so the move to rows cost each of them an `await` and nothing else. Add a
+field by widening the table and the mapper, not by putting prose back here.
+
+Both filter on `status: 'published'`, and that is the only thing standing
+between a draft and a candidate. See `apps/admin/README.md` for the publish
+workflow and the validation that guards it.
+
+Awards go the other way: `src/lib/awards.ts` is code precisely because an award
+is a rule, and a rule edited in the CMS would rewrite history for everyone who
+had already met the old one.
 
 A lesson or resource without a body is _planned and unwritten_, and the UI says
 so. Do not give one an empty body to make the list look finished — a candidate
