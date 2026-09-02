@@ -2,6 +2,17 @@ import createMDX from '@next/mdx';
 import type { NextConfig } from 'next';
 
 const nextConfig: NextConfig = {
+  /**
+   * This site is served at bandzen.com/docs, rewritten from apps/web.
+   *
+   * basePath is what makes that work rather than the rewrite alone: it prefixes
+   * every asset URL and every `<Link>`, so /_next/* is requested under /docs and
+   * reaches this zone instead of 404ing against web's.
+   *
+   * It applies to this deployment's own URL too — the docs preview serves at
+   * <preview>/docs, and its root 404s. That is expected.
+   */
+  basePath: '/docs',
   reactCompiler: true,
   // Pages are `.mdx` as often as `.tsx`. Every doc is a real route rather than
   // data behind a catch-all, which is what gives us typed routes and a

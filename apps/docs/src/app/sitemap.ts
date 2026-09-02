@@ -2,7 +2,9 @@ import type { MetadataRoute } from 'next';
 
 import { ALL_PAGES } from '@/content/nav';
 
-const BASE = process.env.NEXT_PUBLIC_DOCS_URL ?? 'https://docs.bandzen.com';
+// The apex plus `/docs`. `basePath` prefixes links and assets, not the URLs a
+// sitemap emits, so this carries the zone's path itself.
+const BASE = process.env.NEXT_PUBLIC_DOCS_URL ?? 'https://bandzen.com/docs';
 
 /** Built from the nav, so a page cannot be in the sitemap and unreachable. */
 export default function sitemap(): MetadataRoute.Sitemap {

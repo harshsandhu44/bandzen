@@ -34,8 +34,11 @@ export const viewport: Viewport = {
 };
 
 export const metadata: Metadata = {
+  // The apex *including* `/docs`. basePath prefixes links and assets but not
+  // metadata URLs, so without the path here `opengraph-image` resolves to
+  // bandzen.com/opengraph-image, which is web's zone and a 404.
   metadataBase: new URL(
-    process.env.NEXT_PUBLIC_DOCS_URL ?? 'https://docs.bandzen.com',
+    process.env.NEXT_PUBLIC_DOCS_URL ?? 'https://bandzen.com/docs',
   ),
   title: { default: 'Bandzen docs', template: '%s · Bandzen docs' },
   description:
