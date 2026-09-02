@@ -1,8 +1,26 @@
 # docs
 
 The user-facing documentation (port 3001). Its own Vercel project with root
-directory `apps/docs`, deployed to `docs.bandzen.com`. It is signed-out,
-indexable, and the only surface besides `apps/web` that is.
+directory `apps/docs`, but **served at `bandzen.com/docs`** — `apps/web`
+rewrites `/docs` and `/docs/*` here, and `basePath: '/docs'` in `next.config.ts`
+is what makes the assets resolve under the apex. It is signed-out, indexable,
+and the only surface besides `apps/web` that is.
+
+`docs.bandzen.com` is deliberately never assigned. Serving from the apex is the
+whole point: these pages rank as part of `bandzen.com` instead of as a separate
+site with no authority of its own.
+
+Two things follow from `basePath` that are easy to get wrong. **This
+deployment's own root 404s** — the docs preview serves at `<preview-url>/docs`.
+And **`basePath` does not reach metadata**: it prefixes every `<Link>` and
+asset, but not `metadataBase`, the social image, or the URLs `sitemap.ts`
+emits. `NEXT_PUBLIC_DOCS_URL` therefore carries the `/docs` itself; drop it and
+the social image resolves to `bandzen.com/opengraph-image`, which is web's zone
+and a 404.
+
+There is no `robots.ts` here on purpose. It would be served at
+`/docs/robots.txt`, which no crawler reads — `apps/web` owns the apex
+`robots.txt` and lists this app's sitemap from it.
 
 Two audiences, and they share almost nothing: **candidates** preparing for
 IELTS, and **teachers** writing the content they practise on. A "teacher" here

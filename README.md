@@ -17,11 +17,36 @@ packages/
   tsconfig/            shared TypeScript configs (@bandzen/tsconfig)
 ```
 
-All four apps deploy separately — a static marketing site on the apex domain,
-the documentation on `docs.bandzen.com`, the signed-in product on
-`app.bandzen.com`, and the CMS on its own project. The marketing CTAs point at
-the product app through `NEXT_PUBLIC_APP_URL`, and both it and the product link
-to the documentation through `NEXT_PUBLIC_DOCS_URL`. `apps/admin` is a separate deployment but not a separate
+All four apps deploy separately — a marketing site on the apex domain, the
+documentation behind it at `/docs`, the signed-in product on `app.bandzen.com`,
+and the CMS on its own project. The marketing CTAs point at the product app
+through `NEXT_PUBLIC_APP_URL`, and the product links back to the documentation
+through `NEXT_PUBLIC_DOCS_URL`.
+
+**`apps/docs` is a multi-zone behind `apps/web`, not a subdomain.** `apps/web`
+rewrites `/docs` and `/docs/*` to the docs deployment, which sets a matching
+`basePath: '/docs'` so its assets resolve under the apex. The two stay separate
+Vercel projects on separate version gates — the rewrite target is a stable
+project origin, so shipping documentation never rebuilds the marketing site.
+The point is that the documentation ranks as part of `bandzen.com` rather than
+as a separate site starting from no authority.
+
+Three consequences worth knowing before touching either app:
+
+- **`docs.bandzen.com` is deliberately never assigned.** One canonical address
+  per page, and no duplicate content to have to canonicalise away.
+- **`basePath` does not reach metadata.** It prefixes every `<Link>` and asset,
+  but not `metadataBase`, the social image URL or the URLs a sitemap emits — so
+  `NEXT_PUBLIC_DOCS_URL` carries the `/docs` itself. Drop it and the social
+  image resolves into web's zone and 404s.
+- **The apex owns `robots.txt`.** Anything `apps/docs` generated would land at
+  `/docs/robots.txt`, which no crawler reads, so `apps/web` serves it and lists
+  both sitemaps.
+
+A docs preview therefore serves at `<preview-url>/docs`, and its root 404s.
+Web's preview proxies `/docs` to docs _production_, because the rewrite target
+is baked in at build time — so review documentation changes on the docs
+preview, not web's. `apps/admin` is a separate deployment but not a separate
 system: it shares the product's Clerk instance and its Neon database, which is
 why a signed-in student is a real session there and has to be turned away
 rather than redirected.
