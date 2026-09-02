@@ -1,4 +1,8 @@
-import { Clause, LegalPage } from '@/components/marketing/legal-page';
+import {
+  Clause,
+  LegalPage,
+  RegisteredDetails,
+} from '@/components/marketing/legal-page';
 import { legal, pricing } from '@/content/sections';
 
 export const metadata = {
@@ -72,13 +76,7 @@ export default function RefundsPage() {
       </Clause>
 
       <Clause title="Contact">
-        <p>
-          {legal.entity}
-          <br />
-          {legal.address}
-          <br />
-          {legal.email}
-        </p>
+        <RegisteredDetails email />
       </Clause>
     </LegalPage>
   );

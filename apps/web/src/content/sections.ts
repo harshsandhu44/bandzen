@@ -49,14 +49,20 @@ export const cta = {
 /**
  * The facts a payment processor and a customer both need.
  *
- * TODO: `entity` and `address` are still bracketed and render verbatim on
- * /about, /contact and /terms. Fill them the moment registration completes —
- * Razorpay's activation review checks that they are real and that the address
- * matches your registration, and they are the last thing blocking it.
+ * `entity` and `address` are null until the business is registered. Null rather
+ * than a placeholder because these render on five public pages, and one saying
+ * "[REGISTERED ADDRESS]" is worse to a customer — and to Razorpay's activation
+ * reviewer — than one saying nothing. Every page that uses them already handles
+ * the absence, so filling them in here is the only step: the registered-details
+ * blocks and the two prose mentions come back on their own.
+ *
+ * TODO: fill both the moment registration completes. Razorpay's review checks
+ * they are real and that the address matches the registration, and they are the
+ * last thing blocking it.
  */
 export const legal = {
-  entity: '[REGISTERED BUSINESS NAME]',
-  address: '[REGISTERED ADDRESS]',
+  entity: null as string | null,
+  address: null as string | null,
   email: 'support@bandzen.com',
   updated: '31 August 2026',
   refundDays: 7,

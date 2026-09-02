@@ -1,4 +1,8 @@
-import { Clause, LegalPage } from '@/components/marketing/legal-page';
+import {
+  Clause,
+  LegalPage,
+  RegisteredDetails,
+} from '@/components/marketing/legal-page';
 import { legal } from '@/content/sections';
 
 export const metadata = {
@@ -11,7 +15,7 @@ export default function PrivacyPage() {
   return (
     <LegalPage
       title="Privacy policy"
-      intro={`How ${legal.entity} handles your data when you use Bandzen.`}
+      intro={`How ${legal.entity ?? 'Bandzen'} handles your data when you use the service.`}
       updated={legal.updated}
     >
       <Clause title="What we collect">
@@ -75,13 +79,7 @@ export default function PrivacyPage() {
       </Clause>
 
       <Clause title="Contact">
-        <p>
-          {legal.entity}
-          <br />
-          {legal.address}
-          <br />
-          {legal.email}
-        </p>
+        <RegisteredDetails email />
       </Clause>
     </LegalPage>
   );
