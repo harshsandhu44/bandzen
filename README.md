@@ -69,6 +69,49 @@ author of it.
 Install once at the root (`pnpm install`) — never inside an app. There is a
 single lockfile and a single `node_modules` store for the whole workspace.
 
+## Versioning and deploys
+
+Every app owns its version in its own `package.json`, and bumping it is how a
+change reaches production. Each app's `vercel.json` points Vercel's ignored
+build step at [`scripts/deploy-if-bumped.sh`](scripts/deploy-if-bumped.sh),
+which builds only when that app's version changed in the deployed commit. A
+docs edit, a refactor or a rename lands on `main` and ships to nobody until
+someone decides it should ship.
+
+```bash
+pnpm --filter app version minor --no-git-tag-version
+```
+
+`--no-git-tag-version` because four apps share one history — a tag reading
+`v0.2.0` would not say of what. Bump in the same commit as the change rather
+than after it: the gate compares one commit against its parent, so the bump
+and the code it ships have to arrive together.
+
+How much to bump is the prefix you are already writing in the commit message.
+`feat` is a minor, `fix` is a patch, anything you would call breaking is a
+major. `1.0.0` is a decision about the product, not about the code.
+
+Previews are never gated. A pull request builds on every push, so the preview
+URL stays current across review commits — none of which bump anything.
+
+**The packages are deliberately unversioned**, and stay at `0.0.0`. A change
+to `packages/ui` or `packages/db` therefore deploys nothing on its own: bump
+each app that should carry it, in the same commit. Fixing a shared query and
+forgetting to bump `apps/app` leaves the fix live nowhere, which is the one
+way this rule bites.
+
+Forgetting a bump is always a missing deploy rather than a wrong one. Redeploy
+from the Vercel dashboard, or push the bump you meant to. The same is true of
+the gate's one blind spot: it looks at the deployed commit against its parent,
+so a bump buried inside a push of several commits is invisible.
+
+Each app shows its version through `@bandzen/ui`'s `Version` — on Settings in
+the product, at the foot of the CMS sidebar, in the marketing footer, and
+under the title in docs. The app reads its own `package.json` in a server
+component and passes the string down; importing that JSON inside a
+`'use client'` subtree would inline the whole file, dependency list included,
+into the browser bundle.
+
 ## Linting
 
 `packages/eslint-config` ships two entry points. Each consumer's
