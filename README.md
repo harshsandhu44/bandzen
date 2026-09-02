@@ -33,9 +33,17 @@ status column defaults to `'published'`. Read
 [`apps/admin/README.md`](apps/admin/README.md) before touching either.
 
 Pricing tiers, the access limits behind them, and the Razorpay build are
-specified in [`PRICING.md`](PRICING.md). It sits at the root because it spans
-both deployments — the tier copy lives in `apps/web`, everything it gates
-lives in `apps/app`.
+specified in [Pricing, tiers and access][pricing] in Notion. It lives there
+rather than in this repo because it spans both deployments — the tier copy
+lives in `apps/web`, everything it gates lives in `apps/app` — and because the
+prices and the founding deadline change without a commit.
+
+These READMEs are mirrored in Notion under [Bandzen — Engineering
+Documentation][docs]. The files here stay the source of truth for anything
+about the code.
+
+[pricing]: https://www.notion.so/3cf5047e85f78107856fe3abd65b7c14
+[docs]: https://www.notion.so/3cf5047e85f7818fbfc5fb8f8fd65808
 
 ## Commands
 

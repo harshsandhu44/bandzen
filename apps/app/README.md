@@ -71,8 +71,10 @@ the bug that hook exists to have fixed — and never gate `submitEssay`: an
 attempt that exists is always graded, because the mark was charged when it was
 created.
 
-See [`PRICING.md`](../../PRICING.md) for why each of those numbers is what it
-is.
+See [Pricing, tiers and access][pricing] in Notion for why each of those
+numbers is what it is.
+
+[pricing]: https://www.notion.so/3cf5047e85f78107856fe3abd65b7c14
 
 `src/proxy.ts` hydrates the session and deliberately does **not** gate routes.
 Clerk dropped `createRouteMatcher` because middleware protection relies on path
