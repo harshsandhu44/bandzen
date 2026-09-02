@@ -83,10 +83,12 @@ someone decides it should ship.
 pnpm --filter app version minor --no-git-tag-version
 ```
 
-`--no-git-tag-version` because four apps share one history — a tag reading
-`v0.2.0` would not say of what. Bump in the same commit as the change rather
-than after it: the gate compares one commit against its parent, so the bump
-and the code it ships have to arrive together.
+`--no-git-tag-version` because a pull request lands squashed — a tag made on
+the branch would name a commit GitHub throws away. Tags are made on `main`
+instead, and they are named per app, so `v0.2.0` never has to say of what.
+Bump in the same commit as the change rather than after it: the gate compares
+one commit against its parent, so the bump and the code it ships have to
+arrive together.
 
 How much to bump is the prefix you are already writing in the commit message.
 `feat` is a minor, `fix` is a patch, anything you would call breaking is a
@@ -112,6 +114,28 @@ at the foot of the docs sidebar. The app reads its own `package.json` in a serve
 component and passes the string down; importing that JSON inside a
 `'use client'` subtree would inline the whole file, dependency list included,
 into the browser bundle.
+
+That number is what is live; the tag is where it came from. Every push to
+`main` runs [`scripts/tag-deployed.sh`](scripts/tag-deployed.sh) through
+[a workflow](.github/workflows/tag.yml), which tags each app the commit
+deploys as `<name>@<version>` — `app@0.3.0`, `web@0.2.0`. One commit bumping
+three apps gets three tags.
+
+```bash
+git tag -l 'app@*' --sort=-v:refname
+git show app@0.3.0
+```
+
+The script mirrors the gate rather than improving on it: same commit pair,
+same version extraction, so a tag exists if and only if that app's production
+build was attempted. It inherits the blind spot too — a bump buried inside a
+multi-commit push deploys nothing and tags nothing, and recovering through the
+Vercel dashboard leaves that version untagged. Holes are the deliberate trade.
+A tag that named a version which never shipped would break the one thing the
+mapping is for.
+
+Tags start at the commit the gate did, so the versions that predate it have
+none, and `admin` has none until its next bump.
 
 ## Linting
 
