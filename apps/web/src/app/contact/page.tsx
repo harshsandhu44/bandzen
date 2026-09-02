@@ -1,4 +1,8 @@
-import { Clause, LegalPage } from '@/components/marketing/legal-page';
+import {
+  Clause,
+  LegalPage,
+  RegisteredDetails,
+} from '@/components/marketing/legal-page';
 import { legal } from '@/content/sections';
 
 export const metadata = {
@@ -19,13 +23,11 @@ export default function ContactPage() {
         </p>
       </Clause>
 
-      <Clause title="Registered details">
-        <p>
-          {legal.entity}
-          <br />
-          {legal.address}
-        </p>
-      </Clause>
+      {legal.entity || legal.address ? (
+        <Clause title="Registered details">
+          <RegisteredDetails />
+        </Clause>
+      ) : null}
 
       <Clause title="Reporting a problem with a band estimate">
         <p>

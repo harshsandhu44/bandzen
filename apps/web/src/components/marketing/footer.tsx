@@ -9,10 +9,6 @@ import { Version } from '@bandzen/ui/components/version';
 
 import pkg from '../../../package.json';
 
-// lucide v1 removed its brand icons, and set as mono text these read better
-// against the display type than a row of glyph buttons would.
-const SOCIAL = ['Instagram', 'YouTube', 'LinkedIn', 'GitHub'] as const;
-
 export function Footer() {
   return (
     <footer className="bg-ink text-paper border-paper/10 border-t">
@@ -23,19 +19,6 @@ export function Footer() {
             <p className="font-display text-paper/70 mt-4 text-xl">
               {brand.tagline}
             </p>
-
-            <ul className="mt-8 flex flex-wrap items-center gap-x-2 gap-y-2">
-              {SOCIAL.map((label) => (
-                <li key={label}>
-                  <a
-                    href="#main"
-                    className="border-paper/20 hover:bg-paper hover:text-ink focus-visible:bg-paper focus-visible:text-ink block border px-3 py-1.5 font-mono text-[0.625rem] tracking-[0.16em] uppercase transition-colors focus-visible:outline-none"
-                  >
-                    {label}
-                  </a>
-                </li>
-              ))}
-            </ul>
           </div>
 
           <div className="grid grid-cols-2 gap-8 sm:grid-cols-4 lg:col-span-8">
@@ -47,21 +30,12 @@ export function Footer() {
                 <ul className="mt-5 flex flex-col gap-3">
                   {group.links.map((link) => (
                     <li key={link.label}>
-                      {link.href.startsWith('#') ? (
-                        <a
-                          href={link.href}
-                          className="text-paper/80 hover:text-paper focus-visible:text-chrome text-sm transition-colors focus-visible:outline-none"
-                        >
-                          {link.label}
-                        </a>
-                      ) : (
-                        <Link
-                          href={link.href}
-                          className="text-paper/80 hover:text-paper focus-visible:text-chrome text-sm transition-colors focus-visible:outline-none"
-                        >
-                          {link.label}
-                        </Link>
-                      )}
+                      <Link
+                        href={link.href}
+                        className="text-paper/80 hover:text-paper focus-visible:text-chrome text-sm transition-colors focus-visible:outline-none"
+                      >
+                        {link.label}
+                      </Link>
                     </li>
                   ))}
                 </ul>

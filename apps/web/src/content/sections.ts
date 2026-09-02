@@ -49,15 +49,21 @@ export const cta = {
 /**
  * The facts a payment processor and a customer both need.
  *
- * TODO: replace every bracketed value below before going live. They render
- * verbatim on /about, /contact, /terms, /privacy and /refunds, and Razorpay's
- * activation review checks that they are real and that the address matches
- * your registration. Nothing else blocks on them.
+ * `entity` and `address` are null until the business is registered. Null rather
+ * than a placeholder because these render on five public pages, and one saying
+ * "[REGISTERED ADDRESS]" is worse to a customer — and to Razorpay's activation
+ * reviewer — than one saying nothing. Every page that uses them already handles
+ * the absence, so filling them in here is the only step: the registered-details
+ * blocks and the two prose mentions come back on their own.
+ *
+ * TODO: fill both the moment registration completes. Razorpay's review checks
+ * they are real and that the address matches the registration, and they are the
+ * last thing blocking it.
  */
 export const legal = {
-  entity: '[REGISTERED BUSINESS NAME]',
-  address: '[REGISTERED ADDRESS]',
-  email: '[CONTACT EMAIL]',
+  entity: null as string | null,
+  address: null as string | null,
+  email: 'support@bandzen.com',
   updated: '31 August 2026',
   refundDays: 7,
 } as const;
@@ -68,7 +74,7 @@ export const hero = {
   headlineAccent: 'anymore.',
   support:
     'Practice all four IELTS modules, take realistic mock tests, and understand exactly what is holding your score back with detailed AI analysis.',
-  note: 'No credit card required.',
+  note: 'Invitation-only while in beta. No credit card required.',
 } as const;
 
 /** Illustrative sample report — the shape of a real Bandzen estimate. */
@@ -312,6 +318,8 @@ export const resources = {
   headline: 'Not only a test engine.',
   support:
     'Strategy, language and worked examples for every part of the exam — written to be read between practice sessions, not instead of them.',
+  /** Every row is the same destination — the library itself, behind the app's sign-in. */
+  href: `${APP_URL}/resources`,
   items: [
     { title: 'IELTS strategies', kind: 'Guides', count: 'Every module' },
     { title: 'Vocabulary', kind: 'Lists', count: 'Topic + academic' },
@@ -388,7 +396,7 @@ export const testimonials = {
 export const pricing = {
   eyebrow: 'Pricing',
   headline: 'Start free. Upgrade when practice turns serious.',
-  note: 'Founding price. Cancel any time; refund within 7 days.',
+  note: 'Founding price until 31 October 2026. Invitation-only while in beta. Cancel any time; refund within 7 days.',
   tiers: [
     {
       name: 'Free',
@@ -474,19 +482,19 @@ export const footer = {
     {
       title: 'Product',
       links: [
-        { label: 'Practice', href: '#practice' },
-        { label: 'Mock Tests', href: '#mock-tests' },
-        { label: 'AI Analysis', href: '#analysis' },
-        { label: 'Study Materials', href: '#resources' },
+        { label: 'Practice', href: '/#practice' },
+        { label: 'Mock Tests', href: '/#mock-tests' },
+        { label: 'AI Analysis', href: '/#analysis' },
+        { label: 'Study Materials', href: '/#resources' },
       ],
     },
     {
       title: 'Resources',
       links: [
-        { label: 'IELTS Reading', href: '#modules' },
-        { label: 'IELTS Listening', href: '#modules' },
-        { label: 'IELTS Writing', href: '#modules' },
-        { label: 'IELTS Speaking', href: '#modules' },
+        { label: 'IELTS Reading', href: '/#modules' },
+        { label: 'IELTS Listening', href: '/#modules' },
+        { label: 'IELTS Writing', href: '/#modules' },
+        { label: 'IELTS Speaking', href: '/#modules' },
       ],
     },
     {

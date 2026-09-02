@@ -1,5 +1,9 @@
-import { Clause, LegalPage } from '@/components/marketing/legal-page';
-import { brand, legal } from '@/content/sections';
+import {
+  Clause,
+  LegalPage,
+  RegisteredDetails,
+} from '@/components/marketing/legal-page';
+import { brand } from '@/content/sections';
 
 export const metadata = {
   title: 'About',
@@ -36,13 +40,7 @@ export default function AboutPage() {
       </Clause>
 
       <Clause title="Who runs it">
-        <p>
-          {legal.entity}
-          <br />
-          {legal.address}
-          <br />
-          {legal.email}
-        </p>
+        <RegisteredDetails email />
       </Clause>
     </LegalPage>
   );

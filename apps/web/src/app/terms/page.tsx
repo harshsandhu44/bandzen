@@ -1,6 +1,10 @@
 import Link from 'next/link';
 
-import { Clause, LegalPage } from '@/components/marketing/legal-page';
+import {
+  Clause,
+  LegalPage,
+  RegisteredDetails,
+} from '@/components/marketing/legal-page';
 import { brand, legal } from '@/content/sections';
 
 export const metadata = {
@@ -12,7 +16,7 @@ export default function TermsPage() {
   return (
     <LegalPage
       title="Terms of service"
-      intro={`These terms cover your use of Bandzen, operated by ${legal.entity}. Using the service means you accept them.`}
+      intro={`These terms cover your use of Bandzen${legal.entity ? `, operated by ${legal.entity}` : ''}. Using the service means you accept them.`}
       updated={legal.updated}
     >
       <Clause title="1. The service">
@@ -102,11 +106,7 @@ export default function TermsPage() {
           We may update these terms; material changes will be notified in the
           product. Questions go to {legal.email}.
         </p>
-        <p>
-          {legal.entity}
-          <br />
-          {legal.address}
-        </p>
+        <RegisteredDetails />
       </Clause>
     </LegalPage>
   );

@@ -1,4 +1,6 @@
-import type { ReactNode } from 'react';
+import { Fragment, type ReactNode } from 'react';
+
+import { legal } from '@/content/sections';
 
 import { Container } from './section';
 import { Footer } from './footer';
@@ -69,5 +71,33 @@ export function Clause({
         {children}
       </div>
     </section>
+  );
+}
+
+/**
+ * The registered-entity block, repeated on five legal pages.
+ *
+ * It renders only the lines that exist, so an unregistered business shows an
+ * email and nothing else rather than a bracketed placeholder. Returns null when
+ * there is nothing at all — a `<p>` holding three `<br />`s and no text.
+ */
+export function RegisteredDetails({ email = false }: { email?: boolean }) {
+  const lines = [
+    legal.entity,
+    legal.address,
+    email ? legal.email : null,
+  ].filter((line): line is string => Boolean(line));
+
+  if (lines.length === 0) return null;
+
+  return (
+    <p>
+      {lines.map((line, i) => (
+        <Fragment key={line}>
+          {i > 0 ? <br /> : null}
+          {line}
+        </Fragment>
+      ))}
+    </p>
   );
 }
