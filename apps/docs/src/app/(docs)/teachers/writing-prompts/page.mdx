@@ -1,0 +1,47 @@
+export const metadata = {
+  title: 'Writing prompts',
+  description: 'Creating the prompts candidates write essays against.',
+};
+
+# Writing prompts
+
+A writing prompt is what a candidate writes an essay against. They are simpler
+than passages — there is no answer key, because the marking is done against the
+band descriptors rather than against a correct answer.
+
+## The fields
+
+| Field       | Notes                               |
+| ----------- | ----------------------------------- |
+| Slug        | Unique across all prompts           |
+| Task        | 1 or 2                              |
+| Format      | Academic or General Training        |
+| Prompt text | The prompt as the candidate sees it |
+
+Task 1 is given 20 minutes and a 150-word minimum; Task 2 gets 40 minutes and
+250 words. Those come from the task number, so setting it correctly is what
+gives the candidate the right clock.
+
+## Format matters more here than elsewhere
+
+A candidate is shown only the prompts matching their exam type. An Academic Task
+1 asks for a description of a chart or process; a General Training Task 1 asks
+for a letter. Filing one under the wrong format puts a task in front of someone
+preparing for a different exam.
+
+## What the plan does with them
+
+[The study plan](/candidates/your-study-plan) only schedules a writing drill if a
+prompt for that task actually exists. If there are no Task 1 prompts, no
+candidate is ever sent to a Task 1 drill — the plan quietly works around the
+gap rather than sending people to an empty screen.
+
+So adding the first prompt of a kind changes what every candidate is asked to
+do. That is worth knowing before publishing one.
+
+<Callout tone="locked" title="Chart data">
+  Prompts can carry chart data through the importer, but nothing renders it yet
+  and there is no form field for it. An Academic Task 1 prompt that depends on a
+  chart the candidate cannot see is not usable — describe the data in the prompt
+  text instead.
+</Callout>

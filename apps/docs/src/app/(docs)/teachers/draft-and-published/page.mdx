@@ -1,0 +1,57 @@
+export const metadata = {
+  title: 'Draft and published',
+  description:
+    'What candidates can see, what publish validation checks, and why deleting is blocked.',
+};
+
+# Draft and published
+
+Every passage, writing prompt, lesson and guide is either **draft** or
+**published**.
+
+> Candidates only ever see published content.
+
+That is the whole rule, and it is worth being certain of before you write
+anything: nothing you create is visible to anyone until you publish it.
+
+## New content starts as a draft
+
+Anything created through the CMS — by the form or
+[by import](/teachers/importing-json) — is a draft. You publish it deliberately,
+when it is ready.
+
+## Publishing checks completeness first
+
+Publishing runs a check and refuses if the item is incomplete, listing exactly
+what is wrong. The checks include:
+
+- A question with no answer key.
+- A matching-headings question on a passage with no headings list.
+- A lesson where every stage is empty.
+
+The error names the specific problem rather than saying something went wrong,
+because the specific problem is the only useful part.
+
+## Editing something already published
+
+Editing a published item **saves in place and stays published**. There is no
+draft copy of a live row, no review step and no version history.
+
+<Callout title="An edit to a published passage is live immediately">
+  There is nothing to undo it with. If you are making a substantial change to
+  something candidates are actively practising on, unpublish it first, edit,
+  then publish again.
+</Callout>
+
+## Deleting is blocked once it has been used
+
+If a passage has attempts against it — or a lesson has been marked read by
+anyone — deleting it is refused, and the error says so.
+
+**Unpublish it instead.** That takes it out of circulation for every candidate
+while leaving their history intact and readable. A candidate who sat a passage
+in March should still be able to open their review of it in June.
+
+This is a real check, not a database setting. It runs before anything is
+deleted, and it is what stands between a tidy-up and a hole in somebody's
+records.

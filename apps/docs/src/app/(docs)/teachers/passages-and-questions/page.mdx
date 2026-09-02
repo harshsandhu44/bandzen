@@ -1,0 +1,65 @@
+export const metadata = {
+  title: 'Passages and questions',
+  description:
+    'Writing a reading passage, its questions, answer keys, evidence and the shared headings list.',
+};
+
+# Passages and questions
+
+A reading passage and its questions are edited together on one screen. This is
+the most involved content type in the CMS, and the one with the most rules.
+
+## The passage
+
+| Field      | Notes                                                                                                                  |
+| ---------- | ---------------------------------------------------------------------------------------------------------------------- |
+| Title      | Shown in the passage list                                                                                              |
+| Slug       | Unique across all passages. It is the identity of the row — changing it on a live passage is effectively a new passage |
+| Body       | The passage text                                                                                                       |
+| Topic      | For grouping                                                                                                           |
+| Format     | Academic or General Training                                                                                           |
+| Difficulty | Used to pick the easiest passage for the diagnostic                                                                    |
+| Headings   | The shared list — see below                                                                                            |
+
+## Questions
+
+Questions are edited inline beneath the passage, in order. Each one carries:
+
+- **Kind** — one of the five types. See
+  [Question types](/reference/question-types).
+- **Prompt** — the question itself.
+- **Options** — for multiple choice only.
+- **Answer key** — see below.
+- **Evidence** — the sentence in the passage that makes the answer the answer.
+- **Explanation** — why.
+
+<Callout title="Evidence is not optional in practice">
+  Evidence and explanation are what the candidate's review page is built from. A
+  question marked right or wrong with nothing behind it teaches nobody anything
+  — it just reports a result.
+</Callout>
+
+## Answer keys
+
+A key holds **every accepted form** of the answer, not just the best one. If
+both "cotton" and "raw cotton" would be accepted, both belong in the key.
+
+Matching ignores capitalisation and surrounding whitespace, so you do not need
+to add case variants or worry about trailing spaces.
+
+Answer keys are stored apart from the questions themselves, so a page that
+renders questions cannot accidentally serialise the answers into it.
+
+## The headings list
+
+Matching-headings questions share **one list per passage**, not one per question.
+
+Two rules make it behave like the real exam:
+
+- **More headings than paragraphs.** The extra ones are distractors; without them
+  the last question answers itself.
+- **Each heading is used at most once.**
+
+A passage with matching-headings questions and no headings list cannot be
+published — the completeness check catches it. See
+[Draft and published](/teachers/draft-and-published).
