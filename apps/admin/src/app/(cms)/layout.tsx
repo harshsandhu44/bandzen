@@ -14,8 +14,10 @@ import {
 } from '@bandzen/ui/components/sidebar';
 import { ThemeToggle } from '@bandzen/ui/components/theme-toggle';
 import { Wordmark } from '@bandzen/ui/components/wordmark';
+import { Version } from '@bandzen/ui/components/version';
 import { requireAdminOrTeacher } from '@/lib/auth';
 import { Nav } from './nav';
+import pkg from '../../../package.json';
 
 /**
  * The CMS shell.
@@ -87,6 +89,8 @@ export default async function CmsLayout({
               </Button>
             </SignOutButton>
           </div>
+
+          <Version value={pkg.version} className="self-start" />
         </SidebarFooter>
 
         <SidebarRail />

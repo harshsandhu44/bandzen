@@ -5,6 +5,10 @@ import { brand, footer } from '@/content/sections';
 import { Container } from './section';
 import { Wordmark } from './wordmark';
 
+import { Version } from '@bandzen/ui/components/version';
+
+import pkg from '../../../package.json';
+
 // lucide v1 removed its brand icons, and set as mono text these read better
 // against the display type than a row of glyph buttons would.
 const SOCIAL = ['Instagram', 'YouTube', 'LinkedIn', 'GitHub'] as const;
@@ -70,9 +74,14 @@ export function Footer() {
           <p className="text-paper/70 max-w-2xl text-xs leading-relaxed">
             {brand.disclaimerShort}
           </p>
-          <p className="text-paper/70 shrink-0 font-mono text-[0.625rem] tracking-[0.16em] uppercase">
-            © {new Date().getFullYear()} {brand.name}
-          </p>
+          <div className="shrink-0 space-y-1.5">
+            <p className="text-paper/70 font-mono text-[0.625rem] tracking-[0.16em] uppercase">
+              © {new Date().getFullYear()} {brand.name}
+            </p>
+            {/* The muted foreground this defaults to is a light-ground colour
+                and would sink into the ink footer. */}
+            <Version value={pkg.version} className="text-paper/70 block" />
+          </div>
         </div>
       </Container>
     </footer>
