@@ -71,3 +71,12 @@ export function isActive(link: NavLink, pathname: string) {
   const prefixes = [link.href, ...(link.owns ?? [])];
   return prefixes.some((p) => pathname === p || pathname.startsWith(`${p}/`));
 }
+
+/**
+ * The documentation site, on its own deployment.
+ *
+ * Not a sixth entry in NAV_LINKS: that list is rendered verbatim as the phone
+ * tab bar, so five is the ceiling and a help link is not worth a tab.
+ */
+export const DOCS_URL =
+  process.env.NEXT_PUBLIC_DOCS_URL ?? 'https://docs.bandzen.com';
