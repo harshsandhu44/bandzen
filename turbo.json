@@ -11,7 +11,7 @@
         "RAZORPAY_*",
         "NEXT_PUBLIC_*"
       ],
-      "outputs": ["dist/**", ".next/**", "!.next/cache/**"]
+      "outputs": ["dist/**", ".next/**", "!.next/cache/**", "!.next/dev/**"]
     },
     "dev": {
       "cache": false,
