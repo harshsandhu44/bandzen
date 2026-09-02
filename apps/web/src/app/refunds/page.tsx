@@ -60,7 +60,7 @@ export default function RefundsPage() {
       <Clause title="What you are paying for">
         <p>
           Bandzen Pro is currently {pricing.tiers[1].price}{' '}
-          {pricing.tiers[1].period}, or {pricing.tiers[1].alt}. Prices are in
+          {pricing.tiers[1].period}, {pricing.tiers[1].alt}. Prices are in
           Indian Rupees and include any applicable taxes unless stated otherwise
           at checkout.
         </p>

@@ -49,15 +49,15 @@ export const cta = {
 /**
  * The facts a payment processor and a customer both need.
  *
- * TODO: replace every bracketed value below before going live. They render
- * verbatim on /about, /contact, /terms, /privacy and /refunds, and Razorpay's
- * activation review checks that they are real and that the address matches
- * your registration. Nothing else blocks on them.
+ * TODO: `entity` and `address` are still bracketed and render verbatim on
+ * /about, /contact and /terms. Fill them the moment registration completes —
+ * Razorpay's activation review checks that they are real and that the address
+ * matches your registration, and they are the last thing blocking it.
  */
 export const legal = {
   entity: '[REGISTERED BUSINESS NAME]',
   address: '[REGISTERED ADDRESS]',
-  email: '[CONTACT EMAIL]',
+  email: 'support@bandzen.com',
   updated: '31 August 2026',
   refundDays: 7,
 } as const;
