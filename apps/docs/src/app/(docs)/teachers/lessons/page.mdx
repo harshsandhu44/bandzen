@@ -1,0 +1,60 @@
+export const metadata = {
+  title: 'Lessons',
+  description: 'Writing a lesson, and the six stages it has to fill.',
+};
+
+# Lessons
+
+A lesson teaches one technique. See
+[the candidate's view](/candidates/lessons) for what it looks like when it is
+finished.
+
+## The fields
+
+| Field         | Notes                                    |
+| ------------- | ---------------------------------------- |
+| Slug          | Unique across all lessons                |
+| Module        | Reading or writing                       |
+| Group         | Foundations, question types, or advanced |
+| Title         | Sentence case                            |
+| Summary       | One line, shown in the index             |
+| Minutes       | Your honest estimate of the reading time |
+| Question kind | Links the lesson to a drill — see below  |
+| Order         | Position within its group                |
+
+## The question kind link
+
+Setting a question kind does two things:
+
+- The lesson's **Practice** stage gets a button straight into that drill.
+- [The study plan](/candidates/your-study-plan) will teach this lesson before
+  drilling that question type, for any candidate weak at it who has not read it.
+
+That second one is why the field matters. A lesson about matching headings with
+no question kind set is a lesson the plan will never reach for.
+
+## The six stages
+
+Every lesson fills the same six stages, and they are not interchangeable:
+
+1. **Understand** — what the technique is and when it applies.
+2. **See** — it done once, worked through.
+3. **Try** — one for the candidate, with the answer and the reasoning.
+4. **Practice** — the link into the drill.
+5. **Check** — what they should now be able to do.
+6. **Improve** — where to go if it did not work.
+
+Each stage is built from blocks: prose, steps, a checklist, a callout, a worked
+example, or a "try this". The example and try blocks take a source, a question,
+an answer and a **why** — the why is the part that teaches.
+
+<Callout title="A lesson needs at least one non-empty stage to publish">
+  The completeness check rejects a lesson where every stage is empty. It does
+  not require all six — a short lesson is allowed — but an empty shell is not.
+</Callout>
+
+## Listing a lesson you have not written
+
+A lesson row with no stages at all shows in the candidate's index as **Not
+written yet**, with no link. That is a legitimate thing to create: it tells
+candidates what is coming without pretending it is there.

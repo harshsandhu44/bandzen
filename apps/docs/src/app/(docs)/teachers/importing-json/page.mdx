@@ -1,0 +1,58 @@
+export const metadata = {
+  title: 'Importing JSON',
+  description:
+    'Bulk-creating content from JSON — the templates, the slug check, and what a partial failure means.',
+};
+
+# Importing JSON
+
+All four content types import from JSON, and each has an import screen under its
+own section. It is the fastest way to add content in bulk, and the way generated
+drafts get in.
+
+## Paste or upload
+
+You can attach a file or paste the JSON into the box. **If you do both, the
+pasted text wins.**
+
+## The templates
+
+Each import screen has a **Copy template** button. It puts a ready-to-use
+template on your clipboard covering that content type and variant — the five
+passage kinds, the writing-prompt variants, the lesson groups, the guide
+categories.
+
+Start from the template rather than from memory. It carries the field names and
+the rules, and getting a field name wrong is the most common reason an import is
+rejected.
+
+## What a file may contain
+
+- **One object, or an array of up to 50.**
+- Every slug must be unique — both against what is already in the database
+  **and** against the rest of the file.
+
+<Callout title="Everything is checked before anything is written">
+  The slug check runs across the whole file first. That pre-check is deliberate
+  and load-bearing: the inserts are not wrapped in a transaction, so it is the
+  only thing standing between a rejected file and a half-imported one.
+</Callout>
+
+## Everything imports as a draft
+
+No matter what the file says, imported rows are drafts. Import, review in the
+CMS, then publish. See [Draft and published](/teachers/draft-and-published).
+
+## If it fails partway
+
+The importer reports **how far it got and which row stopped it**. Rows before
+that point were created; that row and everything after it were not.
+
+Fix the named row, remove the rows that already landed, and import the rest.
+The slug check will refuse a re-import of the ones that succeeded, which is the
+safety net working rather than a second error.
+
+## After importing
+
+You stay on the import screen with a report of what was made. It does not
+redirect you, so you can fix and re-import without navigating back.

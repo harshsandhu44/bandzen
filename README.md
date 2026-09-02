@@ -7,7 +7,7 @@ pnpm workspaces + Turborepo monorepo.
 ```
 apps/
   web/                 marketing site (port 3000)
-  docs/                @bandzen/ui reference + integration test (port 3001)
+  docs/                user and teacher documentation (port 3001)
   app/                 the product: Clerk + Neon + OpenAI (port 3002)
   admin/               the CMS: content editing behind a role gate (port 3003)
 packages/
@@ -17,10 +17,11 @@ packages/
   tsconfig/            shared TypeScript configs (@bandzen/tsconfig)
 ```
 
-`apps/web`, `apps/app` and `apps/admin` deploy separately — a static marketing
-site on the apex domain, the signed-in product on `app.bandzen.com`, and the
-CMS on its own project. The marketing CTAs point at the product app through
-`NEXT_PUBLIC_APP_URL`. `apps/admin` is a separate deployment but not a separate
+All four apps deploy separately — a static marketing site on the apex domain,
+the documentation on `docs.bandzen.com`, the signed-in product on
+`app.bandzen.com`, and the CMS on its own project. The marketing CTAs point at
+the product app through `NEXT_PUBLIC_APP_URL`, and both it and the product link
+to the documentation through `NEXT_PUBLIC_DOCS_URL`. `apps/admin` is a separate deployment but not a separate
 system: it shares the product's Clerk instance and its Neon database, which is
 why a signed-in student is a real session there and has to be turned away
 rather than redirected.
@@ -107,7 +108,7 @@ so a bump buried inside a push of several commits is invisible.
 
 Each app shows its version through `@bandzen/ui`'s `Version` — on Settings in
 the product, at the foot of the CMS sidebar, in the marketing footer, and
-under the title in docs. The app reads its own `package.json` in a server
+at the foot of the docs sidebar. The app reads its own `package.json` in a server
 component and passes the string down; importing that JSON inside a
 `'use client'` subtree would inline the whole file, dependency list included,
 into the browser bundle.
@@ -184,8 +185,11 @@ happens to match what `@bandzen/ui` already ships is indistinguishable from
 no override at all.
 
 Only override what differs. Everything left alone stays in sync with the
-shared system — `apps/docs` does exactly this, which is why it renders the
-same components in a different theme than `apps/web`.
+shared system — `apps/admin` overrides six tokens to plum and inherits the
+rest, which is why it reads as its own surface without being a second design.
+
+`apps/docs` overrides nothing, deliberately. It documents the product, so a
+link there has to be the same cobalt as the button it is describing.
 
 ## Adding an app
 

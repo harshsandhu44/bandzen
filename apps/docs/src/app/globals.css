@@ -1,13 +1,10 @@
+/**
+ * Docs inherits the shared theme untouched.
+ *
+ * This file used to override `--primary` to a green, to prove an app could
+ * retheme `@bandzen/ui` without build tooling. apps/admin makes that point with
+ * its plum, and it makes it on a surface that has a reason to look different.
+ * Docs describes the product, so a link here is the same cobalt as the button
+ * it is describing.
+ */
 @import '@bandzen/ui/globals.css';
-
-/* Docs-only token overrides. These come after the shared design system, so
-   they win — everything not listed here stays in sync with @bandzen/ui.
-   The hue is deliberately far from the Bandzen brand (cobalt, hue 264): the
-   job of this file is to make the override mechanism visible at a glance, so
-   a value that merely echoes the shared theme would prove nothing.
-   --radius is not overridden here on purpose — every component this app
-   currently renders is a Button, and base-lyra Buttons are rounded-none, so
-   the change would be invisible. */
-:root {
-  --primary: oklch(0.45 0.11 165);
-}

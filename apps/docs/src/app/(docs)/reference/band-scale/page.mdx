@@ -1,0 +1,61 @@
+import { WRITING_CRITERIA } from '@/content/facts';
+
+export const metadata = {
+  title: 'The band scale',
+  description:
+    'How Bandzen turns reading answers and essays into a 0–9 band, and what that band is not.',
+};
+
+# The band scale
+
+IELTS reports on a 0–9 scale in half-band steps. Bandzen estimates on the same
+scale so its figures are comparable to the ones you are aiming for.
+
+<Ruler className="my-8" />
+
+## Reading
+
+Your raw score is scaled to 40 first, so a 13-question practice set reports on
+the same scale as a full test. Then it converts:
+
+<BandTable />
+
+This is the public Academic Reading conversion. It is currently applied to
+General Training candidates too, and General Training converts more generously —
+so a General Training reading band from Bandzen is conservative.
+
+## Writing
+
+Four criteria, each given its own band by the marker:
+
+<ul className="mt-4 list-[square] space-y-2 pl-5 text-[0.9375rem] leading-7 marker:text-chrome">
+  {WRITING_CRITERIA.map((criterion) => (
+    <li key={criterion}>{criterion}</li>
+  ))}
+</ul>
+
+The overall band is the **mean of the four, rounded to the nearest half band**.
+It is not a separate judgement made on top of them, so a report where three
+criteria are 6.5 and one is 5.0 lands at 6.0 — and the 5.0 is the thing to work
+on.
+
+## Your overall estimate
+
+Where both modules have been measured, an overall figure is the mean of them.
+
+Two modules, not four. IELTS averages all four skills; Bandzen only has two of
+them, so a Bandzen overall estimate is not directly comparable to an IELTS
+overall band. It is a measure of your reading and writing.
+
+## What a band from Bandzen is not
+
+<Callout title="An estimate, not a score">
+  It is produced by this product from work you did here. It is not an IELTS
+  score, it does not come from IELTS, and it does not predict what you will get
+  on the day. Writing bands in particular come from a language model reading
+  against the published descriptors, and two markings of the same essay can
+  differ.
+</Callout>
+
+Read the movement, not the point. One essay half a band above the last is inside
+the noise. Five attempts trending upward is a signal.

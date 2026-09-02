@@ -1,0 +1,48 @@
+export const metadata = {
+  title: 'How reading is marked',
+  description:
+    'The raw-score conversion, how answers are compared, and what the review shows you.',
+};
+
+# How reading is marked
+
+Reading marking is a pure function. No model is involved, the answer key is
+fixed, and the same answers would produce the same score every time.
+
+## How your answer is compared
+
+Every question's key holds **every accepted form** of the answer, so both
+"cotton" and "raw cotton" can be right where both are.
+
+Comparison ignores capitalisation and surrounding whitespace. Typing ` TRUE`
+is not a mistake and is not marked as one.
+
+## Raw score to band
+
+Your raw score is scaled up to 40 first, so a 13-question practice set reports on
+the same scale as a full test. Then:
+
+<BandTable />
+
+<Callout title="Academic scale, both formats">
+  This is the public Academic Reading conversion, and it is currently applied to
+  General Training candidates too. General Training converts more generously, so
+  if you are sitting General Training, treat your reading band as conservative
+  until that ships.
+</Callout>
+
+## The review
+
+The review page shows:
+
+- Your **band**, and the raw score behind it, labelled as an estimate rather
+  than a score.
+- Every question, marked correct or incorrect.
+- For each one, the **evidence sentence** — the line in the passage that makes
+  the answer the answer — and an explanation of why.
+- **Recurring patterns**: question types you are consistently weak at across
+  every attempt you have made, not just this one.
+
+The evidence sentence is the part worth slowing down on. Getting a question
+wrong tells you little; seeing the sentence you needed to have found, and
+realising you read past it, tells you what to do differently next time.

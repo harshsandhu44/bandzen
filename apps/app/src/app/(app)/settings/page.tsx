@@ -3,6 +3,7 @@ import { SignOutButton } from '@clerk/nextjs';
 import { currentUser } from '@clerk/nextjs/server';
 import { Button } from '@bandzen/ui/components/button';
 import { PageHeader, SectionHeader } from '@/components/app/primitives';
+import { DOCS_URL } from '../nav-links';
 import { ThemeToggle } from '@bandzen/ui/components/theme-toggle';
 import { Version } from '@bandzen/ui/components/version';
 import { requireUserId } from '@/lib/auth';
@@ -114,6 +115,21 @@ export default async function SettingsPage() {
             <dt className="text-sm text-muted-foreground">Appearance</dt>
             <dd>
               <ThemeToggle />
+            </dd>
+          </div>
+          {/* Also in the sidebar, but the sidebar does not exist on a phone
+              and this is the one screen every breakpoint can reach. */}
+          <div className="flex items-baseline justify-between gap-4 py-3">
+            <dt className="text-sm text-muted-foreground">Help</dt>
+            <dd>
+              <a
+                href={DOCS_URL}
+                target="_blank"
+                rel="noreferrer noopener"
+                className="text-sm underline decoration-border underline-offset-4 transition-colors hover:decoration-foreground"
+              >
+                Documentation
+              </a>
             </dd>
           </div>
           {/* Here rather than in the shell, because the sidebar this app's

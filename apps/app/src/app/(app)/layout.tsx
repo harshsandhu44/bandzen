@@ -24,6 +24,7 @@ import {
 } from '@/lib/entitlements';
 import { foundingEndsAt } from '@/lib/razorpay';
 import { daysUntil } from '@/lib/dates';
+import { DOCS_URL } from './nav-links';
 import { MobileNav } from './mobile-nav';
 import { Nav } from './nav';
 
@@ -136,6 +137,18 @@ export default async function AppLayout({ children }: LayoutProps<'/'>) {
               ) : null}
             </dl>
           ) : null}
+
+          {/* Not a nav destination — NAV_LINKS is the phone tab bar and five is
+              the ceiling. Settings carries the same link for the breakpoints
+              where this sidebar does not exist. */}
+          <a
+            href={DOCS_URL}
+            target="_blank"
+            rel="noreferrer noopener"
+            className="text-xs text-muted-foreground underline decoration-sidebar-border underline-offset-4 transition-colors hover:text-foreground"
+          >
+            Documentation
+          </a>
 
           <div className="flex items-center justify-between gap-2">
             <ThemeToggle />
