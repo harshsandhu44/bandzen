@@ -73,10 +73,11 @@ export function isActive(link: NavLink, pathname: string) {
 }
 
 /**
- * The documentation site, on its own deployment.
+ * The documentation, served at /docs on the marketing origin rather than on a
+ * subdomain. Absolute because this app is a different origin.
  *
  * Not a sixth entry in NAV_LINKS: that list is rendered verbatim as the phone
  * tab bar, so five is the ceiling and a help link is not worth a tab.
  */
 export const DOCS_URL =
-  process.env.NEXT_PUBLIC_DOCS_URL ?? 'https://docs.bandzen.com';
+  process.env.NEXT_PUBLIC_DOCS_URL ?? 'https://bandzen.com/docs';

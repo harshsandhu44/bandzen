@@ -36,9 +36,6 @@ export const nav = [
  */
 const APP_URL = process.env.NEXT_PUBLIC_APP_URL ?? 'https://app.bandzen.com';
 
-/** The documentation site, on its own deployment. Override for :3001. */
-const DOCS_URL = process.env.NEXT_PUBLIC_DOCS_URL ?? 'https://docs.bandzen.com';
-
 export const cta = {
   primary: { label: 'Start preparing free', href: `${APP_URL}/signup` },
   secondary: { label: 'Take a diagnostic test', href: `${APP_URL}/diagnostic` },
@@ -492,7 +489,8 @@ export const footer = {
     {
       title: 'Company',
       links: [
-        { label: 'Docs', href: DOCS_URL },
+        // Same origin: /docs is a rewrite onto the docs zone.
+        { label: 'Docs', href: '/docs' },
         { label: 'About', href: '/about' },
         { label: 'Contact', href: '/contact' },
       ],
