@@ -1,0 +1,31 @@
+# Tags what `main` deploys, so a version read off production maps back to a
+# commit. The work is in scripts/tag-deployed.sh; this only supplies the two
+# things a local run cannot — a checkout of main after the squash, and the
+# credentials to push.
+name: Tag deployed versions
+
+on:
+  push:
+    branches: [main]
+
+permissions:
+  contents: write
+
+jobs:
+  tag:
+    runs-on: ubuntu-latest
+    steps:
+      # Depth 2 is the commit and its parent, which is the whole comparison.
+      # Tags come along so an existing one is seen and skipped rather than
+      # recreated and rejected at push.
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
+          fetch-tags: true
+
+      - name: Tag the apps this commit deploys
+        run: |
+          tags="$(scripts/tag-deployed.sh)"
+          [ -n "$tags" ] || exit 0
+          # Unquoted: one push for however many apps this commit bumped.
+          git push origin $tags
