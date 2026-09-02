@@ -1,0 +1,61 @@
+import { FREE } from '@/content/facts';
+
+export const metadata = {
+  title: 'Writing and marking',
+  description:
+    'Choosing a prompt, writing under timing, and when your weekly mark is spent.',
+};
+
+# Writing and marking
+
+Writing is the module with a language model behind it. You write against a
+prompt under timing, submit, and a marker reads it against the IELTS band
+descriptors.
+
+## The two tasks
+
+|        | Time   | Minimum words |
+| ------ | ------ | ------------- |
+| Task 1 | 20 min | 150           |
+| Task 2 | 40 min | 250           |
+
+The prompt list filters by task. What you are shown depends on whether your
+account is set to Academic or General Training.
+
+## Writing
+
+The editor shows the prompt, a timer, and a live word count. Your essay saves as
+you type, with retries if a save fails.
+
+**Autosave is never blocked.** Not by a spent quota, not by anything — a save
+that refused would be a save that lost your work, which is the one thing an
+editor must not do.
+
+Leaving and coming back resumes the same attempt with your text in it.
+
+## When the mark is spent
+
+<Callout
+  tone="pro"
+  title={`Free: ${FREE.essays} marked essays per ${FREE.windowDays} days`}
+>
+  The mark is charged when you **start** an attempt, not when you submit it.
+</Callout>
+
+That ordering matters, and it works in your favour:
+
+- **An attempt that exists is always marked.** Once you have started one, nothing
+  can stop it being read — the cost was already taken.
+- **A failed marking run costs you nothing.** If the marker errors, you can run
+  it again and it does not count a second time.
+- **Abandoning a started attempt does spend the mark.** If you open an essay and
+  never write it, that is one of your two gone for the window.
+
+The quota meter is on the prompt list from your first visit, showing what is
+left and the exact day it resets. When it is spent, the Start button stays
+visible but disabled — the product tells you why rather than hiding the feature.
+
+## After you submit
+
+You go to the report, which may still be marking. See
+[Your writing report](/candidates/your-writing-report).

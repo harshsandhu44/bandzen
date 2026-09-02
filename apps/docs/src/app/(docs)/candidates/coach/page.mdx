@@ -1,0 +1,64 @@
+import { COACH_MAX_TURNS, FREE } from '@/content/facts';
+
+export const metadata = {
+  title: 'Bandzen Coach',
+  description:
+    'A tutor that has read your marked work — what it can see, what it will not do, and the limits.',
+};
+
+# Bandzen Coach
+
+Coach is a chat that knows how you are doing. It is a tutor, not an examiner.
+
+## What it can see
+
+Coach is given your situation from your own records before it answers anything:
+
+- Your exam type, target band, test date and daily minutes.
+- Your latest reading and writing estimates.
+- Your most recent report — the four criteria, their comments, and the
+  weaknesses in it.
+- Your reading accuracy, broken down by question type.
+
+That context is assembled on the server from your rows. Nothing typed into the
+chat can widen it, and Coach cannot see another candidate's work.
+
+## What it will not do
+
+Coach is instructed not to claim to be an official examiner, not to guarantee
+you a band, and not to invent a statistic. If it does not have a figure, it
+says so rather than producing a plausible one.
+
+It cannot mark an essay. Pasting one in gets you an opinion, not a report —
+[submit it properly](/candidates/writing-and-marking) if you want it marked
+against the criteria.
+
+## Starting points
+
+The six starters on the page are worth using, because they are the questions
+Coach can answer best from what it has:
+
+- What should I study today?
+- Explain my latest test
+- Why do I struggle with Matching Headings?
+- How do I improve my Writing?
+- Give me a Speaking Part 2 question
+- What is the difference between Band 6 and Band 7 Writing?
+
+## Limits
+
+<Callout
+  tone="pro"
+  title={`Free: ${FREE.coach} messages per ${FREE.windowDays} days`}
+>
+  The meter is on the page from your first visit, and it says the exact day it
+  resets. Coach is one of only two things metered on Free, because it is one of
+  only two things that cost money to run.
+</Callout>
+
+A conversation carries **{COACH_MAX_TURNS} turns** of history. Past that, the
+earliest exchanges drop out — so if a long conversation starts drifting, opening
+a fresh one with a specific question works better than pushing on.
+
+Your messages are not stored. Only the fact that a message was sent is
+recorded, and only so the meter can count it.

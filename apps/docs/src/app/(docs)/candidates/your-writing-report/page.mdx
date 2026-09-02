@@ -1,0 +1,70 @@
+import { WRITING_CRITERIA } from '@/content/facts';
+
+export const metadata = {
+  title: 'Your writing report',
+  description:
+    'The four criteria, the annotations on your own sentences, and what to do when marking fails.',
+};
+
+# Your writing report
+
+The report is what a marker made of your essay. It arrives in up to a minute,
+and you do not have to wait on the page for it.
+
+## The three states
+
+**Marking.** "Reading your response" with an indeterminate bar. You can close the
+tab — the marking finishes without you and the report is there when you come
+back.
+
+**Failed.** Marking errored. Your response is saved and nothing is lost, and
+there is a **Mark it again** button.
+
+<Callout title="A failed run has never counted against your weekly marks">
+  Retrying costs you nothing. The mark was charged when you started the attempt,
+  and a run that failed did not consume a second one.
+</Callout>
+
+**Done.** The report itself.
+
+## What is in it
+
+**An overall band**, shown against the 0–9 scale. It is the mean of the four
+criteria, rounded to the nearest half band — not a separate judgement layered on
+top of them.
+
+**The four criteria**, each with its own band and a comment saying what earned
+it:
+
+<ul className="mt-4 space-y-2 pl-5 text-[0.9375rem] leading-7 list-[square] marker:text-chrome">
+  {WRITING_CRITERIA.map((criterion) => (
+    <li key={criterion}>{criterion}</li>
+  ))}
+</ul>
+
+**Annotations** — between four and eight short extracts, quoted **verbatim from
+your own essay**, each marked as one of:
+
+| Mark          | Means                         |
+| ------------- | ----------------------------- |
+| Works well    | Do more of this               |
+| Error         | A concrete mistake, named     |
+| Needs support | A claim that goes undeveloped |
+
+Every quote is checked against your essay before you see it, and any the marker
+produced that is not literally in your text is dropped. A missing annotation is
+better than an invented one.
+
+**Strengths and weaknesses**, as short lists.
+
+## What the report is not
+
+It is an estimate produced by a language model reading against the published
+band descriptors. It is not an IELTS score, and no examiner has seen your essay.
+Two markings of the same essay can differ slightly, which is worth remembering
+before reading much into a half-band move between two essays.
+
+The thing to act on is not the number. It is the lowest criterion and the
+comment attached to it — that comment is what
+[your study plan](/candidates/your-study-plan) reads to name your next writing
+task.

@@ -1,0 +1,59 @@
+import { PLAN_HORIZON_DAYS } from '@/content/facts';
+
+export const metadata = {
+  title: 'Your study plan',
+  description:
+    'How Bandzen decides what to ask you to do each day, and why yesterday is not in it.',
+};
+
+# Your study plan
+
+The plan on Today is one task a day, chosen from what your marked work shows. It
+is a set of rules, not a model — the same inputs always produce the same plan,
+and nothing about it is generated text.
+
+## How far ahead it looks
+
+Up to **{PLAN_HORIZON_DAYS} days**, or the days until your test date, whichever
+is shorter. Day one is today, not tomorrow.
+
+If you have no test date, it runs a rolling fortnight and moves forward with
+you.
+
+## What it puts in a day
+
+**Which skill.** If your reading and writing estimates differ by a whole band or
+more, the weaker one gets two days in three. Otherwise the two alternate. A gap
+of half a band is left alone — that is inside the noise of an estimate, and
+chasing it would mean reacting to a single bad afternoon.
+
+**Which drill.** Reading days rotate through drills aimed at your weakest
+question type, timed passages, and full-length practice. Writing days rotate
+through full-timing essays, intro-and-thesis-only work, and paragraph
+development taken from a body paragraph a marker flagged. A drill is only
+scheduled if content for it actually exists, so you will never be sent to a Task
+1 drill on a day when there are no Task 1 prompts.
+
+**Learn before drill.** If your weakest question type has a lesson you have not
+read, the first reading slot teaches it instead of drilling it. Repeating a
+technique you have not been shown is just repeating the mistake faster.
+
+**The named weakness.** Your first writing task carries the actual thing the
+marker found — not "Task 2 essay" but "Task 2 essay — focus: underdeveloped
+body paragraphs".
+
+## Why yesterday is not in it
+
+The plan is rebuilt from today forward every time you open it. Nothing is
+stored, and a past day's plan cannot be recovered.
+
+That is deliberate, and it has a consequence worth knowing: **which module a
+Tuesday in August asked for has no answer.** Whether you studied that Tuesday
+does — that is what a [study day](/candidates/awards-and-streaks) records, and
+it is the only thing about a past day that Bandzen keeps.
+
+<Callout title="One task at a time">
+  Exactly one task is ever active. The rest of the week is shown under "Coming
+  up", greyed, so you can see the shape of it without being able to work ahead
+  into a plan that will be rebuilt tomorrow anyway.
+</Callout>

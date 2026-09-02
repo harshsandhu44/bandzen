@@ -1,0 +1,66 @@
+import { FREE, PRICING_URL, REFUND_DAYS, TRIAL_DAYS } from '@/content/facts';
+
+export const metadata = {
+  title: 'Plans and limits',
+  description:
+    'What Free includes, what Pro adds, and exactly what happens when you cancel.',
+};
+
+# Plans and limits
+
+## What Free includes
+
+Two things are metered, and only two: **marked essays** and **Coach messages**.
+They are the two things that cost real money every time they run.
+
+|                          | Free                                     |
+| ------------------------ | ---------------------------------------- |
+| Marked essays            | {FREE.essays} per {FREE.windowDays} days |
+| Coach messages           | {FREE.coach} per {FREE.windowDays} days  |
+| Diagnostic               | {FREE.diagnostics}, ever                 |
+| Band history on Progress | Last {FREE.trendPoints} attempts         |
+| Reading practice         | Unlimited                                |
+| Lessons                  | Unlimited                                |
+| Guides                   | Unlimited                                |
+
+Reading, lessons and guides are unlimited on purpose. Marking a reading attempt
+costs nothing to run, and capping the thing that builds the habit would be
+throttling the reason to be here at all.
+
+## The window is rolling
+
+The {FREE.windowDays}-day window rolls; it is not a calendar week resetting on
+Mondays. Your meter always shows the exact day yours resets — "Thursday" while
+that is unambiguous, a date once it is not.
+
+## Your trial
+
+Finishing [setting up](/candidates/setting-up) grants **{TRIAL_DAYS} days of
+Pro**. It starts then rather than when your invitation was sent, so the clock
+does not run while you have not opened the product.
+
+## What Pro changes
+
+Unlimited essay marking, unlimited Coach, your full band history on Progress,
+and retaking the diagnostic.
+
+Prices change, so they are not written here. They are on the
+[pricing section of the Bandzen site]({PRICING_URL}), which is where they are
+kept up to date.
+
+## Cancelling
+
+<Callout title="You keep the period you paid for">
+  Cancelling does not end your access. It stops the renewal. Pro runs to the end
+  of the period already paid for, and then you are on Free.
+</Callout>
+
+After that: {FREE.essays} essay marks and {FREE.coach} Coach messages a week,
+and your band history goes back to the last {FREE.trendPoints} attempts. Reading
+practice and lessons stay unlimited.
+
+**A failed payment is not an instant cutoff.** Access is decided by the date your
+period runs to, and a failed renewal simply does not extend it — so the retry
+window is a grace period at no cost to you.
+
+Refunds are available within **{REFUND_DAYS} days**.
