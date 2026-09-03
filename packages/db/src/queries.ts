@@ -428,7 +428,8 @@ export async function deletePassage(id: string) {
 }
 
 export async function createQuestion(
-  passageId: string,
+  /** Exactly one of these, matching which module owns the question. */
+  parent: { passageId: string } | { trackId: string },
   input: {
     idx: number;
     kind: Question['kind'];
@@ -443,7 +444,7 @@ export async function createQuestion(
     await db
       .insert(questions)
       .values({
-        passageId,
+        ...parent,
         idx: input.idx,
         kind: input.kind,
         prompt: input.prompt,
@@ -502,6 +503,199 @@ export async function updateQuestion(
 
 export async function deleteQuestion(id: string) {
   await db.delete(questions).where(eq(questions.id, id));
+}
+
+// ---------------------------------------------------------------------------
+// CMS — listening tracks
+//
+// Modelled on passages: a track carries child `questions` (via the shared
+// `createQuestion`/`updateQuestion`/`deleteQuestion` above) and a track-level
+// `matchingOptions` list playing the same role `passages.headings` does for
+// matching_headings. The one thing passages has no analogue for is `audioUrl`,
+// which the CMS uploads to R2 before it ever calls `createTrack`.
+// ---------------------------------------------------------------------------
+
+export async function listTracksAdmin(filters?: { status?: ContentStatus }) {
+  return db
+    .select()
+    .from(listeningTracks)
+    .where(
+      filters?.status ? eq(listeningTracks.status, filters.status) : undefined,
+    )
+    .orderBy(listeningTracks.createdAt);
+}
+
+export async function getTrackAdmin(id: string) {
+  const track = await firstRow(
+    await db
+      .select()
+      .from(listeningTracks)
+      .where(eq(listeningTracks.id, id))
+      .limit(1),
+  );
+  if (!track) return null;
+
+  const trackQuestions = await db
+    .select({
+      id: questions.id,
+      idx: questions.idx,
+      kind: questions.kind,
+      prompt: questions.prompt,
+      options: questions.options,
+      evidence: questions.evidence,
+      explanation: questions.explanation,
+      answer: questionAnswers.answer,
+    })
+    .from(questions)
+    .leftJoin(questionAnswers, eq(questionAnswers.questionId, questions.id))
+    .where(eq(questions.trackId, id))
+    .orderBy(questions.idx);
+
+  return { ...track, questions: trackQuestions };
+}
+
+export async function createTrack(input: {
+  slug: string;
+  title: string;
+  /** At least one of transcript / audioUrl. The CMS generates whichever is absent. */
+  transcript?: string | null;
+  audioUrl?: string | null;
+  topic?: string | null;
+  matchingOptions?: string[] | null;
+  difficulty?: number;
+  updatedBy: string;
+}) {
+  return firstRow(
+    await db
+      .insert(listeningTracks)
+      .values({ ...input, status: 'draft' })
+      .returning(),
+  );
+}
+
+export async function updateTrack(
+  id: string,
+  input: Partial<{
+    title: string;
+    transcript: string | null;
+    audioUrl: string | null;
+    topic: string | null;
+    matchingOptions: string[] | null;
+    difficulty: number;
+    generationError: string | null;
+    generationStartedAt: Date | null;
+  }>,
+  updatedBy: string,
+) {
+  return firstRow(
+    await db
+      .update(listeningTracks)
+      .set({ ...input, updatedBy, updatedAt: new Date() })
+      .where(eq(listeningTracks.id, id))
+      .returning(),
+  );
+}
+
+/** The fields the CMS generate route reads to decide what to do. */
+export async function getTrackGenerationState(id: string) {
+  return firstRow(
+    await db
+      .select({
+        id: listeningTracks.id,
+        slug: listeningTracks.slug,
+        transcript: listeningTracks.transcript,
+        audioUrl: listeningTracks.audioUrl,
+        generationError: listeningTracks.generationError,
+        generationStartedAt: listeningTracks.generationStartedAt,
+      })
+      .from(listeningTracks)
+      .where(eq(listeningTracks.id, id))
+      .limit(1),
+  );
+}
+
+/** Everything a track needs before it can go live. One issue per gap. */
+export async function checkTrackCompleteness(id: string): Promise<string[]> {
+  const track = await firstRow(
+    await db
+      .select()
+      .from(listeningTracks)
+      .where(eq(listeningTracks.id, id))
+      .limit(1),
+  );
+  if (!track) return ['the track itself (not found)'];
+
+  const trackQuestions = await db
+    .select({
+      idx: questions.idx,
+      kind: questions.kind,
+      answer: questionAnswers.answer,
+    })
+    .from(questions)
+    .leftJoin(questionAnswers, eq(questionAnswers.questionId, questions.id))
+    .where(eq(questions.trackId, id));
+
+  const issues: string[] = [];
+  if (!track.transcript) issues.push('a transcript');
+  if (!track.audioUrl) issues.push('an audio file');
+  if (trackQuestions.length === 0) issues.push('at least one question');
+
+  for (const q of trackQuestions) {
+    if (!q.answer || q.answer.length === 0) {
+      issues.push(`an answer for question ${q.idx}`);
+    }
+  }
+
+  const matchingQuestions = trackQuestions.filter((q) => q.kind === 'matching');
+  const options = track.matchingOptions ?? [];
+  if (matchingQuestions.length > 0 && options.length === 0) {
+    issues.push('a matching options list, for the matching question(s)');
+  } else {
+    for (const q of matchingQuestions) {
+      if (q.answer && !q.answer.every((a) => options.includes(a))) {
+        issues.push(
+          `question ${q.idx}'s answer is not in the matching options list`,
+        );
+      }
+    }
+  }
+
+  return issues;
+}
+
+export async function publishTrack(id: string, updatedBy: string) {
+  const issues = await checkTrackCompleteness(id);
+  if (issues.length > 0) throw new PublishValidationError(issues);
+  return firstRow(
+    await db
+      .update(listeningTracks)
+      .set({ status: 'published', updatedBy, updatedAt: new Date() })
+      .where(eq(listeningTracks.id, id))
+      .returning(),
+  );
+}
+
+export async function unpublishTrack(id: string, updatedBy: string) {
+  return firstRow(
+    await db
+      .update(listeningTracks)
+      .set({ status: 'draft', updatedBy, updatedAt: new Date() })
+      .where(eq(listeningTracks.id, id))
+      .returning(),
+  );
+}
+
+export async function deleteTrack(id: string) {
+  const [{ n }] = await db
+    .select({ n: count() })
+    .from(attempts)
+    .where(eq(attempts.trackId, id));
+  if (n > 0) {
+    throw new ContentInUseError(
+      `Cannot delete: ${n} attempt(s) reference this track. Unpublish it instead.`,
+    );
+  }
+  await db.delete(listeningTracks).where(eq(listeningTracks.id, id));
 }
 
 // ---------------------------------------------------------------------------
@@ -815,7 +1009,8 @@ export async function deleteResource(id: string) {
 // CMS overview — counts and recent activity for the admin home page
 // ---------------------------------------------------------------------------
 
-export type ContentType = 'passage' | 'writing-prompt' | 'lesson' | 'resource';
+export type ContentType =
+  'passage' | 'listening-track' | 'writing-prompt' | 'lesson' | 'resource';
 
 export type StatusCount = { draft: number; published: number; total: number };
 
@@ -832,16 +1027,20 @@ function tally(rows: { status: ContentStatus; n: number }[]): StatusCount {
  * the wire just to take an array length.
  *
  * Written out per table rather than mapped over a list of tables: drizzle's
- * `.from()` generics don't survive a union of four different pgTable types.
+ * `.from()` generics don't survive a union of different pgTable types.
  */
 export async function contentCounts(): Promise<
   Record<ContentType, StatusCount>
 > {
-  const [passage, writingPrompt, lesson, resource] = await Promise.all([
+  const [passage, track, writingPrompt, lesson, resource] = await Promise.all([
     db
       .select({ status: passages.status, n: count() })
       .from(passages)
       .groupBy(passages.status),
+    db
+      .select({ status: listeningTracks.status, n: count() })
+      .from(listeningTracks)
+      .groupBy(listeningTracks.status),
     db
       .select({ status: writingPrompts.status, n: count() })
       .from(writingPrompts)
@@ -858,6 +1057,7 @@ export async function contentCounts(): Promise<
 
   return {
     passage: tally(passage),
+    'listening-track': tally(track),
     'writing-prompt': tally(writingPrompt),
     lesson: tally(lesson),
     resource: tally(resource),
@@ -892,6 +1092,16 @@ export async function listRecentlyEdited(limit = 10): Promise<RecentEdit[]> {
         updatedBy: passages.updatedBy,
       })
       .from(passages),
+    db
+      .select({
+        type: sql<ContentType>`'listening-track'`.as('type'),
+        id: listeningTracks.id,
+        label: listeningTracks.title,
+        status: listeningTracks.status,
+        updatedAt: listeningTracks.updatedAt,
+        updatedBy: listeningTracks.updatedBy,
+      })
+      .from(listeningTracks),
     db
       .select({
         type: sql<ContentType>`'writing-prompt'`.as('type'),

@@ -620,7 +620,7 @@ export async function getListeningTest(userId: string, attemptId: string) {
   const attempt = await getAttempt(userId, attemptId);
   if (!attempt?.trackId) return null;
 
-  const [track] = await db
+  const [row] = await db
     .select({
       title: listeningTracks.title,
       audioUrl: listeningTracks.audioUrl,
@@ -628,7 +628,10 @@ export async function getListeningTest(userId: string, attemptId: string) {
     })
     .from(listeningTracks)
     .where(eq(listeningTracks.id, attempt.trackId));
-  if (!track) return null;
+  // audio_url is nullable at the column level (the CMS can hold a track that
+  // is still being synthesized) but a published track always has one.
+  if (!row || row.audioUrl == null) return null;
+  const track = { ...row, audioUrl: row.audioUrl };
 
   const qs = await db
     .select({
@@ -706,14 +709,17 @@ export async function getListeningReview(userId: string, attemptId: string) {
   const attempt = await getAttempt(userId, attemptId);
   if (!attempt?.trackId || attempt.status !== 'complete') return null;
 
-  const [track] = await db
+  const [row] = await db
     .select({
       title: listeningTracks.title,
       transcript: listeningTracks.transcript,
     })
     .from(listeningTracks)
     .where(eq(listeningTracks.id, attempt.trackId));
-  if (!track) return null;
+  // transcript is nullable at the column level; a completed attempt's track
+  // has always been published, which requires one.
+  if (!row || row.transcript == null) return null;
+  const track = { ...row, transcript: row.transcript };
 
   const rows = await db
     .select({

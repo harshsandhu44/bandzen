@@ -71,6 +71,13 @@
       "when": 1788375245047,
       "tag": "0009_lively_tinkerer",
       "breakpoints": true
+    },
+    {
+      "idx": 10,
+      "version": "7",
+      "when": 1788453266716,
+      "tag": "0010_perfect_bill_hollister",
+      "breakpoints": true
     }
   ]
 }

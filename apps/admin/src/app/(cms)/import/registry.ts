@@ -1,10 +1,12 @@
 import {
   createPassage,
   createQuestion,
+  createTrack,
   createWritingPrompt,
   createLesson,
   createResource,
   listPassagesAdmin,
+  listTracksAdmin,
   listWritingPromptsAdmin,
   listLessonsAdmin,
   listResourcesAdmin,
@@ -13,6 +15,7 @@ import type { z } from 'zod';
 import {
   parseItems,
   passageSchema,
+  listeningTrackSchema,
   writingPromptSchema,
   lessonSchema,
   resourceSchema,
@@ -101,17 +104,57 @@ export const REGISTRY = {
       // fails here leaves an incomplete draft, which publish-validation
       // already catches.
       for (const q of item.questions) {
-        await createQuestion(passage.id, {
-          idx: q.idx,
-          kind: q.kind,
-          prompt: q.prompt,
-          options: q.options,
-          evidence: q.evidence,
-          explanation: q.explanation,
-          answer: q.answer,
-        });
+        await createQuestion(
+          { passageId: passage.id },
+          {
+            idx: q.idx,
+            kind: q.kind,
+            prompt: q.prompt,
+            options: q.options,
+            evidence: q.evidence,
+            explanation: q.explanation,
+            answer: q.answer,
+          },
+        );
       }
       return { id: passage.id, slug: passage.slug, label: passage.title };
+    },
+  }),
+
+  listening: entry({
+    noun: 'listening track',
+    templates: TEMPLATES.listening,
+    schema: listeningTrackSchema,
+    listSlugs: async () => (await listTracksAdmin()).map((t) => t.slug),
+    insert: async (item, userId) => {
+      const track = await createTrack({
+        slug: item.slug,
+        title: item.title,
+        topic: item.topic,
+        transcript: item.transcript,
+        audioUrl: item.audioUrl,
+        matchingOptions: item.matchingOptions,
+        difficulty: item.difficulty,
+        updatedBy: userId,
+      });
+      if (!track) throw new Error('the listening track row was not created');
+
+      // Sequential, not transactional -- same neon-http limitation as passages.
+      for (const q of item.questions) {
+        await createQuestion(
+          { trackId: track.id },
+          {
+            idx: q.idx,
+            kind: q.kind,
+            prompt: q.prompt,
+            options: q.options,
+            evidence: q.evidence,
+            explanation: q.explanation,
+            answer: q.answer,
+          },
+        );
+      }
+      return { id: track.id, slug: track.slug, label: track.title };
     },
   }),
 

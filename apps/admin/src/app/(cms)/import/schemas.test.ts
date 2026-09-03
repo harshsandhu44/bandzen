@@ -6,6 +6,7 @@ import {
   MAX_ITEMS,
   findSlugClashes,
   lessonSchema,
+  listeningTrackSchema,
   parseItems,
   passageSchema,
   resourceSchema,
@@ -52,6 +53,55 @@ test('the passage schema parses every generated passage on disk', () => {
     assert.equal(parsed.length, 1);
     assert.equal(parsed[0].questions.length, 13);
   }
+});
+
+test('the listening track schema parses every generated track on disk', () => {
+  const files = readdirSync(join(CONTENT, 'listening')).filter((f) =>
+    f.endsWith('.json'),
+  );
+  assert.ok(files.length > 0, 'expected generated tracks to check against');
+
+  for (const file of files) {
+    const parsed = items(
+      parseItems(
+        listeningTrackSchema,
+        readJson(join(CONTENT, 'listening', file)),
+      ),
+    );
+    assert.equal(parsed.length, 1);
+    assert.ok(parsed[0].audioUrl, `${file} was seeded without an audioUrl`);
+
+    // Every matching answer is drawn from the shared list.
+    const options = new Set(parsed[0].matchingOptions ?? []);
+    for (const q of parsed[0].questions) {
+      if (q.kind !== 'matching') continue;
+      assert.ok(
+        q.answer.every((a) => options.has(a)),
+        `${file} idx ${q.idx}: answer is not in matchingOptions`,
+      );
+    }
+  }
+});
+
+test('a listening row needs a transcript or an audioUrl, not neither', () => {
+  const base = { slug: 'a', title: 'T', topic: 'x', difficulty: 2 };
+
+  // Either one alone is enough, and questions may be omitted.
+  assert.equal(
+    items(parseItems(listeningTrackSchema, { ...base, transcript: 'hi' }))
+      .length,
+    1,
+  );
+  const audioOnly = items(
+    parseItems(listeningTrackSchema, {
+      ...base,
+      audioUrl: 'https://r2.example/a.mp3',
+    }),
+  );
+  assert.deepEqual(audioOnly[0].questions, []);
+
+  // Neither is a parse error.
+  assert.match(error(parseItems(listeningTrackSchema, base)), /transcript/);
 });
 
 test('the writing prompt schema parses content/prompts.json', () => {

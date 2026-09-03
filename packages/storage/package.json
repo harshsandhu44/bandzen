@@ -1,0 +1,23 @@
+{
+  "name": "@bandzen/storage",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    "./r2": "./src/r2.ts"
+  },
+  "scripts": {
+    "lint": "eslint",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@aws-sdk/client-s3": "^3.1125.0"
+  },
+  "devDependencies": {
+    "@bandzen/eslint-config": "workspace:*",
+    "@bandzen/tsconfig": "workspace:*",
+    "@types/node": "^20",
+    "eslint": "^9",
+    "typescript": "^5"
+  }
+}

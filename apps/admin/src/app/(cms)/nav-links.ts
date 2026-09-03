@@ -2,6 +2,7 @@ import {
   BookOpen,
   FileText,
   GraduationCap,
+  Headphones,
   LayoutDashboard,
   Library,
   Users,
@@ -33,6 +34,7 @@ export type NavLink = {
 export const NAV_LINKS: readonly NavLink[] = [
   { href: '/', label: 'Overview', Icon: LayoutDashboard },
   { href: '/passages', label: 'Passages', Icon: BookOpen },
+  { href: '/listening', label: 'Listening', Icon: Headphones },
   { href: '/writing-prompts', label: 'Writing prompts', Icon: FileText },
   { href: '/lessons', label: 'Lessons', Icon: GraduationCap },
   { href: '/resources', label: 'Resources', Icon: Library },

@@ -27,6 +27,9 @@ const QUESTION_KINDS = [
   'sentence_completion',
 ] as const;
 
+/** The full `question_kind` enum — the listening editor and import allow any. */
+const ALL_QUESTION_KINDS = [...QUESTION_KINDS, 'matching'] as const;
+
 const LESSON_STAGE_IDS = [
   'understand',
   'see',
@@ -83,6 +86,48 @@ export const passageSchema = z.object({
     }),
   ),
 });
+
+// ---------------------------------------------------------------------------
+// Listening tracks
+// ---------------------------------------------------------------------------
+
+/**
+ * Mirrors `apps/app/src/lib/ai/schemas.ts`'s `generatedListeningTrackSchema`
+ * — what `scripts/generate-listening-content.mts` produces — plus the
+ * `audioUrl` the synthesize step writes back into the same file.
+ *
+ * `transcript` and `audioUrl` are each optional, but at least one is required:
+ * the CMS generates the other after import (TTS, or Whisper), the same way the
+ * New-track form does. `questions` may be omitted for an audio-only row — they
+ * can't be written until the transcript exists.
+ */
+export const listeningTrackSchema = z
+  .object({
+    slug,
+    title: z.string(),
+    topic: z.string(),
+    difficulty: z.number().int().min(1).max(5),
+    transcript: z.string().optional(),
+    audioUrl: z.string().min(1).optional(),
+    matchingOptions: z.array(z.string()).nullish(),
+    questions: z
+      .array(
+        z.object({
+          idx: z.number().int(),
+          kind: z.enum(ALL_QUESTION_KINDS),
+          prompt: z.string(),
+          options: z.array(z.string()).nullable(),
+          answer: z.array(z.string()),
+          evidence: z.string(),
+          explanation: z.string(),
+        }),
+      )
+      .default([]),
+  })
+  .refine((t) => !!t.transcript || !!t.audioUrl, {
+    message: 'provide a transcript or an audioUrl',
+    path: ['transcript'],
+  });
 
 // ---------------------------------------------------------------------------
 // Writing prompts

@@ -1,0 +1,23 @@
+{
+  "name": "@bandzen/ai",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    "./speech": "./src/speech.ts"
+  },
+  "scripts": {
+    "lint": "eslint",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "openai": "^7.8.0"
+  },
+  "devDependencies": {
+    "@bandzen/eslint-config": "workspace:*",
+    "@bandzen/tsconfig": "workspace:*",
+    "@types/node": "^20",
+    "eslint": "^9",
+    "typescript": "^5"
+  }
+}

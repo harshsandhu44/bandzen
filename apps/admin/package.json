@@ -11,7 +11,9 @@
     "typecheck": "next typegen && tsc --noEmit"
   },
   "dependencies": {
+    "@bandzen/ai": "workspace:*",
     "@bandzen/db": "workspace:*",
+    "@bandzen/storage": "workspace:*",
     "@bandzen/ui": "workspace:*",
     "@clerk/nextjs": "^7.8.3",
     "lucide-react": "^1.37.0",

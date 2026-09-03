@@ -11,63 +11,17 @@
  * one track's transcript does not re-spend on every other track. `--force`
  * resynthesizes everything.
  *
- * A plain `fetch` against ElevenLabs' REST API rather than their SDK — a
- * couple of HTTP calls don't justify a new dependency. R2 gets `@aws-sdk/
- * client-s3` instead: R2 speaks the S3 API, and hand-rolling SigV4 signing
- * is worse than the dependency, which only ever runs in this Node script,
- * never in the app bundle.
+ * The TTS call goes through `@bandzen/ai` and the R2 upload through
+ * `@bandzen/storage`; both are shared with apps/admin's Listening CMS, which
+ * does the same two steps on demand.
  */
 import { readFileSync, readdirSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
-import { PutObjectCommand, S3Client } from '@aws-sdk/client-s3';
+import { synthesizeSpeech } from '@bandzen/ai/speech';
+import { uploadObject } from '@bandzen/storage/r2';
 import type { GeneratedListeningTrack as Track } from '../src/lib/ai/schemas.ts';
 
 const SEED_DIR = join(import.meta.dirname, '..', 'content', 'listening');
-// Rachel, one of ElevenLabs' premade voices — a reasonable single-voice
-// default for v1. Override per-run if a track needs a different accent.
-const VOICE_ID = process.env.ELEVENLABS_VOICE_ID ?? '21m00Tcm4TlvDq8ikWAM';
-
-function r2Client() {
-  const accountId = requireEnv('R2_ACCOUNT_ID');
-  return new S3Client({
-    region: 'auto',
-    endpoint: `https://${accountId}.r2.cloudflarestorage.com`,
-    credentials: {
-      accessKeyId: requireEnv('R2_ACCESS_KEY_ID'),
-      secretAccessKey: requireEnv('R2_SECRET_ACCESS_KEY'),
-    },
-  });
-}
-
-function requireEnv(name: string) {
-  const value = process.env[name];
-  if (!value)
-    throw new Error(`Missing ${name}. Try: node --env-file=.env.local ...`);
-  return value;
-}
-
-async function synthesize(transcript: string): Promise<Buffer> {
-  const key = requireEnv('ELEVENLABS_API_KEY');
-
-  const res = await fetch(
-    `https://api.elevenlabs.io/v1/text-to-speech/${VOICE_ID}`,
-    {
-      method: 'POST',
-      headers: {
-        'xi-api-key': key,
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        text: transcript,
-        model_id: 'eleven_multilingual_v2',
-      }),
-    },
-  );
-  if (!res.ok) {
-    throw new Error(`ElevenLabs ${res.status}: ${await res.text()}`);
-  }
-  return Buffer.from(await res.arrayBuffer());
-}
 
 async function run(force: boolean) {
   const files = readdirSync(SEED_DIR).filter((f) => f.endsWith('.json'));
@@ -77,10 +31,6 @@ async function run(force: boolean) {
     );
     return;
   }
-
-  const bucket = requireEnv('R2_BUCKET');
-  const publicUrl = requireEnv('R2_PUBLIC_URL').replace(/\/$/, '');
-  const s3 = r2Client();
 
   for (const file of files.sort()) {
     const path = join(SEED_DIR, file);
@@ -94,19 +44,13 @@ async function run(force: boolean) {
     }
 
     console.log(`  … synthesizing ${track.slug}`);
-    const audio = await synthesize(track.transcript);
+    const audio = await synthesizeSpeech(track.transcript);
 
-    const key = `listening/${track.slug}.mp3`;
-    await s3.send(
-      new PutObjectCommand({
-        Bucket: bucket,
-        Key: key,
-        Body: audio,
-        ContentType: 'audio/mpeg',
-      }),
-    );
-
-    track.audioUrl = `${publicUrl}/${key}`;
+    track.audioUrl = await uploadObject({
+      key: `listening/${track.slug}.mp3`,
+      body: audio,
+      contentType: 'audio/mpeg',
+    });
     writeFileSync(path, `${JSON.stringify(track, null, 2)}\n`);
     console.log(`  ✓ ${track.slug} — ${track.audioUrl}`);
   }
