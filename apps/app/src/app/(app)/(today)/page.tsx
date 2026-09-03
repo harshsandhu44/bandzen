@@ -128,7 +128,11 @@ export default async function DashboardPage() {
       <PerformanceInsight insight={insight} />
 
       <BandOverview
-        bands={{ reading: data.readingBand, writing: data.writingBand }}
+        bands={{
+          reading: data.readingBand,
+          writing: data.writingBand,
+          listening: data.listeningBand,
+        }}
         target={profile.targetBand}
       />
 

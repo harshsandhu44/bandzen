@@ -34,7 +34,7 @@ export default async function ReviewPage({
 
   // Accuracy across every attempt, so a mistake made here can be named as a
   // recurring one -- or not named at all, when the history is too thin.
-  const history = await accuracyByQuestionKind(userId);
+  const history = await accuracyByQuestionKind(userId, 'reading');
   const byKind = new Map(history.map((k) => [k.kind, k]));
 
   const label = (kind: string) =>

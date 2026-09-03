@@ -30,9 +30,20 @@ import {
  * finishing a test changes today rather than next week.
  */
 
-/** Reading and writing to one overall figure, on IELTS's half-band grid. */
-export const meanBand = (a: number, b: number) =>
-  Math.round(((a + b) / 2) * 2) / 2;
+/**
+ * Whichever modules have a measured band, to one overall figure, on IELTS's
+ * half-band grid. Nulls are dropped rather than treated as zero -- an
+ * unmeasured module says nothing about the candidate, so it must not pull
+ * the average down.
+ */
+export const meanBand = (...bands: (number | null | undefined)[]) => {
+  const measured = bands.filter((b): b is number => b != null);
+  if (!measured.length) return null;
+  return (
+    Math.round((measured.reduce((sum, b) => sum + b, 0) / measured.length) * 2) /
+    2
+  );
+};
 
 export async function loadPlanData(
   userId: string,
@@ -44,6 +55,7 @@ export async function loadPlanData(
   const [
     readingBand,
     writingBand,
+    listeningBand,
     report,
     kindAccuracy,
     doneToday,
@@ -54,8 +66,9 @@ export async function loadPlanData(
   ] = await Promise.all([
     latestBand(userId, 'reading'),
     latestBand(userId, 'writing'),
+    latestBand(userId, 'listening'),
     latestReport(userId),
-    accuracyByQuestionKind(userId),
+    accuracyByQuestionKind(userId, 'reading'),
     attemptsSubmittedOn(userId, start, end),
     listLessonProgress(userId),
     listPassages(),
@@ -93,10 +106,7 @@ export async function loadPlanData(
     profile.studyMinutes,
   );
 
-  const estimated =
-    readingBand != null && writingBand != null
-      ? meanBand(readingBand, writingBand)
-      : (readingBand ?? writingBand);
+  const estimated = meanBand(readingBand, writingBand, listeningBand);
 
   return {
     planInput,
@@ -105,10 +115,11 @@ export async function loadPlanData(
     estimated,
     readingBand,
     writingBand,
+    listeningBand,
     report,
     kindAccuracy,
     completedLessonIds,
     /** True once anything has actually been measured. */
-    measured: readingBand != null || writingBand != null,
+    measured: readingBand != null || writingBand != null || listeningBand != null,
   };
 }

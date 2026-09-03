@@ -396,7 +396,7 @@ export async function listCompletedAttempts(userId: string, limit = 20) {
 
 export async function latestBand(
   userId: string,
-  module: 'reading' | 'writing',
+  module: 'reading' | 'writing' | 'listening',
 ) {
   const [row] = await db
     .select({ band: attempts.band })
@@ -904,13 +904,20 @@ export async function attemptsSubmittedOn(
 }
 
 /**
- * Reading accuracy per question kind. Feeds the skill matrix, the dashboard
- * insight and review's pattern detection -- one query, because they are three
- * views of the same fact and should never disagree.
+ * Accuracy per question kind. Feeds the skill matrix, the dashboard insight
+ * and review's pattern detection -- one query, because they are three views
+ * of the same fact and should never disagree.
+ *
+ * `multiple_choice` and `sentence_completion` are answered by both Reading
+ * and Listening, so a kind alone no longer identifies one skill -- pass
+ * `module` to scope to one (every existing caller wants exactly one skill's
+ * view); omit it only for a caller that is itself module-aware and will use
+ * the `module` each row now carries.
  */
-export async function accuracyByQuestionKind(userId: string) {
+export async function accuracyByQuestionKind(userId: string, module?: Skill) {
   const rows = await db
     .select({
+      module: attempts.module,
       kind: questions.kind,
       value: attemptAnswers.value,
       answer: questionAnswers.answer,
@@ -919,20 +926,33 @@ export async function accuracyByQuestionKind(userId: string) {
     .innerJoin(attempts, eq(attempts.id, attemptAnswers.attemptId))
     .innerJoin(questions, eq(questions.id, attemptAnswers.questionId))
     .innerJoin(questionAnswers, eq(questionAnswers.questionId, questions.id))
-    .where(and(eq(attempts.userId, userId), eq(attempts.status, 'complete')));
+    .where(
+      and(
+        eq(attempts.userId, userId),
+        eq(attempts.status, 'complete'),
+        module ? eq(attempts.module, module) : undefined,
+      ),
+    );
 
-  const byKind = new Map<string, { correct: number; total: number }>();
+  const byKind = new Map<
+    string,
+    { module: Skill; kind: Question['kind']; correct: number; total: number }
+  >();
   for (const row of rows) {
-    const tally = byKind.get(row.kind) ?? { correct: 0, total: 0 };
+    const key = `${row.module}:${row.kind}`;
+    const tally = byKind.get(key) ?? {
+      module: row.module,
+      kind: row.kind,
+      correct: 0,
+      total: 0,
+    };
     tally.total += 1;
     if (isAnswerCorrect(row.answer, row.value)) tally.correct += 1;
-    byKind.set(row.kind, tally);
+    byKind.set(key, tally);
   }
 
-  return [...byKind.entries()].map(([kind, t]) => ({
-    kind: kind as Question['kind'],
-    correct: t.correct,
-    total: t.total,
+  return [...byKind.values()].map((t) => ({
+    ...t,
     accuracy: t.total ? t.correct / t.total : 0,
   }));
 }

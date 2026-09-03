@@ -100,13 +100,16 @@ export default async function PracticePage() {
             <ul className="mt-4 divide-y divide-border border-y border-border">
               {weak.map((k) => (
                 <li
-                  key={k.kind}
+                  key={`${k.module}-${k.kind}`}
                   className="flex items-center justify-between gap-4 py-2.5"
                 >
                   <span className="text-sm">
                     {QUESTION_KIND_LABEL[
                       k.kind as keyof typeof QUESTION_KIND_LABEL
                     ] ?? k.kind}
+                    <span className="ml-2 font-mono text-[0.625rem] tracking-[0.16em] text-muted-foreground uppercase">
+                      {MODULE_LABEL[k.module]}
+                    </span>
                   </span>
                   <span className="flex items-center gap-4">
                     <span className="font-metric text-metric-sm text-muted-foreground">
@@ -121,7 +124,11 @@ export default async function PracticePage() {
             <Button
               className="mt-5"
               nativeButton={false}
-              render={<Link href={`/reading?kind=${weak[0]!.kind}`} />}
+              render={
+                <Link
+                  href={`${MODULE_HREF[weak[0]!.module]}?kind=${weak[0]!.kind}`}
+                />
+              }
             >
               Practise{' '}
               {QUESTION_KIND_LABEL[
