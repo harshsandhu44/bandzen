@@ -16,7 +16,7 @@ export default async function NewTrackPage() {
       <PageHeader
         eyebrow="Listening"
         title="New track"
-        description="Created as a draft. The MP3 is uploaded now; add its questions and answer keys on the next screen, then publish."
+        description="Created as a draft. Give a transcript, an MP3, or both — whichever is missing is generated (audio from the transcript, or a transcript from the audio). Add questions on the next screen, then publish."
       />
       <form
         action={createTrackAction}
@@ -48,24 +48,20 @@ export default async function NewTrackPage() {
         </div>
         <div className="space-y-2">
           <Label htmlFor="transcript">
-            Transcript (the spoken script — this is the answer key, never sent
-            to a student mid-attempt)
+            Transcript (the spoken script — the answer key, never sent to a
+            student mid-attempt). Leave blank to transcribe it from the audio.
           </Label>
-          <Textarea
-            id="transcript"
-            name="transcript"
-            required
-            className="min-h-64"
-          />
+          <Textarea id="transcript" name="transcript" className="min-h-64" />
         </div>
         <div className="space-y-2">
-          <Label htmlFor="audio">Audio (MP3)</Label>
+          <Label htmlFor="audio">
+            Audio (MP3). Leave blank to synthesize it from the transcript.
+          </Label>
           <input
             id="audio"
             name="audio"
             type="file"
             accept="audio/mpeg,.mp3"
-            required
             className="text-xs"
           />
         </div>

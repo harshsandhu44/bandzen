@@ -557,8 +557,9 @@ export async function getTrackAdmin(id: string) {
 export async function createTrack(input: {
   slug: string;
   title: string;
-  transcript: string;
-  audioUrl: string;
+  /** At least one of transcript / audioUrl. The CMS generates whichever is absent. */
+  transcript?: string | null;
+  audioUrl?: string | null;
   topic?: string | null;
   matchingOptions?: string[] | null;
   difficulty?: number;
@@ -576,11 +577,13 @@ export async function updateTrack(
   id: string,
   input: Partial<{
     title: string;
-    transcript: string;
-    audioUrl: string;
+    transcript: string | null;
+    audioUrl: string | null;
     topic: string | null;
     matchingOptions: string[] | null;
     difficulty: number;
+    generationError: string | null;
+    generationStartedAt: Date | null;
   }>,
   updatedBy: string,
 ) {
@@ -590,6 +593,24 @@ export async function updateTrack(
       .set({ ...input, updatedBy, updatedAt: new Date() })
       .where(eq(listeningTracks.id, id))
       .returning(),
+  );
+}
+
+/** The fields the CMS generate route reads to decide what to do. */
+export async function getTrackGenerationState(id: string) {
+  return firstRow(
+    await db
+      .select({
+        id: listeningTracks.id,
+        slug: listeningTracks.slug,
+        transcript: listeningTracks.transcript,
+        audioUrl: listeningTracks.audioUrl,
+        generationError: listeningTracks.generationError,
+        generationStartedAt: listeningTracks.generationStartedAt,
+      })
+      .from(listeningTracks)
+      .where(eq(listeningTracks.id, id))
+      .limit(1),
   );
 }
 
@@ -615,6 +636,8 @@ export async function checkTrackCompleteness(id: string): Promise<string[]> {
     .where(eq(questions.trackId, id));
 
   const issues: string[] = [];
+  if (!track.transcript) issues.push('a transcript');
+  if (!track.audioUrl) issues.push('an audio file');
   if (trackQuestions.length === 0) issues.push('at least one question');
 
   for (const q of trackQuestions) {

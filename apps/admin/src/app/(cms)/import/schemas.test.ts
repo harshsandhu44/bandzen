@@ -83,6 +83,27 @@ test('the listening track schema parses every generated track on disk', () => {
   }
 });
 
+test('a listening row needs a transcript or an audioUrl, not neither', () => {
+  const base = { slug: 'a', title: 'T', topic: 'x', difficulty: 2 };
+
+  // Either one alone is enough, and questions may be omitted.
+  assert.equal(
+    items(parseItems(listeningTrackSchema, { ...base, transcript: 'hi' }))
+      .length,
+    1,
+  );
+  const audioOnly = items(
+    parseItems(listeningTrackSchema, {
+      ...base,
+      audioUrl: 'https://r2.example/a.mp3',
+    }),
+  );
+  assert.deepEqual(audioOnly[0].questions, []);
+
+  // Neither is a parse error.
+  assert.match(error(parseItems(listeningTrackSchema, base)), /transcript/);
+});
+
 test('the writing prompt schema parses content/prompts.json', () => {
   const parsed = items(
     parseItems(writingPromptSchema, readJson(join(CONTENT, 'prompts.json'))),

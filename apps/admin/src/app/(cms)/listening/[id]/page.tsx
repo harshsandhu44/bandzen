@@ -18,6 +18,7 @@ import { PublishControls } from '@/components/publish-controls';
 import {
   updateTrackAction,
   replaceAudioAction,
+  regenerateAudioAction,
   publishTrackAction,
   unpublishTrackAction,
   deleteTrackAction,
@@ -25,6 +26,7 @@ import {
   updateQuestionAction,
   deleteQuestionAction,
 } from '../actions';
+import { GenerationStatus } from './generation-status';
 
 // Every kind in the enum. Real listening leans on multiple_choice,
 // sentence_completion and matching, but the reading kinds are left available
@@ -99,13 +101,24 @@ export default async function EditTrackPage({
             </div>
             <div className="space-y-2">
               <Label htmlFor="transcript">Transcript</Label>
+              {!track.transcript && track.audioUrl ? (
+                <GenerationStatus
+                  trackId={track.id}
+                  missing="transcript"
+                  error={track.generationError}
+                />
+              ) : null}
               <Textarea
                 id="transcript"
                 name="transcript"
-                defaultValue={track.transcript}
-                required
+                defaultValue={track.transcript ?? ''}
                 className="min-h-64"
               />
+              <p className="text-xs text-muted-foreground">
+                This is the answer key — grading and every question&apos;s
+                evidence are matched against it verbatim. If it was transcribed
+                from the audio, read it through before publishing.
+              </p>
             </div>
             <div className="space-y-2">
               <Label htmlFor="matchingOptions">
@@ -129,17 +142,28 @@ export default async function EditTrackPage({
           <CardTitle>Audio</CardTitle>
         </CardHeader>
         <CardContent className="space-y-3">
-          <p className="text-sm">
-            <a
-              href={track.audioUrl}
-              target="_blank"
-              rel="noreferrer"
-              className="font-mono text-xs hover:underline"
-            >
-              {track.audioUrl}
-            </a>
-          </p>
-          <audio controls src={track.audioUrl} className="w-full" />
+          {track.audioUrl ? (
+            <>
+              <p className="text-sm">
+                <a
+                  href={track.audioUrl}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="font-mono text-xs hover:underline"
+                >
+                  {track.audioUrl}
+                </a>
+              </p>
+              <audio controls src={track.audioUrl} className="w-full" />
+            </>
+          ) : (
+            <GenerationStatus
+              trackId={track.id}
+              missing="audio"
+              error={track.generationError}
+            />
+          )}
+
           <form
             action={replaceAudioAction}
             encType="multipart/form-data"
@@ -147,7 +171,9 @@ export default async function EditTrackPage({
           >
             <input type="hidden" name="id" value={track.id} />
             <div className="space-y-1">
-              <Label htmlFor="audio">Replace audio (MP3)</Label>
+              <Label htmlFor="audio">
+                {track.audioUrl ? 'Replace audio (MP3)' : 'Upload audio (MP3)'}
+              </Label>
               <input
                 id="audio"
                 name="audio"
@@ -161,6 +187,15 @@ export default async function EditTrackPage({
               Upload
             </Button>
           </form>
+
+          {track.audioUrl && track.transcript ? (
+            <form action={regenerateAudioAction}>
+              <input type="hidden" name="id" value={track.id} />
+              <Button type="submit" size="sm" variant="ghost">
+                Regenerate audio from transcript
+              </Button>
+            </form>
+          ) : null}
         </CardContent>
       </Card>
 

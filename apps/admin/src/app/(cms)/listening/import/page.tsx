@@ -20,10 +20,11 @@ export default async function ImportListeningPage() {
             <code className="font-mono text-xs">
               apps/app/content/listening/*.json
             </code>
-            ), or an array of them. Each file&apos;s{' '}
-            <code className="font-mono text-xs">audioUrl</code> must already
-            point at a synthesized MP3. They arrive as drafts &mdash; review
-            each one and publish from its own page.
+            ), or an array of them. Each row needs a{' '}
+            <code className="font-mono text-xs">transcript</code> or an{' '}
+            <code className="font-mono text-xs">audioUrl</code> (or both); the
+            other is generated when you open the draft. They arrive as drafts
+            &mdash; review each one and publish from its own page.
           </>
         }
       />

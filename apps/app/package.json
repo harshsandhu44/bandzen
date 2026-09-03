@@ -26,6 +26,7 @@
     "db:backfill-awards": "node --env-file=.env.local scripts/backfill-awards.mts"
   },
   "dependencies": {
+    "@bandzen/ai": "workspace:*",
     "@bandzen/db": "workspace:*",
     "@bandzen/storage": "workspace:*",
     "@bandzen/ui": "workspace:*",

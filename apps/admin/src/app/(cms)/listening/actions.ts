@@ -37,14 +37,14 @@ function splitCommas(value: FormDataEntryValue | null): string[] {
 }
 
 /**
- * Uploads the posted MP3 to R2 and returns its public URL. A fresh UUID key
- * every time, so replacing a track's audio never has to worry about a stale
- * CDN copy under the old key — the row just points somewhere new.
+ * Uploads the posted MP3 to R2 and returns its public URL, or null when no
+ * file was attached. A fresh UUID key every time, so replacing a track's audio
+ * never has to worry about a stale CDN copy under the old key.
  */
-async function uploadAudio(file: FormDataEntryValue | null): Promise<string> {
-  if (!(file instanceof File) || file.size === 0) {
-    throw new Error('Choose an MP3 file for the audio.');
-  }
+async function uploadAudio(
+  file: FormDataEntryValue | null,
+): Promise<string | null> {
+  if (!(file instanceof File) || file.size === 0) return null;
   const body = Buffer.from(await file.arrayBuffer());
   return uploadObject({
     key: `listening/${crypto.randomUUID()}.mp3`,
@@ -55,12 +55,16 @@ async function uploadAudio(file: FormDataEntryValue | null): Promise<string> {
 
 export async function createTrackAction(formData: FormData) {
   const { userId } = await requireAdminOrTeacher();
+  const transcript = String(formData.get('transcript') ?? '').trim() || null;
   const audioUrl = await uploadAudio(formData.get('audio'));
+  if (!transcript && !audioUrl) {
+    throw new Error('Provide a transcript, an MP3, or both.');
+  }
   const track = await createTrack({
     slug: String(formData.get('slug') ?? '').trim(),
     title: String(formData.get('title') ?? '').trim(),
     topic: String(formData.get('topic') ?? '').trim() || null,
-    transcript: String(formData.get('transcript') ?? '').trim(),
+    transcript,
     difficulty: Number(formData.get('difficulty') ?? 3),
     audioUrl,
     updatedBy: userId,
@@ -77,7 +81,7 @@ export async function updateTrackAction(formData: FormData) {
     {
       title: String(formData.get('title') ?? '').trim(),
       topic: String(formData.get('topic') ?? '').trim() || null,
-      transcript: String(formData.get('transcript') ?? '').trim(),
+      transcript: String(formData.get('transcript') ?? '').trim() || null,
       difficulty: Number(formData.get('difficulty') ?? 3),
       matchingOptions: splitLines(formData.get('matchingOptions')),
     },
@@ -90,7 +94,24 @@ export async function replaceAudioAction(formData: FormData) {
   const { userId } = await requireAdminOrTeacher();
   const id = String(formData.get('id') ?? '');
   const audioUrl = await uploadAudio(formData.get('audio'));
+  if (!audioUrl) throw new Error('Choose an MP3 file to upload.');
   await updateTrack(id, { audioUrl }, userId);
+  revalidatePath(`/listening/${id}`);
+}
+
+/**
+ * Drop the current audio and let the edit page's generation poll re-synthesize
+ * it from the (presumably just-edited) transcript. One generation code path,
+ * in the API route — this only clears the fields it keys off.
+ */
+export async function regenerateAudioAction(formData: FormData) {
+  const { userId } = await requireAdminOrTeacher();
+  const id = String(formData.get('id') ?? '');
+  await updateTrack(
+    id,
+    { audioUrl: null, generationError: null, generationStartedAt: null },
+    userId,
+  );
   revalidatePath(`/listening/${id}`);
 }
 

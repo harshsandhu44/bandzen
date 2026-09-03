@@ -35,6 +35,9 @@ importers:
 
   apps/admin:
     dependencies:
+      '@bandzen/ai':
+        specifier: workspace:*
+        version: link:../../packages/ai
       '@bandzen/db':
         specifier: workspace:*
         version: link:../../packages/db
@@ -102,6 +105,9 @@ importers:
 
   apps/app:
     dependencies:
+      '@bandzen/ai':
+        specifier: workspace:*
+        version: link:../../packages/ai
       '@bandzen/db':
         specifier: workspace:*
         version: link:../../packages/db
@@ -294,6 +300,28 @@ importers:
       tailwindcss:
         specifier: ^4
         version: 4.3.3
+      typescript:
+        specifier: ^5
+        version: 5.9.3
+
+  packages/ai:
+    dependencies:
+      openai:
+        specifier: ^7.8.0
+        version: 7.8.0(@aws-sdk/credential-provider-node@3.972.82)(@smithy/signature-v4@5.7.3)(undici@7.29.0)(zod@4.5.4)
+    devDependencies:
+      '@bandzen/eslint-config':
+        specifier: workspace:*
+        version: link:../eslint-config
+      '@bandzen/tsconfig':
+        specifier: workspace:*
+        version: link:../tsconfig
+      '@types/node':
+        specifier: ^20
+        version: 20.19.43
+      eslint:
+        specifier: ^9
+        version: 9.39.5(jiti@2.7.0)(supports-color@7.2.0)
       typescript:
         specifier: ^5
         version: 5.9.3

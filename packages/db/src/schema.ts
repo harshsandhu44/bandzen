@@ -304,16 +304,27 @@ export const writingPrompts = pgTable('writing_prompts', {
  * `transcript` is the answer key made of prose. It must never be sent to the
  * client during an in-progress attempt; only the offline content scripts and
  * the post-submission review page read it.
+ *
+ * `transcript` and `audio_url` are nullable: the CMS accepts a track with just
+ * one of the two and generates the other (TTS from the transcript, or Whisper
+ * from the audio). Both are required before a track can be published — see
+ * `checkTrackCompleteness`.
  */
 export const listeningTracks = pgTable('listening_tracks', {
   id: uuid('id').primaryKey().defaultRandom(),
   slug: text('slug').notNull().unique(),
   title: text('title').notNull(),
   topic: text('topic'),
-  transcript: text('transcript').notNull(),
-  audioUrl: text('audio_url').notNull(),
+  transcript: text('transcript'),
+  audioUrl: text('audio_url'),
   /** Shared option list for this track's `matching` questions — same role as passages.headings. */
   matchingOptions: jsonb('matching_options').$type<string[] | null>(),
+  /** Last CMS generation failure (TTS or transcription). Null once it succeeds. */
+  generationError: text('generation_error'),
+  /** Set while a CMS generation is in flight, so a page refresh can't start a second. Cleared on settle. */
+  generationStartedAt: timestamp('generation_started_at', {
+    withTimezone: true,
+  }),
   difficulty: integer('difficulty').notNull().default(3),
   /** New rows default to 'published' — draft is set explicitly by the CMS on create. */
   status: contentStatus('status').notNull().default('published'),

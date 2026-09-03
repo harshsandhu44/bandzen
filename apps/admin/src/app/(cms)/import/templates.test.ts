@@ -151,6 +151,11 @@ for (const option of LISTENING_TEMPLATES) {
       parseItems(listeningTrackSchema, exampleFrom(option.template)),
     );
 
+    // A template example always ships a full track — transcript, audio, the
+    // lot — even though import allows a row with only one of the two.
+    assert.ok(track.transcript, 'the example needs a transcript');
+    assert.ok(track.audioUrl, 'the example needs an audioUrl');
+
     // Evidence is the rule the template leans on hardest.
     for (const q of track.questions) {
       assert.ok(
