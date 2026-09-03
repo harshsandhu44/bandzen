@@ -56,6 +56,7 @@ export async function loadPlanData(
     readingBand,
     writingBand,
     listeningBand,
+    speakingBand,
     report,
     kindAccuracy,
     doneToday,
@@ -67,6 +68,7 @@ export async function loadPlanData(
     latestBand(userId, 'reading'),
     latestBand(userId, 'writing'),
     latestBand(userId, 'listening'),
+    latestBand(userId, 'speaking'),
     latestReport(userId),
     accuracyByQuestionKind(userId, 'reading'),
     attemptsSubmittedOn(userId, start, end),
@@ -106,7 +108,12 @@ export async function loadPlanData(
     profile.studyMinutes,
   );
 
-  const estimated = meanBand(readingBand, writingBand, listeningBand);
+  const estimated = meanBand(
+    readingBand,
+    writingBand,
+    listeningBand,
+    speakingBand,
+  );
 
   return {
     planInput,
@@ -116,10 +123,15 @@ export async function loadPlanData(
     readingBand,
     writingBand,
     listeningBand,
+    speakingBand,
     report,
     kindAccuracy,
     completedLessonIds,
     /** True once anything has actually been measured. */
-    measured: readingBand != null || writingBand != null || listeningBand != null,
+    measured:
+      readingBand != null ||
+      writingBand != null ||
+      listeningBand != null ||
+      speakingBand != null,
   };
 }

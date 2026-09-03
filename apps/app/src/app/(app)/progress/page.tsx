@@ -97,7 +97,8 @@ export default async function ProgressPage() {
   const reading = latest('reading');
   const writing = latest('writing');
   const listening = latest('listening');
-  const overall = meanBand(reading, writing, listening);
+  const speaking = latest('speaking');
+  const overall = meanBand(reading, writing, listening, speaking);
 
   if (!points.length) {
     return (

@@ -16,16 +16,22 @@ import { GradingWatch } from '@/components/app/grading-watch';
 
 export const metadata = { title: 'Writing report' };
 
+// The Annotation kind union is shared with Speaking; the essay grader only
+// ever emits these three.
 const ANNOTATION_STYLE: Record<Annotation['kind'], string> = {
   good: 'border-primary',
   grammar: 'border-destructive',
   development: 'border-chrome',
+  vocabulary: 'border-chrome',
+  fluency: 'border-chrome',
 };
 
 const ANNOTATION_LABEL: Record<Annotation['kind'], string> = {
   good: 'Works well',
   grammar: 'Error',
   development: 'Needs support',
+  vocabulary: 'Word choice',
+  fluency: 'Fluency',
 };
 
 export default async function ReportPage({
