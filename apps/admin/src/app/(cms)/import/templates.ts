@@ -4,6 +4,7 @@ import type {
   listeningTrackSchema,
   passageSchema,
   resourceSchema,
+  speakingTestSchema,
   writingPromptSchema,
 } from './schemas';
 
@@ -595,6 +596,116 @@ still plausible. The example is shortened; a real track has ten questions.`,
         },
       ],
     },
+  },
+});
+
+// ---------------------------------------------------------------------------
+// Speaking tests
+// ---------------------------------------------------------------------------
+
+type SpeakingTest = z.infer<typeof speakingTestSchema>;
+
+const SPEAKING_BASE = `Write an IELTS Speaking test as a JSON array matching the example below
+exactly. Return JSON only.
+
+- The three parts are flattened into one ordered "prompts" array. idx starts
+  at 1 with no gaps. part is 1, 2 or 3.
+- Part 1: 3-4 short personal questions on ONE familiar topic, answerable in a
+  sentence or two.
+- Part 2: exactly one prompt, part 2, whose text is the "Describe ..." cue
+  card line. cueCardPoints is the 3-4 "You should say:" bullets. prepSeconds
+  is 60.
+- Part 3: 4-6 abstract discussion questions that open the Part 2 topic out —
+  opinion, comparison, cause, prediction. No yes/no questions. prepSeconds 0.
+- Every prompt is what an examiner says aloud — no stage directions.
+- cueCardPoints is null on Part 1 and Part 3 prompts. Omit audioUrl; the CMS
+  synthesizes the examiner voice when you open the draft.
+- Never reproduce copyrighted exam questions.`;
+
+const SPEAKING_EXAMPLE: SpeakingTest = {
+  slug: 'a-place-you-return-to',
+  title: 'Speaking — a place you return to',
+  topic: 'Somewhere the candidate goes back to often',
+  difficulty: 3,
+  prompts: [
+    {
+      idx: 1,
+      part: 1,
+      text: 'Where is your home town, and what is it known for?',
+      cueCardPoints: null,
+      prepSeconds: 0,
+    },
+    {
+      idx: 2,
+      part: 1,
+      text: 'Do you still live there now? Why or why not?',
+      cueCardPoints: null,
+      prepSeconds: 0,
+    },
+    {
+      idx: 3,
+      part: 1,
+      text: 'Is it a good place for young people to grow up?',
+      cueCardPoints: null,
+      prepSeconds: 0,
+    },
+    {
+      idx: 4,
+      part: 2,
+      text: 'Describe a place you often go back to. You should say:',
+      cueCardPoints: [
+        'where it is and how you first came to know it',
+        'how often you go there and who with',
+        'what you usually do while you are there',
+        'and explain why you keep going back.',
+      ],
+      prepSeconds: 60,
+    },
+    {
+      idx: 5,
+      part: 3,
+      text: 'Why do people form strong attachments to particular places?',
+      cueCardPoints: null,
+      prepSeconds: 0,
+    },
+    {
+      idx: 6,
+      part: 3,
+      text: 'Do you think a place can lose the meaning it once had for someone?',
+      cueCardPoints: null,
+      prepSeconds: 0,
+    },
+    {
+      idx: 7,
+      part: 3,
+      text: 'How has the way people choose where to live changed in recent decades?',
+      cueCardPoints: null,
+      prepSeconds: 0,
+    },
+    {
+      idx: 8,
+      part: 3,
+      text: 'Is it better to spend your life in one place or to move around?',
+      cueCardPoints: null,
+      prepSeconds: 0,
+    },
+  ],
+};
+
+export const SPEAKING_TEMPLATES = build<SpeakingTest>(SPEAKING_BASE, {
+  general: {
+    label: 'General',
+    focus:
+      'A full test — 3-4 Part 1 questions, one Part 2 cue card, 4-6 Part 3\nquestions. The example below is complete.',
+    example: SPEAKING_EXAMPLE,
+  },
+  'part-2-topic': {
+    label: 'Part 2 topic',
+    focus: `Build the whole test outward from a single Part 2 topic: pick the
+cue card first, then Part 1 questions on the everyday side of that topic and
+Part 3 questions on its abstract side. The example does this with "a place you
+return to".`,
+    example: SPEAKING_EXAMPLE,
   },
 });
 
@@ -1351,6 +1462,7 @@ questions, Part 2 the long turn from a cue card, Part 3 the abstract discussion.
 export const TEMPLATES = {
   passages: PASSAGE_TEMPLATES,
   listening: LISTENING_TEMPLATES,
+  speaking: SPEAKING_TEMPLATES,
   'writing-prompts': WRITING_PROMPT_TEMPLATES,
   lessons: LESSON_TEMPLATES,
   resources: RESOURCE_TEMPLATES,

@@ -18,9 +18,18 @@ export default async function SpeakingPage() {
         title="Speaking"
         description="Full Parts 1–3 interviews. Each prompt gets a synthesized examiner voice; students record their answers and are graded from the audio. Students only ever see published tests."
         action={
-          <Button nativeButton={false} render={<Link href="/speaking/new" />}>
-            New test
-          </Button>
+          <div className="flex items-center gap-2">
+            <Button
+              nativeButton={false}
+              render={<Link href="/speaking/import" />}
+              variant="outline"
+            >
+              Import JSON
+            </Button>
+            <Button nativeButton={false} render={<Link href="/speaking/new" />}>
+              New test
+            </Button>
+          </div>
         }
       />
 

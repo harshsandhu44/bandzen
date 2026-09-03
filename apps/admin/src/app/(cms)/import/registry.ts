@@ -1,11 +1,15 @@
 import {
   createPassage,
   createQuestion,
+  createSpeakingPrompt,
+  createSpeakingTest,
+  updateSpeakingPrompt,
   createTrack,
   createWritingPrompt,
   createLesson,
   createResource,
   listPassagesAdmin,
+  listSpeakingTestsAdmin,
   listTracksAdmin,
   listWritingPromptsAdmin,
   listLessonsAdmin,
@@ -16,6 +20,7 @@ import {
   parseItems,
   passageSchema,
   listeningTrackSchema,
+  speakingTestSchema,
   writingPromptSchema,
   lessonSchema,
   resourceSchema,
@@ -155,6 +160,40 @@ export const REGISTRY = {
         );
       }
       return { id: track.id, slug: track.slug, label: track.title };
+    },
+  }),
+
+  speaking: entry({
+    noun: 'speaking test',
+    templates: TEMPLATES.speaking,
+    schema: speakingTestSchema,
+    listSlugs: async () => (await listSpeakingTestsAdmin()).map((t) => t.slug),
+    insert: async (item, userId) => {
+      const test = await createSpeakingTest({
+        slug: item.slug,
+        title: item.title,
+        topic: item.topic,
+        difficulty: item.difficulty,
+        updatedBy: userId,
+      });
+      if (!test) throw new Error('the speaking test row was not created');
+
+      // Sequential, not transactional -- same neon-http limitation as passages.
+      for (const p of item.prompts) {
+        const prompt = await createSpeakingPrompt(test.id, {
+          idx: p.idx,
+          part: p.part,
+          text: p.text,
+          cueCardPoints: p.cueCardPoints ?? null,
+          prepSeconds: p.prepSeconds,
+        });
+        // A file straight from the synthesize step already carries the
+        // examiner audio; keep it rather than making the CMS re-spend on TTS.
+        if (prompt && p.audioUrl) {
+          await updateSpeakingPrompt(prompt.id, { audioUrl: p.audioUrl });
+        }
+      }
+      return { id: test.id, slug: test.slug, label: test.title };
     },
   }),
 

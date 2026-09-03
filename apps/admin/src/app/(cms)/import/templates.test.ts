@@ -3,6 +3,7 @@ import { test } from 'node:test';
 import {
   lessonSchema,
   listeningTrackSchema,
+  speakingTestSchema,
   parseItems,
   passageSchema,
   resourceSchema,
@@ -12,6 +13,7 @@ import {
 import {
   LESSON_TEMPLATES,
   LISTENING_TEMPLATES,
+  SPEAKING_TEMPLATES,
   PASSAGE_TEMPLATES,
   RESOURCE_TEMPLATES,
   TEMPLATES,
@@ -190,6 +192,35 @@ for (const option of LISTENING_TEMPLATES) {
     if (option.key === 'matching') {
       assert.equal(track.questions[0].kind, 'matching');
     }
+  });
+}
+
+for (const option of SPEAKING_TEMPLATES) {
+  test(`speaking/${option.key}: the example is a valid test`, () => {
+    const [spk] = items(
+      parseItems(speakingTestSchema, exampleFrom(option.template)),
+    );
+
+    for (const part of [1, 2, 3]) {
+      assert.ok(
+        spk.prompts.some((p) => p.part === part),
+        `the example needs a Part ${part} prompt`,
+      );
+    }
+    const p2 = spk.prompts.filter((p) => p.part === 2);
+    assert.equal(p2.length, 1, 'exactly one Part 2 prompt');
+    assert.ok(
+      p2[0].cueCardPoints && p2[0].cueCardPoints.length >= 3,
+      'the Part 2 cue card needs at least three points',
+    );
+    assert.equal(p2[0].prepSeconds, 60, 'Part 2 has 60s of prep');
+
+    const idxs = spk.prompts.map((p) => p.idx);
+    assert.deepEqual(
+      idxs,
+      [...idxs].sort((a, b) => a - b),
+      'prompts are in idx order',
+    );
   });
 }
 
