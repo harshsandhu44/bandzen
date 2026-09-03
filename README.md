@@ -76,37 +76,34 @@ Every app owns its version in its own `package.json`, and bumping it is how a
 change reaches production. Each app's `vercel.json` points Vercel's ignored
 build step at [`scripts/deploy-if-bumped.sh`](scripts/deploy-if-bumped.sh),
 which builds only when that app's version changed in the deployed commit. A
-docs edit, a refactor or a rename lands on `main` and ships to nobody until
-someone decides it should ship.
+docs edit, a refactor or a rename lands on `main` and ships to nobody until a
+release decides it should ship.
 
-```bash
-pnpm --filter app version minor --no-git-tag-version
-```
+The bump itself is automatic. [`multi-semantic-release`](https://github.com/dhoulb/multi-semantic-release),
+configured in [`.releaserc.json`](.releaserc.json) and run by
+[a workflow](.github/workflows/release.yml) on every push to `main`, walks
+each app's commits since its own last release tag, decides whether one is
+due from their conventional-commit prefixes (`feat` → minor, `fix` → patch,
+`BREAKING CHANGE` → major — nothing else releases), and if so bumps that
+app's `package.json`, writes its `CHANGELOG.md`, tags it `<name>@<version>`,
+and pushes. That push is what triggers the deploy gate above: nothing bumps
+without a real `feat`/`fix` commit behind it, and nothing ships without a
+bump. There is no separate "bump to ship" step to remember or forget.
 
-`--no-git-tag-version` because a pull request lands squashed — a tag made on
-the branch would name a commit GitHub throws away. Tags are made on `main`
-instead, and they are named per app, so `v0.2.0` never has to say of what.
-Bump in the same commit as the change rather than after it: the gate compares
-one commit against its parent, so the bump and the code it ships have to
-arrive together.
-
-How much to bump is the prefix you are already writing in the commit message.
-`feat` is a minor, `fix` is a patch, anything you would call breaking is a
-major. `1.0.0` is a decision about the product, not about the code.
+Because it works from commit prefixes rather than a manual `pnpm version`,
+writing the type honestly is what decides what happens next — `fix(app): …`
+is a real patch release the moment it lands on `main`.
 
 Previews are never gated. A pull request builds on every push, so the preview
-URL stays current across review commits — none of which bump anything.
+URL stays current across review commits — the release workflow only runs on
+`main`.
 
-**The packages are deliberately unversioned**, and stay at `0.0.0`. A change
-to `packages/ui` or `packages/db` therefore deploys nothing on its own: bump
-each app that should carry it, in the same commit. Fixing a shared query and
-forgetting to bump `apps/app` leaves the fix live nowhere, which is the one
-way this rule bites.
-
-Forgetting a bump is always a missing deploy rather than a wrong one. Redeploy
-from the Vercel dashboard, or push the bump you meant to. The same is true of
-the gate's one blind spot: it looks at the deployed commit against its parent,
-so a bump buried inside a push of several commits is invisible.
+**The packages are deliberately unversioned**, and stay at `0.0.0`.
+`--ignore-packages=packages/**` in the `release` script keeps them out of the
+release set entirely, so a change to `packages/ui` or `packages/db` deploys
+nothing on its own — it has to ship inside a commit that also touches an
+app's own path, which is what its commit's `feat`/`fix` prefix and changed
+files need to reflect.
 
 Each app shows its version through `@bandzen/ui`'s `Version` — on Settings in
 the product, at the foot of the CMS sidebar, in the marketing footer, and
@@ -115,27 +112,18 @@ component and passes the string down; importing that JSON inside a
 `'use client'` subtree would inline the whole file, dependency list included,
 into the browser bundle.
 
-That number is what is live; the tag is where it came from. Every push to
-`main` runs [`scripts/tag-deployed.sh`](scripts/tag-deployed.sh) through
-[a workflow](.github/workflows/tag.yml), which tags each app the commit
-deploys as `<name>@<version>` — `app@0.3.0`, `web@0.2.0`. One commit bumping
-three apps gets three tags.
+That number is what is live; the tag is where it came from — same
+`<name>@<version>` format the release workflow already writes.
 
 ```bash
 git tag -l 'app@*' --sort=-v:refname
 git show app@0.3.0
 ```
 
-The script mirrors the gate rather than improving on it: same commit pair,
-same version extraction, so a tag exists if and only if that app's production
-build was attempted. It inherits the blind spot too — a bump buried inside a
-multi-commit push deploys nothing and tags nothing, and recovering through the
-Vercel dashboard leaves that version untagged. Holes are the deliberate trade.
-A tag that named a version which never shipped would break the one thing the
-mapping is for.
-
-Tags start at the commit the gate did, so the versions that predate it have
-none, and `admin` has none until its next bump.
+[`scripts/tag-deployed.sh`](scripts/tag-deployed.sh) predates the release
+workflow and is no longer run automatically, but stays as a manual backfill
+tool — pass it a commit to tag whatever app version it deployed, for anything
+tagged before the release workflow existed.
 
 ## Linting
 

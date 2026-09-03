@@ -1,0 +1,47 @@
+# Computes each app's next version from its own commits since its last
+# release and, if one is due, bumps its package.json, writes its changelog,
+# tags it, and pushes — which is also the deploy gesture: each app's
+# `vercel.json` only builds when its version changed in the pushed commit
+# (scripts/deploy-if-bumped.sh), so this push is what ships it.
+#
+# multi-semantic-release runs the whole semantic-release pipeline once per
+# workspace package, scoping each run's commit history to that package's own
+# path. `--ignore-packages=packages/**` keeps this to the four apps; the
+# shared packages/db and packages/ui are consumed via workspace:* and are
+# never released on their own.
+#
+# Superseded scripts/tag-deployed.sh + .github/workflows/tag.yml, which did
+# the tagging half of this by hand off a manual version bump. The script
+# stays for manual backfill/debugging; the workflow that ran it automatically
+# is removed.
+name: Release
+
+on:
+  push:
+    branches: [main]
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      # Full history and tags: multi-semantic-release finds each package's
+      # last release by walking back to its most recent tag.
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          fetch-tags: true
+
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - run: pnpm install --frozen-lockfile
+
+      - run: pnpm release
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
