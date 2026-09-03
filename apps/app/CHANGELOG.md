@@ -1,3 +1,10 @@
+# app [0.6.0](https://github.com/harshsandhu44/bandzen/compare/app@0.5.0...app@0.6.0) (2026-09-03)
+
+
+### Features
+
+* Speaking module — async recorded, audio-graded, Pro-only ([#19](https://github.com/harshsandhu44/bandzen/issues/19)) ([4a48972](https://github.com/harshsandhu44/bandzen/commit/4a489724ad540d2919b56fcde906cf3f57c89673))
+
 # app [0.5.0](https://github.com/harshsandhu44/bandzen/compare/app@0.4.0...app@0.5.0) (2026-09-03)
 
 
