@@ -83,9 +83,18 @@ export function parseStructured<T>(
   const raw = choice.message.content;
   if (!raw) throw new ModelOutputError('Completion carried no content');
 
+  // Strict Structured Outputs returns bare JSON, but the audio models the
+  // Speaking grader uses accept no `response_format` at all and sometimes wrap
+  // the object in a ```json fence. Strip one if it is there; a bare object is
+  // untouched.
+  const unfenced = raw
+    .trim()
+    .replace(/^```(?:json)?\s*\n?/i, '')
+    .replace(/\n?```\s*$/, '');
+
   let json: unknown;
   try {
-    json = JSON.parse(raw);
+    json = JSON.parse(unfenced);
   } catch {
     throw new ModelOutputError('Completion was not valid JSON');
   }

@@ -63,6 +63,21 @@ test('parses a well-formed response', () => {
   assert.equal(parsed.criteria[0]?.name, 'Task Response');
 });
 
+test('strips a ```json fence the audio models sometimes add', () => {
+  const body = {
+    band: 7,
+    criteria: [],
+    annotations: [],
+    strengths: [],
+    weaknesses: [],
+  };
+  const parsed = parseStructured(
+    ok('```json\n' + JSON.stringify(body) + '\n```'),
+    writingEvaluationSchema,
+  );
+  assert.equal(parsed.band, 7);
+});
+
 test('a refusal is an error, not a silent empty report', () => {
   const response = completion({
     message: { content: null, refusal: 'I cannot assess this.' },

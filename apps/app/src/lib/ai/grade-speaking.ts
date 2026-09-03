@@ -12,9 +12,33 @@ import { openai } from './client';
 import { SPEAKING_GRADER_MODEL } from './models';
 import { SPEAKING_RUBRIC } from './speaking-rubric';
 import { speakingEvaluationSchema } from './schemas';
-import { parseStructured, strictJsonSchema } from './structured';
+import { parseStructured } from './structured';
 
-const REPORT_SCHEMA = strictJsonSchema(speakingEvaluationSchema);
+/**
+ * The audio models accept no `response_format` at all — not strict Structured
+ * Outputs, not JSON mode — so the shape is spelled out here instead and
+ * `parseStructured` validates what comes back against
+ * `speakingEvaluationSchema`. This message comes after the cacheable rubric so
+ * it does not break the prefix cache.
+ */
+const RESPONSE_SHAPE = `Reply with ONE JSON object and nothing else — no prose, no code fence. Shape:
+
+{
+  "band": <number, 0-9, whole or half>,
+  "criteria": [
+    { "name": "Fluency and Coherence", "band": <number>, "comment": <string> },
+    { "name": "Lexical Resource", "band": <number>, "comment": <string> },
+    { "name": "Grammatical Range and Accuracy", "band": <number>, "comment": <string> },
+    { "name": "Pronunciation", "band": <number>, "comment": <string> }
+  ],
+  "annotations": [
+    { "quote": <verbatim words the candidate said>, "kind": "good" | "grammar" | "vocabulary" | "fluency", "comment": <string> }
+  ],
+  "strengths": [<string>, <string>, <string>],
+  "weaknesses": [<string>, <string>, <string>]
+}
+
+All four criteria, in that order. Four to eight annotations.`;
 
 /** Half-band rounding, and never outside the scale whatever the model says. */
 const toBand = (n: number) => Math.min(9, Math.max(0, Math.round(n * 2) / 2));
@@ -96,16 +120,9 @@ export async function gradeSpeaking(attemptId: string) {
       messages: [
         // The rubric MUST come first and byte-identical -- see speaking-rubric.ts.
         { role: 'system', content: SPEAKING_RUBRIC },
+        { role: 'system', content: RESPONSE_SHAPE },
         { role: 'user', content },
       ],
-      response_format: {
-        type: 'json_schema',
-        json_schema: {
-          name: 'speaking_report',
-          strict: true,
-          schema: REPORT_SCHEMA,
-        },
-      },
     });
 
     const parsed = parseStructured(response, speakingEvaluationSchema);
