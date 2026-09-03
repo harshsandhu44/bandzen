@@ -1,49 +1,48 @@
+import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { BandScale } from '@bandzen/ui/components/band-scale';
+import { Button } from '@bandzen/ui/components/button';
 import { cn } from '@bandzen/ui/lib/utils';
 import { requireUserId } from '@/lib/auth';
-import {
-  essayAllowance,
-  getProfile,
-  getReport,
-  markedEssayCount,
-} from '@/lib/db/queries';
-import { Button } from '@bandzen/ui/components/button';
-import { UpgradePrompt, resetLabel } from '@/components/billing/pro';
-import { retryGrading } from '../../actions';
-import type { Annotation } from '@/lib/db/schema';
+import { getSpeakingReport } from '@/lib/db/queries';
 import { GradingWatch } from '@/components/app/grading-watch';
+import type { Annotation } from '@/lib/db/schema';
+import { retrySpeakingGrading } from '../../actions';
 
-export const metadata = { title: 'Writing report' };
+export const metadata = { title: 'Speaking report' };
 
-// The Annotation kind union is shared with Speaking; the essay grader only
-// ever emits these three.
 const ANNOTATION_STYLE: Record<Annotation['kind'], string> = {
   good: 'border-primary',
   grammar: 'border-destructive',
-  development: 'border-chrome',
   vocabulary: 'border-chrome',
   fluency: 'border-chrome',
+  development: 'border-chrome',
 };
 
 const ANNOTATION_LABEL: Record<Annotation['kind'], string> = {
   good: 'Works well',
-  grammar: 'Error',
-  development: 'Needs support',
+  grammar: 'Grammar',
   vocabulary: 'Word choice',
   fluency: 'Fluency',
+  development: 'Needs support',
 };
 
-export default async function ReportPage({
+const PART_LABEL: Record<number, string> = {
+  1: 'Part 1',
+  2: 'Part 2',
+  3: 'Part 3',
+};
+
+export default async function SpeakingReportPage({
   params,
-}: PageProps<'/writing/[attemptId]/report'>) {
+}: PageProps<'/speaking/[attemptId]/report'>) {
   const { attemptId } = await params;
   const userId = await requireUserId();
 
-  const data = await getReport(userId, attemptId);
+  const data = await getSpeakingReport(userId, attemptId);
   if (!data) notFound();
 
-  const { attempt, report, essay } = data;
+  const { attempt, report, responses } = data;
 
   if (attempt.status === 'grading' || attempt.status === 'in_progress') {
     return (
@@ -52,12 +51,11 @@ export default async function ReportPage({
         <p className="font-mono text-[0.6875rem] tracking-[0.18em] text-muted-foreground uppercase">
           Marking
         </p>
-        <h1 className="font-title text-title-lg">Reading your response</h1>
+        <h1 className="font-title text-title-lg">Listening to your answers</h1>
         <p className="text-sm text-muted-foreground">
-          This takes up to a minute. You can close this tab — the report will be
-          here when you come back.
+          This takes a minute or two — the examiner listens to every answer. You
+          can close this tab; the report will be here when you come back.
         </p>
-        {/* Indeterminate, because a fake percentage is a lie about progress. */}
         <div className="h-px w-full overflow-hidden bg-border">
           <div className="h-px w-1/3 animate-pulse bg-primary" />
         </div>
@@ -69,70 +67,25 @@ export default async function ReportPage({
     return (
       <div className="max-w-md space-y-4">
         <h1 className="font-title text-title-lg">Marking failed</h1>
-        <p className="text-sm text-muted-foreground text-pretty">
-          Your response is saved and nothing has been lost. Marking it again
-          costs you nothing — a failed run has never counted against your weekly
-          marks.
+        <p className="text-sm text-pretty text-muted-foreground">
+          Your recordings are saved and nothing has been lost. Marking again
+          costs you nothing.
         </p>
-
-        {/* This used to say "try submitting again from Writing", which created
-            a new empty attempt and stranded the essay. The retry is here now,
-            on the row that actually failed. */}
-        <form action={retryGrading}>
+        <form action={retrySpeakingGrading}>
           <input type="hidden" name="attemptId" value={attemptId} />
           <Button type="submit">Mark it again</Button>
         </form>
-
-        {essay?.body ? (
-          <details className="border-t border-border pt-4">
-            <summary className="cursor-pointer font-mono text-[0.6875rem] tracking-[0.18em] text-muted-foreground uppercase">
-              Your response · {essay.wordCount} words
-            </summary>
-            <p className="mt-4 text-sm leading-7 whitespace-pre-wrap">
-              {essay.body}
-            </p>
-          </details>
-        ) : null}
       </div>
     );
   }
 
   if (!report) notFound();
 
-  // Two moments, and only two. The first report is demonstrated value with no
-  // scarcity attached — they have just seen what Pro is. The report that
-  // empties the allowance pairs that with a real limit and a real date. The
-  // same block under every report is wallpaper by the third view, and starts
-  // making the feedback itself feel like bait.
-  const [quota, marked, profile] = await Promise.all([
-    essayAllowance(userId),
-    markedEssayCount(userId),
-    getProfile(userId),
-  ]);
-
-  const prompt = quota.unlimited
-    ? null
-    : !quota.allowed
-      ? {
-          eyebrow: 'That was your last mark this week',
-          title: 'Keep going without waiting',
-          meta: quota.resetsAt
-            ? `Next free mark ${resetLabel(quota.resetsAt, profile?.timezone)}`
-            : undefined,
-        }
-      : marked <= 1
-        ? {
-            eyebrow: 'Your first marked essay',
-            title: 'Every essay, marked like this',
-            meta: `${quota.remaining} of ${quota.limit} marks left this week`,
-          }
-        : null;
-
   return (
     <div className="max-w-3xl space-y-10">
       <header className="space-y-4">
         <p className="font-mono text-[0.6875rem] tracking-[0.18em] text-muted-foreground uppercase">
-          Writing report
+          Speaking report
         </p>
         <div className="flex items-baseline gap-4">
           <span className="font-metric text-metric-lg">
@@ -142,7 +95,7 @@ export default async function ReportPage({
             Estimate, not an official score
           </span>
         </div>
-        <BandScale value={report.band} label="Writing" />
+        <BandScale value={report.band} label="Speaking" />
       </header>
 
       <section className="space-y-6">
@@ -182,7 +135,7 @@ export default async function ReportPage({
 
       {report.annotations.length ? (
         <section>
-          <h2 className="mb-3 font-title text-title">In your response</h2>
+          <h2 className="mb-3 font-title text-title">In your answers</h2>
           <ul className="space-y-4">
             {report.annotations.map((a, i) => (
               <li
@@ -204,26 +157,43 @@ export default async function ReportPage({
         </section>
       ) : null}
 
-      {prompt ? (
-        <UpgradePrompt
-          eyebrow={prompt.eyebrow}
-          title={prompt.title}
-          meta={prompt.meta}
-          source="report_moment"
-          cta="See Pro"
-        />
-      ) : null}
+      <section className="space-y-3">
+        <h2 className="font-title text-title">Your answers</h2>
+        {responses.map((r) => (
+          <details key={r.promptId} className="border-t border-border pt-3">
+            <summary className="cursor-pointer text-sm">
+              <span className="font-mono text-[0.6875rem] tracking-[0.18em] text-muted-foreground uppercase">
+                {PART_LABEL[r.part] ?? `Part ${r.part}`} ·{' '}
+              </span>
+              {r.promptText}
+            </summary>
+            <div className="mt-3 space-y-3">
+              <audio controls src={r.audioUrl} className="w-full" />
+              {r.transcript ? (
+                <p className="text-sm leading-7 whitespace-pre-line text-muted-foreground">
+                  {r.transcript}
+                </p>
+              ) : (
+                <p className="text-xs text-muted-foreground">
+                  Transcript unavailable for this answer.
+                </p>
+              )}
+            </div>
+          </details>
+        ))}
+      </section>
 
-      {essay ? (
-        <details className="border-t border-border pt-6">
-          <summary className="cursor-pointer font-mono text-[0.6875rem] tracking-[0.18em] text-muted-foreground uppercase">
-            Your response · {essay.wordCount} words
-          </summary>
-          <p className="mt-4 text-sm leading-7 whitespace-pre-wrap">
-            {essay.body}
-          </p>
-        </details>
-      ) : null}
+      <div className="flex flex-wrap items-center gap-3 border-t border-border pt-6">
+        <Button nativeButton={false} render={<Link href="/speaking" />}>
+          Practise another test
+        </Button>
+        <Link
+          href="/progress"
+          className="font-mono text-[0.6875rem] tracking-[0.18em] text-muted-foreground uppercase underline underline-offset-4 hover:text-foreground"
+        >
+          All reviews
+        </Link>
+      </div>
     </div>
   );
 }

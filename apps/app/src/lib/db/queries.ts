@@ -38,6 +38,9 @@ import {
   questionAnswers,
   questions,
   reports,
+  speakingPrompts,
+  speakingResponses,
+  speakingTests,
   subscriptions,
   writingPrompts,
   type Annotation,
@@ -51,10 +54,12 @@ export {
   DIFFICULTY_RANGE,
   listLessonProgress,
   listPassages,
+  listSpeakingTests,
   listTracks,
   listWritingPrompts,
   markLessonComplete,
   pickEasiestPassage,
+  pickEasiestSpeakingTest,
   pickEasiestTrack,
   pickTask2Prompt,
 } from '@bandzen/db/queries';
@@ -394,10 +399,7 @@ export async function listCompletedAttempts(userId: string, limit = 20) {
     .limit(limit);
 }
 
-export async function latestBand(
-  userId: string,
-  module: 'reading' | 'writing' | 'listening',
-) {
+export async function latestBand(userId: string, module: Skill) {
   const [row] = await db
     .select({ band: attempts.band })
     .from(attempts)
@@ -416,7 +418,12 @@ export async function latestBand(
 
 export async function findInProgress(
   userId: string,
-  where: { passageId?: string; promptId?: string; trackId?: string },
+  where: {
+    passageId?: string;
+    promptId?: string;
+    trackId?: string;
+    speakingTestId?: string;
+  },
 ) {
   const clauses = [
     eq(attempts.userId, userId),
@@ -425,6 +432,8 @@ export async function findInProgress(
   if (where.passageId) clauses.push(eq(attempts.passageId, where.passageId));
   if (where.promptId) clauses.push(eq(attempts.promptId, where.promptId));
   if (where.trackId) clauses.push(eq(attempts.trackId, where.trackId));
+  if (where.speakingTestId)
+    clauses.push(eq(attempts.speakingTestId, where.speakingTestId));
 
   return firstRow(
     await db
@@ -437,11 +446,12 @@ export async function findInProgress(
 
 export async function createAttempt(values: {
   userId: string;
-  module: 'reading' | 'writing' | 'listening';
+  module: Skill;
   kind?: 'practice' | 'diagnostic' | 'mock';
   passageId?: string;
   promptId?: string;
   trackId?: string;
+  speakingTestId?: string;
   parentId?: string;
 }) {
   const [row] = await db
@@ -745,6 +755,162 @@ export async function getListeningReview(userId: string, attemptId: string) {
     .orderBy(questions.idx);
 
   return { attempt, track, rows };
+}
+
+// ---------------------------------------------------------------------------
+// Speaking
+// ---------------------------------------------------------------------------
+
+/**
+ * Everything the test runner needs. No answer key exists for Speaking, so
+ * unlike `getListeningTest` there is nothing sensitive to withhold — the
+ * prompts and their examiner audio are the whole of it.
+ */
+export async function getSpeakingTest(userId: string, attemptId: string) {
+  const attempt = await getAttempt(userId, attemptId);
+  if (!attempt?.speakingTestId) return null;
+
+  const [test] = await db
+    .select({ title: speakingTests.title })
+    .from(speakingTests)
+    .where(eq(speakingTests.id, attempt.speakingTestId));
+  if (!test) return null;
+
+  const prompts = await db
+    .select({
+      id: speakingPrompts.id,
+      idx: speakingPrompts.idx,
+      part: speakingPrompts.part,
+      text: speakingPrompts.text,
+      cueCardPoints: speakingPrompts.cueCardPoints,
+      prepSeconds: speakingPrompts.prepSeconds,
+      audioUrl: speakingPrompts.audioUrl,
+    })
+    .from(speakingPrompts)
+    .where(eq(speakingPrompts.testId, attempt.speakingTestId))
+    .orderBy(speakingPrompts.idx);
+
+  const saved = await db
+    .select({
+      promptId: speakingResponses.promptId,
+      audioUrl: speakingResponses.audioUrl,
+      durationSeconds: speakingResponses.durationSeconds,
+    })
+    .from(speakingResponses)
+    .where(eq(speakingResponses.attemptId, attemptId));
+
+  return { attempt, test, prompts, saved };
+}
+
+/**
+ * Store one recorded answer. Called as the candidate finishes each prompt, so
+ * a refresh mid-test loses nothing. Ownership is checked here because
+ * `speaking_responses` has no user id of its own.
+ */
+export async function saveSpeakingResponse(
+  userId: string,
+  attemptId: string,
+  promptId: string,
+  audioUrl: string,
+  durationSeconds: number | null,
+) {
+  const attempt = await getAttempt(userId, attemptId);
+  if (!attempt || attempt.status !== 'in_progress') return;
+
+  await db
+    .insert(speakingResponses)
+    .values({ attemptId, promptId, audioUrl, durationSeconds })
+    .onConflictDoUpdate({
+      target: [speakingResponses.attemptId, speakingResponses.promptId],
+      set: { audioUrl, durationSeconds, updatedAt: new Date() },
+    });
+}
+
+/**
+ * The prompts and recordings for a claimed attempt. No userId — like
+ * `loadForGrading`, the caller only runs after `claimForGrading` authorised
+ * the attempt id.
+ */
+export async function loadSpeakingForGrading(attemptId: string) {
+  const [attempt] = await db
+    .select({ speakingTestId: attempts.speakingTestId })
+    .from(attempts)
+    .where(eq(attempts.id, attemptId));
+  if (!attempt?.speakingTestId) return null;
+
+  const [test] = await db
+    .select({ title: speakingTests.title })
+    .from(speakingTests)
+    .where(eq(speakingTests.id, attempt.speakingTestId));
+  if (!test) return null;
+
+  const rows = await db
+    .select({
+      promptId: speakingPrompts.id,
+      idx: speakingPrompts.idx,
+      part: speakingPrompts.part,
+      text: speakingPrompts.text,
+      audioUrl: speakingResponses.audioUrl,
+    })
+    .from(speakingPrompts)
+    .innerJoin(
+      speakingResponses,
+      and(
+        eq(speakingResponses.promptId, speakingPrompts.id),
+        eq(speakingResponses.attemptId, attemptId),
+      ),
+    )
+    .where(eq(speakingPrompts.testId, attempt.speakingTestId))
+    .orderBy(speakingPrompts.idx);
+
+  return { title: test.title, answers: rows };
+}
+
+/** Persist the Whisper transcript of one answer, for the review page. */
+export async function saveResponseTranscript(
+  attemptId: string,
+  promptId: string,
+  transcript: string,
+) {
+  await db
+    .update(speakingResponses)
+    .set({ transcript })
+    .where(
+      and(
+        eq(speakingResponses.attemptId, attemptId),
+        eq(speakingResponses.promptId, promptId),
+      ),
+    );
+}
+
+/** Attempt + report + every recorded answer with its transcript, for review. */
+export async function getSpeakingReport(userId: string, attemptId: string) {
+  const attempt = await getAttempt(userId, attemptId);
+  if (!attempt) return null;
+
+  const [report] = await db
+    .select()
+    .from(reports)
+    .where(eq(reports.attemptId, attemptId));
+
+  const responses = await db
+    .select({
+      promptId: speakingResponses.promptId,
+      idx: speakingPrompts.idx,
+      part: speakingPrompts.part,
+      promptText: speakingPrompts.text,
+      audioUrl: speakingResponses.audioUrl,
+      transcript: speakingResponses.transcript,
+    })
+    .from(speakingResponses)
+    .innerJoin(
+      speakingPrompts,
+      eq(speakingPrompts.id, speakingResponses.promptId),
+    )
+    .where(eq(speakingResponses.attemptId, attemptId))
+    .orderBy(speakingPrompts.idx);
+
+  return { attempt, report: report ?? null, responses };
 }
 
 // ---------------------------------------------------------------------------

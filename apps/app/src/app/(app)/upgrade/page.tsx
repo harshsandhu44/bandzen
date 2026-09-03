@@ -40,6 +40,7 @@ const DATE = new Intl.DateTimeFormat('en-GB', {
 /** What Pro removes the ceiling on, in the order a candidate feels them. */
 const INCLUDED = [
   'Unlimited essay marking, against all four IELTS criteria',
+  'Speaking tests, graded from your audio on all four criteria',
   'Unlimited Bandzen Coach',
   'Retake the diagnostic whenever you want to re-measure',
   'Your full band history, not just the last five attempts',
@@ -50,7 +51,7 @@ const INCLUDED = [
  * partly for these can take the seven-day refund — which is the only thing
  * that makes listing them honest.
  */
-const PLANNED = ['Full four-skill mock tests', 'AI Speaking analysis'];
+const PLANNED = ['Full four-skill mock tests'];
 
 export default async function UpgradePage(props: PageProps<'/upgrade'>) {
   const userId = await requireUserId();
@@ -58,7 +59,7 @@ export default async function UpgradePage(props: PageProps<'/upgrade'>) {
   const source =
     typeof searchParams.from === 'string' ? searchParams.from : 'direct';
 
-  const [user, profile, subscription, reading, writing, listening] =
+  const [user, profile, subscription, reading, writing, listening, speaking] =
     await Promise.all([
       currentUser(),
       getProfile(userId),
@@ -66,6 +67,7 @@ export default async function UpgradePage(props: PageProps<'/upgrade'>) {
       latestBand(userId, 'reading'),
       latestBand(userId, 'writing'),
       latestBand(userId, 'listening'),
+      latestBand(userId, 'speaking'),
     ]);
 
   await capture(userId, 'upgrade_viewed', { source });
@@ -78,7 +80,7 @@ export default async function UpgradePage(props: PageProps<'/upgrade'>) {
   const days = profile?.testDate
     ? daysUntil(profile.testDate, profile.timezone)
     : null;
-  const measured = meanBand(reading, writing, listening);
+  const measured = meanBand(reading, writing, listening, speaking);
   const gap =
     profile?.targetBand != null && measured != null
       ? profile.targetBand - measured

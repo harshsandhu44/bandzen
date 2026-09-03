@@ -130,6 +130,35 @@ export const listeningTrackSchema = z
   });
 
 // ---------------------------------------------------------------------------
+// Speaking tests
+// ---------------------------------------------------------------------------
+
+/**
+ * Mirrors what `apps/app/scripts/generate-speaking-content.mts` writes: the
+ * three parts flattened to one ordered `prompts` array. `audioUrl` is the
+ * examiner voice the synthesize step fills in; a row without it imports fine
+ * and the CMS generates the rest when the draft is opened.
+ */
+export const speakingTestSchema = z.object({
+  slug,
+  title: z.string(),
+  topic: z.string(),
+  difficulty: z.number().int().min(1).max(5),
+  prompts: z
+    .array(
+      z.object({
+        idx: z.number().int(),
+        part: z.number().int().min(1).max(3),
+        text: z.string(),
+        cueCardPoints: z.array(z.string()).nullish(),
+        prepSeconds: z.number().int().min(0).default(0),
+        audioUrl: z.string().min(1).optional(),
+      }),
+    )
+    .min(1),
+});
+
+// ---------------------------------------------------------------------------
 // Writing prompts
 // ---------------------------------------------------------------------------
 

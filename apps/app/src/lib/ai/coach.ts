@@ -45,12 +45,13 @@ export const MAX_TURNS = 20;
  * an absence is stated as one so the model does not fill the gap itself.
  */
 export async function buildCoachContext(userId: string): Promise<string> {
-  const [profile, reading, writing, listening, report, accuracy] =
+  const [profile, reading, writing, listening, speaking, report, accuracy] =
     await Promise.all([
       getProfile(userId),
       latestBand(userId, 'reading'),
       latestBand(userId, 'writing'),
       latestBand(userId, 'listening'),
+      latestBand(userId, 'speaking'),
       latestReport(userId),
       accuracyByQuestionKind(userId, 'reading'),
     ]);
@@ -93,7 +94,11 @@ export async function buildCoachContext(userId: string): Promise<string> {
       ? `Latest estimated Listening band: ${listening.toFixed(1)}.`
       : 'Listening: never attempted, so there is no estimate.',
   );
-  lines.push('Speaking is not yet available in Bandzen.');
+  lines.push(
+    speaking != null
+      ? `Latest estimated Speaking band: ${speaking.toFixed(1)}.`
+      : 'Speaking: never attempted, so there is no estimate.',
+  );
 
   if (report?.criteria?.length) {
     lines.push(

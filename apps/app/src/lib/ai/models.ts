@@ -16,3 +16,19 @@ export const GRADER_MODEL = process.env.OPENAI_GRADER_MODEL ?? 'gpt-5.4-mini';
 
 /** Generates the content bank. Runs offline, once, never in a request path. */
 export const CONTENT_MODEL = process.env.OPENAI_CONTENT_MODEL ?? 'gpt-5.5';
+
+/**
+ * Grades Speaking tests. Hears the candidate's audio directly, so Fluency and
+ * Pronunciation are scored from evidence rather than inferred from a
+ * transcript. Runs once per submitted test — the recurring cost of the
+ * Speaking module.
+ *
+ * `gpt-audio-mini` is the cost-efficient GA audio model: audio in, text out.
+ * It accepts no `response_format` (not strict Structured Outputs, not JSON
+ * mode), so `grade-speaking.ts` spells the JSON shape out in the prompt and
+ * `parseStructured` validates the reply. Re-check against this account's
+ * /v1/models when changing it — a wrong id 404s at call time, and the env
+ * override makes a correction a redeploy rather than a code change.
+ */
+export const SPEAKING_GRADER_MODEL =
+  process.env.OPENAI_SPEAKING_GRADER_MODEL ?? 'gpt-audio-mini';

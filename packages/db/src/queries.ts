@@ -13,6 +13,8 @@ import {
   questionAnswers,
   questions,
   resources,
+  speakingPrompts,
+  speakingTests,
   writingPrompts,
   type ContentStatus,
   type Lesson,
@@ -168,6 +170,46 @@ export async function pickEasiestTrack() {
       .from(listeningTracks)
       .where(eq(listeningTracks.status, 'published'))
       .orderBy(listeningTracks.difficulty)
+      .limit(1),
+  );
+}
+
+// ---------------------------------------------------------------------------
+// Speaking — practice list (student-facing)
+// ---------------------------------------------------------------------------
+
+export function listSpeakingTests(filters?: {
+  difficulty?: keyof typeof DIFFICULTY_RANGE;
+  id?: string;
+}) {
+  const clauses = [eq(speakingTests.status, 'published')];
+  if (filters?.id) clauses.push(eq(speakingTests.id, filters.id));
+  if (filters?.difficulty) {
+    const [min, max] = DIFFICULTY_RANGE[filters.difficulty];
+    clauses.push(
+      gte(speakingTests.difficulty, min),
+      lte(speakingTests.difficulty, max),
+    );
+  }
+  return db
+    .select({
+      id: speakingTests.id,
+      title: speakingTests.title,
+      topic: speakingTests.topic,
+      difficulty: speakingTests.difficulty,
+    })
+    .from(speakingTests)
+    .where(and(...clauses))
+    .orderBy(speakingTests.difficulty);
+}
+
+export async function pickEasiestSpeakingTest() {
+  return firstRow(
+    await db
+      .select({ id: speakingTests.id })
+      .from(speakingTests)
+      .where(eq(speakingTests.status, 'published'))
+      .orderBy(speakingTests.difficulty)
       .limit(1),
   );
 }
@@ -699,6 +741,220 @@ export async function deleteTrack(id: string) {
 }
 
 // ---------------------------------------------------------------------------
+// CMS — speaking tests
+//
+// Modelled on the listening CMS: a test carries child `speaking_prompts`
+// (parallel to `questions`, minus the answer key), and a test-level audio
+// generation pass fills in every prompt's examiner voice — see the admin
+// `/api/speaking/[id]/generate` route.
+// ---------------------------------------------------------------------------
+
+export async function listSpeakingTestsAdmin(filters?: {
+  status?: ContentStatus;
+}) {
+  return db
+    .select()
+    .from(speakingTests)
+    .where(
+      filters?.status ? eq(speakingTests.status, filters.status) : undefined,
+    )
+    .orderBy(speakingTests.createdAt);
+}
+
+export async function getSpeakingTestAdmin(id: string) {
+  const test = await firstRow(
+    await db
+      .select()
+      .from(speakingTests)
+      .where(eq(speakingTests.id, id))
+      .limit(1),
+  );
+  if (!test) return null;
+
+  const prompts = await db
+    .select()
+    .from(speakingPrompts)
+    .where(eq(speakingPrompts.testId, id))
+    .orderBy(speakingPrompts.idx);
+
+  return { ...test, prompts };
+}
+
+export async function createSpeakingTest(input: {
+  slug: string;
+  title: string;
+  topic?: string | null;
+  difficulty?: number;
+  updatedBy: string;
+}) {
+  return firstRow(
+    await db
+      .insert(speakingTests)
+      .values({ ...input, status: 'draft' })
+      .returning(),
+  );
+}
+
+export async function updateSpeakingTest(
+  id: string,
+  input: Partial<{
+    title: string;
+    topic: string | null;
+    difficulty: number;
+    generationError: string | null;
+    generationStartedAt: Date | null;
+  }>,
+  updatedBy: string,
+) {
+  return firstRow(
+    await db
+      .update(speakingTests)
+      .set({ ...input, updatedBy, updatedAt: new Date() })
+      .where(eq(speakingTests.id, id))
+      .returning(),
+  );
+}
+
+export async function createSpeakingPrompt(
+  testId: string,
+  input: {
+    idx: number;
+    part: number;
+    text: string;
+    cueCardPoints?: string[] | null;
+    prepSeconds?: number;
+  },
+) {
+  return firstRow(
+    await db
+      .insert(speakingPrompts)
+      .values({ testId, ...input })
+      .returning(),
+  );
+}
+
+export async function updateSpeakingPrompt(
+  id: string,
+  input: Partial<{
+    idx: number;
+    part: number;
+    text: string;
+    cueCardPoints: string[] | null;
+    prepSeconds: number;
+    audioUrl: string | null;
+  }>,
+) {
+  return firstRow(
+    await db
+      .update(speakingPrompts)
+      .set(input)
+      .where(eq(speakingPrompts.id, id))
+      .returning(),
+  );
+}
+
+export async function deleteSpeakingPrompt(id: string) {
+  await db.delete(speakingPrompts).where(eq(speakingPrompts.id, id));
+}
+
+/** The fields the CMS generate route reads to decide what to synthesize. */
+export async function getSpeakingTestGenerationState(id: string) {
+  const test = await firstRow(
+    await db
+      .select({
+        id: speakingTests.id,
+        slug: speakingTests.slug,
+        generationStartedAt: speakingTests.generationStartedAt,
+      })
+      .from(speakingTests)
+      .where(eq(speakingTests.id, id))
+      .limit(1),
+  );
+  if (!test) return null;
+
+  const prompts = await db
+    .select({
+      id: speakingPrompts.id,
+      idx: speakingPrompts.idx,
+      text: speakingPrompts.text,
+      audioUrl: speakingPrompts.audioUrl,
+    })
+    .from(speakingPrompts)
+    .where(eq(speakingPrompts.testId, id))
+    .orderBy(speakingPrompts.idx);
+
+  return { ...test, prompts };
+}
+
+/** Everything a test needs before it can go live. One issue per gap. */
+export async function checkSpeakingTestCompleteness(
+  id: string,
+): Promise<string[]> {
+  const test = await firstRow(
+    await db
+      .select()
+      .from(speakingTests)
+      .where(eq(speakingTests.id, id))
+      .limit(1),
+  );
+  if (!test) return ['the test itself (not found)'];
+
+  const prompts = await db
+    .select()
+    .from(speakingPrompts)
+    .where(eq(speakingPrompts.testId, id));
+
+  const issues: string[] = [];
+  for (const part of [1, 2, 3]) {
+    if (!prompts.some((p) => p.part === part)) {
+      issues.push(`at least one Part ${part} prompt`);
+    }
+  }
+  for (const p of prompts) {
+    if (!p.audioUrl) issues.push(`examiner audio for prompt ${p.idx}`);
+    if (p.part === 2 && (!p.cueCardPoints || p.cueCardPoints.length === 0)) {
+      issues.push(`cue-card points for the Part 2 prompt (${p.idx})`);
+    }
+  }
+  return issues;
+}
+
+export async function publishSpeakingTest(id: string, updatedBy: string) {
+  const issues = await checkSpeakingTestCompleteness(id);
+  if (issues.length > 0) throw new PublishValidationError(issues);
+  return firstRow(
+    await db
+      .update(speakingTests)
+      .set({ status: 'published', updatedBy, updatedAt: new Date() })
+      .where(eq(speakingTests.id, id))
+      .returning(),
+  );
+}
+
+export async function unpublishSpeakingTest(id: string, updatedBy: string) {
+  return firstRow(
+    await db
+      .update(speakingTests)
+      .set({ status: 'draft', updatedBy, updatedAt: new Date() })
+      .where(eq(speakingTests.id, id))
+      .returning(),
+  );
+}
+
+export async function deleteSpeakingTest(id: string) {
+  const [{ n }] = await db
+    .select({ n: count() })
+    .from(attempts)
+    .where(eq(attempts.speakingTestId, id));
+  if (n > 0) {
+    throw new ContentInUseError(
+      `Cannot delete: ${n} attempt(s) reference this test. Unpublish it instead.`,
+    );
+  }
+  await db.delete(speakingTests).where(eq(speakingTests.id, id));
+}
+
+// ---------------------------------------------------------------------------
 // CMS — writing prompts
 // ---------------------------------------------------------------------------
 
@@ -1010,7 +1266,12 @@ export async function deleteResource(id: string) {
 // ---------------------------------------------------------------------------
 
 export type ContentType =
-  'passage' | 'listening-track' | 'writing-prompt' | 'lesson' | 'resource';
+  | 'passage'
+  | 'listening-track'
+  | 'speaking-test'
+  | 'writing-prompt'
+  | 'lesson'
+  | 'resource';
 
 export type StatusCount = { draft: number; published: number; total: number };
 
@@ -1032,32 +1293,38 @@ function tally(rows: { status: ContentStatus; n: number }[]): StatusCount {
 export async function contentCounts(): Promise<
   Record<ContentType, StatusCount>
 > {
-  const [passage, track, writingPrompt, lesson, resource] = await Promise.all([
-    db
-      .select({ status: passages.status, n: count() })
-      .from(passages)
-      .groupBy(passages.status),
-    db
-      .select({ status: listeningTracks.status, n: count() })
-      .from(listeningTracks)
-      .groupBy(listeningTracks.status),
-    db
-      .select({ status: writingPrompts.status, n: count() })
-      .from(writingPrompts)
-      .groupBy(writingPrompts.status),
-    db
-      .select({ status: lessons.status, n: count() })
-      .from(lessons)
-      .groupBy(lessons.status),
-    db
-      .select({ status: resources.status, n: count() })
-      .from(resources)
-      .groupBy(resources.status),
-  ]);
+  const [passage, track, speakingTest, writingPrompt, lesson, resource] =
+    await Promise.all([
+      db
+        .select({ status: passages.status, n: count() })
+        .from(passages)
+        .groupBy(passages.status),
+      db
+        .select({ status: listeningTracks.status, n: count() })
+        .from(listeningTracks)
+        .groupBy(listeningTracks.status),
+      db
+        .select({ status: speakingTests.status, n: count() })
+        .from(speakingTests)
+        .groupBy(speakingTests.status),
+      db
+        .select({ status: writingPrompts.status, n: count() })
+        .from(writingPrompts)
+        .groupBy(writingPrompts.status),
+      db
+        .select({ status: lessons.status, n: count() })
+        .from(lessons)
+        .groupBy(lessons.status),
+      db
+        .select({ status: resources.status, n: count() })
+        .from(resources)
+        .groupBy(resources.status),
+    ]);
 
   return {
     passage: tally(passage),
     'listening-track': tally(track),
+    'speaking-test': tally(speakingTest),
     'writing-prompt': tally(writingPrompt),
     lesson: tally(lesson),
     resource: tally(resource),
@@ -1102,6 +1369,16 @@ export async function listRecentlyEdited(limit = 10): Promise<RecentEdit[]> {
         updatedBy: listeningTracks.updatedBy,
       })
       .from(listeningTracks),
+    db
+      .select({
+        type: sql<ContentType>`'speaking-test'`.as('type'),
+        id: speakingTests.id,
+        label: speakingTests.title,
+        status: speakingTests.status,
+        updatedAt: speakingTests.updatedAt,
+        updatedBy: speakingTests.updatedBy,
+      })
+      .from(speakingTests),
     db
       .select({
         type: sql<ContentType>`'writing-prompt'`.as('type'),

@@ -3,12 +3,11 @@ import type { Skill } from '@/lib/db/schema';
 /**
  * The four IELTS modules as the interface talks about them.
  *
- * Deliberately NOT the `attempt_module` enum. That enum is the set of modules
- * a candidate can actually sit, and widening it would be a lie the type system
- * would then help us tell — a listening attempt has nowhere to store audio, no
- * questions to answer and no way to be scored. Listening and Speaking are real
- * to the navigation and to nothing else until the content exists, so they live
- * here, and `Skill` stays the type of anything that creates a row.
+ * Now identical in membership to the `attempt_module` enum — every module has
+ * an engine. Kept as its own list rather than derived from the enum because
+ * `IELTSModule` is the vocabulary the navigation and marketing copy use, and
+ * `Skill` is the type of anything that creates a row; they happen to coincide
+ * today but mean different things.
  */
 export const IELTS_MODULES = [
   'listening',
@@ -24,6 +23,7 @@ export const AVAILABLE_MODULES: readonly Skill[] = [
   'reading',
   'writing',
   'listening',
+  'speaking',
 ];
 
 export function isAvailable(module: IELTSModule): module is Skill {
@@ -38,9 +38,7 @@ export const MODULE_LABEL: Record<IELTSModule, string> = {
 };
 
 /** Why a module is not yet openable. Shown verbatim, so it stays honest. */
-export const UNAVAILABLE_REASON: Record<string, string> = {
-  speaking: 'Speaking practice needs recording we have not built yet.',
-};
+export const UNAVAILABLE_REASON: Record<string, string> = {};
 
 export type IELTSExamType = 'academic' | 'general';
 

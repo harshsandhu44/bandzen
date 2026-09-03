@@ -34,12 +34,15 @@ const MODULE_HREF: Record<string, string> = {
   reading: '/reading',
   writing: '/writing',
   listening: '/listening',
+  speaking: '/speaking',
 };
 
 const MODULE_BLURB: Record<string, string> = {
   reading: 'Timed passages, filtered by the question type you want to drill.',
   writing: 'Task 2 prompts, graded against the four IELTS criteria.',
   listening: 'Tracks that play once, exactly as they do in the exam.',
+  speaking:
+    'A full Parts 1–3 interview. Record each answer; graded from your audio. Pro.',
 };
 
 /**
@@ -273,9 +276,9 @@ export default async function PracticePage() {
           <div>
             <p className="font-title text-sm">Full four-skill mock</p>
             <p className="mt-1 max-w-prose text-sm text-muted-foreground text-pretty">
-              A complete mock needs Listening and Speaking, and neither has
-              material yet. Until they do, the Reading and Writing sections
-              above are the whole of what we can mark honestly.
+              All four modules exist now, but a single sitting that chains them
+              under one timer and one combined band is still being built.
+              Practise them individually above in the meantime.
             </p>
           </div>
         </div>
