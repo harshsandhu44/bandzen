@@ -1,0 +1,10 @@
+{
+  "extends": "@bandzen/tsconfig/base.json",
+  "compilerOptions": {
+    "paths": {
+      "@bandzen/storage/*": ["./src/*"]
+    }
+  },
+  "include": ["src/**/*.ts"],
+  "exclude": ["node_modules"]
+}

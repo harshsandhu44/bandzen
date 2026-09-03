@@ -20,6 +20,7 @@ export const metadata = { title: 'Overview' };
 
 const SECTIONS: { type: ContentType; label: string; href: string }[] = [
   { type: 'passage', label: 'Passages', href: '/passages' },
+  { type: 'listening-track', label: 'Listening', href: '/listening' },
   {
     type: 'writing-prompt',
     label: 'Writing prompts',
@@ -31,6 +32,7 @@ const SECTIONS: { type: ContentType; label: string; href: string }[] = [
 
 const EDIT_HREF: Record<ContentType, (id: string) => string> = {
   passage: (id) => `/passages/${id}`,
+  'listening-track': (id) => `/listening/${id}`,
   'writing-prompt': (id) => `/writing-prompts/${id}`,
   lesson: (id) => `/lessons/${id}`,
   resource: (id) => `/resources/${id}`,
@@ -38,6 +40,7 @@ const EDIT_HREF: Record<ContentType, (id: string) => string> = {
 
 const TYPE_LABEL: Record<ContentType, string> = {
   passage: 'Passage',
+  'listening-track': 'Track',
   'writing-prompt': 'Prompt',
   lesson: 'Lesson',
   resource: 'Resource',
@@ -89,7 +92,7 @@ export default async function OverviewPage() {
           mono scale with a tracked-out label above it — the same treatment a
           band score gets in apps/app. Four bordered boxes around four numbers
           added a frame and no information. */}
-      <div className="grid gap-6 border-y border-border py-6 sm:grid-cols-2 lg:grid-cols-4">
+      <div className="grid gap-6 border-y border-border py-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5">
         {SECTIONS.map((section) => {
           const { draft, published, total } = counts[section.type];
           return (

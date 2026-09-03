@@ -1,6 +1,7 @@
 import type { z } from 'zod';
 import type {
   lessonSchema,
+  listeningTrackSchema,
   passageSchema,
   resourceSchema,
   writingPromptSchema,
@@ -434,6 +435,163 @@ export const PASSAGE_TEMPLATES = build<Passage>(PASSAGE_BASE, {
       },
     ]),
   ),
+});
+
+// ---------------------------------------------------------------------------
+// Listening tracks
+// ---------------------------------------------------------------------------
+
+type ListeningTrack = z.infer<typeof listeningTrackSchema>;
+
+/**
+ * A CMS listening import expects a fully reviewed, already-synthesized track:
+ * the `audioUrl` has to point at an MP3 that already exists (the offline
+ * synthesize step, or a file uploaded through the New-track form). The model
+ * only ever writes the transcript and questions.
+ */
+const LISTENING_BASE = `Write an IELTS Listening track as a JSON array matching the example below
+exactly. Return JSON only.
+
+- transcript is an original spoken script — a monologue, or a conversation
+  with each speaker labelled "Name:" on its own line. Never reproduce
+  copyrighted exam material.
+- Ten questions, idx 1..10 with no gaps, mixing at least two of:
+  multiple_choice, sentence_completion, matching.
+- Every question's evidence must be a line that appears verbatim in the
+  transcript.
+- multiple_choice supplies four options and the answer matches one exactly.
+- matching has options: null and draws its answer from the single track-level
+  matchingOptions list. Supply at least three more matchingOptions than there
+  are matching questions; no option answers two questions.
+- sentence_completion answers are words lifted verbatim from the transcript,
+  within the word limit stated in the prompt.
+- difficulty is 1-5. audioUrl must be a real URL to an existing MP3.`;
+
+export const LISTENING_TEMPLATES = build<ListeningTrack>(LISTENING_BASE, {
+  general: {
+    label: 'General',
+    focus:
+      'Mix at least two kinds across the questions. The example below is\nshortened to three questions; a real track has ten.',
+    example: {
+      slug: 'riverside-library-tour',
+      title: 'A Tour of the Riverside Library',
+      topic: 'A new visitor is shown around a community library',
+      difficulty: 2,
+      audioUrl:
+        'https://pub-example.r2.dev/listening/riverside-library-tour.mp3',
+      transcript:
+        "Guide: Welcome to the Riverside Community Library. Our opening hours are nine to six on weekdays, and ten to four on Saturdays.\nVisitor: Is there a fee to join?\nGuide: Membership is free for residents. You'll need to show proof of address, such as a utility bill.\nVisitor: How many books can I borrow at once?\nGuide: Up to eight items, for three weeks each. You can renew online twice.\nVisitor: And where are the study rooms?\nGuide: On the second floor. They must be booked in advance at the front desk.",
+      matchingOptions: null,
+      questions: [
+        {
+          idx: 1,
+          kind: 'multiple_choice',
+          prompt: 'How many items can a member borrow at once?',
+          options: ['up to eight', 'up to three', 'up to six', 'up to twelve'],
+          answer: ['up to eight'],
+          evidence: 'Up to eight items, for three weeks each.',
+          explanation: 'The guide states the borrowing limit is eight items.',
+        },
+        {
+          idx: 2,
+          kind: 'sentence_completion',
+          prompt:
+            'Complete the sentence. Write ONE WORD. To join, residents must show proof of ________.',
+          options: null,
+          answer: ['address'],
+          evidence:
+            "You'll need to show proof of address, such as a utility bill.",
+          explanation:
+            'Proof of address is the requirement the guide names for joining.',
+        },
+        {
+          idx: 3,
+          kind: 'sentence_completion',
+          prompt:
+            'Complete the sentence. Write ONE WORD. The study rooms are on the ________ floor.',
+          options: null,
+          answer: ['second'],
+          evidence: 'On the second floor.',
+          explanation: 'The guide places the study rooms on the second floor.',
+        },
+      ],
+    },
+  },
+  matching: {
+    label: 'Matching',
+    focus: `Lead with matching questions, each asking which instruction or
+feature goes with a place or person named in the transcript, all drawing from
+one shared matchingOptions list. Keep at least three spare options that are
+still plausible. The example is shortened; a real track has ten questions.`,
+    example: {
+      slug: 'volunteer-shift-briefing',
+      title: 'A Volunteer Shift Briefing',
+      topic:
+        'A coordinator explains the rules for each area to a new volunteer',
+      difficulty: 3,
+      audioUrl:
+        'https://pub-example.r2.dev/listening/volunteer-shift-briefing.mp3',
+      transcript:
+        'Coordinator: Before you start your volunteer shift, here are the rules for each area.\nFor the reception desk, always log every visitor in the paper book.\nFor the cafe, wipe down the tables after each customer leaves.\nFor the garden, put all tools back in the locked shed before you go home.\nVolunteer: Got it. Anything about the shop?\nCoordinator: For the shop, count the till twice at closing time.',
+      matchingOptions: [
+        'Log every visitor',
+        'Wipe down the tables',
+        'Return tools to the shed',
+        'Count the till twice',
+        'Wear a name badge',
+        'Water the plants',
+        'Lock the front gate',
+      ],
+      questions: [
+        {
+          idx: 1,
+          kind: 'matching',
+          prompt: 'Which instruction is given for the reception desk?',
+          options: null,
+          answer: ['Log every visitor'],
+          evidence:
+            'For the reception desk, always log every visitor in the paper book.',
+          explanation: 'The reception-desk rule is to log every visitor.',
+        },
+        {
+          idx: 2,
+          kind: 'matching',
+          prompt: 'Which instruction is given for the cafe?',
+          options: null,
+          answer: ['Wipe down the tables'],
+          evidence:
+            'For the cafe, wipe down the tables after each customer leaves.',
+          explanation:
+            'The cafe rule is to wipe the tables after each customer.',
+        },
+        {
+          idx: 3,
+          kind: 'matching',
+          prompt: 'Which instruction is given for the garden?',
+          options: null,
+          answer: ['Return tools to the shed'],
+          evidence:
+            'For the garden, put all tools back in the locked shed before you go home.',
+          explanation:
+            'The garden rule is to return the tools to the locked shed.',
+        },
+        {
+          idx: 4,
+          kind: 'multiple_choice',
+          prompt: 'What must the volunteer do at the shop?',
+          options: [
+            'count the till twice',
+            'restock the shelves',
+            'mop the floor',
+            'email the manager',
+          ],
+          answer: ['count the till twice'],
+          evidence: 'For the shop, count the till twice at closing time.',
+          explanation: 'The shop rule is to count the till twice at closing.',
+        },
+      ],
+    },
+  },
 });
 
 // ---------------------------------------------------------------------------
@@ -1188,6 +1346,7 @@ questions, Part 2 the long turn from a cue card, Part 3 the abstract discussion.
 
 export const TEMPLATES = {
   passages: PASSAGE_TEMPLATES,
+  listening: LISTENING_TEMPLATES,
   'writing-prompts': WRITING_PROMPT_TEMPLATES,
   lessons: LESSON_TEMPLATES,
   resources: RESOURCE_TEMPLATES,

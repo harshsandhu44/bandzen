@@ -2,6 +2,7 @@ import assert from 'node:assert/strict';
 import { test } from 'node:test';
 import {
   lessonSchema,
+  listeningTrackSchema,
   parseItems,
   passageSchema,
   resourceSchema,
@@ -10,6 +11,7 @@ import {
 } from './schemas.ts';
 import {
   LESSON_TEMPLATES,
+  LISTENING_TEMPLATES,
   PASSAGE_TEMPLATES,
   RESOURCE_TEMPLATES,
   TEMPLATES,
@@ -142,6 +144,49 @@ test('every multiple-choice example offers four options and one of them is the a
     }
   }
 });
+
+for (const option of LISTENING_TEMPLATES) {
+  test(`listening/${option.key}: the example is a valid track`, () => {
+    const [track] = items(
+      parseItems(listeningTrackSchema, exampleFrom(option.template)),
+    );
+
+    // Evidence is the rule the template leans on hardest.
+    for (const q of track.questions) {
+      assert.ok(
+        track.transcript.includes(q.evidence),
+        `idx ${q.idx}: evidence is not verbatim in the transcript`,
+      );
+    }
+
+    // Every matching answer comes from the shared list, and no option is
+    // spent twice.
+    const matching = track.questions.filter((q) => q.kind === 'matching');
+    const options = track.matchingOptions ?? [];
+    const usedAnswers = new Set<string>();
+    for (const q of matching) {
+      assert.ok(
+        options.includes(q.answer[0]),
+        `idx ${q.idx}: "${q.answer[0]}" is not in matchingOptions`,
+      );
+      assert.ok(!usedAnswers.has(q.answer[0]), `idx ${q.idx}: reused option`);
+      usedAnswers.add(q.answer[0]);
+    }
+    if (matching.length > 0) {
+      assert.ok(
+        options.length >= matching.length + 3,
+        'at least three spare matching options, per the rules',
+      );
+    }
+
+    const kinds = new Set(track.questions.map((q) => q.kind));
+    assert.ok(kinds.size >= 2, 'a track example should mix at least two kinds');
+
+    if (option.key === 'matching') {
+      assert.equal(track.questions[0].kind, 'matching');
+    }
+  });
+}
 
 for (const option of WRITING_PROMPT_TEMPLATES) {
   test(`writing-prompts/${option.key}: the example is a valid prompt`, () => {
