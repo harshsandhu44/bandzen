@@ -444,10 +444,12 @@ export const PASSAGE_TEMPLATES = build<Passage>(PASSAGE_BASE, {
 type ListeningTrack = z.infer<typeof listeningTrackSchema>;
 
 /**
- * A CMS listening import expects a fully reviewed, already-synthesized track:
- * the `audioUrl` has to point at an MP3 that already exists (the offline
- * synthesize step, or a file uploaded through the New-track form). The model
- * only ever writes the transcript and questions.
+ * The example below is a complete track — transcript, audio and questions —
+ * because that is what the offline pipeline emits and what a model prompted
+ * with this should aim for. Import itself is looser: a row needs a
+ * `transcript` OR an `audioUrl` (the CMS generates the other when the draft
+ * is opened), and `questions` may be omitted on an audio-only row since they
+ * can't be written before the transcript exists.
  */
 const LISTENING_BASE = `Write an IELTS Listening track as a JSON array matching the example below
 exactly. Return JSON only.
@@ -465,7 +467,9 @@ exactly. Return JSON only.
   are matching questions; no option answers two questions.
 - sentence_completion answers are words lifted verbatim from the transcript,
   within the word limit stated in the prompt.
-- difficulty is 1-5. audioUrl must be a real URL to an existing MP3.`;
+- difficulty is 1-5.
+- Provide a transcript, an audioUrl, or both. audioUrl, when given, must be a
+  real URL to an existing MP3. Omit questions if you only have the audio.`;
 
 export const LISTENING_TEMPLATES = build<ListeningTrack>(LISTENING_BASE, {
   general: {
