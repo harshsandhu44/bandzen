@@ -60,6 +60,7 @@ export async function updateTestAction(formData: FormData) {
  * API route.
  */
 export async function regenerateAudioAction(formData: FormData) {
+  await requireAdminOrTeacher();
   const promptId = String(formData.get('promptId') ?? '');
   const testId = String(formData.get('testId') ?? '');
   await updateSpeakingPrompt(promptId, { audioUrl: null });

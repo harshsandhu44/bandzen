@@ -57,6 +57,7 @@ export default async function EditPassagePage({
       />
 
       <PublishControls
+        noun="passage"
         id={passage.id}
         status={passage.status}
         publishAction={publishPassageAction}

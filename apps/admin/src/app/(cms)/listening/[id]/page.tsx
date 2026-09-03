@@ -61,6 +61,7 @@ export default async function EditTrackPage({
       />
 
       <PublishControls
+        noun="track"
         id={track.id}
         status={track.status}
         publishAction={publishTrackAction}
@@ -106,6 +107,7 @@ export default async function EditTrackPage({
                   trackId={track.id}
                   missing="transcript"
                   error={track.generationError}
+                  timedOut={track.generationTimedOut}
                 />
               ) : null}
               <Textarea
@@ -161,6 +163,7 @@ export default async function EditTrackPage({
               trackId={track.id}
               missing="audio"
               error={track.generationError}
+              timedOut={track.generationTimedOut}
             />
           )}
 

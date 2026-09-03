@@ -1,5 +1,9 @@
 import { NextResponse } from 'next/server';
-import { getTrackGenerationState, updateTrack } from '@bandzen/db/queries';
+import {
+  GENERATION_STALE_MS,
+  getTrackGenerationState,
+  updateTrack,
+} from '@bandzen/db/queries';
 import { synthesizeSpeech, transcribeAudio } from '@bandzen/ai/speech';
 import { uploadObject } from '@bandzen/storage/r2';
 import { requireAdminOrTeacher } from '@/lib/auth';
@@ -7,9 +11,6 @@ import { requireAdminOrTeacher } from '@/lib/auth';
 // TTS of a full transcript, or Whisper of a few minutes of audio, comfortably
 // under two minutes. The default 15s function budget would not cover it.
 export const maxDuration = 120;
-
-/** A generation older than this is treated as dead, and a new one may start. */
-const STALE_MS = 3 * 60 * 1000;
 
 /**
  * Fills in whichever of transcript / audio a track is missing:
@@ -40,7 +41,7 @@ export async function POST(
 
   const running =
     track.generationStartedAt != null &&
-    Date.now() - track.generationStartedAt.getTime() < STALE_MS;
+    Date.now() - track.generationStartedAt.getTime() < GENERATION_STALE_MS;
   if (running) {
     return NextResponse.json({ status: 'running' });
   }

@@ -7,24 +7,26 @@ import { Button } from '@bandzen/ui/components/button';
 /**
  * Shown in place of the audio player or the transcript box while the other one
  * is being generated. Kicks the generation route once on mount, then polls the
- * page (via router.refresh) until the field lands. On failure it stops polling
- * and offers a retry.
- *
- * The parent only renders this when the field is actually missing, so once
- * generation succeeds the component unmounts and the interval is cleared.
+ * page (via router.refresh) until the field lands. On failure — or once the
+ * server marks the run stale (`timedOut`) — it stops polling and offers a
+ * retry rather than spinning forever, which is what happened when a long
+ * synthesis outran the 120s function budget and left no error behind.
  */
 export function GenerationStatus({
   trackId,
   missing,
   error,
+  timedOut = false,
 }: {
   trackId: string;
   missing: 'audio' | 'transcript';
   error: string | null;
+  timedOut?: boolean;
 }) {
   const router = useRouter();
   const kicked = useRef(false);
   const [retrying, setRetrying] = useState(false);
+  const halted = !!error || timedOut;
 
   useEffect(() => {
     let active = true;
@@ -36,7 +38,7 @@ export function GenerationStatus({
       if (active) router.refresh();
     }
 
-    if (!error) {
+    if (!halted) {
       kick();
       const timer = setInterval(() => {
         if (active) router.refresh();
@@ -50,7 +52,7 @@ export function GenerationStatus({
     return () => {
       active = false;
     };
-  }, [trackId, error, router]);
+  }, [trackId, halted, router]);
 
   async function retry() {
     setRetrying(true);
@@ -67,10 +69,12 @@ export function GenerationStatus({
 
   return (
     <div className="space-y-2 border border-dashed border-border p-3 text-sm">
-      {error ? (
+      {halted ? (
         <>
           <p className="font-mono text-xs text-destructive">
-            Generation failed: {error}
+            {error
+              ? `Generation failed: ${error}`
+              : 'Generation timed out. A large file can exceed the time limit — try again, and it picks up from what is still missing.'}
           </p>
           <Button
             type="button"

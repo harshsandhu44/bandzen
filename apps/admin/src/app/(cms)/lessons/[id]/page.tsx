@@ -59,6 +59,7 @@ export default async function EditLessonPage({
       />
 
       <PublishControls
+        noun="lesson"
         id={lesson.id}
         status={lesson.status}
         publishAction={publishLessonAction}

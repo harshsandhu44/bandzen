@@ -62,6 +62,7 @@ export default async function EditSpeakingTestPage({
       />
 
       <PublishControls
+        noun="speaking test"
         id={test.id}
         status={test.status}
         publishAction={publishTestAction}
@@ -115,6 +116,7 @@ export default async function EditSpeakingTestPage({
               testId={test.id}
               pending={pending}
               error={test.generationError}
+              timedOut={test.generationTimedOut}
             />
           ) : (
             <p className="text-muted-foreground">

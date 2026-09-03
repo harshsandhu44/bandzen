@@ -45,6 +45,7 @@ export default async function EditWritingPromptPage({
       />
 
       <PublishControls
+        noun="writing prompt"
         id={prompt.id}
         status={prompt.status}
         publishAction={publishWritingPromptAction}

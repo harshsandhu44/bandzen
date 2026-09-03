@@ -55,6 +55,7 @@ export default async function EditResourcePage({
       />
 
       <PublishControls
+        noun="resource"
         id={resource.id}
         status={resource.status}
         publishAction={publishResourceAction}

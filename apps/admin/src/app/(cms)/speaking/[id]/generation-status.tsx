@@ -6,24 +6,26 @@ import { Button } from '@bandzen/ui/components/button';
 
 /**
  * Shown while any prompt in the test is missing its examiner audio. Kicks the
- * generation route once on mount, then refreshes the page every 4s until every
- * prompt has audio. On failure it stops and offers a retry.
- *
- * Same shape as the listening CMS's GenerationStatus — the parent only renders
- * it while audio is actually missing, so it unmounts once generation succeeds.
+ * generation route once on mount, then refreshes every 4s until every prompt
+ * has audio. On failure — or once the server marks the run stale (`timedOut`)
+ * — it stops and offers a retry. Retrying resumes from the prompts still
+ * missing audio, so a test that outran the 120s budget can be finished.
  */
 export function GenerationStatus({
   testId,
   pending,
   error,
+  timedOut = false,
 }: {
   testId: string;
   pending: number;
   error: string | null;
+  timedOut?: boolean;
 }) {
   const router = useRouter();
   const kicked = useRef(false);
   const [retrying, setRetrying] = useState(false);
+  const halted = !!error || timedOut;
 
   useEffect(() => {
     let active = true;
@@ -35,7 +37,7 @@ export function GenerationStatus({
       if (active) router.refresh();
     }
 
-    if (!error) {
+    if (!halted) {
       kick();
       const timer = setInterval(() => {
         if (active) router.refresh();
@@ -49,7 +51,7 @@ export function GenerationStatus({
     return () => {
       active = false;
     };
-  }, [testId, error, router]);
+  }, [testId, halted, router]);
 
   async function retry() {
     setRetrying(true);
@@ -61,10 +63,12 @@ export function GenerationStatus({
 
   return (
     <div className="space-y-2 border border-dashed border-border p-3 text-sm">
-      {error ? (
+      {halted ? (
         <>
           <p className="font-mono text-xs text-destructive">
-            Generation failed: {error}
+            {error
+              ? `Generation failed: ${error}`
+              : 'Generation timed out. A test with many prompts can exceed the time limit — try again to finish the ones still missing audio.'}
           </p>
           <Button
             type="button"

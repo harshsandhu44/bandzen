@@ -33,6 +33,19 @@ async function firstRow<T>(rows: T[]) {
   return rows[0] ?? null;
 }
 
+/**
+ * A generation run (listening audio/transcript, speaking examiner audio) older
+ * than this is treated as dead: its serverless function was almost certainly
+ * killed mid-run, which clears neither the field nor the error. The generate
+ * routes let a new run start past it; the editors show a retry instead of
+ * spinning. Kept here so the routes and the `get*Admin` getters agree.
+ */
+export const GENERATION_STALE_MS = 3 * 60 * 1000;
+
+export function isGenerationStale(startedAt: Date | null): boolean {
+  return startedAt != null && Date.now() - startedAt.getTime() > GENERATION_STALE_MS;
+}
+
 /** Difficulty bands, as the practice filters present them. */
 export const DIFFICULTY_RANGE = {
   easy: [1, 2],
@@ -593,7 +606,11 @@ export async function getTrackAdmin(id: string) {
     .where(eq(questions.trackId, id))
     .orderBy(questions.idx);
 
-  return { ...track, questions: trackQuestions };
+  return {
+    ...track,
+    questions: trackQuestions,
+    generationTimedOut: isGenerationStale(track.generationStartedAt),
+  };
 }
 
 export async function createTrack(input: {
@@ -777,7 +794,11 @@ export async function getSpeakingTestAdmin(id: string) {
     .where(eq(speakingPrompts.testId, id))
     .orderBy(speakingPrompts.idx);
 
-  return { ...test, prompts };
+  return {
+    ...test,
+    prompts,
+    generationTimedOut: isGenerationStale(test.generationStartedAt),
+  };
 }
 
 export async function createSpeakingTest(input: {

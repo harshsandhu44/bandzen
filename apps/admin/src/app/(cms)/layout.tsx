@@ -17,6 +17,7 @@ import { Wordmark } from '@bandzen/ui/components/wordmark';
 import { Version } from '@bandzen/ui/components/version';
 import { requireAdminOrTeacher } from '@/lib/auth';
 import { Nav } from './nav';
+import { Toaster } from '@/components/toast';
 import pkg from '../../../package.json';
 
 /**
@@ -97,6 +98,13 @@ export default async function CmsLayout({
       </Sidebar>
 
       <SidebarInset>
+        <a
+          href="#main"
+          className="sr-only focus:not-sr-only focus:absolute focus:top-2 focus:left-2 focus:z-50 focus:bg-background focus:px-3 focus:py-1.5 focus:text-sm focus:ring-1 focus:ring-ring"
+        >
+          Skip to content
+        </a>
+
         {/* The only way to open the Sheet below `md`. Hidden from `md` up,
             where the rail and Cmd/Ctrl+B do the job and a header would be a
             band of empty space above every screen. */}
@@ -105,8 +113,11 @@ export default async function CmsLayout({
           <Wordmark tag="CMS" />
         </header>
 
-        <div className="flex-1 p-6 sm:p-10">{children}</div>
+        <main id="main" className="flex-1 p-6 sm:p-10">
+          {children}
+        </main>
       </SidebarInset>
+      <Toaster />
     </SidebarProvider>
   );
 }
