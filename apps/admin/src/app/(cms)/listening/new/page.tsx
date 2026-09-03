@@ -4,6 +4,7 @@ import { Label } from '@bandzen/ui/components/label';
 import { Textarea } from '@bandzen/ui/components/textarea';
 import { PageHeader } from '@bandzen/ui/components/primitives';
 import { requireAdminOrTeacher } from '@/lib/auth';
+import { GeneratePanel } from '@/components/generate-panel';
 import { createTrackAction } from '../actions';
 
 export const metadata = { title: 'New track' };
@@ -18,6 +19,12 @@ export default async function NewTrackPage() {
         title="New track"
         description="Created as a draft. Give a transcript, an MP3, or both — whichever is missing is generated (audio from the transcript, or a transcript from the audio). Add questions on the next screen, then publish."
       />
+
+      <GeneratePanel type="listening" noun="track" />
+
+      <div className="border-t border-border pt-2 font-mono text-xs text-muted-foreground">
+        or fill it in by hand
+      </div>
       <form
         action={createTrackAction}
         encType="multipart/form-data"
