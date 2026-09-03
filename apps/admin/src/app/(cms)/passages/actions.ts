@@ -11,29 +11,17 @@ import {
   createQuestion,
   updateQuestion,
   deleteQuestion,
+  getPassageAdmin,
 } from '@bandzen/db/queries';
-import type { Question } from '@bandzen/db/schema';
 import { ContentInUseError, PublishValidationError } from '@bandzen/db/errors';
 import { requireAdminOrTeacher } from '@/lib/auth';
+import { ok, fail, type ActionResult } from '@/lib/action-result';
+import {
+  savePassagePayloadSchema,
+  type SavePassagePayload,
+} from './[id]/schema';
 
 export type ActionState = { error: string | null };
-
-/** Multi-line textarea -> string[] (one entry per non-blank line). */
-function splitLines(value: FormDataEntryValue | null): string[] | null {
-  const lines = String(value ?? '')
-    .split('\n')
-    .map((s) => s.trim())
-    .filter(Boolean);
-  return lines.length > 0 ? lines : null;
-}
-
-/** Comma-separated field -> string[], for the (usually one-entry) answer key. */
-function splitCommas(value: FormDataEntryValue | null): string[] {
-  return String(value ?? '')
-    .split(',')
-    .map((s) => s.trim())
-    .filter(Boolean);
-}
 
 export async function createPassageAction(formData: FormData) {
   const { userId } = await requireAdminOrTeacher();
@@ -50,23 +38,6 @@ export async function createPassageAction(formData: FormData) {
   redirect(`/passages/${passage.id}`);
 }
 
-export async function updatePassageAction(formData: FormData) {
-  const { userId } = await requireAdminOrTeacher();
-  const id = String(formData.get('id') ?? '');
-  await updatePassage(
-    id,
-    {
-      title: String(formData.get('title') ?? '').trim(),
-      body: String(formData.get('body') ?? '').trim(),
-      topic: String(formData.get('topic') ?? '').trim() || null,
-      format: (formData.get('format') as 'academic' | 'general') ?? 'academic',
-      difficulty: Number(formData.get('difficulty') ?? 3),
-      headings: splitLines(formData.get('headings')),
-    },
-    userId,
-  );
-  revalidatePath(`/passages/${id}`);
-}
 
 export async function publishPassageAction(
   _prev: ActionState,
@@ -110,43 +81,69 @@ export async function deletePassageAction(
   redirect('/passages');
 }
 
-export async function createQuestionAction(formData: FormData) {
-  await requireAdminOrTeacher();
-  const passageId = String(formData.get('passageId') ?? '');
-  await createQuestion(
-    { passageId },
-    {
-      idx: Number(formData.get('idx') ?? 0),
-      kind: formData.get('kind') as Question['kind'],
-      prompt: String(formData.get('prompt') ?? '').trim(),
-      options: splitLines(formData.get('options')),
-      evidence: String(formData.get('evidence') ?? '').trim() || null,
-      explanation: String(formData.get('explanation') ?? '').trim() || null,
-      answer: splitCommas(formData.get('answer')),
-    },
-  );
-  revalidatePath(`/passages/${passageId}`);
-}
 
-export async function updateQuestionAction(formData: FormData) {
-  await requireAdminOrTeacher();
-  const id = String(formData.get('id') ?? '');
-  const passageId = String(formData.get('passageId') ?? '');
-  await updateQuestion(id, {
-    idx: Number(formData.get('idx') ?? 0),
-    kind: formData.get('kind') as Question['kind'],
-    prompt: String(formData.get('prompt') ?? '').trim(),
-    options: splitLines(formData.get('options')),
-    evidence: String(formData.get('evidence') ?? '').trim() || null,
-    explanation: String(formData.get('explanation') ?? '').trim() || null,
-    answer: splitCommas(formData.get('answer')),
-  });
-  revalidatePath(`/passages/${passageId}`);
-}
 
-export async function deleteQuestionAction(formData: FormData) {
-  await requireAdminOrTeacher();
-  const passageId = String(formData.get('passageId') ?? '');
-  await deleteQuestion(String(formData.get('id') ?? ''));
-  revalidatePath(`/passages/${passageId}`);
+
+/**
+ * One Save for the whole passage editor: the passage fields plus its full
+ * question list. Questions are diffed against what is stored — rows dropped
+ * from the form are deleted, rows with an id are updated, rows without one are
+ * created. Sequential, not transactional (neon-http), same as the importer.
+ */
+export async function savePassageAction(
+  payload: SavePassagePayload,
+): Promise<ActionResult> {
+  const { userId } = await requireAdminOrTeacher();
+
+  const parsed = savePassagePayloadSchema.safeParse(payload);
+  if (!parsed.success) {
+    return fail('Some fields are invalid — check the highlighted ones.');
+  }
+  const p = parsed.data;
+
+  try {
+    await updatePassage(
+      p.id,
+      {
+        title: p.title,
+        body: p.body,
+        topic: p.topic,
+        format: p.format,
+        difficulty: p.difficulty,
+        headings: p.headings.length > 0 ? p.headings : null,
+      },
+      userId,
+    );
+
+    const existing = await getPassageAdmin(p.id);
+    if (!existing) return fail('That passage no longer exists.');
+
+    const keep = new Set(
+      p.questions.filter((q) => q.id).map((q) => q.id as string),
+    );
+    for (const q of existing.questions) {
+      if (!keep.has(q.id)) await deleteQuestion(q.id);
+    }
+
+    for (const q of p.questions) {
+      const fields = {
+        idx: q.idx,
+        kind: q.kind,
+        prompt: q.prompt,
+        options: q.options,
+        evidence: q.evidence,
+        explanation: q.explanation,
+        answer: q.answer,
+      };
+      if (q.id) await updateQuestion(q.id, fields);
+      else await createQuestion({ passageId: p.id }, fields);
+    }
+
+    revalidatePath(`/passages/${p.id}`);
+    revalidatePath('/passages');
+    return ok('Saved');
+  } catch (e) {
+    console.error('[cms] savePassage failed', e);
+    return fail(e instanceof Error ? e.message : 'Could not save the passage.');
+  }
 }
