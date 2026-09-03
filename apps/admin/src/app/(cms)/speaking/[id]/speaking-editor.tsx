@@ -15,7 +15,7 @@ import { Input } from '@bandzen/ui/components/input';
 import { Select } from '@bandzen/ui/components/select';
 import { Textarea } from '@bandzen/ui/components/textarea';
 import { SaveBar } from '@/components/editor-shell';
-import { toastResult } from '@/components/toast';
+import { toast, toastResult } from '@/components/toast';
 import { useUnsavedGuard } from '@/lib/use-unsaved-guard';
 import { saveSpeakingTestAction } from '../actions';
 import {
@@ -67,7 +67,7 @@ export function SpeakingEditor({
   };
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+    <form onSubmit={handleSubmit(onSubmit, () => toast.error("Some fields need fixing — check the form."))} className="space-y-6">
       <Card>
         <CardHeader>
           <CardTitle>Test</CardTitle>
