@@ -5,6 +5,7 @@ import {
   Headphones,
   LayoutDashboard,
   Library,
+  Mic,
   Users,
   type LucideIcon,
 } from 'lucide-react';
@@ -35,6 +36,7 @@ export const NAV_LINKS: readonly NavLink[] = [
   { href: '/', label: 'Overview', Icon: LayoutDashboard },
   { href: '/passages', label: 'Passages', Icon: BookOpen },
   { href: '/listening', label: 'Listening', Icon: Headphones },
+  { href: '/speaking', label: 'Speaking', Icon: Mic },
   { href: '/writing-prompts', label: 'Writing prompts', Icon: FileText },
   { href: '/lessons', label: 'Lessons', Icon: GraduationCap },
   { href: '/resources', label: 'Resources', Icon: Library },

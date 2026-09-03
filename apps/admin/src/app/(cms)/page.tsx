@@ -21,6 +21,7 @@ export const metadata = { title: 'Overview' };
 const SECTIONS: { type: ContentType; label: string; href: string }[] = [
   { type: 'passage', label: 'Passages', href: '/passages' },
   { type: 'listening-track', label: 'Listening', href: '/listening' },
+  { type: 'speaking-test', label: 'Speaking', href: '/speaking' },
   {
     type: 'writing-prompt',
     label: 'Writing prompts',
@@ -33,6 +34,7 @@ const SECTIONS: { type: ContentType; label: string; href: string }[] = [
 const EDIT_HREF: Record<ContentType, (id: string) => string> = {
   passage: (id) => `/passages/${id}`,
   'listening-track': (id) => `/listening/${id}`,
+  'speaking-test': (id) => `/speaking/${id}`,
   'writing-prompt': (id) => `/writing-prompts/${id}`,
   lesson: (id) => `/lessons/${id}`,
   resource: (id) => `/resources/${id}`,
@@ -41,6 +43,7 @@ const EDIT_HREF: Record<ContentType, (id: string) => string> = {
 const TYPE_LABEL: Record<ContentType, string> = {
   passage: 'Passage',
   'listening-track': 'Track',
+  'speaking-test': 'Speaking',
   'writing-prompt': 'Prompt',
   lesson: 'Lesson',
   resource: 'Resource',
