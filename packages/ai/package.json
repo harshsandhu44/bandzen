@@ -4,14 +4,22 @@
   "private": true,
   "type": "module",
   "exports": {
-    "./speech": "./src/speech.ts"
+    "./speech": "./src/speech.ts",
+    "./client": "./src/client.ts",
+    "./models": "./src/models.ts",
+    "./structured": "./src/structured.ts",
+    "./schemas": "./src/schemas.ts",
+    "./prompts": "./src/prompts.ts",
+    "./generate": "./src/generate.ts"
   },
   "scripts": {
     "lint": "eslint",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "test": "node --test \"src/**/*.test.ts\""
   },
   "dependencies": {
-    "openai": "^7.8.0"
+    "openai": "^7.8.0",
+    "zod": "^4.5.4"
   },
   "devDependencies": {
     "@bandzen/eslint-config": "workspace:*",

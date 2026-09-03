@@ -2,9 +2,17 @@
   "extends": "@bandzen/tsconfig/base.json",
   "compilerOptions": {
     "paths": {
-      "@bandzen/ai/*": ["./src/*"]
-    }
+      "@bandzen/ai/*": [
+        "./src/*"
+      ]
+    },
+    "allowImportingTsExtensions": true,
+    "noEmit": true
   },
-  "include": ["src/**/*.ts"],
-  "exclude": ["node_modules"]
+  "include": [
+    "src/**/*.ts"
+  ],
+  "exclude": [
+    "node_modules"
+  ]
 }
