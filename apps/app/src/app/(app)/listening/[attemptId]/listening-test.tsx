@@ -91,7 +91,10 @@ function Player({ audioUrl }: { audioUrl: string }) {
 
   const start = () => {
     setState('playing');
-    ref.current?.play();
+    // play() returns a promise that rejects with AbortError if the element
+    // unmounts before it resolves -- submitting mid-playback navigates away
+    // and does exactly that. Not an error worth surfacing.
+    ref.current?.play().catch(() => {});
   };
 
   return (
