@@ -12,17 +12,14 @@ import {
 import { ContentInUseError, PublishValidationError } from '@bandzen/db/errors';
 import type { Resource } from '@bandzen/db/schema';
 import { requireAdminOrTeacher } from '@/lib/auth';
+import { ok, fail, type ActionResult } from '@/lib/action-result';
+import {
+  saveResourcePayloadSchema,
+  type SaveResourcePayload,
+} from './[id]/schema';
 
 export type ActionState = { error: string | null };
 
-/** Blank-line-separated textarea -> one string per paragraph. */
-function splitParagraphs(value: FormDataEntryValue | null): string[] | null {
-  const paragraphs = String(value ?? '')
-    .split(/\n\s*\n/)
-    .map((s) => s.trim())
-    .filter(Boolean);
-  return paragraphs.length > 0 ? paragraphs : null;
-}
 
 function orNull(value: FormDataEntryValue | null) {
   const s = String(value ?? '').trim();
@@ -48,25 +45,6 @@ export async function createResourceAction(formData: FormData) {
   redirect(`/resources/${resource.id}`);
 }
 
-export async function updateResourceAction(formData: FormData) {
-  const { userId } = await requireAdminOrTeacher();
-  const id = String(formData.get('id') ?? '');
-  await updateResource(
-    id,
-    {
-      title: String(formData.get('title') ?? '').trim(),
-      summary: String(formData.get('summary') ?? '').trim(),
-      category: formData.get('category') as never,
-      level: formData.get('level') as never,
-      minutes: Number(formData.get('minutes') ?? 5),
-      module: orNull(formData.get('module')) as never,
-      questionKind: orNull(formData.get('questionKind')) as never,
-      body: splitParagraphs(formData.get('body')),
-    },
-    userId,
-  );
-  revalidatePath(`/resources/${id}`);
-}
 
 export async function publishResourceAction(
   _prev: ActionState,
@@ -108,4 +86,22 @@ export async function deleteResourceAction(
   }
   revalidatePath('/resources');
   redirect('/resources');
+}
+
+export async function saveResourceAction(
+  id: string,
+  input: SaveResourcePayload,
+): Promise<ActionResult> {
+  const { userId } = await requireAdminOrTeacher();
+  const parsed = saveResourcePayloadSchema.safeParse(input);
+  if (!parsed.success) return fail('Check the highlighted fields.');
+  try {
+    await updateResource(id, parsed.data, userId);
+    revalidatePath(`/resources/${id}`);
+    revalidatePath('/resources');
+    return ok('Saved');
+  } catch (e) {
+    console.error('[cms] saveResource failed', e);
+    return fail(e instanceof Error ? e.message : 'Could not save.');
+  }
 }

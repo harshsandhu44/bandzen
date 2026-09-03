@@ -11,30 +11,17 @@ import {
   createQuestion,
   updateQuestion,
   deleteQuestion,
+  getTrackAdmin,
 } from '@bandzen/db/queries';
-import type { Question } from '@bandzen/db/schema';
 import { ContentInUseError, PublishValidationError } from '@bandzen/db/errors';
 import { uploadObject } from '@bandzen/storage/r2';
 import { requireAdminOrTeacher } from '@/lib/auth';
+import { ok, fail, type ActionResult } from '@/lib/action-result';
+import { saveTrackPayloadSchema, type SaveTrackPayload } from './[id]/schema';
 
 export type ActionState = { error: string | null };
 
-/** Multi-line textarea -> string[] (one entry per non-blank line). */
-function splitLines(value: FormDataEntryValue | null): string[] | null {
-  const lines = String(value ?? '')
-    .split('\n')
-    .map((s) => s.trim())
-    .filter(Boolean);
-  return lines.length > 0 ? lines : null;
-}
 
-/** Comma-separated field -> string[], for the (usually one-entry) answer key. */
-function splitCommas(value: FormDataEntryValue | null): string[] {
-  return String(value ?? '')
-    .split(',')
-    .map((s) => s.trim())
-    .filter(Boolean);
-}
 
 /**
  * Uploads the posted MP3 to R2 and returns its public URL, or null when no
@@ -73,22 +60,6 @@ export async function createTrackAction(formData: FormData) {
   redirect(`/listening/${track.id}`);
 }
 
-export async function updateTrackAction(formData: FormData) {
-  const { userId } = await requireAdminOrTeacher();
-  const id = String(formData.get('id') ?? '');
-  await updateTrack(
-    id,
-    {
-      title: String(formData.get('title') ?? '').trim(),
-      topic: String(formData.get('topic') ?? '').trim() || null,
-      transcript: String(formData.get('transcript') ?? '').trim() || null,
-      difficulty: Number(formData.get('difficulty') ?? 3),
-      matchingOptions: splitLines(formData.get('matchingOptions')),
-    },
-    userId,
-  );
-  revalidatePath(`/listening/${id}`);
-}
 
 export async function replaceAudioAction(formData: FormData) {
   const { userId } = await requireAdminOrTeacher();
@@ -157,43 +128,68 @@ export async function deleteTrackAction(
   redirect('/listening');
 }
 
-export async function createQuestionAction(formData: FormData) {
-  await requireAdminOrTeacher();
-  const trackId = String(formData.get('trackId') ?? '');
-  await createQuestion(
-    { trackId },
-    {
-      idx: Number(formData.get('idx') ?? 0),
-      kind: formData.get('kind') as Question['kind'],
-      prompt: String(formData.get('prompt') ?? '').trim(),
-      options: splitLines(formData.get('options')),
-      evidence: String(formData.get('evidence') ?? '').trim() || null,
-      explanation: String(formData.get('explanation') ?? '').trim() || null,
-      answer: splitCommas(formData.get('answer')),
-    },
-  );
-  revalidatePath(`/listening/${trackId}`);
-}
 
-export async function updateQuestionAction(formData: FormData) {
-  await requireAdminOrTeacher();
-  const id = String(formData.get('id') ?? '');
-  const trackId = String(formData.get('trackId') ?? '');
-  await updateQuestion(id, {
-    idx: Number(formData.get('idx') ?? 0),
-    kind: formData.get('kind') as Question['kind'],
-    prompt: String(formData.get('prompt') ?? '').trim(),
-    options: splitLines(formData.get('options')),
-    evidence: String(formData.get('evidence') ?? '').trim() || null,
-    explanation: String(formData.get('explanation') ?? '').trim() || null,
-    answer: splitCommas(formData.get('answer')),
-  });
-  revalidatePath(`/listening/${trackId}`);
-}
 
-export async function deleteQuestionAction(formData: FormData) {
-  await requireAdminOrTeacher();
-  const trackId = String(formData.get('trackId') ?? '');
-  await deleteQuestion(String(formData.get('id') ?? ''));
-  revalidatePath(`/listening/${trackId}`);
+
+/**
+ * One Save for the listening editor: track fields plus its full question list.
+ * Questions are diffed against what is stored (shared question queries, keyed
+ * by trackId). Audio stays a separate upload; the generation poll fills in a
+ * missing transcript or audio file.
+ */
+export async function saveTrackAction(
+  payload: SaveTrackPayload,
+): Promise<ActionResult> {
+  const { userId } = await requireAdminOrTeacher();
+
+  const parsed = saveTrackPayloadSchema.safeParse(payload);
+  if (!parsed.success) {
+    return fail('Some fields are invalid — check the highlighted ones.');
+  }
+  const p = parsed.data;
+
+  try {
+    await updateTrack(
+      p.id,
+      {
+        title: p.title,
+        topic: p.topic,
+        difficulty: p.difficulty,
+        transcript: p.transcript,
+        matchingOptions: p.matchingOptions,
+      },
+      userId,
+    );
+
+    const existing = await getTrackAdmin(p.id);
+    if (!existing) return fail('That track no longer exists.');
+
+    const keep = new Set(
+      p.questions.filter((q) => q.id).map((q) => q.id as string),
+    );
+    for (const q of existing.questions) {
+      if (!keep.has(q.id)) await deleteQuestion(q.id);
+    }
+
+    for (const q of p.questions) {
+      const fields = {
+        idx: q.idx,
+        kind: q.kind,
+        prompt: q.prompt,
+        options: q.options,
+        evidence: q.evidence,
+        explanation: q.explanation,
+        answer: q.answer,
+      };
+      if (q.id) await updateQuestion(q.id, fields);
+      else await createQuestion({ trackId: p.id }, fields);
+    }
+
+    revalidatePath(`/listening/${p.id}`);
+    revalidatePath('/listening');
+    return ok('Saved');
+  } catch (e) {
+    console.error('[cms] saveTrack failed', e);
+    return fail(e instanceof Error ? e.message : 'Could not save the track.');
+  }
 }

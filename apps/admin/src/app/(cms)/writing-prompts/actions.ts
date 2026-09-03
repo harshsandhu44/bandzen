@@ -11,6 +11,8 @@ import {
 } from '@bandzen/db/queries';
 import { ContentInUseError, PublishValidationError } from '@bandzen/db/errors';
 import { requireAdminOrTeacher } from '@/lib/auth';
+import { ok, fail, type ActionResult } from '@/lib/action-result';
+import { promptFormSchema } from './[id]/schema';
 
 export type ActionState = { error: string | null };
 
@@ -27,20 +29,6 @@ export async function createWritingPromptAction(formData: FormData) {
   redirect(`/writing-prompts/${prompt.id}`);
 }
 
-export async function updateWritingPromptAction(formData: FormData) {
-  const { userId } = await requireAdminOrTeacher();
-  const id = String(formData.get('id') ?? '');
-  await updateWritingPrompt(
-    id,
-    {
-      task: Number(formData.get('task') ?? 2),
-      format: (formData.get('format') as 'academic' | 'general') ?? 'academic',
-      promptText: String(formData.get('promptText') ?? '').trim(),
-    },
-    userId,
-  );
-  revalidatePath(`/writing-prompts/${id}`);
-}
 
 export async function publishWritingPromptAction(
   _prev: ActionState,
@@ -82,4 +70,22 @@ export async function deleteWritingPromptAction(
   }
   revalidatePath('/writing-prompts');
   redirect('/writing-prompts');
+}
+
+export async function savePromptAction(
+  id: string,
+  input: unknown,
+): Promise<ActionResult> {
+  const { userId } = await requireAdminOrTeacher();
+  const parsed = promptFormSchema.safeParse(input);
+  if (!parsed.success) return fail('Check the highlighted fields.');
+  try {
+    await updateWritingPrompt(id, parsed.data, userId);
+    revalidatePath(`/writing-prompts/${id}`);
+    revalidatePath('/writing-prompts');
+    return ok('Saved');
+  } catch (e) {
+    console.error('[cms] savePrompt failed', e);
+    return fail(e instanceof Error ? e.message : 'Could not save.');
+  }
 }
