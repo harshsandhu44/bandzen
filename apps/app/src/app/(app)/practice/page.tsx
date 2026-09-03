@@ -33,11 +33,13 @@ const MIN_ATTEMPTED = 5;
 const MODULE_HREF: Record<string, string> = {
   reading: '/reading',
   writing: '/writing',
+  listening: '/listening',
 };
 
 const MODULE_BLURB: Record<string, string> = {
   reading: 'Timed passages, filtered by the question type you want to drill.',
   writing: 'Task 2 prompts, graded against the four IELTS criteria.',
+  listening: 'Tracks that play once, exactly as they do in the exam.',
 };
 
 /**
