@@ -1,3 +1,10 @@
+# admin [0.3.0](https://github.com/harshsandhu44/bandzen/compare/admin@0.2.0...admin@0.3.0) (2026-09-03)
+
+
+### Features
+
+* Speaking module — async recorded, audio-graded, Pro-only ([#19](https://github.com/harshsandhu44/bandzen/issues/19)) ([4a48972](https://github.com/harshsandhu44/bandzen/commit/4a489724ad540d2919b56fcde906cf3f57c89673))
+
 # admin [0.2.0](https://github.com/harshsandhu44/bandzen/compare/admin@0.1.0...admin@0.2.0) (2026-09-03)
 
 
