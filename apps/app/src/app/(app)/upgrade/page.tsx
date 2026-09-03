@@ -12,6 +12,7 @@ import { capture } from '@/lib/analytics';
 import { requireUserId } from '@/lib/auth';
 import { daysUntil } from '@/lib/dates';
 import { getProfile, getSubscription, latestBand } from '@/lib/db/queries';
+import { meanBand } from '@/lib/plan-data';
 import {
   FREE_COACH_MESSAGES_PER_WINDOW,
   FREE_ESSAYS_PER_WINDOW,
@@ -57,13 +58,15 @@ export default async function UpgradePage(props: PageProps<'/upgrade'>) {
   const source =
     typeof searchParams.from === 'string' ? searchParams.from : 'direct';
 
-  const [user, profile, subscription, reading, writing] = await Promise.all([
-    currentUser(),
-    getProfile(userId),
-    getSubscription(userId),
-    latestBand(userId, 'reading'),
-    latestBand(userId, 'writing'),
-  ]);
+  const [user, profile, subscription, reading, writing, listening] =
+    await Promise.all([
+      currentUser(),
+      getProfile(userId),
+      getSubscription(userId),
+      latestBand(userId, 'reading'),
+      latestBand(userId, 'writing'),
+      latestBand(userId, 'listening'),
+    ]);
 
   await capture(userId, 'upgrade_viewed', { source });
 
@@ -75,7 +78,7 @@ export default async function UpgradePage(props: PageProps<'/upgrade'>) {
   const days = profile?.testDate
     ? daysUntil(profile.testDate, profile.timezone)
     : null;
-  const measured = writing ?? reading;
+  const measured = meanBand(reading, writing, listening);
   const gap =
     profile?.targetBand != null && measured != null
       ? profile.targetBand - measured

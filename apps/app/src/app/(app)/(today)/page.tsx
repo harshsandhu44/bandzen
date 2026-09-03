@@ -128,7 +128,11 @@ export default async function DashboardPage() {
       <PerformanceInsight insight={insight} />
 
       <BandOverview
-        bands={{ reading: data.readingBand, writing: data.writingBand }}
+        bands={{
+          reading: data.readingBand,
+          writing: data.writingBand,
+          listening: data.listeningBand,
+        }}
         target={profile.targetBand}
       />
 
@@ -145,7 +149,9 @@ export default async function DashboardPage() {
                   href={
                     a.module === 'reading'
                       ? `/reading/${a.id}/review`
-                      : `/writing/${a.id}/report`
+                      : a.module === 'listening'
+                        ? `/listening/${a.id}/review`
+                        : `/writing/${a.id}/report`
                   }
                   className="text-sm underline-offset-4 hover:underline"
                 >

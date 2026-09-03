@@ -9,7 +9,7 @@ import { requireUserId } from '@/lib/auth';
 import {
   accuracyByQuestionKind,
   getAttempt,
-  getReadingReview,
+  getListeningReview,
   isAnswerCorrect,
 } from '@/lib/db/queries';
 import { QUESTION_KIND_LABEL } from '@/lib/modules';
@@ -21,20 +21,20 @@ export const metadata = { title: 'Review' };
 
 export default async function ReviewPage({
   params,
-}: PageProps<'/reading/[attemptId]/review'>) {
+}: PageProps<'/listening/[attemptId]/review'>) {
   const { attemptId } = await params;
   const userId = await requireUserId();
 
   const attempt = await getAttempt(userId, attemptId);
   if (!attempt) notFound();
-  if (attempt.status !== 'complete') redirect(`/reading/${attemptId}`);
+  if (attempt.status !== 'complete') redirect(`/listening/${attemptId}`);
 
-  const data = await getReadingReview(userId, attemptId);
+  const data = await getListeningReview(userId, attemptId);
   if (!data) notFound();
 
   // Accuracy across every attempt, so a mistake made here can be named as a
   // recurring one -- or not named at all, when the history is too thin.
-  const history = await accuracyByQuestionKind(userId, 'reading');
+  const history = await accuracyByQuestionKind(userId, 'listening');
   const byKind = new Map(history.map((k) => [k.kind, k]));
 
   const label = (kind: string) =>
@@ -59,7 +59,7 @@ export default async function ReviewPage({
     <div className="max-w-3xl space-y-10">
       <header className="space-y-4">
         <p className="font-mono text-[0.6875rem] tracking-[0.18em] text-muted-foreground uppercase">
-          Review · {data.passage.title}
+          Review · {data.track.title}
         </p>
         <div className="flex items-baseline gap-4">
           <span className="font-metric text-metric-lg">
@@ -71,7 +71,7 @@ export default async function ReviewPage({
           </span>
         </div>
         {attempt.band != null ? (
-          <BandScale value={attempt.band} label="Reading" />
+          <BandScale value={attempt.band} label="Listening" />
         ) : null}
       </header>
 
@@ -171,7 +171,7 @@ export default async function ReviewPage({
                     one was not a one-off.
                   </p>
                   <Link
-                    href={`/reading?kind=${kind}`}
+                    href={`/listening?kind=${kind}`}
                     className="inline-flex items-center gap-1 text-xs underline-offset-4 hover:underline"
                   >
                     Practise {label(kind)}
@@ -184,20 +184,33 @@ export default async function ReviewPage({
         </section>
       ) : null}
 
+      <section aria-labelledby="transcript-heading" className="space-y-3">
+        <SectionHeader as="h2">
+          <span id="transcript-heading">Transcript</span>
+        </SectionHeader>
+        {data.track.transcript.split(/\n\s*\n/).map((para, i) => (
+          <p key={i} className="text-sm leading-7 whitespace-pre-line">
+            {para}
+          </p>
+        ))}
+      </section>
+
       <div className="flex flex-wrap items-center gap-3 border-t border-border pt-6">
         <Button
           nativeButton={false}
           render={
             <Link
               href={
-                patterns[0] ? `/reading?kind=${patterns[0].kind}` : '/reading'
+                patterns[0]
+                  ? `/listening?kind=${patterns[0].kind}`
+                  : '/listening'
               }
             />
           }
         >
           {patterns[0]
             ? `Practise ${label(patterns[0].kind)}`
-            : 'Practise another passage'}
+            : 'Practise another track'}
           <ArrowRight />
         </Button>
         <Link

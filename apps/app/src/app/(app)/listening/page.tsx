@@ -1,0 +1,162 @@
+import Link from 'next/link';
+import { Button } from '@bandzen/ui/components/button';
+import { EmptyState, PageHeader } from '@/components/app/primitives';
+import { FilterBar } from '@/components/app/filter-bar';
+import { requireUserId } from '@/lib/auth';
+import { DIFFICULTY_RANGE, listTracks } from '@/lib/db/queries';
+import { QUESTION_KIND_LABEL } from '@/lib/modules';
+import { startListeningAttempt } from './actions';
+
+/**
+ * Content is shared and immutable, but it lives in the database and there is
+ * no database at build time — so render on demand rather than prerender.
+ *
+ * ponytail: this is a handful of rows per request. If the track list grows
+ * enough to matter, wrap the query in a cache rather than making the page
+ * static, since the seed can change without a redeploy.
+ */
+export const dynamic = 'force-dynamic';
+
+export const metadata = { title: 'Listening practice' };
+
+/** The question kinds that actually appear on a listening track — T/F/NG and
+ *  matching_headings are reading-specific, so they're left out of this filter. */
+const LISTENING_KINDS = [
+  'multiple_choice',
+  'sentence_completion',
+  'matching',
+] as const;
+
+const KIND_OPTIONS = [
+  { value: '', label: 'All types' },
+  ...LISTENING_KINDS.map((value) => ({
+    value,
+    label: QUESTION_KIND_LABEL[value],
+  })),
+];
+
+const DIFFICULTY_OPTIONS = [
+  { value: '', label: 'Any' },
+  { value: 'easy', label: 'Easy' },
+  { value: 'medium', label: 'Medium' },
+  { value: 'hard', label: 'Hard' },
+];
+
+type Kind = (typeof LISTENING_KINDS)[number];
+type Difficulty = keyof typeof DIFFICULTY_RANGE;
+
+export default async function ListeningPage({
+  searchParams,
+}: PageProps<'/listening'>) {
+  // Auth is checked at the resource, not in middleware — see proxy.ts.
+  await requireUserId();
+
+  const sp = await searchParams;
+  const one = (v: string | string[] | undefined) =>
+    (Array.isArray(v) ? v[0] : v) || undefined;
+
+  // Unknown values are dropped rather than passed to the query.
+  const rawKind = one(sp.kind);
+  const kind = (LISTENING_KINDS as readonly string[]).includes(rawKind ?? '')
+    ? (rawKind as Kind)
+    : undefined;
+
+  const rawDifficulty = one(sp.difficulty);
+  const difficulty =
+    rawDifficulty && rawDifficulty in DIFFICULTY_RANGE
+      ? (rawDifficulty as Difficulty)
+      : undefined;
+
+  const trackId = one(sp.track);
+
+  const tracks = await listTracks({ kind, difficulty, id: trackId });
+  const params = { kind, difficulty };
+
+  return (
+    <div className="max-w-3xl space-y-8">
+      <PageHeader
+        eyebrow="Listening"
+        title="Practice tracks"
+        description={
+          kind
+            ? `Tracks containing ${QUESTION_KIND_LABEL[kind]} questions. Audio plays once, exactly as it does in the exam.`
+            : 'Each track plays once, exactly as it does in the exam, with a batch of questions to answer as you listen.'
+        }
+      />
+
+      {trackId ? (
+        <p className="border-l-2 border-chrome py-2 pl-4 text-sm">
+          Showing the track from your study plan.{' '}
+          <Link href="/listening" className="underline underline-offset-4">
+            Show all tracks
+          </Link>
+        </p>
+      ) : (
+        <div className="flex flex-wrap gap-x-10 gap-y-4">
+          <FilterBar
+            legend="Question type"
+            param="kind"
+            options={KIND_OPTIONS}
+            active={kind ?? ''}
+            basePath="/listening"
+            params={params}
+          />
+          <FilterBar
+            legend="Difficulty"
+            param="difficulty"
+            options={DIFFICULTY_OPTIONS}
+            active={difficulty ?? ''}
+            basePath="/listening"
+            params={params}
+          />
+        </div>
+      )}
+
+      {!tracks.length ? (
+        kind || difficulty ? (
+          <EmptyState
+            title="No tracks match those filters"
+            description="There are only a few tracks seeded so far. Widen the filters, or practise a different question type."
+            action={
+              <Button
+                variant="outline"
+                size="sm"
+                nativeButton={false}
+                render={<Link href="/listening" />}
+              >
+                Clear filters
+              </Button>
+            }
+          />
+        ) : (
+          <EmptyState
+            title="No tracks seeded yet"
+            description="Run pnpm content:listening:generate, review the JSON it writes, then pnpm content:listening:audio, pnpm content:listening:sql, and pnpm db:seed."
+          />
+        )
+      ) : (
+        <ul className="divide-y divide-border border-y border-border">
+          {tracks.map((t) => (
+            <li
+              key={t.id}
+              className="flex items-center justify-between gap-4 py-4"
+            >
+              <div>
+                <h2 className="font-medium">{t.title}</h2>
+                <p className="font-mono text-[0.6875rem] tracking-[0.18em] text-muted-foreground uppercase">
+                  {t.topic} · Level {t.difficulty}
+                </p>
+              </div>
+              <form action={startListeningAttempt}>
+                <input type="hidden" name="trackId" value={t.id} />
+                <Button type="submit" variant="outline" size="sm">
+                  Start
+                </Button>
+              </form>
+            </li>
+          ))}
+        </ul>
+      )}
+    </div>
+  );
+}

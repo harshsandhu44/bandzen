@@ -103,3 +103,66 @@ export const generatedPassageSchema = z.object({
 
 export type GeneratedPassage = z.infer<typeof generatedPassageSchema>;
 export type GeneratedQuestion = z.infer<typeof generatedQuestionSchema>;
+
+/**
+ * One generated Listening track — a transcript plus its questions, with no
+ * audio yet. Shared with `scripts/generate-listening-content.mts`.
+ *
+ * Only the three question kinds real Listening actually uses: T/F/NG and
+ * matching_headings are Reading-specific (the latter needs a passage's
+ * paragraphs, which a spoken track has none of).
+ */
+export const LISTENING_QUESTION_KINDS = [
+  'multiple_choice',
+  'sentence_completion',
+  'matching',
+] as const;
+
+export const generatedListeningQuestionSchema = z.object({
+  idx: z.int(),
+  kind: z.enum(LISTENING_QUESTION_KINDS),
+  prompt: z.string(),
+  options: z
+    .array(z.string())
+    .nullable()
+    .describe(
+      'Choices for multiple_choice ONLY. Must be null for matching, which draws from the track-level matchingOptions list.',
+    ),
+  answer: z
+    .array(z.string())
+    .describe(
+      'Accepted answers. One entry normally; more only where the transcript genuinely supports a synonym.',
+    ),
+  evidence: z
+    .string()
+    .describe(
+      'The exact line(s) from transcript that justify the answer, verbatim.',
+    ),
+  explanation: z.string(),
+});
+
+export const generatedListeningTrackSchema = z.object({
+  slug: z.string().describe('kebab-case, unique'),
+  title: z.string(),
+  topic: z.string(),
+  difficulty: z.int().min(1).max(5),
+  transcript: z
+    .string()
+    .describe(
+      '350-450 words of spoken script (a monologue or a conversation between clearly labelled speakers), on a everyday or academic topic a real IELTS Listening section would use.',
+    ),
+  matchingOptions: z
+    .array(z.string())
+    .nullable()
+    .describe(
+      'One shared list of options covering every `matching` question, with at least three MORE options than there are such questions, or null if the track has no matching questions.',
+    ),
+  questions: z.array(generatedListeningQuestionSchema),
+});
+
+export type GeneratedListeningTrack = z.infer<
+  typeof generatedListeningTrackSchema
+>;
+export type GeneratedListeningQuestion = z.infer<
+  typeof generatedListeningQuestionSchema
+>;

@@ -28,7 +28,13 @@ import {
 } from '@/lib/db/queries';
 import { AwardWall } from '@/components/awards/award-wall';
 import { ProTag } from '@/components/billing/pro';
-import { MODULE_LABEL, QUESTION_KIND_LABEL } from '@/lib/modules';
+import {
+  AVAILABLE_MODULES,
+  IELTS_MODULES,
+  MODULE_LABEL,
+  QUESTION_KIND_LABEL,
+  isAvailable,
+} from '@/lib/modules';
 import { meanBand } from '@/lib/plan-data';
 import type { Skill } from '@/lib/db/schema';
 
@@ -54,7 +60,7 @@ export default async function ProgressPage() {
     await Promise.all([
       getProfile(userId),
       bandHistory(userId),
-      accuracyByQuestionKind(userId),
+      accuracyByQuestionKind(userId, 'reading'),
       activitySummary(userId),
       listLessonProgress(userId),
       listCompletedAttempts(userId, 50),
@@ -90,10 +96,8 @@ export default async function ProgressPage() {
 
   const reading = latest('reading');
   const writing = latest('writing');
-  const overall =
-    reading != null && writing != null
-      ? meanBand(reading, writing)
-      : (reading ?? writing);
+  const listening = latest('listening');
+  const overall = meanBand(reading, writing, listening);
 
   if (!points.length) {
     return (
@@ -188,7 +192,7 @@ export default async function ProgressPage() {
           <span id="modules-heading">By module</span>
         </SectionHeader>
 
-        {(['reading', 'writing'] as const).map((module) => {
+        {AVAILABLE_MODULES.map((module) => {
           const modulePoints = byModule(module);
           if (!modulePoints.length) {
             return (
@@ -219,8 +223,9 @@ export default async function ProgressPage() {
           );
         })}
 
-        <LockedModule module="listening" />
-        <LockedModule module="speaking" />
+        {IELTS_MODULES.filter((m) => !isAvailable(m)).map((module) => (
+          <LockedModule key={module} module={module} />
+        ))}
       </section>
 
       {accuracy.length ? (

@@ -44,7 +44,7 @@ export const NAV_LINKS: readonly NavLink[] = [
     href: '/practice',
     label: 'Practice',
     Icon: BookOpen,
-    owns: ['/reading', '/writing', '/tests', '/diagnostic'],
+    owns: ['/reading', '/writing', '/listening', '/tests', '/diagnostic'],
   },
   { href: '/progress', label: 'Progress', Icon: LineChart, owns: ['/review'] },
   { href: '/coach', label: 'Coach', Icon: MessageSquare },

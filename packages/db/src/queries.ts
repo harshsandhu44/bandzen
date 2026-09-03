@@ -8,6 +8,7 @@ import {
   attempts,
   lessonProgress,
   lessons,
+  listeningTracks,
   passages,
   questionAnswers,
   questions,
@@ -106,6 +107,67 @@ export async function pickEasiestPassage() {
       .from(passages)
       .where(eq(passages.status, 'published'))
       .orderBy(passages.difficulty)
+      .limit(1),
+  );
+}
+
+/**
+ * Listening tracks. No format filter — real IELTS Listening is identical for
+ * Academic and General Training, unlike Reading/Writing.
+ */
+export function listTracks(filters?: {
+  kind?: Question['kind'];
+  difficulty?: keyof typeof DIFFICULTY_RANGE;
+  id?: string;
+}) {
+  const clauses = [eq(listeningTracks.status, 'published')];
+
+  if (filters?.id) clauses.push(eq(listeningTracks.id, filters.id));
+
+  if (filters?.difficulty) {
+    const [min, max] = DIFFICULTY_RANGE[filters.difficulty];
+    clauses.push(
+      gte(listeningTracks.difficulty, min),
+      lte(listeningTracks.difficulty, max),
+    );
+  }
+
+  if (filters?.kind) {
+    // A track qualifies if it carries at least one question of that kind.
+    clauses.push(
+      exists(
+        db
+          .select({ one: sql`1` })
+          .from(questions)
+          .where(
+            and(
+              eq(questions.trackId, listeningTracks.id),
+              eq(questions.kind, filters.kind),
+            ),
+          ),
+      ),
+    );
+  }
+
+  return db
+    .select({
+      id: listeningTracks.id,
+      title: listeningTracks.title,
+      topic: listeningTracks.topic,
+      difficulty: listeningTracks.difficulty,
+    })
+    .from(listeningTracks)
+    .where(clauses.length ? and(...clauses) : undefined)
+    .orderBy(listeningTracks.difficulty);
+}
+
+export async function pickEasiestTrack() {
+  return firstRow(
+    await db
+      .select({ id: listeningTracks.id })
+      .from(listeningTracks)
+      .where(eq(listeningTracks.status, 'published'))
+      .orderBy(listeningTracks.difficulty)
       .limit(1),
   );
 }
