@@ -166,3 +166,96 @@ export type GeneratedListeningTrack = z.infer<
 export type GeneratedListeningQuestion = z.infer<
   typeof generatedListeningQuestionSchema
 >;
+
+// ---------------------------------------------------------------------------
+// Speaking
+// ---------------------------------------------------------------------------
+
+/**
+ * The IELTS Speaking assessment criteria, each 0-9. The overall band is their
+ * mean, rounded to the nearest half band — the same rule as Writing.
+ */
+export const SPEAKING_CRITERION_NAMES = [
+  'Fluency and Coherence',
+  'Lexical Resource',
+  'Grammatical Range and Accuracy',
+  'Pronunciation',
+] as const;
+
+/**
+ * The grader's report on one Speaking test. Same shape as
+ * `writingEvaluationSchema` so it writes to the same `reports` table and the
+ * report page can share its rendering.
+ *
+ * Annotation `quote`s are lifted from the Whisper transcripts of the answers;
+ * `grade-speaking.ts` drops any that do not appear verbatim, exactly as the
+ * essay grader does.
+ */
+export const speakingEvaluationSchema = z.object({
+  band: z.number().describe('Overall band, 0-9, whole or half.'),
+  criteria: z.array(
+    z.object({
+      name: z.enum(SPEAKING_CRITERION_NAMES),
+      band: z.number(),
+      comment: z.string(),
+    }),
+  ),
+  annotations: z.array(
+    z.object({
+      quote: z
+        .string()
+        .describe('Verbatim extract from what the candidate said.'),
+      kind: z.enum(['good', 'grammar', 'vocabulary', 'fluency']),
+      comment: z.string(),
+    }),
+  ),
+  strengths: z.array(z.string()),
+  weaknesses: z.array(z.string()),
+});
+
+export type SpeakingEvaluation = z.infer<typeof speakingEvaluationSchema>;
+
+/**
+ * One generated Speaking test — the three parts, no audio yet. Shared with
+ * `scripts/generate-speaking-content.mts`.
+ *
+ * `.describe()` strings carry the IELTS format rules and are shipped to the
+ * model as part of the schema — edit them as you would a prompt.
+ */
+const generatedSpeakingQuestionSchema = z.object({
+  idx: z.int().describe('Ordering within the whole test, starting at 1.'),
+  text: z.string(),
+});
+
+export const generatedSpeakingTestSchema = z.object({
+  slug: z.string().describe('kebab-case, unique'),
+  title: z.string(),
+  topic: z.string(),
+  difficulty: z.int().min(1).max(5),
+  part1: z
+    .array(generatedSpeakingQuestionSchema)
+    .describe(
+      '3-4 short personal questions on one familiar topic (home, work, study, hobbies), the kind that open a real IELTS interview.',
+    ),
+  part2: z
+    .object({
+      cueCard: z
+        .string()
+        .describe(
+          'The "Describe a ..." task line the candidate speaks to for 1-2 minutes.',
+        ),
+      points: z
+        .array(z.string())
+        .describe(
+          'The 3-4 "You should say:" bullet points printed on the cue card.',
+        ),
+    })
+    .describe('The Part 2 long turn. One cue card. prep_seconds is 60.'),
+  part3: z
+    .array(generatedSpeakingQuestionSchema)
+    .describe(
+      '4-6 abstract discussion questions thematically linked to the Part 2 topic — opinion, comparison, speculation.',
+    ),
+});
+
+export type GeneratedSpeakingTest = z.infer<typeof generatedSpeakingTestSchema>;
