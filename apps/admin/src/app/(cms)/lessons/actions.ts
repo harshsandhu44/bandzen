@@ -12,6 +12,7 @@ import {
 import type { Lesson } from '@bandzen/db/schema';
 import { ContentInUseError, PublishValidationError } from '@bandzen/db/errors';
 import { requireAdminOrTeacher } from '@/lib/auth';
+import { runBulk } from '@/lib/bulk';
 import { ok, fail, type ActionResult } from '@/lib/action-result';
 import {
   saveLessonPayloadSchema,
@@ -129,4 +130,31 @@ export async function saveLessonAction(
     console.error('[cms] saveLesson failed', e);
     return fail(e instanceof Error ? e.message : 'Could not save the lesson.');
   }
+}
+
+export async function bulkPublishLessonsAction(
+  ids: string[],
+): Promise<ActionResult> {
+  const { userId } = await requireAdminOrTeacher();
+  const result = await runBulk(ids, (id) => publishLesson(id, userId), 'Published');
+  revalidatePath('/lessons');
+  return result;
+}
+
+export async function bulkUnpublishLessonsAction(
+  ids: string[],
+): Promise<ActionResult> {
+  const { userId } = await requireAdminOrTeacher();
+  const result = await runBulk(ids, (id) => unpublishLesson(id, userId), 'Unpublished');
+  revalidatePath('/lessons');
+  return result;
+}
+
+export async function bulkDeleteLessonsAction(
+  ids: string[],
+): Promise<ActionResult> {
+  await requireAdminOrTeacher();
+  const result = await runBulk(ids, (id) => deleteLesson(id), 'Deleted');
+  revalidatePath('/lessons');
+  return result;
 }

@@ -1,6 +1,19 @@
 import 'server-only';
 
-import { and, count, desc, eq, exists, gte, lte, sql } from 'drizzle-orm';
+import {
+  and,
+  count,
+  desc,
+  eq,
+  exists,
+  gte,
+  ilike,
+  isNotNull,
+  lt,
+  lte,
+  or,
+  sql,
+} from 'drizzle-orm';
 import { unionAll } from 'drizzle-orm/pg-core';
 import { db } from './client';
 import { ContentInUseError, PublishValidationError } from './errors';
@@ -31,6 +44,20 @@ import {
 
 async function firstRow<T>(rows: T[]) {
   return rows[0] ?? null;
+}
+
+/** The `?q=` box on every admin list: case-insensitive match on title/slug. */
+export type AdminListFilters = { status?: ContentStatus; q?: string };
+function adminSearch(
+  slugCol: Parameters<typeof ilike>[0],
+  titleCol: Parameters<typeof ilike>[0] | null,
+  q?: string,
+) {
+  if (!q?.trim()) return undefined;
+  const like = `%${q.trim()}%`;
+  const parts = [ilike(slugCol, like)];
+  if (titleCol) parts.push(ilike(titleCol, like));
+  return or(...parts);
 }
 
 /**
@@ -339,11 +366,16 @@ export async function markLessonComplete(userId: string, lessonSlug: string) {
 // a visible "incomplete" draft, not silent data corruption.
 // ---------------------------------------------------------------------------
 
-export async function listPassagesAdmin(filters?: { status?: ContentStatus }) {
+export async function listPassagesAdmin(filters?: AdminListFilters) {
   return db
     .select()
     .from(passages)
-    .where(filters?.status ? eq(passages.status, filters.status) : undefined)
+    .where(
+      and(
+        filters?.status ? eq(passages.status, filters.status) : undefined,
+        adminSearch(passages.slug, passages.title, filters?.q),
+      ),
+    )
     .orderBy(passages.createdAt);
 }
 
@@ -570,12 +602,17 @@ export async function deleteQuestion(id: string) {
 // which the CMS uploads to R2 before it ever calls `createTrack`.
 // ---------------------------------------------------------------------------
 
-export async function listTracksAdmin(filters?: { status?: ContentStatus }) {
+export async function listTracksAdmin(filters?: AdminListFilters) {
   return db
     .select()
     .from(listeningTracks)
     .where(
-      filters?.status ? eq(listeningTracks.status, filters.status) : undefined,
+      and(
+        filters?.status
+          ? eq(listeningTracks.status, filters.status)
+          : undefined,
+        adminSearch(listeningTracks.slug, listeningTracks.title, filters?.q),
+      ),
     )
     .orderBy(listeningTracks.createdAt);
 }
@@ -766,14 +803,15 @@ export async function deleteTrack(id: string) {
 // `/api/speaking/[id]/generate` route.
 // ---------------------------------------------------------------------------
 
-export async function listSpeakingTestsAdmin(filters?: {
-  status?: ContentStatus;
-}) {
+export async function listSpeakingTestsAdmin(filters?: AdminListFilters) {
   return db
     .select()
     .from(speakingTests)
     .where(
-      filters?.status ? eq(speakingTests.status, filters.status) : undefined,
+      and(
+        filters?.status ? eq(speakingTests.status, filters.status) : undefined,
+        adminSearch(speakingTests.slug, speakingTests.title, filters?.q),
+      ),
     )
     .orderBy(speakingTests.createdAt);
 }
@@ -979,14 +1017,17 @@ export async function deleteSpeakingTest(id: string) {
 // CMS — writing prompts
 // ---------------------------------------------------------------------------
 
-export async function listWritingPromptsAdmin(filters?: {
-  status?: ContentStatus;
-}) {
+export async function listWritingPromptsAdmin(filters?: AdminListFilters) {
   return db
     .select()
     .from(writingPrompts)
     .where(
-      filters?.status ? eq(writingPrompts.status, filters.status) : undefined,
+      and(
+        filters?.status
+          ? eq(writingPrompts.status, filters.status)
+          : undefined,
+        adminSearch(writingPrompts.slug, null, filters?.q),
+      ),
     )
     .orderBy(writingPrompts.createdAt);
 }
@@ -1076,11 +1117,16 @@ export async function deleteWritingPrompt(id: string) {
 // CMS — lessons
 // ---------------------------------------------------------------------------
 
-export async function listLessonsAdmin(filters?: { status?: ContentStatus }) {
+export async function listLessonsAdmin(filters?: AdminListFilters) {
   return db
     .select()
     .from(lessons)
-    .where(filters?.status ? eq(lessons.status, filters.status) : undefined)
+    .where(
+      and(
+        filters?.status ? eq(lessons.status, filters.status) : undefined,
+        adminSearch(lessons.slug, lessons.title, filters?.q),
+      ),
+    )
     .orderBy(lessons.module, lessons.group, lessons.orderIndex);
 }
 
@@ -1189,11 +1235,16 @@ export async function deleteLesson(id: string) {
 // delete-safety check to run here -- a hard delete is always safe.
 // ---------------------------------------------------------------------------
 
-export async function listResourcesAdmin(filters?: { status?: ContentStatus }) {
+export async function listResourcesAdmin(filters?: AdminListFilters) {
   return db
     .select()
     .from(resources)
-    .where(filters?.status ? eq(resources.status, filters.status) : undefined)
+    .where(
+      and(
+        filters?.status ? eq(resources.status, filters.status) : undefined,
+        adminSearch(resources.slug, resources.title, filters?.q),
+      ),
+    )
     .orderBy(resources.category, resources.orderIndex);
 }
 
@@ -1435,4 +1486,65 @@ export async function listRecentlyEdited(limit = 10): Promise<RecentEdit[]> {
     .limit(limit);
 
   return rows;
+}
+
+/** One row on the dashboard's "needs attention" list. */
+export type AttentionItem = {
+  type: ContentType;
+  id: string;
+  label: string;
+  reason: string;
+};
+
+/**
+ * Content that is stuck and would otherwise stay invisible until someone
+ * opened it: an audio/transcript generation that errored, and one whose run
+ * went stale (its serverless function was killed before it could finish).
+ */
+export async function listNeedsAttention(): Promise<AttentionItem[]> {
+  const staleBefore = new Date(Date.now() - GENERATION_STALE_MS);
+
+  const tracks = await db
+    .select({
+      id: listeningTracks.id,
+      label: listeningTracks.title,
+      error: listeningTracks.generationError,
+      startedAt: listeningTracks.generationStartedAt,
+    })
+    .from(listeningTracks)
+    .where(
+      or(
+        isNotNull(listeningTracks.generationError),
+        lt(listeningTracks.generationStartedAt, staleBefore),
+      ),
+    );
+
+  const tests = await db
+    .select({
+      id: speakingTests.id,
+      label: speakingTests.title,
+      error: speakingTests.generationError,
+      startedAt: speakingTests.generationStartedAt,
+    })
+    .from(speakingTests)
+    .where(
+      or(
+        isNotNull(speakingTests.generationError),
+        lt(speakingTests.generationStartedAt, staleBefore),
+      ),
+    );
+
+  const toItem =
+    (type: ContentType) =>
+    (r: { id: string; label: string; error: string | null }): AttentionItem => ({
+      type,
+      id: r.id,
+      label: r.label,
+      reason: r.error ? `Generation failed: ${r.error}` : 'Generation timed out',
+    });
+
+  return [
+    ...tracks.map(toItem('listening-track')),
+    ...tests.map(toItem('speaking-test')),
+  ];
 }

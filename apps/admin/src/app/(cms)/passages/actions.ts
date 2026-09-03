@@ -15,6 +15,7 @@ import {
 } from '@bandzen/db/queries';
 import { ContentInUseError, PublishValidationError } from '@bandzen/db/errors';
 import { requireAdminOrTeacher } from '@/lib/auth';
+import { runBulk } from '@/lib/bulk';
 import { ok, fail, type ActionResult } from '@/lib/action-result';
 import {
   savePassagePayloadSchema,
@@ -146,4 +147,31 @@ export async function savePassageAction(
     console.error('[cms] savePassage failed', e);
     return fail(e instanceof Error ? e.message : 'Could not save the passage.');
   }
+}
+
+export async function bulkPublishPassagesAction(
+  ids: string[],
+): Promise<ActionResult> {
+  const { userId } = await requireAdminOrTeacher();
+  const result = await runBulk(ids, (id) => publishPassage(id, userId), 'Published');
+  revalidatePath('/passages');
+  return result;
+}
+
+export async function bulkUnpublishPassagesAction(
+  ids: string[],
+): Promise<ActionResult> {
+  const { userId } = await requireAdminOrTeacher();
+  const result = await runBulk(ids, (id) => unpublishPassage(id, userId), 'Unpublished');
+  revalidatePath('/passages');
+  return result;
+}
+
+export async function bulkDeletePassagesAction(
+  ids: string[],
+): Promise<ActionResult> {
+  await requireAdminOrTeacher();
+  const result = await runBulk(ids, (id) => deletePassage(id), 'Deleted');
+  revalidatePath('/passages');
+  return result;
 }

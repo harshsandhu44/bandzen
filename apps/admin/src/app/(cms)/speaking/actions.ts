@@ -15,6 +15,7 @@ import {
 } from '@bandzen/db/queries';
 import { ContentInUseError, PublishValidationError } from '@bandzen/db/errors';
 import { requireAdminOrTeacher } from '@/lib/auth';
+import { runBulk } from '@/lib/bulk';
 import { ok, fail, type ActionResult } from '@/lib/action-result';
 import {
   saveSpeakingPayloadSchema,
@@ -148,4 +149,31 @@ export async function saveSpeakingTestAction(
     console.error('[cms] saveSpeakingTest failed', e);
     return fail(e instanceof Error ? e.message : 'Could not save the test.');
   }
+}
+
+export async function bulkPublishTestsAction(
+  ids: string[],
+): Promise<ActionResult> {
+  const { userId } = await requireAdminOrTeacher();
+  const result = await runBulk(ids, (id) => publishSpeakingTest(id, userId), 'Published');
+  revalidatePath('/speaking');
+  return result;
+}
+
+export async function bulkUnpublishTestsAction(
+  ids: string[],
+): Promise<ActionResult> {
+  const { userId } = await requireAdminOrTeacher();
+  const result = await runBulk(ids, (id) => unpublishSpeakingTest(id, userId), 'Unpublished');
+  revalidatePath('/speaking');
+  return result;
+}
+
+export async function bulkDeleteTestsAction(
+  ids: string[],
+): Promise<ActionResult> {
+  await requireAdminOrTeacher();
+  const result = await runBulk(ids, (id) => deleteSpeakingTest(id), 'Deleted');
+  revalidatePath('/speaking');
+  return result;
 }

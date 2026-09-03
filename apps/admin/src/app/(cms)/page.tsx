@@ -4,6 +4,7 @@ import { Button } from '@bandzen/ui/components/button';
 import {
   contentCounts,
   listRecentlyEdited,
+  listNeedsAttention,
   type ContentType,
 } from '@bandzen/db/queries';
 import {
@@ -61,9 +62,10 @@ function ago(date: Date) {
 
 export default async function OverviewPage() {
   await requireAdminOrTeacher();
-  const [counts, recent] = await Promise.all([
+  const [counts, recent, attention] = await Promise.all([
     contentCounts(),
     listRecentlyEdited(10),
+    listNeedsAttention(),
   ]);
 
   // One Clerk call for the whole feed: `updatedBy` is a raw userId, and rows
@@ -122,6 +124,33 @@ export default async function OverviewPage() {
           );
         })}
       </div>
+
+      {attention.length > 0 ? (
+        <section className="space-y-3">
+          <SectionHeader>Needs attention</SectionHeader>
+          <ul className="divide-y divide-border border-y border-destructive/40">
+            {attention.map((item) => (
+              <li
+                key={`${item.type}:${item.id}`}
+                className="flex items-center gap-3 py-3"
+              >
+                <Eyebrow as="span" className="w-16 shrink-0">
+                  {TYPE_LABEL[item.type]}
+                </Eyebrow>
+                <Link
+                  href={EDIT_HREF[item.type](item.id)}
+                  className="flex-1 truncate text-sm hover:underline"
+                >
+                  {item.label}
+                </Link>
+                <span className="shrink-0 font-mono text-xs text-destructive">
+                  {item.reason}
+                </span>
+              </li>
+            ))}
+          </ul>
+        </section>
+      ) : null}
 
       <section className="space-y-3">
         <SectionHeader>Recently edited</SectionHeader>

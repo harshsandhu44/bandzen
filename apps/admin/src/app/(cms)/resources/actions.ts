@@ -12,6 +12,7 @@ import {
 import { ContentInUseError, PublishValidationError } from '@bandzen/db/errors';
 import type { Resource } from '@bandzen/db/schema';
 import { requireAdminOrTeacher } from '@/lib/auth';
+import { runBulk } from '@/lib/bulk';
 import { ok, fail, type ActionResult } from '@/lib/action-result';
 import {
   saveResourcePayloadSchema,
@@ -104,4 +105,31 @@ export async function saveResourceAction(
     console.error('[cms] saveResource failed', e);
     return fail(e instanceof Error ? e.message : 'Could not save.');
   }
+}
+
+export async function bulkPublishResourcesAction(
+  ids: string[],
+): Promise<ActionResult> {
+  const { userId } = await requireAdminOrTeacher();
+  const result = await runBulk(ids, (id) => publishResource(id, userId), 'Published');
+  revalidatePath('/resources');
+  return result;
+}
+
+export async function bulkUnpublishResourcesAction(
+  ids: string[],
+): Promise<ActionResult> {
+  const { userId } = await requireAdminOrTeacher();
+  const result = await runBulk(ids, (id) => unpublishResource(id, userId), 'Unpublished');
+  revalidatePath('/resources');
+  return result;
+}
+
+export async function bulkDeleteResourcesAction(
+  ids: string[],
+): Promise<ActionResult> {
+  await requireAdminOrTeacher();
+  const result = await runBulk(ids, (id) => deleteResource(id), 'Deleted');
+  revalidatePath('/resources');
+  return result;
 }

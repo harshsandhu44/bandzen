@@ -11,6 +11,7 @@ import {
 } from '@bandzen/db/queries';
 import { ContentInUseError, PublishValidationError } from '@bandzen/db/errors';
 import { requireAdminOrTeacher } from '@/lib/auth';
+import { runBulk } from '@/lib/bulk';
 import { ok, fail, type ActionResult } from '@/lib/action-result';
 import { promptFormSchema } from './[id]/schema';
 
@@ -88,4 +89,31 @@ export async function savePromptAction(
     console.error('[cms] savePrompt failed', e);
     return fail(e instanceof Error ? e.message : 'Could not save.');
   }
+}
+
+export async function bulkPublishPromptsAction(
+  ids: string[],
+): Promise<ActionResult> {
+  const { userId } = await requireAdminOrTeacher();
+  const result = await runBulk(ids, (id) => publishWritingPrompt(id, userId), 'Published');
+  revalidatePath('/writing-prompts');
+  return result;
+}
+
+export async function bulkUnpublishPromptsAction(
+  ids: string[],
+): Promise<ActionResult> {
+  const { userId } = await requireAdminOrTeacher();
+  const result = await runBulk(ids, (id) => unpublishWritingPrompt(id, userId), 'Unpublished');
+  revalidatePath('/writing-prompts');
+  return result;
+}
+
+export async function bulkDeletePromptsAction(
+  ids: string[],
+): Promise<ActionResult> {
+  await requireAdminOrTeacher();
+  const result = await runBulk(ids, (id) => deleteWritingPrompt(id), 'Deleted');
+  revalidatePath('/writing-prompts');
+  return result;
 }

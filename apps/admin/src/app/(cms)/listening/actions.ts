@@ -16,6 +16,7 @@ import {
 import { ContentInUseError, PublishValidationError } from '@bandzen/db/errors';
 import { uploadObject } from '@bandzen/storage/r2';
 import { requireAdminOrTeacher } from '@/lib/auth';
+import { runBulk } from '@/lib/bulk';
 import { ok, fail, type ActionResult } from '@/lib/action-result';
 import { saveTrackPayloadSchema, type SaveTrackPayload } from './[id]/schema';
 
@@ -192,4 +193,31 @@ export async function saveTrackAction(
     console.error('[cms] saveTrack failed', e);
     return fail(e instanceof Error ? e.message : 'Could not save the track.');
   }
+}
+
+export async function bulkPublishTracksAction(
+  ids: string[],
+): Promise<ActionResult> {
+  const { userId } = await requireAdminOrTeacher();
+  const result = await runBulk(ids, (id) => publishTrack(id, userId), 'Published');
+  revalidatePath('/listening');
+  return result;
+}
+
+export async function bulkUnpublishTracksAction(
+  ids: string[],
+): Promise<ActionResult> {
+  const { userId } = await requireAdminOrTeacher();
+  const result = await runBulk(ids, (id) => unpublishTrack(id, userId), 'Unpublished');
+  revalidatePath('/listening');
+  return result;
+}
+
+export async function bulkDeleteTracksAction(
+  ids: string[],
+): Promise<ActionResult> {
+  await requireAdminOrTeacher();
+  const result = await runBulk(ids, (id) => deleteTrack(id), 'Deleted');
+  revalidatePath('/listening');
+  return result;
 }
