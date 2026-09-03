@@ -33,9 +33,14 @@ export const questionKind = pgEnum('question_kind', [
   'multiple_choice',
   'matching_headings',
   'sentence_completion',
+  'matching',
 ]);
 
-export const attemptModule = pgEnum('attempt_module', ['reading', 'writing']);
+export const attemptModule = pgEnum('attempt_module', [
+  'reading',
+  'writing',
+  'listening',
+]);
 export const attemptKind = pgEnum('attempt_kind', [
   'practice',
   'diagnostic',
@@ -236,9 +241,14 @@ export const questions = pgTable(
   'questions',
   {
     id: uuid('id').primaryKey().defaultRandom(),
-    passageId: uuid('passage_id')
-      .notNull()
-      .references(() => passages.id, { onDelete: 'cascade' }),
+    /** Exactly one of passageId/trackId is set, matching which module owns the question. */
+    passageId: uuid('passage_id').references(() => passages.id, {
+      onDelete: 'cascade',
+    }),
+    trackId: uuid('track_id').references(
+      (): AnyPgColumn => listeningTracks.id,
+      { onDelete: 'cascade' },
+    ),
     idx: integer('idx').notNull(),
     kind: questionKind('kind').notNull(),
     prompt: text('prompt').notNull(),
@@ -248,7 +258,10 @@ export const questions = pgTable(
     evidence: text('evidence'),
     explanation: text('explanation'),
   },
-  (t) => [uniqueIndex('questions_passage_idx_key').on(t.passageId, t.idx)],
+  (t) => [
+    uniqueIndex('questions_passage_idx_key').on(t.passageId, t.idx),
+    uniqueIndex('questions_track_idx_key').on(t.trackId, t.idx),
+  ],
 );
 
 /**
@@ -284,6 +297,35 @@ export const writingPrompts = pgTable('writing_prompts', {
     .defaultNow(),
 });
 
+/**
+ * Real IELTS Listening is identical for Academic and General Training — no
+ * `format` column, unlike passages/writingPrompts.
+ *
+ * `transcript` is the answer key made of prose. It must never be sent to the
+ * client during an in-progress attempt; only the offline content scripts and
+ * the post-submission review page read it.
+ */
+export const listeningTracks = pgTable('listening_tracks', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  slug: text('slug').notNull().unique(),
+  title: text('title').notNull(),
+  topic: text('topic'),
+  transcript: text('transcript').notNull(),
+  audioUrl: text('audio_url').notNull(),
+  /** Shared option list for this track's `matching` questions — same role as passages.headings. */
+  matchingOptions: jsonb('matching_options').$type<string[] | null>(),
+  difficulty: integer('difficulty').notNull().default(3),
+  /** New rows default to 'published' — draft is set explicitly by the CMS on create. */
+  status: contentStatus('status').notNull().default('published'),
+  updatedBy: text('updated_by'),
+  updatedAt: timestamp('updated_at', { withTimezone: true })
+    .notNull()
+    .defaultNow(),
+  createdAt: timestamp('created_at', { withTimezone: true })
+    .notNull()
+    .defaultNow(),
+});
+
 // ---------------------------------------------------------------------------
 // Attempts
 // ---------------------------------------------------------------------------
@@ -300,6 +342,9 @@ export const attempts = pgTable(
       onDelete: 'set null',
     }),
     promptId: uuid('prompt_id').references(() => writingPrompts.id, {
+      onDelete: 'set null',
+    }),
+    trackId: uuid('track_id').references(() => listeningTracks.id, {
       onDelete: 'set null',
     }),
     /** Set on the writing half of a diagnostic, pointing at the reading half. */
@@ -547,10 +592,11 @@ export const awards = pgTable(
   (t) => [primaryKey({ columns: [t.userId, t.awardId] })],
 );
 
-/** The two v1 modules, as a plain union for code that never touches the DB. */
+/** The IELTS modules that can create an attempts row, as a plain union for code that never touches the DB. */
 export type Skill = (typeof attemptModule.enumValues)[number];
 
 export type Passage = typeof passages.$inferSelect;
+export type ListeningTrack = typeof listeningTracks.$inferSelect;
 export type Question = typeof questions.$inferSelect;
 export type WritingPrompt = typeof writingPrompts.$inferSelect;
 export type Attempt = typeof attempts.$inferSelect;
