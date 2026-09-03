@@ -145,7 +145,9 @@ export default async function DashboardPage() {
                   href={
                     a.module === 'reading'
                       ? `/reading/${a.id}/review`
-                      : `/writing/${a.id}/report`
+                      : a.module === 'listening'
+                        ? `/listening/${a.id}/review`
+                        : `/writing/${a.id}/report`
                   }
                   className="text-sm underline-offset-4 hover:underline"
                 >
