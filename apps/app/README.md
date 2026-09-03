@@ -8,10 +8,11 @@ static deployment.
 · OpenAI (essay grading, Bandzen Coach, offline content generation) · Zod
 (form input and model output).
 
-Reading and Writing are the modules with engines behind them. Listening and
-Speaking appear in the navigation as locked states that say what is missing —
-there is no audio, no transcription and no content for either, so anything that
-implied otherwise would be a lie to someone paying for practice.
+All four modules have engines behind them. Reading and Listening are scored
+deterministically (`grading.ts`); Writing and Speaking are graded by a model
+against the IELTS band descriptors, past the response via `after()`. Speaking
+is Pro-only — grading a test from its audio is the most expensive per-unit AI
+cost in the app.
 
 ## Setup
 
