@@ -40,6 +40,7 @@ export const attemptModule = pgEnum('attempt_module', [
   'reading',
   'writing',
   'listening',
+  'speaking',
 ]);
 export const attemptKind = pgEnum('attempt_kind', [
   'practice',
@@ -337,6 +338,67 @@ export const listeningTracks = pgTable('listening_tracks', {
     .defaultNow(),
 });
 
+/**
+ * One Speaking test — Parts 1, 2 and 3, the same for Academic and General
+ * Training (no `format` column, like `listening_tracks`).
+ *
+ * The prompts live in `speaking_prompts`. There is no answer key: a Speaking
+ * response is graded against a rubric, not matched. `generation_started_at`
+ * and `generation_error` cover the CMS pass that synthesizes the examiner
+ * audio for every prompt that is missing it — see the admin generate route.
+ */
+export const speakingTests = pgTable('speaking_tests', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  slug: text('slug').notNull().unique(),
+  title: text('title').notNull(),
+  topic: text('topic'),
+  /** Last CMS examiner-audio generation failure. Null once it succeeds. */
+  generationError: text('generation_error'),
+  /** Set while a CMS audio pass is in flight, so a refresh can't start a second. */
+  generationStartedAt: timestamp('generation_started_at', {
+    withTimezone: true,
+  }),
+  difficulty: integer('difficulty').notNull().default(3),
+  /** New rows default to 'published' — draft is set explicitly by the CMS on create. */
+  status: contentStatus('status').notNull().default('published'),
+  updatedBy: text('updated_by'),
+  updatedAt: timestamp('updated_at', { withTimezone: true })
+    .notNull()
+    .defaultNow(),
+  createdAt: timestamp('created_at', { withTimezone: true })
+    .notNull()
+    .defaultNow(),
+});
+
+/**
+ * One examiner prompt within a test. Parallel to `questions`, minus the answer
+ * key and the option lists.
+ *
+ * `audio_url` is nullable: the CMS accepts a prompt with just text and
+ * synthesizes the examiner audio (ElevenLabs) before the test can be
+ * published — see `checkSpeakingTestCompleteness`.
+ */
+export const speakingPrompts = pgTable(
+  'speaking_prompts',
+  {
+    id: uuid('id').primaryKey().defaultRandom(),
+    testId: uuid('test_id')
+      .notNull()
+      .references(() => speakingTests.id, { onDelete: 'cascade' }),
+    idx: integer('idx').notNull(),
+    /** 1, 2 or 3 — which part of the test this prompt belongs to. */
+    part: integer('part').notNull(),
+    text: text('text').notNull(),
+    /** The cue-card bullet points. Part 2 only; null elsewhere. */
+    cueCardPoints: jsonb('cue_card_points').$type<string[] | null>(),
+    /** Seconds of preparation before recording. 60 for Part 2, 0 otherwise. */
+    prepSeconds: integer('prep_seconds').notNull().default(0),
+    /** The synthesized examiner voice reading `text`. Null until generated. */
+    audioUrl: text('audio_url'),
+  },
+  (t) => [uniqueIndex('speaking_prompts_test_idx_key').on(t.testId, t.idx)],
+);
+
 // ---------------------------------------------------------------------------
 // Attempts
 // ---------------------------------------------------------------------------
@@ -358,6 +420,10 @@ export const attempts = pgTable(
     trackId: uuid('track_id').references(() => listeningTracks.id, {
       onDelete: 'set null',
     }),
+    speakingTestId: uuid('speaking_test_id').references(
+      () => speakingTests.id,
+      { onDelete: 'set null' },
+    ),
     /** Set on the writing half of a diagnostic, pointing at the reading half. */
     parentId: uuid('parent_id').references((): AnyPgColumn => attempts.id, {
       onDelete: 'cascade',
@@ -414,7 +480,12 @@ export const essays = pgTable('essays', {
 export type Criterion = { name: string; band: number; comment: string };
 export type Annotation = {
   quote: string;
-  kind: 'good' | 'grammar' | 'development';
+  /**
+   * `development` is Writing's; `vocabulary` and `fluency` are Speaking's.
+   * `good` and `grammar` are shared. Stored as free jsonb, so widening this
+   * union is the whole change.
+   */
+  kind: 'good' | 'grammar' | 'development' | 'vocabulary' | 'fluency';
   comment: string;
 };
 
@@ -433,6 +504,33 @@ export const reports = pgTable('reports', {
     .notNull()
     .defaultNow(),
 });
+
+/**
+ * One recorded answer to a Speaking prompt. The Speaking analogue of
+ * `attempt_answers` — uploaded to R2 as the candidate finishes each prompt, so
+ * a refresh mid-test loses nothing.
+ *
+ * `transcript` is filled by Whisper at grading time and only read by the
+ * review page; the grader itself hears the audio.
+ */
+export const speakingResponses = pgTable(
+  'speaking_responses',
+  {
+    attemptId: uuid('attempt_id')
+      .notNull()
+      .references(() => attempts.id, { onDelete: 'cascade' }),
+    promptId: uuid('prompt_id')
+      .notNull()
+      .references(() => speakingPrompts.id, { onDelete: 'cascade' }),
+    audioUrl: text('audio_url').notNull(),
+    transcript: text('transcript'),
+    durationSeconds: integer('duration_seconds'),
+    updatedAt: timestamp('updated_at', { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+  },
+  (t) => [primaryKey({ columns: [t.attemptId, t.promptId] })],
+);
 
 // ---------------------------------------------------------------------------
 // Learning — lessons and resources, editable through the CMS
@@ -608,6 +706,9 @@ export type Skill = (typeof attemptModule.enumValues)[number];
 
 export type Passage = typeof passages.$inferSelect;
 export type ListeningTrack = typeof listeningTracks.$inferSelect;
+export type SpeakingTest = typeof speakingTests.$inferSelect;
+export type SpeakingPrompt = typeof speakingPrompts.$inferSelect;
+export type SpeakingResponse = typeof speakingResponses.$inferSelect;
 export type Question = typeof questions.$inferSelect;
 export type WritingPrompt = typeof writingPrompts.$inferSelect;
 export type Attempt = typeof attempts.$inferSelect;
