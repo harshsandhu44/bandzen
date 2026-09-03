@@ -1,0 +1,124 @@
+import Link from 'next/link';
+import { Button } from '@bandzen/ui/components/button';
+import { EmptyState, PageHeader } from '@/components/app/primitives';
+import { FilterBar } from '@/components/app/filter-bar';
+import { ProLocked } from '@/components/billing/pro';
+import { requireUserId } from '@/lib/auth';
+import { DIFFICULTY_RANGE, isPro, listSpeakingTests } from '@/lib/db/queries';
+import { startSpeakingAttempt } from './actions';
+
+/** See listening/page.tsx — content is rows, and there is no DB at build time. */
+export const dynamic = 'force-dynamic';
+
+export const metadata = { title: 'Speaking practice' };
+
+const DIFFICULTY_OPTIONS = [
+  { value: '', label: 'Any' },
+  { value: 'easy', label: 'Easy' },
+  { value: 'medium', label: 'Medium' },
+  { value: 'hard', label: 'Hard' },
+];
+
+type Difficulty = keyof typeof DIFFICULTY_RANGE;
+
+export default async function SpeakingPage({
+  searchParams,
+}: PageProps<'/speaking'>) {
+  const userId = await requireUserId();
+  const pro = await isPro(userId);
+
+  const sp = await searchParams;
+  const one = (v: string | string[] | undefined) =>
+    (Array.isArray(v) ? v[0] : v) || undefined;
+
+  const rawDifficulty = one(sp.difficulty);
+  const difficulty =
+    rawDifficulty && rawDifficulty in DIFFICULTY_RANGE
+      ? (rawDifficulty as Difficulty)
+      : undefined;
+
+  const testId = one(sp.test);
+  const tests = await listSpeakingTests({ difficulty, id: testId });
+
+  return (
+    <div className="max-w-3xl space-y-8">
+      <PageHeader
+        eyebrow="Speaking"
+        title="Practice tests"
+        description="A full interview — Part 1, the Part 2 long turn, and Part 3. You hear the examiner, record each answer, and get a band estimate against the four speaking criteria."
+      />
+
+      {!pro ? (
+        <ProLocked
+          title="Speaking"
+          description="A test is graded from your audio against all four criteria, pronunciation included. That marking is part of Pro."
+          source="speaking_wall"
+        />
+      ) : null}
+
+      {testId ? (
+        <p className="border-l-2 border-chrome py-2 pl-4 text-sm">
+          Showing the test from your study plan.{' '}
+          <Link href="/speaking" className="underline underline-offset-4">
+            Show all tests
+          </Link>
+        </p>
+      ) : (
+        <FilterBar
+          legend="Difficulty"
+          param="difficulty"
+          options={DIFFICULTY_OPTIONS}
+          active={difficulty ?? ''}
+          basePath="/speaking"
+          params={{ difficulty }}
+        />
+      )}
+
+      {!tests.length ? (
+        difficulty ? (
+          <EmptyState
+            title="No tests match that filter"
+            description="Only a few tests are seeded so far. Widen the filter."
+            action={
+              <Button
+                variant="outline"
+                size="sm"
+                nativeButton={false}
+                render={<Link href="/speaking" />}
+              >
+                Clear filter
+              </Button>
+            }
+          />
+        ) : (
+          <EmptyState
+            title="No tests seeded yet"
+            description="Run pnpm content:speaking:generate, review the JSON it writes, then pnpm content:speaking:audio, pnpm content:speaking:sql, and pnpm db:seed:speaking."
+          />
+        )
+      ) : (
+        <ul className="divide-y divide-border border-y border-border">
+          {tests.map((t) => (
+            <li
+              key={t.id}
+              className="flex items-center justify-between gap-4 py-4"
+            >
+              <div>
+                <h2 className="font-medium">{t.title}</h2>
+                <p className="font-mono text-[0.6875rem] tracking-[0.18em] text-muted-foreground uppercase">
+                  {t.topic} · Level {t.difficulty}
+                </p>
+              </div>
+              <form action={startSpeakingAttempt}>
+                <input type="hidden" name="testId" value={t.id} />
+                <Button type="submit" variant="outline" size="sm">
+                  Start
+                </Button>
+              </form>
+            </li>
+          ))}
+        </ul>
+      )}
+    </div>
+  );
+}

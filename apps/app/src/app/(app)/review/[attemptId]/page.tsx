@@ -24,6 +24,8 @@ export default async function ReviewRedirect({
       ? `/reading/${attempt.id}/review`
       : attempt.module === 'listening'
         ? `/listening/${attempt.id}/review`
-        : `/writing/${attempt.id}/report`,
+        : attempt.module === 'speaking'
+          ? `/speaking/${attempt.id}/report`
+          : `/writing/${attempt.id}/report`,
   );
 }
