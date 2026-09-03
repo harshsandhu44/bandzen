@@ -1,0 +1,149 @@
+{
+  "slug": "community-tool-library-orientation",
+  "title": "Orientation at a Community Tool Library",
+  "topic": "A new member asks about borrowing tools and using shared work areas",
+  "difficulty": 2,
+  "transcript": "Maya: Good evening, everyone. Tonight's short orientation is to explain how borrowing equipment works at the Riverside Tool Library.\n\nLeo: Thanks, Maya. I joined online, but I haven't visited before. Is this the main building?\n\nMaya: Yes, though people often walk past it. The front entrance is on Mill Lane, between the chemist and the bicycle shop.\n\nLeo: Right, I'll remember that. What kind of membership do most people choose?\n\nMaya: The standard annual membership is twelve pounds, and that suits most households. The student annual membership is seven pounds, but it requires a current college card. We also sell a day pass, but that is really for visitors who need just one tool.\n\nLeo: And is there a deposit when we borrow something expensive?\n\nMaya: For power tools, we take a refundable deposit of twenty pounds. You get it back when the tool returns in good condition.\n\nLeo: How long can I keep things at home?\n\nMaya: Most items go out for one week. If you bring something back late, the fee is one pound per day, because other members may be waiting.\n\nLeo: I saw different rooms on the map. Are there separate rules for each area?\n\nMaya: There are. For the repair bench, the key point is: Ask staff for a safety check before you switch anything on.\n\nLeo: That makes sense, especially with drills and saws.\n\nMaya: For the sewing corner, the key point is: Bring your own consumables, such as thread, buttons and fabric scraps.\n\nLeo: So the machines are shared, but not the materials.\n\nMaya: Exactly. For the paint station, the key point is: Clean it immediately after use, even if the next person says they do not mind.\n\nLeo: What about the garden tools? I noticed they were by the back door.\n\nMaya: Those can be borrowed like any other item, but muddy tools must be rinsed outside. Please do not use the toilet sinks for that.\n\nLeo: Are there training sessions for beginners?\n\nMaya: Yes. The workshop next Tuesday is called Bike Brakes for Beginners. It starts at six thirty and lasts about ninety minutes.\n\nLeo: Great. Last question: what happens if I open a box at home and a piece is missing?\n\nMaya: If anything is missing, don't try to replace it yourself; email a photo to the loans desk.\n\nLeo: Got it. This seems much easier than buying tools I might only use once.\n\nMaya: That's the idea. Borrow carefully, return on time, and tell us quickly if something is damaged or incomplete.",
+  "matchingOptions": [
+    "Ask staff for a safety check",
+    "Bring your own consumables",
+    "Clean it immediately after use",
+    "Return it by noon",
+    "Use it only outdoors",
+    "Label it with your name",
+    "Book it two weeks in advance"
+  ],
+  "questions": [
+    {
+      "idx": 1,
+      "kind": "multiple_choice",
+      "prompt": "What is the main purpose of the orientation?",
+      "options": [
+        "to explain how borrowing equipment works",
+        "to advertise a new bicycle shop",
+        "to train staff in customer service",
+        "to collect suggestions for new tools"
+      ],
+      "answer": [
+        "to explain how borrowing equipment works"
+      ],
+      "evidence": "Maya: Good evening, everyone. Tonight's short orientation is to explain how borrowing equipment works at the Riverside Tool Library.",
+      "explanation": "Maya states that the orientation is to explain the borrowing system."
+    },
+    {
+      "idx": 2,
+      "kind": "sentence_completion",
+      "prompt": "Complete the sentence. Write NO MORE THAN TWO WORDS. The front entrance is on ________.",
+      "options": null,
+      "answer": [
+        "Mill Lane"
+      ],
+      "evidence": "Maya: Yes, though people often walk past it. The front entrance is on Mill Lane, between the chemist and the bicycle shop.",
+      "explanation": "Maya gives the location of the front entrance as Mill Lane."
+    },
+    {
+      "idx": 3,
+      "kind": "multiple_choice",
+      "prompt": "Which membership does Maya say suits most households?",
+      "options": [
+        "the standard annual membership",
+        "the student annual membership",
+        "the day pass",
+        "the visitor card"
+      ],
+      "answer": [
+        "the standard annual membership"
+      ],
+      "evidence": "Maya: The standard annual membership is twelve pounds, and that suits most households. The student annual membership is seven pounds, but it requires a current college card. We also sell a day pass, but that is really for visitors who need just one tool.",
+      "explanation": "Maya directly says the standard annual membership suits most households."
+    },
+    {
+      "idx": 4,
+      "kind": "sentence_completion",
+      "prompt": "Complete the sentence. Write NO MORE THAN TWO WORDS. For power tools, members pay a refundable deposit of ________.",
+      "options": null,
+      "answer": [
+        "twenty pounds"
+      ],
+      "evidence": "Maya: For power tools, we take a refundable deposit of twenty pounds. You get it back when the tool returns in good condition.",
+      "explanation": "The deposit amount mentioned for power tools is twenty pounds."
+    },
+    {
+      "idx": 5,
+      "kind": "multiple_choice",
+      "prompt": "What is the late return fee?",
+      "options": [
+        "one pound per day",
+        "two pounds per week",
+        "seven pounds per item",
+        "twelve pounds per month"
+      ],
+      "answer": [
+        "one pound per day"
+      ],
+      "evidence": "Maya: Most items go out for one week. If you bring something back late, the fee is one pound per day, because other members may be waiting.",
+      "explanation": "Maya says the fee for a late return is one pound per day."
+    },
+    {
+      "idx": 6,
+      "kind": "matching",
+      "prompt": "Which instruction is given for the repair bench? Choose from the matching options.",
+      "options": null,
+      "answer": [
+        "Ask staff for a safety check"
+      ],
+      "evidence": "Maya: There are. For the repair bench, the key point is: Ask staff for a safety check before you switch anything on.",
+      "explanation": "The repair bench instruction is to ask staff for a safety check."
+    },
+    {
+      "idx": 7,
+      "kind": "matching",
+      "prompt": "Which instruction is given for the sewing corner? Choose from the matching options.",
+      "options": null,
+      "answer": [
+        "Bring your own consumables"
+      ],
+      "evidence": "Maya: For the sewing corner, the key point is: Bring your own consumables, such as thread, buttons and fabric scraps.",
+      "explanation": "For the sewing corner, members must bring their own consumables."
+    },
+    {
+      "idx": 8,
+      "kind": "matching",
+      "prompt": "Which instruction is given for the paint station? Choose from the matching options.",
+      "options": null,
+      "answer": [
+        "Clean it immediately after use"
+      ],
+      "evidence": "Maya: Exactly. For the paint station, the key point is: Clean it immediately after use, even if the next person says they do not mind.",
+      "explanation": "The paint station must be cleaned immediately after use."
+    },
+    {
+      "idx": 9,
+      "kind": "sentence_completion",
+      "prompt": "Complete the sentence. Write NO MORE THAN FOUR WORDS. The workshop next Tuesday is called ________.",
+      "options": null,
+      "answer": [
+        "Bike Brakes for Beginners"
+      ],
+      "evidence": "Maya: Yes. The workshop next Tuesday is called Bike Brakes for Beginners. It starts at six thirty and lasts about ninety minutes.",
+      "explanation": "Maya gives the exact title of the workshop."
+    },
+    {
+      "idx": 10,
+      "kind": "multiple_choice",
+      "prompt": "What should Leo do if a piece is missing from a box?",
+      "options": [
+        "email a photo to the loans desk",
+        "buy a replacement immediately",
+        "return the box without comment",
+        "ask the next borrower to check"
+      ],
+      "answer": [
+        "email a photo to the loans desk"
+      ],
+      "evidence": "Maya: If anything is missing, don't try to replace it yourself; email a photo to the loans desk.",
+      "explanation": "Maya tells Leo not to replace the missing part himself, but to email a photo to the loans desk."
+    }
+  ],
+  "audioUrl": "https://pub-fbae5ca09eba4fd0820da2b390dd7ca0.r2.dev/listening/community-tool-library-orientation.mp3"
+}
