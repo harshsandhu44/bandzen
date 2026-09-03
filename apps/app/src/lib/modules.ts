@@ -20,7 +20,11 @@ export const IELTS_MODULES = [
 export type IELTSModule = (typeof IELTS_MODULES)[number];
 
 /** The modules with a working engine behind them. */
-export const AVAILABLE_MODULES: readonly Skill[] = ['reading', 'writing'];
+export const AVAILABLE_MODULES: readonly Skill[] = [
+  'reading',
+  'writing',
+  'listening',
+];
 
 export function isAvailable(module: IELTSModule): module is Skill {
   return (AVAILABLE_MODULES as readonly string[]).includes(module);
@@ -35,7 +39,6 @@ export const MODULE_LABEL: Record<IELTSModule, string> = {
 
 /** Why a module is not yet openable. Shown verbatim, so it stays honest. */
 export const UNAVAILABLE_REASON: Record<string, string> = {
-  listening: 'Listening practice needs audio we have not recorded yet.',
   speaking: 'Speaking practice needs recording we have not built yet.',
 };
 
@@ -52,6 +55,7 @@ export const QUESTION_KIND_LABEL = {
   multiple_choice: 'Multiple choice',
   matching_headings: 'Matching headings',
   sentence_completion: 'Sentence completion',
+  matching: 'Matching',
 } as const;
 
 export type QuestionKind = keyof typeof QUESTION_KIND_LABEL;

@@ -32,6 +32,7 @@ import {
   coachMessages,
   essays,
   lessonProgress,
+  listeningTracks,
   passages,
   profiles,
   questionAnswers,
@@ -50,9 +51,11 @@ export {
   DIFFICULTY_RANGE,
   listLessonProgress,
   listPassages,
+  listTracks,
   listWritingPrompts,
   markLessonComplete,
   pickEasiestPassage,
+  pickEasiestTrack,
   pickTask2Prompt,
 } from '@bandzen/db/queries';
 
@@ -413,7 +416,7 @@ export async function latestBand(
 
 export async function findInProgress(
   userId: string,
-  where: { passageId?: string; promptId?: string },
+  where: { passageId?: string; promptId?: string; trackId?: string },
 ) {
   const clauses = [
     eq(attempts.userId, userId),
@@ -421,6 +424,7 @@ export async function findInProgress(
   ];
   if (where.passageId) clauses.push(eq(attempts.passageId, where.passageId));
   if (where.promptId) clauses.push(eq(attempts.promptId, where.promptId));
+  if (where.trackId) clauses.push(eq(attempts.trackId, where.trackId));
 
   return firstRow(
     await db
@@ -433,10 +437,11 @@ export async function findInProgress(
 
 export async function createAttempt(values: {
   userId: string;
-  module: 'reading' | 'writing';
+  module: 'reading' | 'writing' | 'listening';
   kind?: 'practice' | 'diagnostic' | 'mock';
   passageId?: string;
   promptId?: string;
+  trackId?: string;
   parentId?: string;
 }) {
   const [row] = await db
@@ -600,6 +605,140 @@ export async function getReadingReview(userId: string, attemptId: string) {
     .orderBy(questions.idx);
 
   return { attempt, passage, rows };
+}
+
+// ---------------------------------------------------------------------------
+// Listening
+// ---------------------------------------------------------------------------
+
+/**
+ * Everything the in-progress test screen needs — deliberately NOT the track's
+ * transcript, which is the answer key. Only the offline content scripts and
+ * `getListeningReview` (below, post-submission) ever read that column.
+ */
+export async function getListeningTest(userId: string, attemptId: string) {
+  const attempt = await getAttempt(userId, attemptId);
+  if (!attempt?.trackId) return null;
+
+  const [track] = await db
+    .select({
+      title: listeningTracks.title,
+      audioUrl: listeningTracks.audioUrl,
+      matchingOptions: listeningTracks.matchingOptions,
+    })
+    .from(listeningTracks)
+    .where(eq(listeningTracks.id, attempt.trackId));
+  if (!track) return null;
+
+  const qs = await db
+    .select({
+      id: questions.id,
+      idx: questions.idx,
+      kind: questions.kind,
+      prompt: questions.prompt,
+      options: questions.options,
+    })
+    .from(questions)
+    .where(eq(questions.trackId, attempt.trackId))
+    .orderBy(questions.idx);
+
+  const saved = await db
+    .select({
+      questionId: attemptAnswers.questionId,
+      value: attemptAnswers.value,
+      flagged: attemptAnswers.flagged,
+    })
+    .from(attemptAnswers)
+    .where(eq(attemptAnswers.attemptId, attemptId));
+
+  return { attempt, track, questions: qs, saved };
+}
+
+/**
+ * Grade and close out a listening attempt. Same shape as `submitReading` —
+ * exact-match scoring against `questionAnswers`, idempotent on `status`.
+ */
+export async function submitListening(userId: string, attemptId: string) {
+  const attempt = await getAttempt(userId, attemptId);
+  if (!attempt?.trackId) return null;
+  if (attempt.status === 'complete') return attempt;
+  if (attempt.module !== 'listening')
+    throw new Error('Not a listening attempt');
+
+  const rows = await db
+    .select({
+      questionId: questions.id,
+      answer: questionAnswers.answer,
+      given: attemptAnswers.value,
+    })
+    .from(questions)
+    .innerJoin(questionAnswers, eq(questionAnswers.questionId, questions.id))
+    .leftJoin(
+      attemptAnswers,
+      and(
+        eq(attemptAnswers.questionId, questions.id),
+        eq(attemptAnswers.attemptId, attemptId),
+      ),
+    )
+    .where(eq(questions.trackId, attempt.trackId));
+
+  const total = rows.length;
+  const correct = rows.filter((r) => isAnswerCorrect(r.answer, r.given)).length;
+
+  const [updated] = await db
+    .update(attempts)
+    .set({
+      status: 'complete',
+      rawScore: correct,
+      total,
+      band: readingBand(correct, total),
+      submittedAt: new Date(),
+    })
+    .where(
+      and(ownAttempt(userId, attemptId), eq(attempts.status, 'in_progress')),
+    )
+    .returning();
+
+  return updated ?? (await getAttempt(userId, attemptId));
+}
+
+export async function getListeningReview(userId: string, attemptId: string) {
+  const attempt = await getAttempt(userId, attemptId);
+  if (!attempt?.trackId || attempt.status !== 'complete') return null;
+
+  const [track] = await db
+    .select({
+      title: listeningTracks.title,
+      transcript: listeningTracks.transcript,
+    })
+    .from(listeningTracks)
+    .where(eq(listeningTracks.id, attempt.trackId));
+  if (!track) return null;
+
+  const rows = await db
+    .select({
+      id: questions.id,
+      idx: questions.idx,
+      kind: questions.kind,
+      prompt: questions.prompt,
+      evidence: questions.evidence,
+      explanation: questions.explanation,
+      answer: questionAnswers.answer,
+      given: attemptAnswers.value,
+    })
+    .from(questions)
+    .innerJoin(questionAnswers, eq(questionAnswers.questionId, questions.id))
+    .leftJoin(
+      attemptAnswers,
+      and(
+        eq(attemptAnswers.questionId, questions.id),
+        eq(attemptAnswers.attemptId, attemptId),
+      ),
+    )
+    .where(eq(questions.trackId, attempt.trackId))
+    .orderBy(questions.idx);
+
+  return { attempt, track, rows };
 }
 
 // ---------------------------------------------------------------------------
