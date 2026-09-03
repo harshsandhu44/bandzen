@@ -8,6 +8,7 @@ import {
   publishWritingPrompt,
   unpublishWritingPrompt,
   deleteWritingPrompt,
+  recordContentEvent,
 } from '@bandzen/db/queries';
 import { ContentInUseError, PublishValidationError } from '@bandzen/db/errors';
 import { requireAdminOrTeacher } from '@/lib/auth';
@@ -27,6 +28,7 @@ export async function createWritingPromptAction(formData: FormData) {
     updatedBy: userId,
   });
   if (!prompt) throw new Error('Failed to create writing prompt.');
+  await recordContentEvent('writing-prompt', prompt.id, userId, 'created');
   redirect(`/writing-prompts/${prompt.id}`);
 }
 
@@ -39,6 +41,7 @@ export async function publishWritingPromptAction(
   const id = String(formData.get('id') ?? '');
   try {
     await publishWritingPrompt(id, userId);
+    await recordContentEvent('writing-prompt', id, userId, 'published');
   } catch (e) {
     if (e instanceof PublishValidationError)
       return { error: `Missing: ${e.issues.join(', ')}` };
@@ -53,6 +56,7 @@ export async function unpublishWritingPromptAction(formData: FormData) {
   const { userId } = await requireAdminOrTeacher();
   const id = String(formData.get('id') ?? '');
   await unpublishWritingPrompt(id, userId);
+  await recordContentEvent('writing-prompt', id, userId, 'unpublished');
   revalidatePath(`/writing-prompts/${id}`);
   revalidatePath('/writing-prompts');
 }
@@ -61,7 +65,7 @@ export async function deleteWritingPromptAction(
   _prev: ActionState,
   formData: FormData,
 ): Promise<ActionState> {
-  await requireAdminOrTeacher();
+  const { userId } = await requireAdminOrTeacher();
   const id = String(formData.get('id') ?? '');
   try {
     await deleteWritingPrompt(id);
@@ -69,6 +73,7 @@ export async function deleteWritingPromptAction(
     if (e instanceof ContentInUseError) return { error: e.message };
     throw e;
   }
+  await recordContentEvent('writing-prompt', id, userId, 'deleted');
   revalidatePath('/writing-prompts');
   redirect('/writing-prompts');
 }
@@ -82,6 +87,7 @@ export async function savePromptAction(
   if (!parsed.success) return fail('Check the highlighted fields.');
   try {
     await updateWritingPrompt(id, parsed.data, userId);
+    await recordContentEvent('writing-prompt', id, userId, 'updated');
     revalidatePath(`/writing-prompts/${id}`);
     revalidatePath('/writing-prompts');
     return ok('Saved');

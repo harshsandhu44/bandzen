@@ -25,10 +25,12 @@ import {
   passages,
   questionAnswers,
   questions,
+  contentEvents,
   resources,
   speakingPrompts,
   speakingTests,
   writingPrompts,
+  type ContentEventAction,
   type ContentStatus,
   type Lesson,
   type LessonStage,
@@ -1547,4 +1549,58 @@ export async function listNeedsAttention(): Promise<AttentionItem[]> {
     ...tracks.map(toItem('listening-track')),
     ...tests.map(toItem('speaking-test')),
   ];
+}
+
+// ---------------------------------------------------------------------------
+// CMS audit trail — content_events
+// ---------------------------------------------------------------------------
+
+export type ContentEventRow = {
+  id: string;
+  action: ContentEventAction;
+  actorId: string | null;
+  createdAt: Date;
+};
+
+/**
+ * Append one audit row. Best-effort: an audit-write failure must never fail
+ * the mutation it describes, so it swallows and logs rather than throwing.
+ */
+export async function recordContentEvent(
+  entityType: ContentType,
+  entityId: string,
+  actorId: string | null,
+  action: ContentEventAction,
+): Promise<void> {
+  try {
+    await db
+      .insert(contentEvents)
+      .values({ entityType, entityId, actorId, action });
+  } catch (e) {
+    console.error('[db] recordContentEvent failed', e);
+  }
+}
+
+/** The history panel on an editor: newest first. */
+export async function listContentEvents(
+  entityType: ContentType,
+  entityId: string,
+  limit = 20,
+): Promise<ContentEventRow[]> {
+  return db
+    .select({
+      id: contentEvents.id,
+      action: contentEvents.action,
+      actorId: contentEvents.actorId,
+      createdAt: contentEvents.createdAt,
+    })
+    .from(contentEvents)
+    .where(
+      and(
+        eq(contentEvents.entityType, entityType),
+        eq(contentEvents.entityId, entityId),
+      ),
+    )
+    .orderBy(desc(contentEvents.createdAt))
+    .limit(limit);
 }

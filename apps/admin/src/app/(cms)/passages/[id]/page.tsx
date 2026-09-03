@@ -6,8 +6,8 @@ import {
 import { PageHeader } from '@bandzen/ui/components/primitives';
 import { requireAdminOrTeacher } from '@/lib/auth';
 import { StatusBadge } from '@/components/status-badge';
-import { PublishControls } from '@/components/publish-controls';
-import { EditorShell, CompletenessPanel } from '@/components/editor-shell';
+import { EditorRail } from '@/components/editor-rail';
+import { EditorShell } from '@/components/editor-shell';
 import { resolveEditorEmail } from '@/lib/editor-email';
 import {
   publishPassageAction,
@@ -69,17 +69,16 @@ export default async function EditPassagePage({
 
       <EditorShell
         rail={
-          <>
-            <PublishControls
-              noun="passage"
-              id={passage.id}
-              status={passage.status}
-              publishAction={publishPassageAction}
-              unpublishAction={unpublishPassageAction}
-              deleteAction={deletePassageAction}
-            />
-            <CompletenessPanel issues={issues} />
-          </>
+          <EditorRail
+            type="passage"
+            id={passage.id}
+            noun="passage"
+            status={passage.status}
+            issues={issues}
+            publishAction={publishPassageAction}
+            unpublishAction={unpublishPassageAction}
+            deleteAction={deletePassageAction}
+          />
         }
       >
         <PassageEditor id={passage.id} defaults={defaults} />

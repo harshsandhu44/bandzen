@@ -7,8 +7,8 @@ import { LESSON_STAGES } from '@bandzen/db/schema';
 import { PageHeader } from '@bandzen/ui/components/primitives';
 import { requireAdminOrTeacher } from '@/lib/auth';
 import { StatusBadge } from '@/components/status-badge';
-import { PublishControls } from '@/components/publish-controls';
-import { EditorShell, CompletenessPanel } from '@/components/editor-shell';
+import { EditorRail } from '@/components/editor-rail';
+import { EditorShell } from '@/components/editor-shell';
 import { resolveEditorEmail } from '@/lib/editor-email';
 import {
   publishLessonAction,
@@ -108,17 +108,16 @@ export default async function EditLessonPage({
 
       <EditorShell
         rail={
-          <>
-            <PublishControls
-              noun="lesson"
-              id={lesson.id}
-              status={lesson.status}
-              publishAction={publishLessonAction}
-              unpublishAction={unpublishLessonAction}
-              deleteAction={deleteLessonAction}
-            />
-            <CompletenessPanel issues={issues} />
-          </>
+          <EditorRail
+            type="lesson"
+            id={lesson.id}
+            noun="lesson"
+            status={lesson.status}
+            issues={issues}
+            publishAction={publishLessonAction}
+            unpublishAction={unpublishLessonAction}
+            deleteAction={deleteLessonAction}
+          />
         }
       >
         <LessonEditor id={lesson.id} defaults={defaults} />

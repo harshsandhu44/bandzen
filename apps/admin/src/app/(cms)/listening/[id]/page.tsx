@@ -14,8 +14,8 @@ import { Field } from '@bandzen/ui/components/field';
 import { PageHeader } from '@bandzen/ui/components/primitives';
 import { requireAdminOrTeacher } from '@/lib/auth';
 import { StatusBadge } from '@/components/status-badge';
-import { PublishControls } from '@/components/publish-controls';
-import { EditorShell, CompletenessPanel } from '@/components/editor-shell';
+import { EditorRail } from '@/components/editor-rail';
+import { EditorShell } from '@/components/editor-shell';
 import { resolveEditorEmail } from '@/lib/editor-email';
 import {
   replaceAudioAction,
@@ -79,17 +79,16 @@ export default async function EditTrackPage({
 
       <EditorShell
         rail={
-          <>
-            <PublishControls
-              noun="track"
-              id={track.id}
-              status={track.status}
-              publishAction={publishTrackAction}
-              unpublishAction={unpublishTrackAction}
-              deleteAction={deleteTrackAction}
-            />
-            <CompletenessPanel issues={issues} />
-          </>
+          <EditorRail
+            type="listening-track"
+            id={track.id}
+            noun="track"
+            status={track.status}
+            issues={issues}
+            publishAction={publishTrackAction}
+            unpublishAction={unpublishTrackAction}
+            deleteAction={deleteTrackAction}
+          />
         }
       >
         <Card>

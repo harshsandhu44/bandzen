@@ -8,6 +8,7 @@ import {
   publishResource,
   unpublishResource,
   deleteResource,
+  recordContentEvent,
 } from '@bandzen/db/queries';
 import { ContentInUseError, PublishValidationError } from '@bandzen/db/errors';
 import type { Resource } from '@bandzen/db/schema';
@@ -43,6 +44,7 @@ export async function createResourceAction(formData: FormData) {
     updatedBy: userId,
   });
   if (!resource) throw new Error('Failed to create resource.');
+  await recordContentEvent('resource', resource.id, userId, 'created');
   redirect(`/resources/${resource.id}`);
 }
 
@@ -55,6 +57,7 @@ export async function publishResourceAction(
   const id = String(formData.get('id') ?? '');
   try {
     await publishResource(id, userId);
+    await recordContentEvent('resource', id, userId, 'published');
   } catch (e) {
     if (e instanceof PublishValidationError)
       return { error: `Missing: ${e.issues.join(', ')}` };
@@ -69,6 +72,7 @@ export async function unpublishResourceAction(formData: FormData) {
   const { userId } = await requireAdminOrTeacher();
   const id = String(formData.get('id') ?? '');
   await unpublishResource(id, userId);
+  await recordContentEvent('resource', id, userId, 'unpublished');
   revalidatePath(`/resources/${id}`);
   revalidatePath('/resources');
 }
@@ -77,7 +81,7 @@ export async function deleteResourceAction(
   _prev: ActionState,
   formData: FormData,
 ): Promise<ActionState> {
-  await requireAdminOrTeacher();
+  const { userId } = await requireAdminOrTeacher();
   const id = String(formData.get('id') ?? '');
   try {
     await deleteResource(id);
@@ -85,6 +89,7 @@ export async function deleteResourceAction(
     if (e instanceof ContentInUseError) return { error: e.message };
     throw e;
   }
+  await recordContentEvent('resource', id, userId, 'deleted');
   revalidatePath('/resources');
   redirect('/resources');
 }
@@ -98,6 +103,7 @@ export async function saveResourceAction(
   if (!parsed.success) return fail('Check the highlighted fields.');
   try {
     await updateResource(id, parsed.data, userId);
+    await recordContentEvent('resource', id, userId, 'updated');
     revalidatePath(`/resources/${id}`);
     revalidatePath('/resources');
     return ok('Saved');

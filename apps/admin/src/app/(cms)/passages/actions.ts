@@ -12,6 +12,7 @@ import {
   updateQuestion,
   deleteQuestion,
   getPassageAdmin,
+  recordContentEvent,
 } from '@bandzen/db/queries';
 import { ContentInUseError, PublishValidationError } from '@bandzen/db/errors';
 import { requireAdminOrTeacher } from '@/lib/auth';
@@ -36,6 +37,7 @@ export async function createPassageAction(formData: FormData) {
     updatedBy: userId,
   });
   if (!passage) throw new Error('Failed to create passage.');
+  await recordContentEvent('passage', passage.id, userId, 'created');
   redirect(`/passages/${passage.id}`);
 }
 
@@ -48,6 +50,7 @@ export async function publishPassageAction(
   const id = String(formData.get('id') ?? '');
   try {
     await publishPassage(id, userId);
+    await recordContentEvent('passage', id, userId, 'published');
   } catch (e) {
     if (e instanceof PublishValidationError)
       return { error: `Missing: ${e.issues.join(', ')}` };
@@ -62,6 +65,7 @@ export async function unpublishPassageAction(formData: FormData) {
   const { userId } = await requireAdminOrTeacher();
   const id = String(formData.get('id') ?? '');
   await unpublishPassage(id, userId);
+  await recordContentEvent('passage', id, userId, 'unpublished');
   revalidatePath(`/passages/${id}`);
   revalidatePath('/passages');
 }
@@ -70,7 +74,7 @@ export async function deletePassageAction(
   _prev: ActionState,
   formData: FormData,
 ): Promise<ActionState> {
-  await requireAdminOrTeacher();
+  const { userId } = await requireAdminOrTeacher();
   const id = String(formData.get('id') ?? '');
   try {
     await deletePassage(id);
@@ -78,6 +82,7 @@ export async function deletePassageAction(
     if (e instanceof ContentInUseError) return { error: e.message };
     throw e;
   }
+  await recordContentEvent('passage', id, userId, 'deleted');
   revalidatePath('/passages');
   redirect('/passages');
 }
@@ -140,6 +145,7 @@ export async function savePassageAction(
       else await createQuestion({ passageId: p.id }, fields);
     }
 
+    await recordContentEvent('passage', p.id, userId, 'updated');
     revalidatePath(`/passages/${p.id}`);
     revalidatePath('/passages');
     return ok('Saved');

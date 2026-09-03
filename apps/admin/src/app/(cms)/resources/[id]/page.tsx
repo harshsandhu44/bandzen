@@ -6,8 +6,8 @@ import {
 import { PageHeader } from '@bandzen/ui/components/primitives';
 import { requireAdminOrTeacher } from '@/lib/auth';
 import { StatusBadge } from '@/components/status-badge';
-import { PublishControls } from '@/components/publish-controls';
-import { EditorShell, CompletenessPanel } from '@/components/editor-shell';
+import { EditorRail } from '@/components/editor-rail';
+import { EditorShell } from '@/components/editor-shell';
 import { resolveEditorEmail } from '@/lib/editor-email';
 import {
   publishResourceAction,
@@ -61,17 +61,16 @@ export default async function EditResourcePage({
 
       <EditorShell
         rail={
-          <>
-            <PublishControls
-              noun="resource"
-              id={resource.id}
-              status={resource.status}
-              publishAction={publishResourceAction}
-              unpublishAction={unpublishResourceAction}
-              deleteAction={deleteResourceAction}
-            />
-            <CompletenessPanel issues={issues} />
-          </>
+          <EditorRail
+            type="resource"
+            id={resource.id}
+            noun="resource"
+            status={resource.status}
+            issues={issues}
+            publishAction={publishResourceAction}
+            unpublishAction={unpublishResourceAction}
+            deleteAction={deleteResourceAction}
+          />
         }
       >
         <ResourceEditor id={resource.id} defaults={defaults} />

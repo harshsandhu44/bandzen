@@ -8,6 +8,7 @@ import {
   publishLesson,
   unpublishLesson,
   deleteLesson,
+  recordContentEvent,
 } from '@bandzen/db/queries';
 import type { Lesson } from '@bandzen/db/schema';
 import { ContentInUseError, PublishValidationError } from '@bandzen/db/errors';
@@ -42,6 +43,7 @@ export async function createLessonAction(formData: FormData) {
     updatedBy: userId,
   });
   if (!lesson) throw new Error('Failed to create lesson.');
+  await recordContentEvent('lesson', lesson.id, userId, 'created');
   redirect(`/lessons/${lesson.id}`);
 }
 
@@ -54,6 +56,7 @@ export async function publishLessonAction(
   const id = String(formData.get('id') ?? '');
   try {
     await publishLesson(id, userId);
+    await recordContentEvent('lesson', id, userId, 'published');
   } catch (e) {
     if (e instanceof PublishValidationError)
       return { error: `Missing: ${e.issues.join(', ')}` };
@@ -68,6 +71,7 @@ export async function unpublishLessonAction(formData: FormData) {
   const { userId } = await requireAdminOrTeacher();
   const id = String(formData.get('id') ?? '');
   await unpublishLesson(id, userId);
+  await recordContentEvent('lesson', id, userId, 'unpublished');
   revalidatePath(`/lessons/${id}`);
   revalidatePath('/lessons');
 }
@@ -76,7 +80,7 @@ export async function deleteLessonAction(
   _prev: ActionState,
   formData: FormData,
 ): Promise<ActionState> {
-  await requireAdminOrTeacher();
+  const { userId } = await requireAdminOrTeacher();
   const id = String(formData.get('id') ?? '');
   try {
     await deleteLesson(id);
@@ -84,6 +88,7 @@ export async function deleteLessonAction(
     if (e instanceof ContentInUseError) return { error: e.message };
     throw e;
   }
+  await recordContentEvent('lesson', id, userId, 'deleted');
   revalidatePath('/lessons');
   redirect('/lessons');
 }
@@ -123,6 +128,7 @@ export async function saveLessonAction(
       },
       userId,
     );
+    await recordContentEvent('lesson', p.id, userId, 'updated');
     revalidatePath(`/lessons/${p.id}`);
     revalidatePath('/lessons');
     return ok('Saved');

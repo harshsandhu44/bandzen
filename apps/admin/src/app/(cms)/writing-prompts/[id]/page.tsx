@@ -3,7 +3,7 @@ import { getWritingPromptById } from '@bandzen/db/queries';
 import { PageHeader } from '@bandzen/ui/components/primitives';
 import { requireAdminOrTeacher } from '@/lib/auth';
 import { StatusBadge } from '@/components/status-badge';
-import { PublishControls } from '@/components/publish-controls';
+import { EditorRail } from '@/components/editor-rail';
 import { EditorShell } from '@/components/editor-shell';
 import { resolveEditorEmail } from '@/lib/editor-email';
 import {
@@ -50,9 +50,10 @@ export default async function EditWritingPromptPage({
 
       <EditorShell
         rail={
-          <PublishControls
-            noun="writing prompt"
+          <EditorRail
+            type="writing-prompt"
             id={prompt.id}
+            noun="writing prompt"
             status={prompt.status}
             publishAction={publishWritingPromptAction}
             unpublishAction={unpublishWritingPromptAction}

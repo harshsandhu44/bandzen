@@ -12,6 +12,7 @@ import {
   updateQuestion,
   deleteQuestion,
   getTrackAdmin,
+  recordContentEvent,
 } from '@bandzen/db/queries';
 import { ContentInUseError, PublishValidationError } from '@bandzen/db/errors';
 import { uploadObject } from '@bandzen/storage/r2';
@@ -58,6 +59,7 @@ export async function createTrackAction(formData: FormData) {
     updatedBy: userId,
   });
   if (!track) throw new Error('Failed to create track.');
+  await recordContentEvent('listening-track', track.id, userId, 'created');
   redirect(`/listening/${track.id}`);
 }
 
@@ -95,6 +97,7 @@ export async function publishTrackAction(
   const id = String(formData.get('id') ?? '');
   try {
     await publishTrack(id, userId);
+    await recordContentEvent('listening-track', id, userId, 'published');
   } catch (e) {
     if (e instanceof PublishValidationError)
       return { error: `Missing: ${e.issues.join(', ')}` };
@@ -109,6 +112,7 @@ export async function unpublishTrackAction(formData: FormData) {
   const { userId } = await requireAdminOrTeacher();
   const id = String(formData.get('id') ?? '');
   await unpublishTrack(id, userId);
+  await recordContentEvent('listening-track', id, userId, 'unpublished');
   revalidatePath(`/listening/${id}`);
   revalidatePath('/listening');
 }
@@ -117,7 +121,7 @@ export async function deleteTrackAction(
   _prev: ActionState,
   formData: FormData,
 ): Promise<ActionState> {
-  await requireAdminOrTeacher();
+  const { userId } = await requireAdminOrTeacher();
   const id = String(formData.get('id') ?? '');
   try {
     await deleteTrack(id);
@@ -125,6 +129,7 @@ export async function deleteTrackAction(
     if (e instanceof ContentInUseError) return { error: e.message };
     throw e;
   }
+  await recordContentEvent('listening-track', id, userId, 'deleted');
   revalidatePath('/listening');
   redirect('/listening');
 }
@@ -186,6 +191,7 @@ export async function saveTrackAction(
       else await createQuestion({ trackId: p.id }, fields);
     }
 
+    await recordContentEvent('listening-track', p.id, userId, 'updated');
     revalidatePath(`/listening/${p.id}`);
     revalidatePath('/listening');
     return ok('Saved');

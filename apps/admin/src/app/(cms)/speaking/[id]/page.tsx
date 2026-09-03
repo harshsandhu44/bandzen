@@ -12,8 +12,8 @@ import {
 import { PageHeader } from '@bandzen/ui/components/primitives';
 import { requireAdminOrTeacher } from '@/lib/auth';
 import { StatusBadge } from '@/components/status-badge';
-import { PublishControls } from '@/components/publish-controls';
-import { EditorShell, CompletenessPanel } from '@/components/editor-shell';
+import { EditorRail } from '@/components/editor-rail';
+import { EditorShell } from '@/components/editor-shell';
 import { resolveEditorEmail } from '@/lib/editor-email';
 import {
   publishTestAction,
@@ -77,17 +77,16 @@ export default async function EditSpeakingTestPage({
 
       <EditorShell
         rail={
-          <>
-            <PublishControls
-              noun="speaking test"
-              id={test.id}
-              status={test.status}
-              publishAction={publishTestAction}
-              unpublishAction={unpublishTestAction}
-              deleteAction={deleteTestAction}
-            />
-            <CompletenessPanel issues={issues} />
-          </>
+          <EditorRail
+            type="speaking-test"
+            id={test.id}
+            noun="speaking test"
+            status={test.status}
+            issues={issues}
+            publishAction={publishTestAction}
+            unpublishAction={unpublishTestAction}
+            deleteAction={deleteTestAction}
+          />
         }
       >
         {pending > 0 ? (

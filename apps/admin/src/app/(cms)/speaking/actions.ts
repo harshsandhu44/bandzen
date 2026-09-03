@@ -12,6 +12,7 @@ import {
   unpublishSpeakingTest,
   updateSpeakingPrompt,
   updateSpeakingTest,
+  recordContentEvent,
 } from '@bandzen/db/queries';
 import { ContentInUseError, PublishValidationError } from '@bandzen/db/errors';
 import { requireAdminOrTeacher } from '@/lib/auth';
@@ -35,6 +36,7 @@ export async function createTestAction(formData: FormData) {
     updatedBy: userId,
   });
   if (!test) throw new Error('Failed to create test.');
+  await recordContentEvent('speaking-test', test.id, userId, 'created');
   redirect(`/speaking/${test.id}`);
 }
 
@@ -48,6 +50,7 @@ export async function publishTestAction(
   const id = String(formData.get('id') ?? '');
   try {
     await publishSpeakingTest(id, userId);
+    await recordContentEvent('speaking-test', id, userId, 'published');
   } catch (e) {
     if (e instanceof PublishValidationError)
       return { error: `Missing: ${e.issues.join(', ')}` };
@@ -62,6 +65,7 @@ export async function unpublishTestAction(formData: FormData) {
   const { userId } = await requireAdminOrTeacher();
   const id = String(formData.get('id') ?? '');
   await unpublishSpeakingTest(id, userId);
+  await recordContentEvent('speaking-test', id, userId, 'unpublished');
   revalidatePath(`/speaking/${id}`);
   revalidatePath('/speaking');
 }
@@ -70,7 +74,7 @@ export async function deleteTestAction(
   _prev: ActionState,
   formData: FormData,
 ): Promise<ActionState> {
-  await requireAdminOrTeacher();
+  const { userId } = await requireAdminOrTeacher();
   const id = String(formData.get('id') ?? '');
   try {
     await deleteSpeakingTest(id);
@@ -78,6 +82,7 @@ export async function deleteTestAction(
     if (e instanceof ContentInUseError) return { error: e.message };
     throw e;
   }
+  await recordContentEvent('speaking-test', id, userId, 'deleted');
   revalidatePath('/speaking');
   redirect('/speaking');
 }
@@ -142,6 +147,7 @@ export async function saveSpeakingTestAction(
       }
     }
 
+    await recordContentEvent('speaking-test', p.id, userId, 'updated');
     revalidatePath(`/speaking/${p.id}`);
     revalidatePath('/speaking');
     return ok('Saved');
