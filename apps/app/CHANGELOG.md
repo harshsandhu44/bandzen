@@ -1,3 +1,10 @@
+# app [0.9.0](https://github.com/harshsandhu44/bandzen/compare/app@0.8.0...app@0.9.0) (2026-09-04)
+
+
+### Features
+
+* **app:** Learn hub, restyled module page, lesson reader with stage rail ([#23](https://github.com/harshsandhu44/bandzen/issues/23)) ([c2ef3d9](https://github.com/harshsandhu44/bandzen/commit/c2ef3d972c19fcc4a5510e0d6e612ac33649c6fb))
+
 # app [0.8.0](https://github.com/harshsandhu44/bandzen/compare/app@0.7.0...app@0.8.0) (2026-09-04)
 
 
