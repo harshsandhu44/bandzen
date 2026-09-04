@@ -1,7 +1,7 @@
 import { Check, Lock } from 'lucide-react';
 import { AWARD_CATALOGUE } from '@/lib/awards';
 import type { Award } from '@/lib/db/schema';
-import { SectionHeader } from '@/components/app/primitives';
+import { Panel } from '@/components/app/primitives';
 
 /**
  * The full ladder: what has been earned, and what the next one asks for.
@@ -15,11 +15,7 @@ export function AwardWall({ awards }: { awards: Award[] }) {
   const earned = new Map(awards.map((a) => [a.awardId, a.earnedAt]));
 
   return (
-    <section aria-labelledby="awards-heading" className="space-y-3">
-      <SectionHeader as="h2">
-        <span id="awards-heading">Awards</span>
-      </SectionHeader>
-
+    <Panel headingId="awards-heading" title="Awards">
       <ul className="grid gap-x-6 gap-y-3 sm:grid-cols-2">
         {AWARD_CATALOGUE.map((award) => {
           const at = earned.get(award.id);
@@ -58,11 +54,11 @@ export function AwardWall({ awards }: { awards: Award[] }) {
         })}
       </ul>
 
-      <p className="max-w-prose text-xs text-muted-foreground">
+      <p className="mt-4 max-w-prose text-xs text-muted-foreground">
         A study day is a day you finished an attempt or a lesson. Streaks are
         kept once earned — missing a day ends the run, but never takes back an
         award you have already got.
       </p>
-    </section>
+    </Panel>
   );
 }

@@ -1,11 +1,7 @@
 import Link from 'next/link';
 import { ArrowRight, Lock } from 'lucide-react';
 import { Button } from '@bandzen/ui/components/button';
-import {
-  Eyebrow,
-  PageHeader,
-  SectionHeader,
-} from '@/components/app/primitives';
+import { Eyebrow, PageHeader, Panel } from '@/components/app/primitives';
 import { SkillStatus, toSkillLevel } from '@/components/app/status';
 import { requireUserId } from '@/lib/auth';
 import {
@@ -78,18 +74,14 @@ export default async function PracticePage() {
     .slice(0, 3);
 
   return (
-    <div className="max-w-3xl space-y-10">
+    <div className="max-w-5xl space-y-4">
       <PageHeader
         eyebrow="Practice"
         title="What do you want to practise?"
         description="Short, focused sessions and full timed tests. Everything here is scored the same way."
       />
 
-      <section aria-labelledby="smart-heading" className="space-y-3">
-        <SectionHeader as="h2">
-          <span id="smart-heading">Smart practice</span>
-        </SectionHeader>
-
+      <Panel headingId="smart-heading" title="Smart practice">
         {weak.length ? (
           <div className="border-l-2 border-chrome bg-secondary/30 py-5 pr-5 pl-5">
             <p className="text-sm font-medium">
@@ -159,14 +151,10 @@ export default async function PracticePage() {
             </Button>
           </div>
         )}
-      </section>
+      </Panel>
 
-      <section aria-labelledby="modules-heading" className="space-y-3">
-        <SectionHeader as="h2">
-          <span id="modules-heading">By module</span>
-        </SectionHeader>
-
-        <div className="grid gap-3 sm:grid-cols-2">
+      <Panel headingId="modules-heading" title="By module">
+        <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
           {IELTS_MODULES.map((module) =>
             isAvailable(module) ? (
               <Link
@@ -206,13 +194,9 @@ export default async function PracticePage() {
             ),
           )}
         </div>
-      </section>
+      </Panel>
 
-      <section aria-labelledby="tests-heading" className="space-y-3">
-        <SectionHeader as="h2">
-          <span id="tests-heading">Sit a test</span>
-        </SectionHeader>
-
+      <Panel headingId="tests-heading" title="Sit a test">
         <article className="border border-border">
           <div className="border-b border-border px-5 py-4">
             <h3 className="font-title text-title">Diagnostic</h3>
@@ -282,7 +266,7 @@ export default async function PracticePage() {
             </p>
           </div>
         </div>
-      </section>
+      </Panel>
     </div>
   );
 }

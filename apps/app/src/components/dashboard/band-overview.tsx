@@ -1,5 +1,5 @@
 import { BandScale } from '@bandzen/ui/components/band-scale';
-import { SectionHeader } from '@/components/app/primitives';
+import { Panel } from '@/components/app/primitives';
 import { LockedModule } from '@/components/app/status';
 import { IELTS_MODULES, MODULE_LABEL, isAvailable } from '@/lib/modules';
 import type { Skill } from '@/lib/db/schema';
@@ -18,11 +18,7 @@ export function BandOverview({
   target?: number | null;
 }) {
   return (
-    <section aria-labelledby="bands-heading" className="space-y-3">
-      <SectionHeader as="h2">
-        <span id="bands-heading">By module</span>
-      </SectionHeader>
-
+    <Panel title="By module" headingId="bands-heading">
       <div className="space-y-3">
         {IELTS_MODULES.map((module) => {
           if (!isAvailable(module)) {
@@ -54,6 +50,6 @@ export function BandOverview({
           );
         })}
       </div>
-    </section>
+    </Panel>
   );
 }

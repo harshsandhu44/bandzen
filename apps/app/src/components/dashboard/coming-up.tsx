@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import { SectionHeader } from '@/components/app/primitives';
+import { Panel } from '@/components/app/primitives';
 import { TaskStatus } from '@/components/app/status';
 import { MODULE_LABEL } from '@/lib/modules';
 import { targetHref, type PlanTask } from '@/lib/study-plan';
@@ -39,11 +39,7 @@ export function ComingUp({
   if (!byDay.size) return null;
 
   return (
-    <section aria-labelledby="upcoming-heading" className="space-y-5">
-      <SectionHeader as="h2">
-        <span id="upcoming-heading">{heading}</span>
-      </SectionHeader>
-
+    <Panel title={heading} headingId="upcoming-heading">
       <ol className="space-y-6">
         {[...byDay.entries()].map(([date, tasks]) => {
           const d = new Date(`${date}T00:00:00Z`);
@@ -87,6 +83,6 @@ export function ComingUp({
           );
         })}
       </ol>
-    </section>
+    </Panel>
   );
 }

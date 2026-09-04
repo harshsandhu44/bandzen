@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import { SectionHeader } from '@/components/app/primitives';
+import { Panel } from '@/components/app/primitives';
 import { TaskStatus } from '@/components/app/status';
 import { MODULE_LABEL } from '@/lib/modules';
 import { targetHref, type PlanProgress } from '@/lib/study-plan';
@@ -19,28 +19,27 @@ export function TodaysPlan({ progress }: { progress: PlanProgress }) {
     : 0;
 
   return (
-    <section aria-labelledby="today-heading" className="space-y-3">
-      <div className="flex items-baseline justify-between gap-4">
-        <SectionHeader as="h2">
-          <span id="today-heading">Today</span>
-        </SectionHeader>
+    <Panel
+      headingId="today-heading"
+      title="Today"
+      action={
         <p className="font-metric text-metric-sm text-muted-foreground">
           {minutesDone} / {minutesGoal} min
         </p>
-      </div>
-
+      }
+    >
       <div
         role="progressbar"
         aria-valuenow={minutesDone}
         aria-valuemin={0}
         aria-valuemax={minutesGoal}
         aria-label="Minutes completed today"
-        className="h-1 w-full bg-border"
+        className="mb-3 h-1 w-full bg-border"
       >
         <div className="h-1 bg-primary" style={{ width: `${pct}%` }} />
       </div>
 
-      <ul className="divide-y divide-border border-y border-border">
+      <ul className="-mb-2.5 divide-y divide-border border-t border-border">
         {tasks.map((task, i) => {
           const href = targetHref(task);
           return (
@@ -81,6 +80,6 @@ export function TodaysPlan({ progress }: { progress: PlanProgress }) {
           );
         })}
       </ul>
-    </section>
+    </Panel>
   );
 }

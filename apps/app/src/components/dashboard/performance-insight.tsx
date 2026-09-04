@@ -1,7 +1,7 @@
 import Link from 'next/link';
 import { ArrowRight } from 'lucide-react';
 import { Button } from '@bandzen/ui/components/button';
-import { EmptyState, SectionHeader } from '@/components/app/primitives';
+import { EmptyState, Panel } from '@/components/app/primitives';
 import { ModuleBadge } from '@/components/app/status';
 import type { PerformanceInsight as Insight } from '@/lib/insight';
 
@@ -16,24 +16,17 @@ import type { PerformanceInsight as Insight } from '@/lib/insight';
 export function PerformanceInsight({ insight }: { insight: Insight | null }) {
   if (!insight) {
     return (
-      <section aria-labelledby="insight-heading" className="space-y-3">
-        <SectionHeader as="h2">
-          <span id="insight-heading">Your biggest opportunity</span>
-        </SectionHeader>
+      <Panel title="Your biggest opportunity" headingId="insight-heading">
         <EmptyState
           title="Nothing to point at yet"
           description="Once you have finished a test we can name the one thing costing you the most marks, and show you why."
         />
-      </section>
+      </Panel>
     );
   }
 
   return (
-    <section aria-labelledby="insight-heading" className="space-y-3">
-      <SectionHeader as="h2">
-        <span id="insight-heading">Your biggest opportunity</span>
-      </SectionHeader>
-
+    <Panel title="Your biggest opportunity" headingId="insight-heading">
       <div className="border-l-2 border-chrome bg-secondary/30 py-4 pr-4 pl-5">
         <div className="flex items-baseline gap-2">
           <ModuleBadge module={insight.module} />
@@ -71,6 +64,6 @@ export function PerformanceInsight({ insight }: { insight: Insight | null }) {
           <ArrowRight />
         </Button>
       </div>
-    </section>
+    </Panel>
   );
 }
