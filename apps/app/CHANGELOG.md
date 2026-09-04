@@ -1,3 +1,10 @@
+# app [0.14.0](https://github.com/harshsandhu44/bandzen/compare/app@0.13.0...app@0.14.0) (2026-09-04)
+
+
+### Features
+
+* **app:** shared review/report components + progress charts ([#28](https://github.com/harshsandhu44/bandzen/issues/28)) ([ab07617](https://github.com/harshsandhu44/bandzen/commit/ab076176f5009297c49803171aea50230574d5ea))
+
 # app [0.13.0](https://github.com/harshsandhu44/bandzen/compare/app@0.12.0...app@0.13.0) (2026-09-04)
 
 
