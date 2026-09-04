@@ -1,0 +1,1 @@
+ALTER TABLE "listening_tracks" ADD COLUMN "peaks" jsonb;
