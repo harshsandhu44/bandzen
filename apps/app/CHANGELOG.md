@@ -1,3 +1,10 @@
+# app [0.11.0](https://github.com/harshsandhu44/bandzen/compare/app@0.10.0...app@0.11.0) (2026-09-04)
+
+
+### Features
+
+* **app:** persistent top bar + dashboard restyle ([#25](https://github.com/harshsandhu44/bandzen/issues/25)) ([da0e802](https://github.com/harshsandhu44/bandzen/commit/da0e8026ec877f211a78f6d57711cd4d87aa8397))
+
 # app [0.10.0](https://github.com/harshsandhu44/bandzen/compare/app@0.9.0...app@0.10.0) (2026-09-04)
 
 
