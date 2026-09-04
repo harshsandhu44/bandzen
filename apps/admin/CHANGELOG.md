@@ -1,3 +1,10 @@
+# admin [0.4.0](https://github.com/harshsandhu44/bandzen/compare/admin@0.3.0...admin@0.4.0) (2026-09-04)
+
+
+### Features
+
+* redesign the admin CMS — editors, findability, preview, audit log, in-app generation ([#20](https://github.com/harshsandhu44/bandzen/issues/20)) ([69aa785](https://github.com/harshsandhu44/bandzen/commit/69aa785d20844fcaee0293bf703f2ca651765f8f))
+
 # admin [0.3.0](https://github.com/harshsandhu44/bandzen/compare/admin@0.2.0...admin@0.3.0) (2026-09-03)
 
 
