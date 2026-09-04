@@ -5,19 +5,20 @@ import { revalidatePath } from 'next/cache';
 import {
   createLesson,
   updateLesson,
-  getLessonById,
   publishLesson,
   unpublishLesson,
   deleteLesson,
+  recordContentEvent,
 } from '@bandzen/db/queries';
-import type {
-  Lesson,
-  LessonBlock,
-  LessonStage,
-  LessonStageId,
-} from '@bandzen/db/schema';
+import type { Lesson } from '@bandzen/db/schema';
 import { ContentInUseError, PublishValidationError } from '@bandzen/db/errors';
 import { requireAdminOrTeacher } from '@/lib/auth';
+import { runBulk } from '@/lib/bulk';
+import { ok, fail, type ActionResult } from '@/lib/action-result';
+import {
+  saveLessonPayloadSchema,
+  type SaveLessonPayload,
+} from './[id]/schema';
 
 export type ActionState = { error: string | null };
 
@@ -26,12 +27,6 @@ function orNull(value: FormDataEntryValue | null) {
   return s || null;
 }
 
-function splitLines(value: FormDataEntryValue | null): string[] {
-  return String(value ?? '')
-    .split('\n')
-    .map((s) => s.trim())
-    .filter(Boolean);
-}
 
 export async function createLessonAction(formData: FormData) {
   const { userId } = await requireAdminOrTeacher();
@@ -48,26 +43,10 @@ export async function createLessonAction(formData: FormData) {
     updatedBy: userId,
   });
   if (!lesson) throw new Error('Failed to create lesson.');
+  await recordContentEvent('lesson', lesson.id, userId, 'created');
   redirect(`/lessons/${lesson.id}`);
 }
 
-export async function updateLessonAction(formData: FormData) {
-  const { userId } = await requireAdminOrTeacher();
-  const id = String(formData.get('id') ?? '');
-  await updateLesson(
-    id,
-    {
-      title: String(formData.get('title') ?? '').trim(),
-      summary: String(formData.get('summary') ?? '').trim(),
-      minutes: Number(formData.get('minutes') ?? 5),
-      questionKind: orNull(
-        formData.get('questionKind'),
-      ) as Lesson['questionKind'],
-    },
-    userId,
-  );
-  revalidatePath(`/lessons/${id}`);
-}
 
 export async function publishLessonAction(
   _prev: ActionState,
@@ -77,6 +56,7 @@ export async function publishLessonAction(
   const id = String(formData.get('id') ?? '');
   try {
     await publishLesson(id, userId);
+    await recordContentEvent('lesson', id, userId, 'published');
   } catch (e) {
     if (e instanceof PublishValidationError)
       return { error: `Missing: ${e.issues.join(', ')}` };
@@ -91,6 +71,7 @@ export async function unpublishLessonAction(formData: FormData) {
   const { userId } = await requireAdminOrTeacher();
   const id = String(formData.get('id') ?? '');
   await unpublishLesson(id, userId);
+  await recordContentEvent('lesson', id, userId, 'unpublished');
   revalidatePath(`/lessons/${id}`);
   revalidatePath('/lessons');
 }
@@ -99,7 +80,7 @@ export async function deleteLessonAction(
   _prev: ActionState,
   formData: FormData,
 ): Promise<ActionState> {
-  await requireAdminOrTeacher();
+  const { userId } = await requireAdminOrTeacher();
   const id = String(formData.get('id') ?? '');
   try {
     await deleteLesson(id);
@@ -107,131 +88,79 @@ export async function deleteLessonAction(
     if (e instanceof ContentInUseError) return { error: e.message };
     throw e;
   }
+  await recordContentEvent('lesson', id, userId, 'deleted');
   revalidatePath('/lessons');
   redirect('/lessons');
 }
 
+
+
+
+
+
+
+
 /**
- * Every stage/block mutation is a read-modify-write of the whole `stages`
- * JSON blob -- there is no per-block DB operation (see packages/db). This is
- * the one place that fetch-modify-save boilerplate lives.
+ * One Save for the lesson editor. The whole `stages` array is a single JSON
+ * blob on the row, so there is no child-row diffing — the payload replaces it
+ * wholesale.
  */
-async function withStages(
-  lessonId: string,
-  userId: string,
-  mutate: (stages: LessonStage[]) => LessonStage[],
-) {
-  const lesson = await getLessonById(lessonId);
-  if (!lesson) return;
-  const stages = mutate([...(lesson.stages ?? [])] as LessonStage[]);
-  await updateLesson(lessonId, { stages }, userId);
-  revalidatePath(`/lessons/${lessonId}`);
-}
-
-export async function addStageAction(formData: FormData) {
+export async function saveLessonAction(
+  payload: SaveLessonPayload,
+): Promise<ActionResult> {
   const { userId } = await requireAdminOrTeacher();
-  const lessonId = String(formData.get('lessonId') ?? '');
-  const stageId = formData.get('stageId') as LessonStageId;
-  await withStages(lessonId, userId, (stages) =>
-    stages.some((s) => s.id === stageId)
-      ? stages
-      : [...stages, { id: stageId, blocks: [] }],
-  );
-}
 
-export async function deleteStageAction(formData: FormData) {
-  const { userId } = await requireAdminOrTeacher();
-  const lessonId = String(formData.get('lessonId') ?? '');
-  const stageId = formData.get('stageId') as LessonStageId;
-  await withStages(lessonId, userId, (stages) =>
-    stages.filter((s) => s.id !== stageId),
-  );
-}
+  const parsed = saveLessonPayloadSchema.safeParse(payload);
+  if (!parsed.success) {
+    return fail('Some fields are invalid — check the highlighted ones.');
+  }
+  const p = parsed.data;
 
-/** Builds the block sub-object for the selected kind, ignoring every other field on the shared "add block" form. */
-function buildBlock(formData: FormData): LessonBlock | null {
-  const kind = String(formData.get('kind') ?? '');
-  switch (kind) {
-    case 'prose':
-      return { kind: 'prose', body: String(formData.get('body') ?? '').trim() };
-    case 'steps':
-      return { kind: 'steps', items: splitLines(formData.get('items')) };
-    case 'checklist':
-      return { kind: 'checklist', items: splitLines(formData.get('items')) };
-    case 'callout':
-      return {
-        kind: 'callout',
-        tone: formData.get('calloutTone') === 'warning' ? 'warning' : 'note',
-        title: String(formData.get('title') ?? '').trim(),
-        body: String(formData.get('body') ?? '').trim(),
-      };
-    case 'example':
-      return {
-        kind: 'example',
-        source: String(formData.get('source') ?? '').trim(),
-        question: String(formData.get('question') ?? '').trim(),
-        answer: String(formData.get('answer') ?? '').trim(),
-        why: String(formData.get('why') ?? '').trim(),
-      };
-    case 'try':
-      return {
-        kind: 'try',
-        source: orNull(formData.get('source')) ?? undefined,
-        question: String(formData.get('question') ?? '').trim(),
-        answer: String(formData.get('answer') ?? '').trim(),
-        why: String(formData.get('why') ?? '').trim(),
-      };
-    default:
-      return null;
+  try {
+    await updateLesson(
+      p.id,
+      {
+        title: p.title,
+        summary: p.summary,
+        minutes: p.minutes,
+        questionKind: p.questionKind as Lesson['questionKind'],
+        stages: p.stages.length > 0 ? p.stages : null,
+      },
+      userId,
+    );
+    await recordContentEvent('lesson', p.id, userId, 'updated');
+    revalidatePath(`/lessons/${p.id}`);
+    revalidatePath('/lessons');
+    return ok('Saved');
+  } catch (e) {
+    console.error('[cms] saveLesson failed', e);
+    return fail(e instanceof Error ? e.message : 'Could not save the lesson.');
   }
 }
 
-export async function addBlockAction(formData: FormData) {
+export async function bulkPublishLessonsAction(
+  ids: string[],
+): Promise<ActionResult> {
   const { userId } = await requireAdminOrTeacher();
-  const lessonId = String(formData.get('lessonId') ?? '');
-  const stageId = formData.get('stageId') as LessonStageId;
-  const block = buildBlock(formData);
-  if (!block) return;
-  await withStages(lessonId, userId, (stages) => {
-    const existing = stages.find((s) => s.id === stageId);
-    if (existing) {
-      return stages.map((s) =>
-        s.id === stageId ? { ...s, blocks: [...s.blocks, block] } : s,
-      );
-    }
-    return [...stages, { id: stageId, blocks: [block] }];
-  });
+  const result = await runBulk(ids, (id) => publishLesson(id, userId), 'Published');
+  revalidatePath('/lessons');
+  return result;
 }
 
-export async function deleteBlockAction(formData: FormData) {
+export async function bulkUnpublishLessonsAction(
+  ids: string[],
+): Promise<ActionResult> {
   const { userId } = await requireAdminOrTeacher();
-  const lessonId = String(formData.get('lessonId') ?? '');
-  const stageId = formData.get('stageId') as LessonStageId;
-  const index = Number(formData.get('index') ?? -1);
-  await withStages(lessonId, userId, (stages) =>
-    stages.map((s) =>
-      s.id === stageId
-        ? { ...s, blocks: s.blocks.filter((_, i) => i !== index) }
-        : s,
-    ),
-  );
+  const result = await runBulk(ids, (id) => unpublishLesson(id, userId), 'Unpublished');
+  revalidatePath('/lessons');
+  return result;
 }
 
-export async function moveBlockAction(formData: FormData) {
-  const { userId } = await requireAdminOrTeacher();
-  const lessonId = String(formData.get('lessonId') ?? '');
-  const stageId = formData.get('stageId') as LessonStageId;
-  const index = Number(formData.get('index') ?? -1);
-  const direction = String(formData.get('direction') ?? '');
-  const target = direction === 'up' ? index - 1 : index + 1;
-
-  await withStages(lessonId, userId, (stages) =>
-    stages.map((s) => {
-      if (s.id !== stageId) return s;
-      if (target < 0 || target >= s.blocks.length) return s;
-      const blocks = [...s.blocks];
-      [blocks[index], blocks[target]] = [blocks[target], blocks[index]];
-      return { ...s, blocks };
-    }),
-  );
+export async function bulkDeleteLessonsAction(
+  ids: string[],
+): Promise<ActionResult> {
+  await requireAdminOrTeacher();
+  const result = await runBulk(ids, (id) => deleteLesson(id), 'Deleted');
+  revalidatePath('/lessons');
+  return result;
 }

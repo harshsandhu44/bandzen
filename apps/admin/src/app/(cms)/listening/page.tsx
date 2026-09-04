@@ -1,15 +1,37 @@
 import Link from 'next/link';
 import { listTracksAdmin } from '@bandzen/db/queries';
 import { Button } from '@bandzen/ui/components/button';
-import { EmptyState, PageHeader } from '@bandzen/ui/components/primitives';
+import { PageHeader } from '@bandzen/ui/components/primitives';
 import { requireAdminOrTeacher } from '@/lib/auth';
-import { StatusBadge } from '@/components/status-badge';
+import { ContentList } from '@/components/content-list';
+import {
+  bulkPublishTracksAction,
+  bulkUnpublishTracksAction,
+  bulkDeleteTracksAction,
+} from './actions';
 
 export const metadata = { title: 'Listening' };
 
-export default async function ListeningPage() {
+export default async function ListeningPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ q?: string; status?: string }>;
+}) {
   await requireAdminOrTeacher();
-  const tracks = await listTracksAdmin();
+  const { q, status } = await searchParams;
+  const rows = await listTracksAdmin({
+    q,
+    status:
+      status === 'draft' || status === 'published' ? status : undefined,
+  });
+
+  const items = rows.map((r) => ({
+    id: r.id,
+    href: `/listening/${r.id}`,
+    title: r.title,
+    meta: `${r.slug} · difficulty ${r.difficulty}`,
+    status: r.status,
+  }));
 
   return (
     <div className="max-w-4xl space-y-8">
@@ -26,52 +48,29 @@ export default async function ListeningPage() {
             >
               Import JSON
             </Button>
-            <Button
-              nativeButton={false}
-              render={<Link href="/listening/new" />}
-            >
+            <Button nativeButton={false} render={<Link href="/listening/new" />}>
               New track
             </Button>
           </div>
         }
       />
 
-      {tracks.length === 0 ? (
-        <EmptyState
-          title="No tracks yet"
-          description="Upload an MP3 and write its transcript by hand, or import a reviewed JSON file from the generation pipeline."
-          action={
-            <Button
-              nativeButton={false}
-              render={<Link href="/listening/new" />}
-            >
-              New track
-            </Button>
-          }
-        />
-      ) : (
-        <ul className="divide-y divide-border border-y border-border">
-          {tracks.map((t) => (
-            <li
-              key={t.id}
-              className="flex items-center justify-between gap-4 py-3"
-            >
-              <div>
-                <Link
-                  href={`/listening/${t.id}`}
-                  className="text-sm hover:underline"
-                >
-                  {t.title}
-                </Link>
-                <p className="text-xs text-muted-foreground">
-                  {t.slug} · difficulty {t.difficulty}
-                </p>
-              </div>
-              <StatusBadge status={t.status} />
-            </li>
-          ))}
-        </ul>
-      )}
+      <ContentList
+        items={items}
+        emptyTitle="No tracks yet"
+        emptyDescription="Upload an MP3 and write its transcript, or import a reviewed JSON file."
+        emptyAction={
+          <Button nativeButton={false} render={<Link href="/listening/new" />}>
+            New track
+          </Button>
+        }
+        bulk={{
+          noun: 'track',
+          publish: bulkPublishTracksAction,
+          unpublish: bulkUnpublishTracksAction,
+          remove: bulkDeleteTracksAction,
+        }}
+      />
     </div>
   );
 }

@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import {
+  GENERATION_STALE_MS,
   getSpeakingTestGenerationState,
   updateSpeakingPrompt,
   updateSpeakingTest,
@@ -11,9 +12,6 @@ import { requireAdminOrTeacher } from '@/lib/auth';
 // One ElevenLabs call per prompt without audio, ~10 prompts a test. The
 // default function budget would not cover a full pass.
 export const maxDuration = 120;
-
-/** A generation older than this is treated as dead, and a new one may start. */
-const STALE_MS = 3 * 60 * 1000;
 
 /**
  * Synthesizes the examiner voice for every prompt in a test that is missing
@@ -40,7 +38,7 @@ export async function POST(
 
   const running =
     test.generationStartedAt != null &&
-    Date.now() - test.generationStartedAt.getTime() < STALE_MS;
+    Date.now() - test.generationStartedAt.getTime() < GENERATION_STALE_MS;
   if (running) {
     return NextResponse.json({ status: 'running' });
   }

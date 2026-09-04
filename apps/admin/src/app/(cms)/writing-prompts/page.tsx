@@ -1,15 +1,37 @@
 import Link from 'next/link';
 import { listWritingPromptsAdmin } from '@bandzen/db/queries';
 import { Button } from '@bandzen/ui/components/button';
-import { EmptyState, PageHeader } from '@bandzen/ui/components/primitives';
+import { PageHeader } from '@bandzen/ui/components/primitives';
 import { requireAdminOrTeacher } from '@/lib/auth';
-import { StatusBadge } from '@/components/status-badge';
+import { ContentList } from '@/components/content-list';
+import {
+  bulkPublishPromptsAction,
+  bulkUnpublishPromptsAction,
+  bulkDeletePromptsAction,
+} from './actions';
 
 export const metadata = { title: 'Writing prompts' };
 
-export default async function WritingPromptsPage() {
+export default async function WritingPromptsPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ q?: string; status?: string }>;
+}) {
   await requireAdminOrTeacher();
-  const prompts = await listWritingPromptsAdmin();
+  const { q, status } = await searchParams;
+  const rows = await listWritingPromptsAdmin({
+    q,
+    status:
+      status === 'draft' || status === 'published' ? status : undefined,
+  });
+
+  const items = rows.map((r) => ({
+    id: r.id,
+    href: `/writing-prompts/${r.id}`,
+    title: r.slug,
+    meta: `Task ${r.task} · ${r.format} · ${r.promptText.slice(0, 80)}`,
+    status: r.status,
+  }));
 
   return (
     <div className="max-w-4xl space-y-8">
@@ -26,52 +48,29 @@ export default async function WritingPromptsPage() {
             >
               Import JSON
             </Button>
-            <Button
-              nativeButton={false}
-              render={<Link href="/writing-prompts/new" />}
-            >
+            <Button nativeButton={false} render={<Link href="/writing-prompts/new" />}>
               New prompt
             </Button>
           </div>
         }
       />
 
-      {prompts.length === 0 ? (
-        <EmptyState
-          title="No writing prompts yet"
-          description="Add a Task 1 or Task 2 prompt for students to practise against. Write one by hand, or import JSON."
-          action={
-            <Button
-              nativeButton={false}
-              render={<Link href="/writing-prompts/new" />}
-            >
-              New prompt
-            </Button>
-          }
-        />
-      ) : (
-        <ul className="divide-y divide-border border-y border-border">
-          {prompts.map((p) => (
-            <li
-              key={p.id}
-              className="flex items-center justify-between gap-4 py-3"
-            >
-              <div>
-                <Link
-                  href={`/writing-prompts/${p.id}`}
-                  className="text-sm hover:underline"
-                >
-                  {p.slug}
-                </Link>
-                <p className="max-w-md truncate text-xs text-muted-foreground">
-                  Task {p.task} · {p.format} · {p.promptText}
-                </p>
-              </div>
-              <StatusBadge status={p.status} />
-            </li>
-          ))}
-        </ul>
-      )}
+      <ContentList
+        items={items}
+        emptyTitle="No writing prompts yet"
+        emptyDescription="Write one by hand, or import a reviewed JSON file."
+        emptyAction={
+          <Button nativeButton={false} render={<Link href="/writing-prompts/new" />}>
+            New prompt
+          </Button>
+        }
+        bulk={{
+          noun: 'prompt',
+          publish: bulkPublishPromptsAction,
+          unpublish: bulkUnpublishPromptsAction,
+          remove: bulkDeletePromptsAction,
+        }}
+      />
     </div>
   );
 }

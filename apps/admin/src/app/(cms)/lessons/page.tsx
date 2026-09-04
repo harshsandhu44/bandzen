@@ -1,37 +1,44 @@
 import Link from 'next/link';
 import { listLessonsAdmin } from '@bandzen/db/queries';
-import { GROUP_TITLE, type Lesson } from '@bandzen/db/schema';
 import { Button } from '@bandzen/ui/components/button';
-import {
-  EmptyState,
-  Eyebrow,
-  PageHeader,
-} from '@bandzen/ui/components/primitives';
+import { PageHeader } from '@bandzen/ui/components/primitives';
 import { requireAdminOrTeacher } from '@/lib/auth';
-import { StatusBadge } from '@/components/status-badge';
+import { ContentList } from '@/components/content-list';
+import {
+  bulkPublishLessonsAction,
+  bulkUnpublishLessonsAction,
+  bulkDeleteLessonsAction,
+} from './actions';
 
 export const metadata = { title: 'Lessons' };
 
-function groupLessons(lessons: Lesson[]) {
-  const byModuleGroup = new Map<string, Lesson[]>();
-  for (const lesson of lessons) {
-    const key = `${lesson.module}:${lesson.group}`;
-    byModuleGroup.set(key, [...(byModuleGroup.get(key) ?? []), lesson]);
-  }
-  return byModuleGroup;
-}
-
-export default async function LessonsPage() {
+export default async function LessonsPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ q?: string; status?: string }>;
+}) {
   await requireAdminOrTeacher();
-  const lessons = await listLessonsAdmin();
-  const grouped = groupLessons(lessons);
+  const { q, status } = await searchParams;
+  const rows = await listLessonsAdmin({
+    q,
+    status:
+      status === 'draft' || status === 'published' ? status : undefined,
+  });
+
+  const items = rows.map((r) => ({
+    id: r.id,
+    href: `/lessons/${r.id}`,
+    title: r.title,
+    meta: `${r.slug} · ${r.module} / ${r.group} · ${r.minutes}m`,
+    status: r.status,
+  }));
 
   return (
     <div className="max-w-4xl space-y-8">
       <PageHeader
         eyebrow="Content"
         title="Lessons"
-        description="Grouped by module, then by section. Order within a group follows the order index."
+        description="Grouped by module then section. Search or filter to narrow the list."
         action={
           <div className="flex items-center gap-2">
             <Button
@@ -48,52 +55,22 @@ export default async function LessonsPage() {
         }
       />
 
-      {grouped.size === 0 ? (
-        <EmptyState
-          title="No lessons yet"
-          description="Lessons are grouped by module and section. Write one by hand, or import JSON with its stages already written."
-          action={
-            <Button nativeButton={false} render={<Link href="/lessons/new" />}>
-              New lesson
-            </Button>
-          }
-        />
-      ) : (
-        [...grouped.entries()].map(([key, group]) => {
-          const [module, groupId] = key.split(':');
-          return (
-            <div key={key} className="space-y-3">
-              <Eyebrow as="h2">
-                {module} · {GROUP_TITLE[groupId as keyof typeof GROUP_TITLE]}
-              </Eyebrow>
-              <ul className="divide-y divide-border border-y border-border">
-                {group.map((lesson) => (
-                  <li
-                    key={lesson.id}
-                    className="flex items-center justify-between gap-4 py-3"
-                  >
-                    <div>
-                      <Link
-                        href={`/lessons/${lesson.id}`}
-                        className="text-sm hover:underline"
-                      >
-                        {lesson.title}
-                      </Link>
-                      <p className="text-xs text-muted-foreground">
-                        {lesson.slug} · {lesson.minutes}m ·{' '}
-                        {lesson.stages
-                          ? `${lesson.stages.length} stage(s)`
-                          : 'unwritten'}
-                      </p>
-                    </div>
-                    <StatusBadge status={lesson.status} />
-                  </li>
-                ))}
-              </ul>
-            </div>
-          );
-        })
-      )}
+      <ContentList
+        items={items}
+        emptyTitle="No lessons yet"
+        emptyDescription="Write one by hand, or import a reviewed JSON file."
+        emptyAction={
+          <Button nativeButton={false} render={<Link href="/lessons/new" />}>
+            New lesson
+          </Button>
+        }
+        bulk={{
+          noun: 'lesson',
+          publish: bulkPublishLessonsAction,
+          unpublish: bulkUnpublishLessonsAction,
+          remove: bulkDeleteLessonsAction,
+        }}
+      />
     </div>
   );
 }

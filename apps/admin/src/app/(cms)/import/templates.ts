@@ -54,9 +54,9 @@ type Passage = z.infer<typeof passageSchema>;
 type Question = Passage['questions'][number];
 
 /**
- * The rules here are the ones in `apps/app/scripts/generate-content.mts`'s
- * SYSTEM prompt, kept so a passage written by hand-prompting a model meets the
- * same bar as one the script generates. Edit both together.
+ * These clipboard rules track the canonical authoring rules in
+ * @bandzen/ai/prompts (PASSAGE_SYSTEM) — reworded for a paste-into-a-chatbot
+ * flow rather than a strict Structured Outputs call. Keep them in step.
  */
 const PASSAGE_BASE = `Write IELTS Academic Reading practice material as a JSON array matching the
 example below exactly. Return JSON only.

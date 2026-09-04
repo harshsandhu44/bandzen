@@ -1,23 +1,44 @@
 import Link from 'next/link';
 import { listResourcesAdmin } from '@bandzen/db/queries';
-import { CATEGORY_TITLE } from '@bandzen/db/schema';
 import { Button } from '@bandzen/ui/components/button';
-import { EmptyState, PageHeader } from '@bandzen/ui/components/primitives';
+import { PageHeader } from '@bandzen/ui/components/primitives';
 import { requireAdminOrTeacher } from '@/lib/auth';
-import { StatusBadge } from '@/components/status-badge';
+import { ContentList } from '@/components/content-list';
+import {
+  bulkPublishResourcesAction,
+  bulkUnpublishResourcesAction,
+  bulkDeleteResourcesAction,
+} from './actions';
 
 export const metadata = { title: 'Resources' };
 
-export default async function ResourcesPage() {
+export default async function ResourcesPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ q?: string; status?: string }>;
+}) {
   await requireAdminOrTeacher();
-  const resources = await listResourcesAdmin();
+  const { q, status } = await searchParams;
+  const rows = await listResourcesAdmin({
+    q,
+    status:
+      status === 'draft' || status === 'published' ? status : undefined,
+  });
+
+  const items = rows.map((r) => ({
+    id: r.id,
+    href: `/resources/${r.id}`,
+    title: r.title,
+    meta: `${r.slug} · ${r.category} · ${r.level}`,
+    status: r.status,
+  }));
 
   return (
     <div className="max-w-4xl space-y-8">
       <PageHeader
         eyebrow="Content"
         title="Resources"
-        description="Short guides students read between practice sessions. Only published ones are visible to them."
+        description="Guides grouped by category. Search or filter to narrow the list."
         action={
           <div className="flex items-center gap-2">
             <Button
@@ -27,52 +48,29 @@ export default async function ResourcesPage() {
             >
               Import JSON
             </Button>
-            <Button
-              nativeButton={false}
-              render={<Link href="/resources/new" />}
-            >
+            <Button nativeButton={false} render={<Link href="/resources/new" />}>
               New resource
             </Button>
           </div>
         }
       />
 
-      {resources.length === 0 ? (
-        <EmptyState
-          title="No resources yet"
-          description="Guides are grouped by category. Write one by hand, or import JSON with its paragraphs already written."
-          action={
-            <Button
-              nativeButton={false}
-              render={<Link href="/resources/new" />}
-            >
-              New resource
-            </Button>
-          }
-        />
-      ) : (
-        <ul className="divide-y divide-border border-y border-border">
-          {resources.map((r) => (
-            <li
-              key={r.id}
-              className="flex items-center justify-between gap-4 py-3"
-            >
-              <div>
-                <Link
-                  href={`/resources/${r.id}`}
-                  className="text-sm hover:underline"
-                >
-                  {r.title}
-                </Link>
-                <p className="text-xs text-muted-foreground">
-                  {CATEGORY_TITLE[r.category]} · {r.level} · {r.minutes}m
-                </p>
-              </div>
-              <StatusBadge status={r.status} />
-            </li>
-          ))}
-        </ul>
-      )}
+      <ContentList
+        items={items}
+        emptyTitle="No resources yet"
+        emptyDescription="Write one by hand, or import a reviewed JSON file."
+        emptyAction={
+          <Button nativeButton={false} render={<Link href="/resources/new" />}>
+            New resource
+          </Button>
+        }
+        bulk={{
+          noun: 'resource',
+          publish: bulkPublishResourcesAction,
+          unpublish: bulkUnpublishResourcesAction,
+          remove: bulkDeleteResourcesAction,
+        }}
+      />
     </div>
   );
 }

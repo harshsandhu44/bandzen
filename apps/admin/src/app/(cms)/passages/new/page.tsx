@@ -4,6 +4,7 @@ import { Label } from '@bandzen/ui/components/label';
 import { Textarea } from '@bandzen/ui/components/textarea';
 import { PageHeader } from '@bandzen/ui/components/primitives';
 import { requireAdminOrTeacher } from '@/lib/auth';
+import { GeneratePanel } from '@/components/generate-panel';
 import { createPassageAction } from '../actions';
 
 export const metadata = { title: 'New passage' };
@@ -18,6 +19,12 @@ export default async function NewPassagePage() {
         title="New passage"
         description="Created as a draft. Add its questions and answer keys on the next screen, then publish."
       />
+
+      <GeneratePanel type="passages" noun="passage" />
+
+      <div className="border-t border-border pt-2 font-mono text-xs text-muted-foreground">
+        or fill it in by hand
+      </div>
       <form action={createPassageAction} className="space-y-4">
         <div className="space-y-2">
           <Label htmlFor="slug">Slug</Label>

@@ -57,6 +57,14 @@ export const attemptStatus = pgEnum('attempt_status', [
 /** Whether a content row is visible to students. Set by the CMS. */
 export const contentStatus = pgEnum('content_status', ['draft', 'published']);
 
+export const contentEventAction = pgEnum('content_event_action', [
+  'created',
+  'updated',
+  'published',
+  'unpublished',
+  'deleted',
+]);
+
 export const lessonGroup = pgEnum('lesson_group', [
   'foundations',
   'question-types',
@@ -701,6 +709,34 @@ export const awards = pgTable(
   (t) => [primaryKey({ columns: [t.userId, t.awardId] })],
 );
 
+/**
+ * A CMS audit trail: who did what to which piece of content, and when. No FK
+ * to the content tables — a `deleted` event outlives the row it names, and the
+ * entity is polymorphic (its `entityType` is a ContentType string). Rows are
+ * append-only; nothing updates or deletes them.
+ */
+export const contentEvents = pgTable(
+  'content_events',
+  {
+    id: uuid('id').primaryKey().defaultRandom(),
+    entityType: text('entity_type').notNull(),
+    entityId: uuid('entity_id').notNull(),
+    /** Clerk userId of whoever made the change; null for pre-audit backfill. */
+    actorId: text('actor_id'),
+    action: contentEventAction('action').notNull(),
+    createdAt: timestamp('created_at', { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+  },
+  (t) => [
+    index('content_events_entity_idx').on(
+      t.entityType,
+      t.entityId,
+      desc(t.createdAt),
+    ),
+  ],
+);
+
 /** The IELTS modules that can create an attempts row, as a plain union for code that never touches the DB. */
 export type Skill = (typeof attemptModule.enumValues)[number];
 
@@ -724,3 +760,5 @@ export type ContentStatus = (typeof contentStatus.enumValues)[number];
 export type LessonGroupValue = (typeof lessonGroup.enumValues)[number];
 export type ResourceCategory = (typeof resourceCategory.enumValues)[number];
 export type ResourceLevel = (typeof resourceLevel.enumValues)[number];
+export type ContentEvent = typeof contentEvents.$inferSelect;
+export type ContentEventAction = (typeof contentEventAction.enumValues)[number];

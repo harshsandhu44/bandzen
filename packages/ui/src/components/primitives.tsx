@@ -1,6 +1,18 @@
 import type { ReactNode } from 'react';
 import { cn } from '@bandzen/ui/lib/utils';
 
+/** A plain <a>; the consuming app passes its router's Link via `render` if it wants one. */
+function BackLink({ href, label }: { href: string; label: string }) {
+  return (
+    <a
+      href={href}
+      className="inline-flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground"
+    >
+      <span aria-hidden>←</span> {label}
+    </a>
+  );
+}
+
 /**
  * The product surfaces' shared furniture, used by apps/app and apps/admin.
  *
@@ -63,14 +75,22 @@ export function PageHeader({
   title,
   description,
   action,
+  backHref,
+  backLabel,
 }: {
   eyebrow?: string;
   title: string;
   description?: ReactNode;
   action?: ReactNode;
+  /** Renders a "← {backLabel}" link above the eyebrow — an editor's route back to its list. */
+  backHref?: string;
+  backLabel?: string;
 }) {
   return (
     <header className="space-y-3">
+      {backHref && backLabel ? (
+        <BackLink href={backHref} label={backLabel} />
+      ) : null}
       {eyebrow ? <Eyebrow>{eyebrow}</Eyebrow> : null}
       <div className="flex flex-wrap items-start justify-between gap-4">
         <h1 className="font-title text-title-lg">{title}</h1>
