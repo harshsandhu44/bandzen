@@ -1,3 +1,10 @@
+# admin [0.6.0](https://github.com/harshsandhu44/bandzen/compare/admin@0.5.0...admin@0.6.0) (2026-09-04)
+
+
+### Features
+
+* **admin:** editor-shaped loading skeletons for */[id] routes ([#40](https://github.com/harshsandhu44/bandzen/issues/40)) ([b747a12](https://github.com/harshsandhu44/bandzen/commit/b747a120cc65ad9e038feb4e21230add18d8d926))
+
 # admin [0.5.0](https://github.com/harshsandhu44/bandzen/compare/admin@0.4.0...admin@0.5.0) (2026-09-04)
 
 
