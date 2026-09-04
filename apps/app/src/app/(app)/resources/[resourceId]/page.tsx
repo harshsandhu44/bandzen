@@ -1,7 +1,8 @@
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
-import { ArrowLeft, ArrowRight, MessageSquare } from 'lucide-react';
+import { ArrowRight, MessageSquare } from 'lucide-react';
 import { Button } from '@bandzen/ui/components/button';
+import { Breadcrumb } from '@/components/app/breadcrumb';
 import { CATEGORY_TITLE, getResource } from '@/content/resources';
 import { requireUserId } from '@/lib/auth';
 import { QUESTION_KIND_LABEL } from '@/lib/modules';
@@ -39,14 +40,17 @@ export default async function ResourcePage({
 
   return (
     <article className="max-w-3xl space-y-8">
+      <Breadcrumb
+        segments={[
+          { label: 'Learn', href: '/learn' },
+          { label: 'Guides', href: '/resources' },
+          { label: resource.title },
+        ]}
+      />
       <header className="space-y-3">
-        <Link
-          href={`/resources?category=${resource.category}`}
-          className="inline-flex items-center gap-1.5 text-sm text-muted-foreground underline-offset-4 hover:text-foreground hover:underline"
-        >
-          <ArrowLeft className="size-3" aria-hidden />
+        <p className="font-mono text-[0.625rem] tracking-[0.16em] text-muted-foreground uppercase">
           {CATEGORY_TITLE[resource.category]}
-        </Link>
+        </p>
         <h1 className="font-title text-title-lg">{resource.title}</h1>
         <p className="text-xs text-muted-foreground tabular-nums">
           {resource.minutes} min · {resource.level}
