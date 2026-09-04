@@ -1,3 +1,10 @@
+## app [0.16.1](https://github.com/harshsandhu44/bandzen/compare/app@0.16.0...app@0.16.1) (2026-09-04)
+
+
+### Bug Fixes
+
+* **app:** log cached_tokens for Speaking grading ([#34](https://github.com/harshsandhu44/bandzen/issues/34)) ([ff5073e](https://github.com/harshsandhu44/bandzen/commit/ff5073e7b50cb5fd3233ff8d63fbcff704a0c781)), closes [#33](https://github.com/harshsandhu44/bandzen/issues/33)
+
 # app [0.16.0](https://github.com/harshsandhu44/bandzen/compare/app@0.15.0...app@0.16.0) (2026-09-04)
 
 
