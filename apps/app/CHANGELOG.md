@@ -1,3 +1,10 @@
+# app [0.16.0](https://github.com/harshsandhu44/bandzen/compare/app@0.15.0...app@0.16.0) (2026-09-04)
+
+
+### Features
+
+* **app:** redesign polish — upgrade + preview badges ([#30](https://github.com/harshsandhu44/bandzen/issues/30)) ([c1624c8](https://github.com/harshsandhu44/bandzen/commit/c1624c8afe26bc92349c3bb6227a22bccf7af5f3))
+
 # app [0.15.0](https://github.com/harshsandhu44/bandzen/compare/app@0.14.0...app@0.15.0) (2026-09-04)
 
 
