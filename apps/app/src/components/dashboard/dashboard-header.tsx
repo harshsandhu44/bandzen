@@ -1,7 +1,4 @@
-import Link from 'next/link';
-import { Settings } from 'lucide-react';
 import { BandScale } from '@bandzen/ui/components/band-scale';
-import { Button } from '@bandzen/ui/components/button';
 import { Metric, StatCard } from '@/components/app/primitives';
 
 /** Time-of-day greeting in the candidate's own zone, not the server's. */
@@ -26,14 +23,12 @@ export function greeting(timezone: string | null | undefined): string {
 }
 
 /**
- * The greeting, and the only route to Settings on a phone.
- *
- * Settings does not get one of the five tabs -- it is opened rarely and
- * deliberately -- so it gets the gear here instead. Hidden from `md` up, where
- * the sidebar already lists it.
+ * The greeting.
  *
  * Shared because the dashboard renders this row twice: once above the
  * analytics, and once above the first-run block when nothing is measured yet.
+ * Settings, the theme and sign out live in the top bar's account menu, which
+ * is present on every breakpoint.
  */
 export function GreetingRow({
   firstName,
@@ -43,22 +38,10 @@ export function GreetingRow({
   timezone: string | null;
 }) {
   return (
-    <div className="flex items-start justify-between gap-4">
-      <h1 className="font-title text-title-lg">
-        {greeting(timezone)}
-        {firstName ? `, ${firstName}` : ''}
-      </h1>
-
-      <Button
-        variant="ghost"
-        size="icon-sm"
-        className="shrink-0 md:hidden"
-        nativeButton={false}
-        render={<Link href="/settings" aria-label="Settings" />}
-      >
-        <Settings />
-      </Button>
-    </div>
+    <h1 className="font-title text-title-lg">
+      {greeting(timezone)}
+      {firstName ? `, ${firstName}` : ''}
+    </h1>
   );
 }
 

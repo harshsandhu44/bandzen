@@ -1,7 +1,6 @@
 import Link from 'next/link';
 import { cookies } from 'next/headers';
-import { SignOutButton } from '@clerk/nextjs';
-import { Button } from '@bandzen/ui/components/button';
+import { currentUser } from '@clerk/nextjs/server';
 import {
   Sidebar,
   SidebarContent,
@@ -12,10 +11,9 @@ import {
   SidebarRail,
 } from '@bandzen/ui/components/sidebar';
 import { Wordmark } from '@bandzen/ui/components/wordmark';
-import { ThemeToggle } from '@bandzen/ui/components/theme-toggle';
 import { Toaster } from '@bandzen/ui/components/sonner';
 import { requireUserId } from '@/lib/auth';
-import { getProfile, proUntil } from '@/lib/db/queries';
+import { essayAllowance, getProfile, proUntil } from '@/lib/db/queries';
 import {
   PLANS,
   formatInr,
@@ -25,9 +23,9 @@ import {
 } from '@/lib/entitlements';
 import { foundingEndsAt } from '@/lib/razorpay';
 import { daysUntil } from '@/lib/dates';
-import { DOCS_URL } from './nav-links';
 import { MobileNav } from './mobile-nav';
 import { Nav } from './nav';
+import { TopBar } from './top-bar';
 
 const FOUNDING_DATE = new Intl.DateTimeFormat('en-GB', {
   day: 'numeric',
@@ -35,53 +33,40 @@ const FOUNDING_DATE = new Intl.DateTimeFormat('en-GB', {
 });
 
 /**
- * The signed-in shell.
+ * The signed-in shell: the `@bandzen/ui` shadcn Sidebar for primary
+ * navigation, a persistent `TopBar` for wayfinding and the account menu, and
+ * `MobileNav` as the bottom tab bar below `md`.
  *
- * The sidebar is `@bandzen/ui`'s shadcn Sidebar rather than a hand-rolled
- * `<aside>`. Two things that bought us:
+ * The sidebar is the shadcn Sidebar rather than a hand-rolled `<aside>` for two
+ * reasons: it is `fixed inset-y-0 h-svh` so its ground is the viewport height
+ * on every route (a flex-row aside stopped at the content height), and it is
+ * `md:block` with `MobileNav` taking over below that rather than simply
+ * vanishing as `hidden sm:flex` did.
  *
- * - **Height.** The old aside sat in a flex row and so stretched only to the
- *   *content* height, which meant its ground stopped mid-page on a short route
- *   and ran long on `/progress`. Sidebar is `fixed inset-y-0 h-svh`, so it is
- *   the viewport's height on every route.
- * - **Mobile.** The old aside was `hidden sm:flex` — below `sm` it was simply
- *   gone. Sidebar is `md:block`, and below that `MobileNav` is the whole
- *   navigation rather than a fallback.
+ * The `TopBar` carries the breadcrumb, the test-day countdown and marks-left,
+ * the theme toggle and the account menu. On a phone it is the only route to
+ * Settings, the theme and sign out — the sidebar is desktop-only and the five
+ * bottom tabs are full. It hides itself on the exam runners, which are
+ * full-bleed `sticky top-0` surfaces of their own.
  *
- * On a phone the sidebar is not used at all: `MobileNav` renders every
- * destination as a tab, and nothing is lost by the sidebar's absence — the
- * countdown is already in Today's header, and the theme and sign out already
- * live on the Settings page. A bottom bar plus a drawer over the same
- * destinations would be two ways to reach one place.
- *
- * So there is no header, on any breakpoint. It only ever existed to hold a
- * drawer trigger, in the worst corner of a phone for a thumb to reach, and the
- * exam screens are `lg:h-svh` full-bleed surfaces with their own `sticky top-0`
- * header — anything sticky above them fights for the same offset.
- *
- * Desktop toggling is the rail at the sidebar's edge, or Cmd/Ctrl+B.
- *
- * This calls `requireUserId()` because it reads the profile for the countdown,
- * not because it is a second gate: every page below still authenticates itself,
- * and every query still takes a userId. See proxy.ts for why the gate lives at
- * the resource rather than in middleware.
+ * This calls `requireUserId()` to read the profile for the countdown, not as a
+ * second gate: every page below still authenticates itself and every query
+ * still takes a userId. See proxy.ts for why the gate lives at the resource.
  */
 export default async function AppLayout({ children }: LayoutProps<'/'>) {
   const userId = await requireUserId();
-  const [profile, until, cookieStore] = await Promise.all([
+  const [profile, until, quota, user, cookieStore] = await Promise.all([
     getProfile(userId),
     proUntil(userId),
+    essayAllowance(userId),
+    currentUser(),
     cookies(),
   ]);
   const days = profile?.testDate
     ? daysUntil(profile.testDate, profile.timezone)
     : null;
+  const testDays = days != null && days >= 0 ? days : null;
 
-  // The persistent entry point, and the only one that is always on screen.
-  // Not a sixth nav item: NAV_LINKS is rendered verbatim as the phone tab bar,
-  // so five is the ceiling. Not a banner either — that would be the header
-  // this app deliberately does not have, and the exam screens cancel the
-  // shell's padding to go full-bleed underneath one.
   const pro = isProAt(until);
   const foundingEnds = foundingEndsAt();
   const founding = isFoundingActive(foundingEnds);
@@ -101,7 +86,7 @@ export default async function AppLayout({ children }: LayoutProps<'/'>) {
           <Nav />
         </SidebarContent>
 
-        <SidebarFooter className="gap-4 p-4">
+        <SidebarFooter className="p-4">
           {pro ? null : (
             <Link
               href="/upgrade?from=sidebar"
@@ -117,54 +102,18 @@ export default async function AppLayout({ children }: LayoutProps<'/'>) {
               </p>
             </Link>
           )}
-
-          {profile?.targetBand != null || days != null ? (
-            <dl className="space-y-1 border-t border-sidebar-border pt-4 font-mono text-[0.625rem] tracking-[0.16em] uppercase">
-              {profile?.targetBand != null ? (
-                <div className="flex justify-between gap-2">
-                  <dt className="text-muted-foreground">Target</dt>
-                  <dd className="tabular-nums">
-                    Band {profile.targetBand.toFixed(1)}
-                  </dd>
-                </div>
-              ) : null}
-              {days != null ? (
-                <div className="flex justify-between gap-2">
-                  <dt className="text-muted-foreground">Test</dt>
-                  <dd className="tabular-nums">
-                    {days === 0 ? 'Today' : `${days} days`}
-                  </dd>
-                </div>
-              ) : null}
-            </dl>
-          ) : null}
-
-          {/* Not a nav destination — NAV_LINKS is the phone tab bar and five is
-              the ceiling. Settings carries the same link for the breakpoints
-              where this sidebar does not exist. */}
-          <a
-            href={DOCS_URL}
-            target="_blank"
-            rel="noreferrer noopener"
-            className="text-xs text-muted-foreground underline decoration-sidebar-border underline-offset-4 transition-colors hover:text-foreground"
-          >
-            Documentation
-          </a>
-
-          <div className="flex items-center justify-between gap-2">
-            <ThemeToggle />
-            <SignOutButton>
-              <Button type="button" variant="ghost" size="sm">
-                Sign out
-              </Button>
-            </SignOutButton>
-          </div>
         </SidebarFooter>
 
         <SidebarRail />
       </Sidebar>
 
       <SidebarInset>
+        <TopBar
+          email={user?.primaryEmailAddress?.emailAddress ?? null}
+          testDays={testDays}
+          essaysLeft={quota.unlimited ? null : quota.remaining}
+        />
+
         {/* `p-6 sm:p-10` is load-bearing: the exam screens cancel exactly these
             with `-m-6 sm:-m-10` to go full-bleed. The extra bottom padding
             survives that cancellation, which is what clears the mobile bar. */}
