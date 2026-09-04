@@ -2,6 +2,7 @@ import type { ReactNode } from 'react';
 import Link from 'next/link';
 import { ArrowRight } from 'lucide-react';
 import { Button } from '@bandzen/ui/components/button';
+import { Progress } from '@bandzen/ui/components/progress';
 import { cn } from '@bandzen/ui/lib/utils';
 import { FeatureBlock } from '@/components/app/primitives';
 import type { Allowance } from '@/lib/entitlements';
@@ -102,7 +103,6 @@ export function QuotaMeter({
   if (allowance.unlimited) return null;
 
   const used = Math.min(allowance.used, allowance.limit);
-  const pct = Math.round((used / allowance.limit) * 100);
   const spent = allowance.remaining === 0;
 
   return (
@@ -130,19 +130,12 @@ export function QuotaMeter({
         </p>
       </div>
 
-      <div
-        role="progressbar"
-        aria-valuenow={used}
-        aria-valuemin={0}
-        aria-valuemax={allowance.limit}
+      <Progress
+        value={used}
+        max={allowance.limit}
         aria-label={`${noun} used this week`}
-        className="h-1 w-full bg-border"
-      >
-        <div
-          className={cn('h-1', spent ? 'bg-chrome' : 'bg-primary')}
-          style={{ width: `${pct}%` }}
-        />
-      </div>
+        indicatorClassName={spent ? 'bg-chrome' : undefined}
+      />
     </div>
   );
 }

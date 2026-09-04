@@ -1,6 +1,7 @@
 import Link from 'next/link';
+import { Badge } from '@bandzen/ui/components/badge';
 import { Button } from '@bandzen/ui/components/button';
-import { EmptyState, PageHeader } from '@/components/app/primitives';
+import { EmptyState, PageHeader, Panel } from '@/components/app/primitives';
 import { FilterBar } from '@/components/app/filter-bar';
 import { requireUserId } from '@/lib/auth';
 import { DIFFICULTY_RANGE, listTracks } from '@/lib/db/queries';
@@ -135,27 +136,37 @@ export default async function ListeningPage({
           />
         )
       ) : (
-        <ul className="divide-y divide-border border-y border-border">
-          {tracks.map((t) => (
-            <li
-              key={t.id}
-              className="flex items-center justify-between gap-4 py-4"
-            >
-              <div>
-                <h2 className="font-medium">{t.title}</h2>
-                <p className="font-mono text-[0.6875rem] tracking-[0.18em] text-muted-foreground uppercase">
-                  {t.topic} · Level {t.difficulty}
-                </p>
-              </div>
-              <form action={startListeningAttempt}>
-                <input type="hidden" name="trackId" value={t.id} />
-                <Button type="submit" variant="outline" size="sm">
-                  Start
-                </Button>
-              </form>
-            </li>
-          ))}
-        </ul>
+        <Panel
+          title="Tracks"
+          action={
+            <span className="font-metric text-metric-sm text-muted-foreground">
+              {tracks.length}
+            </span>
+          }
+        >
+          <ul className="-my-3 divide-y divide-border">
+            {tracks.map((t) => (
+              <li
+                key={t.id}
+                className="flex items-center justify-between gap-4 py-3"
+              >
+                <div className="min-w-0">
+                  <h2 className="font-medium">{t.title}</h2>
+                  <p className="mt-1 flex items-center gap-2 text-xs text-muted-foreground">
+                    <Badge variant="secondary">Level {t.difficulty}</Badge>
+                    <span className="truncate">{t.topic}</span>
+                  </p>
+                </div>
+                <form action={startListeningAttempt}>
+                  <input type="hidden" name="trackId" value={t.id} />
+                  <Button type="submit" variant="outline" size="sm">
+                    Start
+                  </Button>
+                </form>
+              </li>
+            ))}
+          </ul>
+        </Panel>
       )}
     </div>
   );
