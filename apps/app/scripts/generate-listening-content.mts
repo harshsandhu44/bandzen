@@ -17,12 +17,8 @@
  */
 import { readFileSync, readdirSync, writeFileSync, mkdirSync } from 'node:fs';
 import { join } from 'node:path';
-import OpenAI from 'openai';
-import {
-  generatedListeningTrackSchema,
-  type GeneratedListeningTrack as Track,
-} from '../src/lib/ai/schemas.ts';
-import { parseStructured, strictJsonSchema } from '../src/lib/ai/structured.ts';
+import { generateListeningTrack } from '@bandzen/ai/generate';
+import { type GeneratedListeningTrack as Track } from '@bandzen/ai/schemas';
 
 const SEED_DIR = join(import.meta.dirname, '..', 'content', 'listening');
 const SQL_OUT = join(
@@ -31,35 +27,8 @@ const SQL_OUT = join(
   'content',
   'listening-seed.sql',
 );
-const MODEL = process.env.OPENAI_CONTENT_MODEL ?? 'gpt-5.5';
-
-const TRACK_SCHEMA = strictJsonSchema(generatedListeningTrackSchema);
-
-const SYSTEM = `You write IELTS Listening practice material — a spoken transcript, not prose to be read.
-
-Rules that matter:
-- The transcript must be original spoken material on an everyday or academic
-  topic. Never reproduce copyrighted exam material. Label each speaker turn in
-  a conversation (e.g. "Sarah:", "Tom:") on its own line; a monologue needs no
-  labels.
-- 10 questions, idx 1..10, mixing at least two of the allowed question kinds
-  (multiple_choice, sentence_completion, matching).
-- multiple_choice must supply four options, and the answer must match one
-  exactly.
-- matching must have options: null. Every such question draws from the single
-  track-level "matchingOptions" list. Provide at least three more options than
-  there are matching questions, no option is the answer to more than one
-  question, and every unused option must still be a credible fit for something
-  in the transcript.
-- sentence_completion answers must be words lifted verbatim from the
-  transcript, respecting a stated word limit in the prompt (real Listening
-  favours short answers — a number, a name, one or two words).
-- Every question's evidence must be a line that appears verbatim in transcript.
-- Distractors must be plausible enough that the question cannot be answered
-  without hearing the whole transcript.`;
 
 async function generate(count: number) {
-  const client = new OpenAI({ apiKey: requireKey() });
   mkdirSync(SEED_DIR, { recursive: true });
 
   const existing = new Set(
@@ -69,25 +38,11 @@ async function generate(count: number) {
   );
 
   for (let i = 0; i < count; i += 1) {
-    const response = await client.chat.completions.create({
-      model: MODEL,
-      messages: [
-        { role: 'system', content: SYSTEM },
-        {
-          role: 'user',
-          content: `Write one IELTS Listening track with 10 questions. Choose a topic unlike any of these already generated: ${[...existing].join(', ') || 'none yet'}.`,
-        },
-      ],
-      response_format: {
-        type: 'json_schema',
-        json_schema: { name: 'track', strict: true, schema: TRACK_SCHEMA },
-      },
+    const { data: track, warnings } = await generateListeningTrack({
+      avoid: [...existing],
     });
-
-    const track = parseStructured(response, generatedListeningTrackSchema);
-    const problems = validate(track);
-    if (problems.length) {
-      console.warn(`  ⚠ ${track.slug}: ${problems.join('; ')}`);
+    if (warnings.length) {
+      console.warn(`  ⚠ ${track.slug}: ${warnings.join('; ')}`);
     }
 
     writeFileSync(
@@ -101,67 +56,6 @@ async function generate(count: number) {
   console.log(
     `\nReview the JSON in content/listening/, then: node scripts/synthesize-listening-audio.mts`,
   );
-}
-
-/**
- * Cheap structural checks. Strict Structured Outputs guarantees the shape but
- * not the sense — "evidence appears verbatim in the transcript" is the one
- * that actually catches a bad generation.
- */
-function validate(t: Track): string[] {
-  const problems: string[] = [];
-  const words = t.transcript.split(/\s+/).length;
-  if (words < 300) problems.push(`transcript only ${words} words`);
-  if (t.questions.length !== 10)
-    problems.push(`${t.questions.length} questions, expected 10`);
-
-  const matchingQs = t.questions.filter((q) => q.kind === 'matching');
-  const used = new Set<string>();
-
-  if (matchingQs.length) {
-    if (
-      !t.matchingOptions ||
-      t.matchingOptions.length < matchingQs.length + 3
-    ) {
-      problems.push(
-        `${t.matchingOptions?.length ?? 0} matching options for ${matchingQs.length} questions, want at least ${matchingQs.length + 3}`,
-      );
-    } else if (new Set(t.matchingOptions).size !== t.matchingOptions.length) {
-      problems.push('duplicate matching options in the shared list');
-    }
-  } else if (t.matchingOptions?.length) {
-    problems.push(
-      'matchingOptions supplied but no matching question uses them',
-    );
-  }
-
-  for (const q of t.questions) {
-    if (!q.answer.length) problems.push(`q${q.idx} has no answer`);
-    if (q.evidence && !t.transcript.includes(q.evidence.trim())) {
-      problems.push(`q${q.idx} evidence not found verbatim in transcript`);
-    }
-
-    if (q.kind === 'matching') {
-      if (q.options?.length) {
-        problems.push(`q${q.idx} matching must not carry its own options`);
-      }
-      const answer = q.answer[0]!;
-      if (!t.matchingOptions?.includes(answer)) {
-        problems.push(
-          `q${q.idx} answer is not in the shared matchingOptions list`,
-        );
-      }
-      if (used.has(answer))
-        problems.push(`q${q.idx} reuses an already-used option`);
-      used.add(answer);
-      continue;
-    }
-
-    if (q.options && q.options.length && !q.options.includes(q.answer[0]!)) {
-      problems.push(`q${q.idx} answer is not one of its options`);
-    }
-  }
-  return problems;
 }
 
 const quote = (v: string) => `'${v.replaceAll("'", "''")}'`;
@@ -237,15 +131,6 @@ function toSql() {
       `${missingAudio} track(s) skipped for missing audio — see warnings above.`,
     );
   }
-}
-
-function requireKey() {
-  const key = process.env.OPENAI_API_KEY;
-  if (!key)
-    throw new Error(
-      'Missing OPENAI_API_KEY. Try: node --env-file=.env.local ...',
-    );
-  return key;
 }
 
 const [command, ...rest] = process.argv.slice(2);
