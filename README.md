@@ -75,9 +75,15 @@ single lockfile and a single `node_modules` store for the whole workspace.
 Every app owns its version in its own `package.json`, and bumping it is how a
 change reaches production. Each app's `vercel.json` points Vercel's ignored
 build step at [`scripts/deploy-if-bumped.sh`](scripts/deploy-if-bumped.sh),
-which builds only when that app's version changed in the deployed commit. A
-docs edit, a refactor or a rename lands on `main` and ships to nobody until a
-release decides it should ship.
+which builds production only when that app's version changed in the deployed
+commit. A docs edit, a refactor or a rename lands on `main` and ships to
+nobody until a release decides it should ship.
+
+Preview deployments gate too, on [`turbo-ignore`](https://turbo.build/repo/docs/reference/turbo-ignore):
+a pull request builds a preview for an app only when that app — or a
+`packages/*` workspace package it depends on — changed since the app's last
+deployment, so a PR scoped to one app stops spinning up preview builds for
+the other three.
 
 The bump itself is automatic. [`multi-semantic-release`](https://github.com/dhoulb/multi-semantic-release),
 configured in [`.releaserc.json`](.releaserc.json) and run by
