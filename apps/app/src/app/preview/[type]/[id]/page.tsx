@@ -9,6 +9,13 @@ import {
   type ContentType,
 } from '@bandzen/db/queries';
 import { STAGE_TITLE } from '@bandzen/db/schema';
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from '@bandzen/ui/components/accordion';
+import { Badge } from '@bandzen/ui/components/badge';
 import { PageHeader, SectionHeader } from '@bandzen/ui/components/primitives';
 import { LessonBlockView } from '@/components/learning/lesson-blocks';
 import { requireContentRole } from '@/lib/auth';
@@ -26,10 +33,10 @@ const TYPES: ContentType[] = [
 
 function Banner({ status }: { status: string }) {
   return (
-    <div className="mb-8 border-l-2 border-primary bg-primary/5 px-4 py-2 text-xs">
-      <span className="font-mono tracking-widest uppercase">Draft preview</span>{' '}
-      — this is how a student sees it. Current status:{' '}
-      <span className="font-medium">{status}</span>.
+    <div className="mb-8 flex flex-wrap items-center gap-x-2 gap-y-1 border-l-2 border-primary bg-primary/5 px-4 py-2 text-xs">
+      <span className="font-mono tracking-widest uppercase">Draft preview</span>
+      <span>— this is how a student sees it.</span>
+      <Badge variant="secondary">{status}</Badge>
     </div>
   );
 }
@@ -149,12 +156,16 @@ export default async function PreviewPage({
           <p className="text-xs text-muted-foreground">No audio yet.</p>
         )}
         {t.transcript ? (
-          <details className="text-sm/relaxed">
-            <summary className="cursor-pointer text-xs text-muted-foreground">
-              Transcript
-            </summary>
-            <p className="mt-2 whitespace-pre-wrap">{t.transcript}</p>
-          </details>
+          <Accordion className="border-t border-border">
+            <AccordionItem value="transcript">
+              <AccordionTrigger>Transcript</AccordionTrigger>
+              <AccordionContent>
+                <p className="text-sm/relaxed whitespace-pre-wrap">
+                  {t.transcript}
+                </p>
+              </AccordionContent>
+            </AccordionItem>
+          </Accordion>
         ) : null}
         <Questions items={t.questions} />
       </>,
@@ -175,7 +186,10 @@ export default async function PreviewPage({
             <section key={part} className="space-y-3">
               <SectionHeader as="h2">Part {part}</SectionHeader>
               {prompts.map((p) => (
-                <div key={p.id} className="space-y-1 border-b border-border pb-3">
+                <div
+                  key={p.id}
+                  className="space-y-1 border-b border-border pb-3"
+                >
                   <p className="text-sm">{p.text}</p>
                   {p.cueCardPoints?.length ? (
                     <ul className="ml-5 list-disc text-sm text-muted-foreground">

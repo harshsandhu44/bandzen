@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import { currentUser } from '@clerk/nextjs/server';
 import { Check, Clock, Lock } from 'lucide-react';
+import { Badge } from '@bandzen/ui/components/badge';
 import { Button } from '@bandzen/ui/components/button';
 import { cn } from '@bandzen/ui/lib/utils';
 import {
@@ -180,9 +181,7 @@ export default async function UpgradePage(props: PageProps<'/upgrade'>) {
                     <div className="flex items-baseline justify-between gap-2">
                       <Eyebrow>{plan.label}</Eyebrow>
                       {saving > 0 ? (
-                        <Eyebrow className="text-chrome">
-                          Save {saving}%
-                        </Eyebrow>
+                        <Badge variant="secondary">Save {saving}%</Badge>
                       ) : null}
                     </div>
 
@@ -248,20 +247,17 @@ export default async function UpgradePage(props: PageProps<'/upgrade'>) {
               className="flex items-start gap-3 py-3 text-sm text-muted-foreground"
             >
               <Lock className="mt-0.5 size-4 shrink-0" aria-hidden />
-              <span>
+              <span className="flex items-center gap-2">
                 {item}
-                <span className="ml-2 font-mono text-[0.6875rem] tracking-[0.18em] uppercase">
-                  Planned
-                </span>
+                <Badge variant="secondary">Planned</Badge>
               </span>
             </li>
           ))}
         </ul>
         <p className="text-xs text-muted-foreground text-pretty">
-          The two planned items do not work yet — there is no audio, no
-          recording and no Listening material behind them. They are listed
-          because they are what we are building next, not because you would be
-          buying them today.
+          The planned item does not work yet — there is no combined timer or
+          band behind it. It is listed because it is what we are building next,
+          not because you would be buying it today.
         </p>
       </section>
 
