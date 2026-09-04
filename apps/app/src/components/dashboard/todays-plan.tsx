@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import { Progress } from '@bandzen/ui/components/progress';
 import { Panel } from '@/components/app/primitives';
 import { TaskStatus } from '@/components/app/status';
 import { MODULE_LABEL } from '@/lib/modules';
@@ -14,9 +15,6 @@ import { targetHref, type PlanProgress } from '@/lib/study-plan';
  */
 export function TodaysPlan({ progress }: { progress: PlanProgress }) {
   const { tasks, minutesDone, minutesGoal } = progress;
-  const pct = minutesGoal
-    ? Math.min(100, (minutesDone / minutesGoal) * 100)
-    : 0;
 
   return (
     <Panel
@@ -28,16 +26,12 @@ export function TodaysPlan({ progress }: { progress: PlanProgress }) {
         </p>
       }
     >
-      <div
-        role="progressbar"
-        aria-valuenow={minutesDone}
-        aria-valuemin={0}
-        aria-valuemax={minutesGoal}
+      <Progress
+        value={Math.min(minutesDone, minutesGoal)}
+        max={minutesGoal || 1}
         aria-label="Minutes completed today"
-        className="mb-3 h-1 w-full bg-border"
-      >
-        <div className="h-1 bg-primary" style={{ width: `${pct}%` }} />
-      </div>
+        className="mb-3"
+      />
 
       <ul className="-mb-2.5 divide-y divide-border border-t border-border">
         {tasks.map((task, i) => {
