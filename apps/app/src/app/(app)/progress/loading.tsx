@@ -13,17 +13,25 @@ export default function Loading() {
         <Skeleton className="h-4 w-full max-w-md" />
       </div>
 
-      <PanelSkeleton bodyClassName="h-48" />
+      <PanelSkeleton bodyClassName="aspect-[3/1] w-full" />
 
-      <div className="grid gap-4 lg:grid-cols-2 lg:items-start">
-        <PanelSkeleton rows={4} />
-        <PanelSkeleton rows={4} />
-      </div>
-      <div className="grid gap-4 lg:grid-cols-2 lg:items-start">
-        <PanelSkeleton rows={3} />
-        <PanelSkeleton rows={4} />
-      </div>
+      <Card>
+        <CardHeader>
+          <Skeleton className="h-4 w-24" />
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="flex gap-6 border-b border-border pb-2.5">
+            {[0, 1, 2].map((i) => (
+              <Skeleton key={i} className="h-3 w-24" />
+            ))}
+          </div>
+          {[0, 1, 2, 3].map((i) => (
+            <Skeleton key={i} className="h-6 w-full" />
+          ))}
+        </CardContent>
+      </Card>
 
+      <PanelSkeleton rows={2} />
       <PanelSkeleton rows={4} />
       <PanelSkeleton rows={5} />
     </div>

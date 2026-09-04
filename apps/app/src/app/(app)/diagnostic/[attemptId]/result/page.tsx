@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { BandScale } from '@bandzen/ui/components/band-scale';
+import { BandReveal } from '@/components/exam/band-reveal';
 import { requireUserId } from '@/lib/auth';
 import { getDiagnostic, getProfile } from '@/lib/db/queries';
 import { todayIso } from '@/lib/dates';
@@ -50,26 +51,20 @@ export default async function DiagnosticResultPage({
           Diagnostic result
         </p>
         {overall != null ? (
-          <div className="flex items-baseline gap-4">
-            <span className="font-metric text-metric-lg">
-              {overall.toFixed(1)}
-            </span>
-            <span className="font-mono text-[0.6875rem] tracking-[0.18em] text-muted-foreground uppercase">
+          <>
+            <BandReveal
+              value={overall}
+              target={profile?.targetBand ?? undefined}
+            />
+            <p className="font-mono text-[0.6875rem] tracking-[0.18em] text-muted-foreground uppercase">
               Estimate, not an official score
-            </span>
-          </div>
+            </p>
+          </>
         ) : (
           <h1 className="font-title text-title-lg">
             {stillGrading ? 'Marking your essay' : 'Diagnostic in progress'}
           </h1>
         )}
-        {overall != null && profile?.targetBand ? (
-          <BandScale
-            value={overall}
-            target={profile.targetBand}
-            variant="axis"
-          />
-        ) : null}
       </header>
 
       <section className="space-y-4">
