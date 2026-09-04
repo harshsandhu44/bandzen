@@ -1,3 +1,10 @@
+# app [0.7.0](https://github.com/harshsandhu44/bandzen/compare/app@0.6.0...app@0.7.0) (2026-09-04)
+
+
+### Features
+
+* redesign the admin CMS — editors, findability, preview, audit log, in-app generation ([#20](https://github.com/harshsandhu44/bandzen/issues/20)) ([69aa785](https://github.com/harshsandhu44/bandzen/commit/69aa785d20844fcaee0293bf703f2ca651765f8f))
+
 # app [0.6.0](https://github.com/harshsandhu44/bandzen/compare/app@0.5.0...app@0.6.0) (2026-09-03)
 
 
