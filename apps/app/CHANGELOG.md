@@ -1,3 +1,10 @@
+# app [0.13.0](https://github.com/harshsandhu44/bandzen/compare/app@0.12.0...app@0.13.0) (2026-09-04)
+
+
+### Features
+
+* **app:** redesign the exam runners ([#27](https://github.com/harshsandhu44/bandzen/issues/27)) ([409f1cb](https://github.com/harshsandhu44/bandzen/commit/409f1cb8660170594b43d61007997751b97bbc19))
+
 # app [0.12.0](https://github.com/harshsandhu44/bandzen/compare/app@0.11.0...app@0.12.0) (2026-09-04)
 
 
