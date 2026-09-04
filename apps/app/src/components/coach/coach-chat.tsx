@@ -6,6 +6,7 @@ import { ArrowUp, Square } from 'lucide-react';
 import { Button } from '@bandzen/ui/components/button';
 import { cn } from '@bandzen/ui/lib/utils';
 import { QuotaMeter, resetLabel } from '@/components/billing/pro';
+import { Markdown } from '@/components/coach/markdown';
 import type { Allowance } from '@/lib/entitlements';
 
 type Message = { role: 'user' | 'assistant'; content: string };
@@ -147,11 +148,15 @@ export function CoachChat({
                 {message.role === 'user' ? 'You' : 'Bandzen Coach'}
               </p>
               {message.content ? (
-                <div className="max-w-prose space-y-3 text-sm/relaxed text-pretty">
-                  {message.content.split('\n\n').map((para, j) => (
-                    <p key={j}>{para}</p>
-                  ))}
-                </div>
+                message.role === 'assistant' ? (
+                  <Markdown>{message.content}</Markdown>
+                ) : (
+                  <div className="max-w-prose space-y-3 text-sm/relaxed text-pretty">
+                    {message.content.split('\n\n').map((para, j) => (
+                      <p key={j}>{para}</p>
+                    ))}
+                  </div>
+                )
               ) : (
                 <p className="text-sm text-muted-foreground">Thinking…</p>
               )}
