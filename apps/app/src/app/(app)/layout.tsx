@@ -13,6 +13,7 @@ import {
 } from '@bandzen/ui/components/sidebar';
 import { Wordmark } from '@bandzen/ui/components/wordmark';
 import { ThemeToggle } from '@bandzen/ui/components/theme-toggle';
+import { Toaster } from '@bandzen/ui/components/sonner';
 import { requireUserId } from '@/lib/auth';
 import { getProfile, proUntil } from '@/lib/db/queries';
 import {
@@ -173,6 +174,8 @@ export default async function AppLayout({ children }: LayoutProps<'/'>) {
 
         <MobileNav />
       </SidebarInset>
+
+      <Toaster position="bottom-center" />
     </SidebarProvider>
   );
 }

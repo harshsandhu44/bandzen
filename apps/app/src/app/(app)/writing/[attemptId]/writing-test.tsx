@@ -5,7 +5,7 @@ import { cn } from '@bandzen/ui/lib/utils';
 import { SaveStatus } from '@/components/app/save-status';
 import { SubmitConfirm } from '@/components/app/submit-confirm';
 import { useAutosave } from '@/lib/use-autosave';
-import { Timer } from '../../reading/[attemptId]/timer';
+import { Timer } from '@/components/app/timer';
 import { saveEssayDraft, submitEssay } from '../actions';
 
 const countWords = (s: string) => (s.trim() ? s.trim().split(/\s+/).length : 0);

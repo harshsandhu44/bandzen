@@ -8,7 +8,7 @@ import { SubmitConfirm } from '@/components/app/submit-confirm';
 import type { Question } from '@/lib/db/schema';
 import { useAutosave } from '@/lib/use-autosave';
 import { saveReadingAnswer, submitReadingAttempt } from '../actions';
-import { Timer } from './timer';
+import { Timer } from '@/components/app/timer';
 
 const TFNG = ['TRUE', 'FALSE', 'NOT GIVEN'];
 const YNNG = ['YES', 'NO', 'NOT GIVEN'];
