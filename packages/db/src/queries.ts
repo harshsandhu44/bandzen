@@ -49,7 +49,17 @@ async function firstRow<T>(rows: T[]) {
 }
 
 /** The `?q=` box on every admin list: case-insensitive match on title/slug. */
-export type AdminListFilters = { status?: ContentStatus; q?: string };
+export type AdminListFilters = {
+  status?: ContentStatus;
+  q?: string;
+  /** Omit both to fetch every matching row — the import registry and the
+   *  AI-generation dedup check need the full set, not a page of it. */
+  limit?: number;
+  offset?: number;
+};
+
+/** Rows per admin list page. */
+export const ADMIN_PAGE_SIZE = 50;
 function adminSearch(
   slugCol: Parameters<typeof ilike>[0],
   titleCol: Parameters<typeof ilike>[0] | null,
@@ -369,7 +379,7 @@ export async function markLessonComplete(userId: string, lessonSlug: string) {
 // ---------------------------------------------------------------------------
 
 export async function listPassagesAdmin(filters?: AdminListFilters) {
-  return db
+  const query = db
     .select()
     .from(passages)
     .where(
@@ -379,6 +389,10 @@ export async function listPassagesAdmin(filters?: AdminListFilters) {
       ),
     )
     .orderBy(passages.createdAt);
+
+  return filters?.limit != null
+    ? query.limit(filters.limit).offset(filters.offset ?? 0)
+    : query;
 }
 
 export async function getPassageAdmin(id: string) {
@@ -605,7 +619,7 @@ export async function deleteQuestion(id: string) {
 // ---------------------------------------------------------------------------
 
 export async function listTracksAdmin(filters?: AdminListFilters) {
-  return db
+  const query = db
     .select()
     .from(listeningTracks)
     .where(
@@ -617,6 +631,10 @@ export async function listTracksAdmin(filters?: AdminListFilters) {
       ),
     )
     .orderBy(listeningTracks.createdAt);
+
+  return filters?.limit != null
+    ? query.limit(filters.limit).offset(filters.offset ?? 0)
+    : query;
 }
 
 export async function getTrackAdmin(id: string) {
@@ -806,7 +824,7 @@ export async function deleteTrack(id: string) {
 // ---------------------------------------------------------------------------
 
 export async function listSpeakingTestsAdmin(filters?: AdminListFilters) {
-  return db
+  const query = db
     .select()
     .from(speakingTests)
     .where(
@@ -816,6 +834,10 @@ export async function listSpeakingTestsAdmin(filters?: AdminListFilters) {
       ),
     )
     .orderBy(speakingTests.createdAt);
+
+  return filters?.limit != null
+    ? query.limit(filters.limit).offset(filters.offset ?? 0)
+    : query;
 }
 
 export async function getSpeakingTestAdmin(id: string) {
@@ -1020,7 +1042,7 @@ export async function deleteSpeakingTest(id: string) {
 // ---------------------------------------------------------------------------
 
 export async function listWritingPromptsAdmin(filters?: AdminListFilters) {
-  return db
+  const query = db
     .select()
     .from(writingPrompts)
     .where(
@@ -1032,6 +1054,10 @@ export async function listWritingPromptsAdmin(filters?: AdminListFilters) {
       ),
     )
     .orderBy(writingPrompts.createdAt);
+
+  return filters?.limit != null
+    ? query.limit(filters.limit).offset(filters.offset ?? 0)
+    : query;
 }
 
 export async function getWritingPromptById(id: string) {
@@ -1120,7 +1146,7 @@ export async function deleteWritingPrompt(id: string) {
 // ---------------------------------------------------------------------------
 
 export async function listLessonsAdmin(filters?: AdminListFilters) {
-  return db
+  const query = db
     .select()
     .from(lessons)
     .where(
@@ -1130,6 +1156,10 @@ export async function listLessonsAdmin(filters?: AdminListFilters) {
       ),
     )
     .orderBy(lessons.module, lessons.group, lessons.orderIndex);
+
+  return filters?.limit != null
+    ? query.limit(filters.limit).offset(filters.offset ?? 0)
+    : query;
 }
 
 export async function getLessonById(id: string) {
@@ -1238,7 +1268,7 @@ export async function deleteLesson(id: string) {
 // ---------------------------------------------------------------------------
 
 export async function listResourcesAdmin(filters?: AdminListFilters) {
-  return db
+  const query = db
     .select()
     .from(resources)
     .where(
@@ -1248,6 +1278,10 @@ export async function listResourcesAdmin(filters?: AdminListFilters) {
       ),
     )
     .orderBy(resources.category, resources.orderIndex);
+
+  return filters?.limit != null
+    ? query.limit(filters.limit).offset(filters.offset ?? 0)
+    : query;
 }
 
 export async function getResourceById(id: string) {
