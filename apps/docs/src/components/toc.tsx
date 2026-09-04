@@ -62,12 +62,12 @@ export function Toc({ headings }: { headings: Record<string, Heading[]> }) {
           const active = heading.id === activeId;
           return (
             <li key={heading.id} className="relative">
-              {/* The same chrome tick the sidebar uses, at heading scale. */}
+              {/* The same --docs-accent tick the sidebar uses, at heading scale. */}
               <span
                 aria-hidden
                 className={cn(
                   'absolute inset-y-0 -left-px w-0.5',
-                  active ? 'bg-chrome' : 'bg-transparent',
+                  active ? 'bg-docs-accent' : 'bg-transparent',
                 )}
               />
               <a

@@ -1,3 +1,4 @@
+import { ThemeToggle } from '@bandzen/ui/components/theme-toggle';
 import { Version } from '@bandzen/ui/components/version';
 import { Wordmark } from '@bandzen/ui/components/wordmark';
 import {
@@ -65,7 +66,8 @@ export default async function DocsLayout({ children }: LayoutProps<'/'>) {
       <SidebarInset>
         <header className="sticky top-0 z-30 flex items-center gap-3 border-b border-border bg-background/90 px-4 py-2.5 supports-backdrop-filter:backdrop-blur-sm sm:px-6">
           <SidebarTrigger />
-          <div className="ml-auto">
+          <div className="ml-auto flex items-center gap-3">
+            <ThemeToggle />
             <Search index={entries} />
           </div>
         </header>

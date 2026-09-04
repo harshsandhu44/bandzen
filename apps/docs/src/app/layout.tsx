@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from 'next';
 import { Archivo, IBM_Plex_Mono, Inter } from 'next/font/google';
+import { ThemeProvider } from 'next-themes';
 import './globals.css';
 
 // The same three families as apps/web, apps/app and apps/admin, and for the
@@ -47,9 +48,14 @@ export default function RootLayout({ children }: LayoutProps<'/'>) {
   return (
     <html
       lang="en"
+      suppressHydrationWarning
       className={`${archivo.variable} ${inter.variable} ${plexMono.variable} h-full antialiased`}
     >
-      <body className="flex min-h-full flex-col">{children}</body>
+      <body className="flex min-h-full flex-col">
+        <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
+          {children}
+        </ThemeProvider>
+      </body>
     </html>
   );
 }
