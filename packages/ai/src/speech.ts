@@ -7,6 +7,7 @@
  * human didn't supply. Not `server-only` — the offline script imports it, same
  * call `apps/app/src/lib/ai/structured.ts` makes.
  */
+import { MPEGDecoder } from 'mpg123-decoder';
 import OpenAI, { toFile } from 'openai';
 
 function requireEnv(name: string) {
@@ -54,6 +55,53 @@ export async function synthesizeSpeech(transcript: string): Promise<Buffer> {
     throw new Error(`ElevenLabs ${res.status}: ${await res.text()}`);
   }
   return Buffer.from(await res.arrayBuffer());
+}
+
+/** Bar count the runner's waveform renders — matches @bandzen/ui's Waveform default. */
+const PEAK_COUNT = 120;
+
+/**
+ * Downsamples raw PCM samples to a fixed-length, 0-1 normalized amplitude
+ * array — one RMS bucket per bar. Pulled out of `computePeaks` so the
+ * bucketing/normalization logic is testable without a real MP3 decode.
+ */
+export function peaksFromSamples(
+  samples: ArrayLike<number>,
+  count = PEAK_COUNT,
+): number[] {
+  if (!samples.length) return [];
+
+  const bucketSize = Math.max(1, Math.floor(samples.length / count));
+  const peaks: number[] = [];
+  let max = 0;
+  for (let i = 0; i < count; i++) {
+    const start = i * bucketSize;
+    let sum = 0;
+    for (let j = start; j < start + bucketSize && j < samples.length; j++) {
+      sum += samples[j] * samples[j];
+    }
+    const rms = Math.sqrt(sum / bucketSize);
+    peaks.push(rms);
+    if (rms > max) max = rms;
+  }
+  return max > 0 ? peaks.map((p) => Math.min(1, p / max)) : peaks;
+}
+
+/**
+ * Downsamples an MP3 to a fixed-length amplitude array (0-1) for the
+ * listening runner's waveform display. Pure WASM decode — no ffmpeg, which
+ * Vercel doesn't ship (the same reason Speaking encodes WAV client-side).
+ */
+export async function computePeaks(mp3: Buffer): Promise<number[]> {
+  const decoder = new MPEGDecoder();
+  await decoder.ready;
+  try {
+    const { channelData } = decoder.decode(new Uint8Array(mp3));
+    const samples = channelData[0];
+    return samples?.length ? peaksFromSamples(samples) : [];
+  } finally {
+    decoder.free();
+  }
 }
 
 /**
