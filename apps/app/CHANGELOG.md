@@ -1,3 +1,10 @@
+# app [0.15.0](https://github.com/harshsandhu44/bandzen/compare/app@0.14.0...app@0.15.0) (2026-09-04)
+
+
+### Features
+
+* **app:** onboarding wizard, settings tabs, coach markdown ([#29](https://github.com/harshsandhu44/bandzen/issues/29)) ([e637e24](https://github.com/harshsandhu44/bandzen/commit/e637e24f48ee145edcf334aaf10722e89d49bb36))
+
 # app [0.14.0](https://github.com/harshsandhu44/bandzen/compare/app@0.13.0...app@0.14.0) (2026-09-04)
 
 
