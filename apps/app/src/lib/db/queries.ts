@@ -635,6 +635,7 @@ export async function getListeningTest(userId: string, attemptId: string) {
       title: listeningTracks.title,
       audioUrl: listeningTracks.audioUrl,
       matchingOptions: listeningTracks.matchingOptions,
+      peaks: listeningTracks.peaks,
     })
     .from(listeningTracks)
     .where(eq(listeningTracks.id, attempt.trackId));

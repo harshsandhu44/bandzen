@@ -82,7 +82,9 @@ function adminSearch(
 export const GENERATION_STALE_MS = 3 * 60 * 1000;
 
 export function isGenerationStale(startedAt: Date | null): boolean {
-  return startedAt != null && Date.now() - startedAt.getTime() > GENERATION_STALE_MS;
+  return (
+    startedAt != null && Date.now() - startedAt.getTime() > GENERATION_STALE_MS
+  );
 }
 
 /** Difficulty bands, as the practice filters present them. */
@@ -697,6 +699,7 @@ export async function updateTrack(
     audioUrl: string | null;
     topic: string | null;
     matchingOptions: string[] | null;
+    peaks: number[] | null;
     difficulty: number;
     generationError: string | null;
     generationStartedAt: Date | null;
@@ -721,6 +724,7 @@ export async function getTrackGenerationState(id: string) {
         slug: listeningTracks.slug,
         transcript: listeningTracks.transcript,
         audioUrl: listeningTracks.audioUrl,
+        peaks: listeningTracks.peaks,
         generationError: listeningTracks.generationError,
         generationStartedAt: listeningTracks.generationStartedAt,
       })
@@ -1047,9 +1051,7 @@ export async function listWritingPromptsAdmin(filters?: AdminListFilters) {
     .from(writingPrompts)
     .where(
       and(
-        filters?.status
-          ? eq(writingPrompts.status, filters.status)
-          : undefined,
+        filters?.status ? eq(writingPrompts.status, filters.status) : undefined,
         adminSearch(writingPrompts.slug, null, filters?.q),
       ),
     )
@@ -1572,11 +1574,17 @@ export async function listNeedsAttention(): Promise<AttentionItem[]> {
 
   const toItem =
     (type: ContentType) =>
-    (r: { id: string; label: string; error: string | null }): AttentionItem => ({
+    (r: {
+      id: string;
+      label: string;
+      error: string | null;
+    }): AttentionItem => ({
       type,
       id: r.id,
       label: r.label,
-      reason: r.error ? `Generation failed: ${r.error}` : 'Generation timed out',
+      reason: r.error
+        ? `Generation failed: ${r.error}`
+        : 'Generation timed out',
     });
 
   return [
