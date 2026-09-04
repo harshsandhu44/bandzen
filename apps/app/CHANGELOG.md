@@ -1,3 +1,10 @@
+# app [0.8.0](https://github.com/harshsandhu44/bandzen/compare/app@0.7.0...app@0.8.0) (2026-09-04)
+
+
+### Features
+
+* **app:** card-based dashboard + multi-column layout ([#22](https://github.com/harshsandhu44/bandzen/issues/22)) ([50732e4](https://github.com/harshsandhu44/bandzen/commit/50732e494ecb7eb1d56c646e600ce2eda909e8af))
+
 # app [0.7.0](https://github.com/harshsandhu44/bandzen/compare/app@0.6.0...app@0.7.0) (2026-09-04)
 
 
