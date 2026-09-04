@@ -1,3 +1,10 @@
+# app [0.10.0](https://github.com/harshsandhu44/bandzen/compare/app@0.9.0...app@0.10.0) (2026-09-04)
+
+
+### Features
+
+* **app:** install redesign primitives + shared exam scaffold ([#24](https://github.com/harshsandhu44/bandzen/issues/24)) ([037a047](https://github.com/harshsandhu44/bandzen/commit/037a04775b92c080d307f06a4187458cbc916e83))
+
 # app [0.9.0](https://github.com/harshsandhu44/bandzen/compare/app@0.8.0...app@0.9.0) (2026-09-04)
 
 
