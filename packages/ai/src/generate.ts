@@ -8,9 +8,9 @@
  * a human to fix before publishing, never fatal.
  */
 import { z } from 'zod';
-import { openai } from './client';
-import { CONTENT_MODEL } from './models';
-import { parseStructured, strictJsonSchema } from './structured';
+import { openai } from './client.ts';
+import { CONTENT_MODEL } from './models.ts';
+import { parseStructured, strictJsonSchema } from './structured.ts';
 import {
   generatedPassageSchema,
   generatedListeningTrackSchema,
@@ -18,8 +18,8 @@ import {
   speakingTestSchema,
   type GeneratedPassage,
   type GeneratedListeningTrack,
-} from './schemas';
-import { PASSAGE_SYSTEM, LISTENING_SYSTEM, SPEAKING_SYSTEM } from './prompts';
+} from './schemas.ts';
+import { PASSAGE_SYSTEM, LISTENING_SYSTEM, SPEAKING_SYSTEM } from './prompts.ts';
 
 export type GenResult<T> = { data: T; warnings: string[] };
 export type GenOptions = {
