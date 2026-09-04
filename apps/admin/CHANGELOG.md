@@ -1,3 +1,10 @@
+# admin [0.5.0](https://github.com/harshsandhu44/bandzen/compare/admin@0.4.0...admin@0.5.0) (2026-09-04)
+
+
+### Features
+
+* **admin:** server-side pagination for content lists ([#38](https://github.com/harshsandhu44/bandzen/issues/38)) ([d566c81](https://github.com/harshsandhu44/bandzen/commit/d566c8199a1c1bbdae9c4f587aa34ff2947205e2))
+
 # admin [0.4.0](https://github.com/harshsandhu44/bandzen/compare/admin@0.3.0...admin@0.4.0) (2026-09-04)
 
 
