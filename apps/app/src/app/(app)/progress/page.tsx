@@ -4,6 +4,13 @@ import { BandScale } from '@bandzen/ui/components/band-scale';
 import { BandTrend } from '@bandzen/ui/components/band-trend';
 import { Button } from '@bandzen/ui/components/button';
 import {
+  Tabs,
+  TabsContent,
+  TabsList,
+  TabsTrigger,
+} from '@bandzen/ui/components/tabs';
+import { BandChart } from '@/components/progress/band-chart';
+import {
   EmptyState,
   Eyebrow,
   Metric,
@@ -144,192 +151,186 @@ export default async function ProgressPage() {
           />
         }
       >
-        <BandTrend
-          points={points}
-          target={profile?.targetBand ?? undefined}
-          // Reading and writing attempts share this line, so first -> last
-          // would subtract one skill's band from the other's and call the
-          // difference progress. The per-module trends below say it properly.
-          delta={new Set(points.map((p) => p.module)).size === 1}
-          caption={
-            hidden
-              ? `Your last ${FREE_TREND_POINTS} attempts, oldest first`
-              : 'All attempts, oldest first'
-          }
-        />
+        <BandChart points={points} target={profile?.targetBand ?? undefined} />
+        <p className="mt-2 font-mono text-[0.625rem] tracking-[0.16em] text-muted-foreground uppercase">
+          {hidden
+            ? `Your last ${FREE_TREND_POINTS} attempts, oldest first`
+            : 'All attempts, oldest first'}
+        </p>
 
-        {/* A true peek: the count is this candidate's own rows, not a
-            decoration. Nothing here is invented to make the number look
-            better. */}
+        {/* The gate is depth, not a whole section — a new candidate loses
+            nothing, and the longer someone practises the more of their own
+            history sits behind it. */}
         {hidden ? (
-          <div className="relative mt-4 overflow-hidden border border-border">
-            <div
-              aria-hidden
-              className="h-10 bg-gradient-to-b from-secondary/60 to-transparent"
-            />
-            <div className="flex flex-wrap items-center justify-between gap-3 px-5 pb-4">
-              <p className="flex items-center gap-2 text-sm">
-                <ProTag />
-                <span className="tabular-nums">
-                  {hidden} earlier {hidden === 1 ? 'attempt' : 'attempts'} not
-                  shown
-                </span>
-              </p>
-              <Link
-                href="/upgrade?from=progress_peek"
-                className="text-sm underline underline-offset-4"
-              >
-                See your full history
-              </Link>
-            </div>
+          <div className="mt-4 flex flex-wrap items-center justify-between gap-3 border border-border border-l-2 border-l-chrome bg-secondary/30 px-4 py-3">
+            <p className="flex items-center gap-2 text-sm">
+              <ProTag />
+              <span className="tabular-nums">
+                {hidden} earlier {hidden === 1 ? 'attempt is' : 'attempts are'}{' '}
+                not shown
+              </span>
+            </p>
+            <Link
+              href="/upgrade?from=progress_peek"
+              className="text-sm underline underline-offset-4 hover:text-foreground"
+            >
+              See your full history
+            </Link>
           </div>
         ) : null}
       </Panel>
 
-      <div className="grid gap-4 lg:grid-cols-2 lg:items-start">
-        <Panel headingId="modules-heading" title="By module">
-          <div className="space-y-4">
-            {AVAILABLE_MODULES.map((module) => {
-              const modulePoints = byModule(module);
-              if (!modulePoints.length) {
+      <Panel headingId="breakdown-heading" title="Breakdown">
+        <Tabs defaultValue="modules">
+          <TabsList variant="line" className="mb-4">
+            <TabsTrigger value="modules">By module</TabsTrigger>
+            {accuracy.length ? (
+              <TabsTrigger value="matrix">Reading skill matrix</TabsTrigger>
+            ) : null}
+            {ranked.length ? (
+              <TabsTrigger value="patterns">Patterns</TabsTrigger>
+            ) : null}
+          </TabsList>
+
+          <TabsContent value="modules">
+            <div className="space-y-4">
+              {AVAILABLE_MODULES.map((module) => {
+                const modulePoints = byModule(module);
+                if (!modulePoints.length) {
+                  return (
+                    <div
+                      key={module}
+                      className="flex items-baseline justify-between gap-4 border-b border-border pb-3"
+                    >
+                      <p className="text-sm">{MODULE_LABEL[module]}</p>
+                      <Eyebrow>Not measured</Eyebrow>
+                    </div>
+                  );
+                }
                 return (
-                  <div
-                    key={module}
-                    className="flex items-baseline justify-between gap-4 border-b border-border pb-3"
-                  >
-                    <p className="text-sm">{MODULE_LABEL[module]}</p>
-                    <Eyebrow>Not measured</Eyebrow>
+                  <div key={module} className="space-y-3">
+                    <BandScale
+                      value={modulePoints.at(-1)!.value}
+                      target={profile?.targetBand ?? undefined}
+                      label={MODULE_LABEL[module]}
+                    />
+                    {modulePoints.length > 1 ? (
+                      <BandTrend
+                        points={modulePoints}
+                        target={profile?.targetBand ?? undefined}
+                        caption={`${MODULE_LABEL[module]} attempts`}
+                      />
+                    ) : null}
                   </div>
                 );
-              }
-              return (
-                <div key={module} className="space-y-3">
-                  <BandScale
-                    value={modulePoints.at(-1)!.value}
-                    target={profile?.targetBand ?? undefined}
-                    label={MODULE_LABEL[module]}
-                  />
-                  {modulePoints.length > 1 ? (
-                    <BandTrend
-                      points={modulePoints}
-                      target={profile?.targetBand ?? undefined}
-                      caption={`${MODULE_LABEL[module]} attempts`}
-                    />
-                  ) : null}
-                </div>
-              );
-            })}
-
-            {IELTS_MODULES.filter((m) => !isAvailable(m)).map((module) => (
-              <LockedModule key={module} module={module} />
-            ))}
-          </div>
-        </Panel>
-
-        {accuracy.length ? (
-          <Panel headingId="matrix-heading" title="Reading skill matrix">
-            <table className="w-full">
-              <caption className="sr-only">
-                Accuracy by reading question type
-              </caption>
-              <thead>
-                <tr className="border-b border-border">
-                  <th scope="col" className="py-2 text-left">
-                    <Eyebrow as="span">Question type</Eyebrow>
-                  </th>
-                  <th scope="col" className="py-2 text-right">
-                    <Eyebrow as="span">Correct</Eyebrow>
-                  </th>
-                  <th scope="col" className="py-2 text-right">
-                    <Eyebrow as="span">Status</Eyebrow>
-                  </th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-border">
-                {[...accuracy]
-                  .sort((a, b) => a.accuracy - b.accuracy)
-                  .map((k) => (
-                    <tr key={k.kind}>
-                      <th
-                        scope="row"
-                        className="py-2.5 text-left text-sm font-normal"
-                      >
-                        {QUESTION_KIND_LABEL[
-                          k.kind as keyof typeof QUESTION_KIND_LABEL
-                        ] ?? k.kind}
-                      </th>
-                      <td className="py-2.5 text-right font-metric text-metric-sm">
-                        {k.correct}/{k.total}
-                      </td>
-                      <td className="py-2.5 text-right">
-                        {k.total >= MIN_ATTEMPTED ? (
-                          <SkillStatus level={toSkillLevel(k.accuracy)} />
-                        ) : (
-                          <Eyebrow as="span">Too few</Eyebrow>
-                        )}
-                      </td>
-                    </tr>
-                  ))}
-              </tbody>
-            </table>
-          </Panel>
-        ) : null}
-      </div>
-
-      <div className="grid gap-4 lg:grid-cols-2 lg:items-start">
-        {ranked.length ? (
-          <Panel
-            headingId="patterns-heading"
-            title="Patterns across your attempts"
-          >
-            <ul className="-my-2.5 divide-y divide-border">
-              {ranked.map((k) => {
-                const label =
-                  QUESTION_KIND_LABEL[
-                    k.kind as keyof typeof QUESTION_KIND_LABEL
-                  ] ?? k.kind;
-                return (
-                  <li
-                    key={k.kind}
-                    className="flex items-center justify-between gap-4 py-2.5"
-                  >
-                    <div className="min-w-0">
-                      <p className="text-sm">{label}</p>
-                      <p className="text-xs text-muted-foreground tabular-nums">
-                        {k.total - k.correct} wrong of {k.total} attempted
-                      </p>
-                    </div>
-                    <span className="flex shrink-0 items-center gap-4">
-                      <SkillStatus level={toSkillLevel(k.accuracy)} />
-                      <Link
-                        href={`/reading?kind=${k.kind}`}
-                        className="text-xs underline-offset-4 hover:underline"
-                      >
-                        Practise
-                      </Link>
-                    </span>
-                  </li>
-                );
               })}
-            </ul>
-          </Panel>
-        ) : null}
 
-        <Panel headingId="activity-heading" title="Activity">
-          <div className="grid grid-cols-2 gap-x-6 gap-y-5">
-            <Metric label="Tests completed" value={activity.attempts} />
-            <Metric label="Questions attempted" value={activity.questions} />
-            <Metric label="Minutes in tests" value={activity.minutes} />
-            <Metric label="Lessons finished" value={lessons.length} />
-          </div>
+              {IELTS_MODULES.filter((m) => !isAvailable(m)).map((module) => (
+                <LockedModule key={module} module={module} />
+              ))}
+            </div>
+          </TabsContent>
 
-          <p className="mt-4 max-w-prose text-xs text-muted-foreground">
-            Minutes count time spent inside timed attempts only. We do not track
-            how long you spend reading a lesson, so it is not included rather
-            than estimated.
-          </p>
-        </Panel>
-      </div>
+          {accuracy.length ? (
+            <TabsContent value="matrix">
+              <table className="w-full">
+                <caption className="sr-only">
+                  Accuracy by reading question type
+                </caption>
+                <thead>
+                  <tr className="border-b border-border">
+                    <th scope="col" className="py-2 text-left">
+                      <Eyebrow as="span">Question type</Eyebrow>
+                    </th>
+                    <th scope="col" className="py-2 text-right">
+                      <Eyebrow as="span">Correct</Eyebrow>
+                    </th>
+                    <th scope="col" className="py-2 text-right">
+                      <Eyebrow as="span">Status</Eyebrow>
+                    </th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-border">
+                  {[...accuracy]
+                    .sort((a, b) => a.accuracy - b.accuracy)
+                    .map((k) => (
+                      <tr key={k.kind}>
+                        <th
+                          scope="row"
+                          className="py-2.5 text-left text-sm font-normal"
+                        >
+                          {QUESTION_KIND_LABEL[
+                            k.kind as keyof typeof QUESTION_KIND_LABEL
+                          ] ?? k.kind}
+                        </th>
+                        <td className="py-2.5 text-right font-metric text-metric-sm">
+                          {k.correct}/{k.total}
+                        </td>
+                        <td className="py-2.5 text-right">
+                          {k.total >= MIN_ATTEMPTED ? (
+                            <SkillStatus level={toSkillLevel(k.accuracy)} />
+                          ) : (
+                            <Eyebrow as="span">Too few</Eyebrow>
+                          )}
+                        </td>
+                      </tr>
+                    ))}
+                </tbody>
+              </table>
+            </TabsContent>
+          ) : null}
+
+          {ranked.length ? (
+            <TabsContent value="patterns">
+              <ul className="-my-2.5 divide-y divide-border">
+                {ranked.map((k) => {
+                  const label =
+                    QUESTION_KIND_LABEL[
+                      k.kind as keyof typeof QUESTION_KIND_LABEL
+                    ] ?? k.kind;
+                  return (
+                    <li
+                      key={k.kind}
+                      className="flex items-center justify-between gap-4 py-2.5"
+                    >
+                      <div className="min-w-0">
+                        <p className="text-sm">{label}</p>
+                        <p className="text-xs text-muted-foreground tabular-nums">
+                          {k.total - k.correct} wrong of {k.total} attempted
+                        </p>
+                      </div>
+                      <span className="flex shrink-0 items-center gap-4">
+                        <SkillStatus level={toSkillLevel(k.accuracy)} />
+                        <Link
+                          href={`/reading?kind=${k.kind}`}
+                          className="text-xs underline-offset-4 hover:underline"
+                        >
+                          Practise
+                        </Link>
+                      </span>
+                    </li>
+                  );
+                })}
+              </ul>
+            </TabsContent>
+          ) : null}
+        </Tabs>
+      </Panel>
+
+      <Panel headingId="activity-heading" title="Activity">
+        <div className="grid grid-cols-2 gap-x-6 gap-y-5 sm:grid-cols-4">
+          <Metric label="Tests completed" value={activity.attempts} />
+          <Metric label="Questions attempted" value={activity.questions} />
+          <Metric label="Minutes in tests" value={activity.minutes} />
+          <Metric label="Lessons finished" value={lessons.length} />
+        </div>
+
+        <p className="mt-4 max-w-prose text-xs text-muted-foreground">
+          Minutes count time spent inside timed attempts only. We do not track
+          how long you spend reading a lesson, so it is not included rather than
+          estimated.
+        </p>
+      </Panel>
 
       <AwardWall awards={awards} />
 
