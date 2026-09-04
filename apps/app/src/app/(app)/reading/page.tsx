@@ -1,6 +1,7 @@
 import Link from 'next/link';
+import { Badge } from '@bandzen/ui/components/badge';
 import { Button } from '@bandzen/ui/components/button';
-import { EmptyState, PageHeader } from '@/components/app/primitives';
+import { EmptyState, PageHeader, Panel } from '@/components/app/primitives';
 import { FilterBar } from '@/components/app/filter-bar';
 import { requireUserId } from '@/lib/auth';
 import { DIFFICULTY_RANGE, listPassages } from '@/lib/db/queries';
@@ -128,27 +129,37 @@ export default async function ReadingPage({
           />
         )
       ) : (
-        <ul className="divide-y divide-border border-y border-border">
-          {passages.map((p) => (
-            <li
-              key={p.id}
-              className="flex items-center justify-between gap-4 py-4"
-            >
-              <div>
-                <h2 className="font-medium">{p.title}</h2>
-                <p className="font-mono text-[0.6875rem] tracking-[0.18em] text-muted-foreground uppercase">
-                  {p.topic} · Level {p.difficulty}
-                </p>
-              </div>
-              <form action={startReadingAttempt}>
-                <input type="hidden" name="passageId" value={p.id} />
-                <Button type="submit" variant="outline" size="sm">
-                  Start
-                </Button>
-              </form>
-            </li>
-          ))}
-        </ul>
+        <Panel
+          title="Passages"
+          action={
+            <span className="font-metric text-metric-sm text-muted-foreground">
+              {passages.length}
+            </span>
+          }
+        >
+          <ul className="-my-3 divide-y divide-border">
+            {passages.map((p) => (
+              <li
+                key={p.id}
+                className="flex items-center justify-between gap-4 py-3"
+              >
+                <div className="min-w-0">
+                  <h2 className="font-medium">{p.title}</h2>
+                  <p className="mt-1 flex items-center gap-2 text-xs text-muted-foreground">
+                    <Badge variant="secondary">Level {p.difficulty}</Badge>
+                    <span className="truncate">{p.topic}</span>
+                  </p>
+                </div>
+                <form action={startReadingAttempt}>
+                  <input type="hidden" name="passageId" value={p.id} />
+                  <Button type="submit" variant="outline" size="sm">
+                    Start
+                  </Button>
+                </form>
+              </li>
+            ))}
+          </ul>
+        </Panel>
       )}
     </div>
   );

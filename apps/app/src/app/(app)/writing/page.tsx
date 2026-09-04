@@ -1,6 +1,7 @@
 import Link from 'next/link';
+import { Badge } from '@bandzen/ui/components/badge';
 import { Button } from '@bandzen/ui/components/button';
-import { EmptyState, PageHeader } from '@/components/app/primitives';
+import { EmptyState, PageHeader, Panel } from '@/components/app/primitives';
 import { FilterBar } from '@/components/app/filter-bar';
 import { requireUserId } from '@/lib/auth';
 import {
@@ -126,44 +127,56 @@ export default async function WritingPage({
           />
         )
       ) : (
-        <ul className="divide-y divide-border border-y border-border">
-          {prompts.map((p) => {
-            const { minutes, minWords } = taskRules(p.task);
-            return (
-              <li
-                key={p.id}
-                className="flex items-start justify-between gap-4 py-4"
-              >
-                <div className="min-w-0">
-                  <p className="font-mono text-[0.6875rem] tracking-[0.18em] text-muted-foreground uppercase">
-                    Task {p.task} · {minutes} min · {minWords}+ words
-                  </p>
-                  <p className="mt-1 line-clamp-2 text-sm">{p.promptText}</p>
-                </div>
-                {quota.allowed ? (
-                  <form action={startWritingAttempt}>
-                    <input type="hidden" name="promptId" value={p.id} />
-                    <Button type="submit" variant="outline" size="sm">
+        <Panel
+          title="Tasks"
+          action={
+            <span className="font-metric text-metric-sm text-muted-foreground">
+              {prompts.length}
+            </span>
+          }
+        >
+          <ul className="-my-3 divide-y divide-border">
+            {prompts.map((p) => {
+              const { minutes, minWords } = taskRules(p.task);
+              return (
+                <li
+                  key={p.id}
+                  className="flex items-start justify-between gap-4 py-3"
+                >
+                  <div className="min-w-0">
+                    <p className="flex items-center gap-2 text-xs text-muted-foreground">
+                      <Badge variant="secondary">Task {p.task}</Badge>
+                      <span className="tabular-nums">
+                        {minutes} min · {minWords}+ words
+                      </span>
+                    </p>
+                    <p className="mt-1 line-clamp-2 text-sm">{p.promptText}</p>
+                  </div>
+                  {quota.allowed ? (
+                    <form action={startWritingAttempt}>
+                      <input type="hidden" name="promptId" value={p.id} />
+                      <Button type="submit" variant="outline" size="sm">
+                        Start
+                      </Button>
+                    </form>
+                  ) : (
+                    /* Disabled and visible, not hidden. Someone who cannot see
+                       what they are missing has nothing to decide about. */
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      disabled
+                      aria-describedby="essay-quota"
+                    >
                       Start
                     </Button>
-                  </form>
-                ) : (
-                  /* Disabled and visible, not hidden. Someone who cannot see
-                     what they are missing has nothing to decide about. */
-                  <Button
-                    type="button"
-                    variant="outline"
-                    size="sm"
-                    disabled
-                    aria-describedby="essay-quota"
-                  >
-                    Start
-                  </Button>
-                )}
-              </li>
-            );
-          })}
-        </ul>
+                  )}
+                </li>
+              );
+            })}
+          </ul>
+        </Panel>
       )}
     </div>
   );
