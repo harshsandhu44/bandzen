@@ -34,12 +34,17 @@ export function ContentList({
   emptyDescription,
   emptyAction,
   bulk,
+  page = 1,
+  hasMore = false,
 }: {
   items: ListItem[];
   emptyTitle: string;
   emptyDescription: string;
   emptyAction?: React.ReactNode;
   bulk?: BulkActions;
+  /** Current 1-indexed page, and whether a next page exists. Server-supplied. */
+  page?: number;
+  hasMore?: boolean;
 }) {
   const router = useRouter();
   const pathname = usePathname();
@@ -54,10 +59,11 @@ export function ContentList({
   const [term, setTerm] = useState(q);
   const debounce = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
 
-  function setParam(key: string, value: string) {
+  function setParam(key: string, value: string, resetPage = false) {
     const next = new URLSearchParams(params);
     if (value) next.set(key, value);
     else next.delete(key);
+    if (resetPage) next.delete('page');
     router.replace(`${pathname}?${next}`);
   }
 
@@ -66,7 +72,7 @@ export function ContentList({
   useEffect(() => {
     if (term === q) return;
     clearTimeout(debounce.current);
-    debounce.current = setTimeout(() => setParam('q', term), 250);
+    debounce.current = setTimeout(() => setParam('q', term, true), 250);
     return () => clearTimeout(debounce.current);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [term]);
@@ -104,14 +110,16 @@ export function ContentList({
         />
         <Select
           value={status}
-          onChange={(e) => setParam('status', e.target.value)}
+          onChange={(e) => setParam('status', e.target.value, true)}
           className="w-36"
         >
           <option value="">All statuses</option>
           <option value="draft">Draft</option>
           <option value="published">Published</option>
         </Select>
-        {filtering ? (
+        {/* ponytail: only exact when there's a single page — with no total-count
+            query, a later page can't say how many rows exist beyond it. */}
+        {filtering && page === 1 && !hasMore ? (
           <span className="font-mono text-xs text-muted-foreground">
             {items.length} match{items.length === 1 ? '' : 'es'}
           </span>
@@ -155,7 +163,18 @@ export function ContentList({
       ) : null}
 
       {items.length === 0 ? (
-        filtering ? (
+        page > 1 ? (
+          <p className="border-y border-border py-6 text-center text-sm text-muted-foreground">
+            Nothing on this page.{' '}
+            <button
+              type="button"
+              className="underline"
+              onClick={() => setParam('page', '')}
+            >
+              Back to page 1
+            </button>
+          </p>
+        ) : filtering ? (
           <p className="border-y border-border py-6 text-center text-sm text-muted-foreground">
             Nothing matches. Clear the filters to see everything.
           </p>
@@ -211,6 +230,34 @@ export function ContentList({
           ))}
         </ul>
       )}
+
+      {items.length > 0 && (page > 1 || hasMore) ? (
+        <div className="flex items-center justify-between pt-1">
+          <Button
+            type="button"
+            size="sm"
+            variant="outline"
+            disabled={page <= 1}
+            onClick={() =>
+              setParam('page', page > 2 ? String(page - 1) : '')
+            }
+          >
+            Previous
+          </Button>
+          <span className="font-mono text-xs text-muted-foreground">
+            Page {page}
+          </span>
+          <Button
+            type="button"
+            size="sm"
+            variant="outline"
+            disabled={!hasMore}
+            onClick={() => setParam('page', String(page + 1))}
+          >
+            Next
+          </Button>
+        </div>
+      ) : null}
     </div>
   );
 }
