@@ -1562,9 +1562,18 @@ export type ContentEventRow = {
   createdAt: Date;
 };
 
+/** Consecutive same-actor 'updated' events within this window collapse into one row. */
+export const UPDATED_COALESCE_MS = 5 * 60 * 1000;
+
 /**
  * Append one audit row. Best-effort: an audit-write failure must never fail
  * the mutation it describes, so it swallows and logs rather than throwing.
+ *
+ * 'updated' events coalesce: every save calls this, so back-to-back saves by
+ * the same actor would otherwise spam the history panel with identical rows.
+ * If the latest event for this entity is already 'updated' by the same actor
+ * within UPDATED_COALESCE_MS, skip the write. Other actions (create, publish,
+ * unpublish, delete) always record — they're one-time transitions, not noise.
  */
 export async function recordContentEvent(
   entityType: ContentType,
@@ -1573,6 +1582,32 @@ export async function recordContentEvent(
   action: ContentEventAction,
 ): Promise<void> {
   try {
+    if (action === 'updated') {
+      const [last] = await db
+        .select({
+          actorId: contentEvents.actorId,
+          action: contentEvents.action,
+          createdAt: contentEvents.createdAt,
+        })
+        .from(contentEvents)
+        .where(
+          and(
+            eq(contentEvents.entityType, entityType),
+            eq(contentEvents.entityId, entityId),
+          ),
+        )
+        .orderBy(desc(contentEvents.createdAt))
+        .limit(1);
+
+      if (
+        last?.action === 'updated' &&
+        last.actorId === actorId &&
+        Date.now() - last.createdAt.getTime() < UPDATED_COALESCE_MS
+      ) {
+        return;
+      }
+    }
+
     await db
       .insert(contentEvents)
       .values({ entityType, entityId, actorId, action });
