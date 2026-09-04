@@ -1,3 +1,10 @@
+# app [0.18.0](https://github.com/harshsandhu44/bandzen/compare/app@0.17.0...app@0.18.0) (2026-09-04)
+
+
+### Features
+
+* **app:** AI-insight bar, watermark, and waveform for exam screens ([#43](https://github.com/harshsandhu44/bandzen/issues/43)) ([98ce31f](https://github.com/harshsandhu44/bandzen/commit/98ce31f4cb6d98181632254c95836b22a3eea19c))
+
 # app [0.17.0](https://github.com/harshsandhu44/bandzen/compare/app@0.16.2...app@0.17.0) (2026-09-04)
 
 
