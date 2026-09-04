@@ -31,6 +31,7 @@ export default async function WritingAttemptPage({
       task={data.prompt.task}
       promptText={data.prompt.promptText}
       initialBody={data.body}
+      autoSubmit={attempt.kind !== 'practice'}
     />
   );
 }

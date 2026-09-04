@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import { cn } from '@bandzen/ui/lib/utils';
 import { SaveStatus } from '@/components/app/save-status';
 import { SubmitConfirm } from '@/components/app/submit-confirm';
@@ -18,6 +18,8 @@ type Props = {
   task: number;
   promptText: string;
   initialBody: string;
+  /** Diagnostic and mock attempts auto-submit at 0:00; practice only warns. */
+  autoSubmit: boolean;
 };
 
 export function WritingTest({
@@ -28,8 +30,11 @@ export function WritingTest({
   task,
   promptText,
   initialBody,
+  autoSubmit,
 }: Props) {
   const [body, setBody] = useState(initialBody);
+  const [timeUp, setTimeUp] = useState(false);
+  const autoFormRef = useRef<HTMLFormElement>(null);
 
   // One key, because there is only one draft -- but the retry and the failure
   // state matter more here than anywhere: this is forty minutes of writing.
@@ -54,7 +59,14 @@ export function WritingTest({
         </p>
         <div className="flex items-center gap-4">
           <SaveStatus status={status} onRetry={retryFailed} />
-          <Timer startedAt={startedAt} minutes={minutes} />
+          <Timer
+            startedAt={startedAt}
+            minutes={minutes}
+            onExpire={() => {
+              setTimeUp(true);
+              if (autoSubmit) autoFormRef.current?.requestSubmit();
+            }}
+          />
           <SubmitConfirm
             action={submitEssay}
             attemptId={attemptId}
@@ -64,6 +76,20 @@ export function WritingTest({
           />
         </div>
       </header>
+
+      {timeUp && !autoSubmit ? (
+        <p
+          role="alert"
+          className="shrink-0 border-b border-chrome bg-secondary/40 px-6 py-2 text-sm"
+        >
+          Time is up. In the real exam this attempt would end now — submit when
+          you are ready.
+        </p>
+      ) : null}
+
+      <form ref={autoFormRef} action={submitEssay} className="hidden">
+        <input type="hidden" name="attemptId" value={attemptId} />
+      </form>
 
       <div className="mx-auto flex w-full max-w-3xl flex-1 flex-col gap-6 p-6">
         <div className="border-l-2 border-chrome pl-4">

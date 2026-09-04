@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { cn } from '@bandzen/ui/lib/utils';
+import { EXAM_RUNNER } from './exam-route';
 import { isActive, NAV_LINKS } from './nav-links';
 
 /**
@@ -18,13 +19,15 @@ import { isActive, NAV_LINKS } from './nav-links';
  * sixth destination cannot be added to the sidebar without someone noticing it
  * has nowhere to go here.
  *
- * Settings is not a tab. It is reached from the gear on Today — see
- * SETTINGS_LINK. The target band, countdown, theme and sign out are not here
- * either: the countdown is already in Today's header, and the theme and sign
- * out already live on the Settings page.
+ * Settings, the theme and sign out are reached from the top bar's account
+ * menu, which is present on every breakpoint. The countdown is in the top bar
+ * too. None of them spend a tab here.
  *
  * The breakpoint has to stay `md`, matching the sidebar's own MOBILE_BREAKPOINT
  * (768px). Split them and there is a window with two navs, or none.
+ *
+ * Hidden on the exam runners: mid-exam is not the moment to tab away, and the
+ * runner puts its own navigator where this bar would sit.
  */
 
 const ITEM =
@@ -32,6 +35,8 @@ const ITEM =
 
 export function MobileNav() {
   const pathname = usePathname();
+
+  if (EXAM_RUNNER.test(pathname)) return null;
 
   return (
     <nav
