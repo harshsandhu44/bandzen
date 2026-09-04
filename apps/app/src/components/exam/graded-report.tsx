@@ -3,6 +3,7 @@ import { BandScale } from '@bandzen/ui/components/band-scale';
 import { Button } from '@bandzen/ui/components/button';
 import { cn } from '@bandzen/ui/lib/utils';
 import { GradingWatch } from '@/components/app/grading-watch';
+import { InsightBar, Watermark } from '@/components/app/primitives';
 import { BandReveal } from '@/components/exam/band-reveal';
 import type { Annotation } from '@/lib/db/schema';
 
@@ -99,8 +100,15 @@ export function GradedReport({
 
   if (!report) return null;
 
+  // The grader already wrote a per-criterion comment — the lowest-band one is
+  // the same "biggest opportunity" derivation `lib/insight.ts` uses.
+  const worst = report.criteria.length
+    ? report.criteria.reduce((low, c) => (c.band < low.band ? c : low))
+    : null;
+
   return (
-    <div className="max-w-3xl space-y-10">
+    <div className="relative isolate max-w-3xl space-y-10 overflow-clip">
+      <Watermark text={moduleLabel} />
       <header className="space-y-4">
         <p className="font-mono text-[0.6875rem] tracking-[0.18em] text-muted-foreground uppercase">
           {moduleLabel} report
@@ -109,6 +117,12 @@ export function GradedReport({
         <p className="font-mono text-[0.6875rem] tracking-[0.18em] text-muted-foreground uppercase">
           Estimate, not an official score
         </p>
+        {worst ? (
+          <InsightBar>
+            {worst.name} is the criterion holding this response at{' '}
+            {worst.band.toFixed(1)}.
+          </InsightBar>
+        ) : null}
       </header>
 
       <section className="space-y-6">

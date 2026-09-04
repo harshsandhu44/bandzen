@@ -81,6 +81,7 @@ function toSql() {
       readFileSync(join(SEED_DIR, file), 'utf8'),
     ) as Track & {
       audioUrl?: string;
+      peaks?: number[];
     };
     if (!t.audioUrl) {
       missingAudio += 1;
@@ -92,12 +93,12 @@ function toSql() {
 
     out.push(
       `-- ${t.title}`,
-      `insert into public.listening_tracks (slug, title, topic, transcript, audio_url, matching_options, difficulty)`,
-      `values (${quote(t.slug)}, ${quote(t.title)}, ${quote(t.topic)}, ${quote(t.transcript)}, ${quote(t.audioUrl)}, ${t.matchingOptions?.length ? jsonb(t.matchingOptions) : 'null'}, ${t.difficulty})`,
+      `insert into public.listening_tracks (slug, title, topic, transcript, audio_url, matching_options, peaks, difficulty)`,
+      `values (${quote(t.slug)}, ${quote(t.title)}, ${quote(t.topic)}, ${quote(t.transcript)}, ${quote(t.audioUrl)}, ${t.matchingOptions?.length ? jsonb(t.matchingOptions) : 'null'}, ${t.peaks?.length ? jsonb(t.peaks) : 'null'}, ${t.difficulty})`,
       `on conflict (slug) do update set`,
       `  title = excluded.title, topic = excluded.topic, transcript = excluded.transcript,`,
       `  audio_url = excluded.audio_url, matching_options = excluded.matching_options,`,
-      `  difficulty = excluded.difficulty;`,
+      `  peaks = excluded.peaks, difficulty = excluded.difficulty;`,
       '',
     );
 

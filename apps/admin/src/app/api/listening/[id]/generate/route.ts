@@ -4,7 +4,11 @@ import {
   getTrackGenerationState,
   updateTrack,
 } from '@bandzen/db/queries';
-import { synthesizeSpeech, transcribeAudio } from '@bandzen/ai/speech';
+import {
+  computePeaks,
+  synthesizeSpeech,
+  transcribeAudio,
+} from '@bandzen/ai/speech';
 import { uploadObject } from '@bandzen/storage/r2';
 import { requireAdminOrTeacher } from '@/lib/auth';
 
@@ -55,12 +59,19 @@ export async function POST(
   try {
     if (hasTranscript && !hasAudio) {
       const mp3 = await synthesizeSpeech(track.transcript!);
-      const audioUrl = await uploadObject({
-        key: `listening/${crypto.randomUUID()}.mp3`,
-        body: mp3,
-        contentType: 'audio/mpeg',
-      });
-      await updateTrack(id, { audioUrl, generationStartedAt: null }, userId);
+      const [audioUrl, peaks] = await Promise.all([
+        uploadObject({
+          key: `listening/${crypto.randomUUID()}.mp3`,
+          body: mp3,
+          contentType: 'audio/mpeg',
+        }),
+        computePeaks(mp3),
+      ]);
+      await updateTrack(
+        id,
+        { audioUrl, peaks, generationStartedAt: null },
+        userId,
+      );
       return NextResponse.json({ status: 'done', generated: 'audio' });
     }
 

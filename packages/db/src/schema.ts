@@ -328,6 +328,8 @@ export const listeningTracks = pgTable('listening_tracks', {
   audioUrl: text('audio_url'),
   /** Shared option list for this track's `matching` questions — same role as passages.headings. */
   matchingOptions: jsonb('matching_options').$type<string[] | null>(),
+  /** Downsampled amplitude peaks (0-1) for the runner's waveform display. Computed once alongside audioUrl. */
+  peaks: jsonb('peaks').$type<number[] | null>(),
   /** Last CMS generation failure (TTS or transcription). Null once it succeeds. */
   generationError: text('generation_error'),
   /** Set while a CMS generation is in flight, so a page refresh can't start a second. Cleared on settle. */

@@ -17,7 +17,7 @@
  */
 import { readFileSync, readdirSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
-import { synthesizeSpeech } from '@bandzen/ai/speech';
+import { computePeaks, synthesizeSpeech } from '@bandzen/ai/speech';
 import { uploadObject } from '@bandzen/storage/r2';
 import type { GeneratedListeningTrack as Track } from '../src/lib/ai/schemas.ts';
 
@@ -36,6 +36,7 @@ async function run(force: boolean) {
     const path = join(SEED_DIR, file);
     const track = JSON.parse(readFileSync(path, 'utf8')) as Track & {
       audioUrl?: string;
+      peaks?: number[];
     };
 
     if (track.audioUrl && !force) {
@@ -51,6 +52,7 @@ async function run(force: boolean) {
       body: audio,
       contentType: 'audio/mpeg',
     });
+    track.peaks = await computePeaks(audio);
     writeFileSync(path, `${JSON.stringify(track, null, 2)}\n`);
     console.log(`  ✓ ${track.slug} — ${track.audioUrl}`);
   }

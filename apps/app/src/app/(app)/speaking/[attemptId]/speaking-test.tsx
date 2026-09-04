@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { Circle, Mic, Play, Square } from 'lucide-react';
 import { Button } from '@bandzen/ui/components/button';
-import { cn } from '@bandzen/ui/lib/utils';
+import { LiveWaveform } from '@bandzen/ui/components/live-waveform';
 import { SubmitConfirm } from '@/components/app/submit-confirm';
 import { ExamNavigator } from '@/components/exam/exam-navigator';
 import { blobToWav } from '@/lib/wav';
@@ -57,8 +57,8 @@ export function SpeakingTest({ attemptId, title, prompts, saved }: Props) {
 
   const [phase, setPhase] = useState<'idle' | 'prep' | 'recording'>('idle');
   const [left, setLeft] = useState(0);
-  const [level, setLevel] = useState(0);
   const [micError, setMicError] = useState<string | null>(null);
+  const [analyser, setAnalyser] = useState<AnalyserNode | null>(null);
 
   const audioRef = useRef<HTMLAudioElement>(null);
   const recorderRef = useRef<MediaRecorder | null>(null);
@@ -66,7 +66,6 @@ export function SpeakingTest({ attemptId, title, prompts, saved }: Props) {
   const startedAtRef = useRef(0);
   const deadlineRef = useRef(0);
   const audioCtxRef = useRef<AudioContext | null>(null);
-  const analyserRef = useRef<AnalyserNode | null>(null);
 
   const prompt = prompts[current]!;
   const cap = MAX_SECONDS[prompt.part] ?? 60;
@@ -126,7 +125,7 @@ export function SpeakingTest({ attemptId, title, prompts, saved }: Props) {
       analyser.fftSize = 256;
       ctx.createMediaStreamSource(stream).connect(analyser);
       audioCtxRef.current = ctx;
-      analyserRef.current = analyser;
+      setAnalyser(analyser);
     } catch {
       // No Web Audio — the meter just stays flat, recording is unaffected.
     }
@@ -143,8 +142,7 @@ export function SpeakingTest({ attemptId, title, prompts, saved }: Props) {
       stream.getTracks().forEach((t) => t.stop());
       void audioCtxRef.current?.close();
       audioCtxRef.current = null;
-      analyserRef.current = null;
-      setLevel(0);
+      setAnalyser(null);
       const duration = Math.round((Date.now() - startedAtRef.current) / 1000);
       const raw = new Blob(chunksRef.current, {
         type: recorder.mimeType || 'audio/webm',
@@ -176,15 +174,6 @@ export function SpeakingTest({ attemptId, title, prompts, saved }: Props) {
         Math.ceil((deadlineRef.current - Date.now()) / 1000),
       );
       setLeft(remaining);
-
-      const analyser = analyserRef.current;
-      if (phase === 'recording' && analyser) {
-        const buf = new Uint8Array(analyser.fftSize);
-        analyser.getByteTimeDomainData(buf);
-        let sum = 0;
-        for (const v of buf) sum += (v - 128) ** 2;
-        setLevel(Math.min(1, Math.sqrt(sum / buf.length) / 40));
-      }
 
       if (remaining <= 0) {
         clearInterval(id);
@@ -281,24 +270,11 @@ export function SpeakingTest({ attemptId, title, prompts, saved }: Props) {
                 <Circle className="size-3 animate-pulse fill-destructive" />
                 Recording · {mmss(left)} left
               </p>
-              <div
-                className="flex h-6 items-end gap-1"
-                aria-hidden
-                role="presentation"
-              >
-                {Array.from({ length: 14 }, (_, i) => (
-                  <span
-                    key={i}
-                    className={cn(
-                      'w-1 rounded-full transition-[height] duration-100',
-                      level * 14 > i ? 'bg-primary' : 'bg-border',
-                    )}
-                    style={{
-                      height: `${Math.max(15, level * 100 * (1 - i / 28))}%`,
-                    }}
-                  />
-                ))}
-              </div>
+              <LiveWaveform
+                analyser={analyser}
+                active={phase === 'recording'}
+                height={24}
+              />
               <Button type="button" onClick={stopRecording}>
                 <Square className="size-4" /> Stop
               </Button>
