@@ -1,3 +1,10 @@
+# app [0.12.0](https://github.com/harshsandhu44/bandzen/compare/app@0.11.0...app@0.12.0) (2026-09-04)
+
+
+### Features
+
+* **app:** practice hub + module page restyle ([#26](https://github.com/harshsandhu44/bandzen/issues/26)) ([baf6d1a](https://github.com/harshsandhu44/bandzen/commit/baf6d1a13c7f32d810051b010bb4d10a1f23eafa))
+
 # app [0.11.0](https://github.com/harshsandhu44/bandzen/compare/app@0.10.0...app@0.11.0) (2026-09-04)
 
 
