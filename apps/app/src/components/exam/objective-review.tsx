@@ -2,7 +2,11 @@ import Link from 'next/link';
 import { ArrowRight, Check, Repeat, X } from 'lucide-react';
 import { Button } from '@bandzen/ui/components/button';
 import { cn } from '@bandzen/ui/lib/utils';
-import { SectionHeader } from '@/components/app/primitives';
+import {
+  InsightBar,
+  SectionHeader,
+  Watermark,
+} from '@/components/app/primitives';
 import { BandReveal } from '@/components/exam/band-reveal';
 import { isAnswerCorrect } from '@/lib/db/queries';
 import {
@@ -86,7 +90,8 @@ export function ObjectiveReview({
     : `/${module}`;
 
   return (
-    <div className="max-w-3xl space-y-10">
+    <div className="relative isolate max-w-3xl space-y-10 overflow-clip">
+      <Watermark text={module} />
       <header className="space-y-4">
         <p className="font-mono text-[0.6875rem] tracking-[0.18em] text-muted-foreground uppercase">
           Review · {title}
@@ -159,14 +164,7 @@ export function ObjectiveReview({
                     </blockquote>
                   ) : null}
                   {!correct && q.explanation ? (
-                    <div className="space-y-1">
-                      <p className="font-mono text-[0.6875rem] tracking-[0.18em] text-muted-foreground uppercase">
-                        Why
-                      </p>
-                      <p className="text-xs leading-6 text-muted-foreground">
-                        {q.explanation}
-                      </p>
-                    </div>
+                    <InsightBar>{q.explanation}</InsightBar>
                   ) : null}
                 </div>
               </div>
@@ -182,31 +180,22 @@ export function ObjectiveReview({
           </SectionHeader>
           <ul className="space-y-3">
             {patterns.map(({ kind, stats }) => (
-              <li
-                key={kind}
-                className="flex items-start gap-3 border-l-2 border-chrome py-3 pr-4 pl-4"
-              >
-                <Repeat
-                  className="mt-0.5 size-3.5 shrink-0 text-muted-foreground"
-                  aria-hidden
-                />
-                <div className="min-w-0 flex-1 space-y-1">
-                  <p className="text-sm">
-                    You have missed{' '}
-                    <strong className="font-medium">
-                      {stats.total - stats.correct} of {stats.total}
-                    </strong>{' '}
-                    {label(kind)} questions across every attempt so far. This
-                    one was not a one-off.
-                  </p>
+              <li key={kind}>
+                <InsightBar icon={Repeat}>
+                  You have missed{' '}
+                  <strong className="font-medium">
+                    {stats.total - stats.correct} of {stats.total}
+                  </strong>{' '}
+                  {label(kind)} questions across every attempt so far. This one
+                  was not a one-off.{' '}
                   <Link
                     href={`/${module}?kind=${kind}`}
-                    className="inline-flex items-center gap-1 text-xs underline-offset-4 hover:underline"
+                    className="inline-flex items-center gap-1 underline-offset-4 hover:underline"
                   >
                     Practise {label(kind)}
                     <ArrowRight className="size-3" aria-hidden />
                   </Link>
-                </div>
+                </InsightBar>
               </li>
             ))}
           </ul>
