@@ -1,4 +1,5 @@
 import type { ReactNode } from 'react';
+import { Sparkle } from 'lucide-react';
 import {
   Card,
   CardAction,
@@ -155,5 +156,62 @@ export function FeatureBlock({
         {action ? <div className="shrink-0">{action}</div> : null}
       </div>
     </section>
+  );
+}
+
+/**
+ * The dark "AI insight" bar from the landing page's module demos
+ * (`apps/web/.../module-panel.tsx`), ported for review/report/insight
+ * screens in this app. Deliberately `bg-foreground text-background` rather
+ * than `bg-ink text-paper` — see the note on `FeatureBlock` above: that pair
+ * swaps under `.dark` and would invert into a white bar on a dark page.
+ *
+ * `bg-foreground text-background` alone has the same problem one step
+ * removed: in dark mode `--foreground` is light, so it renders as a *white*
+ * card, not a dark one. The `dark:` override below is copied from
+ * `FeatureBlock` for the same reason it exists there — a quieter bordered
+ * `--secondary` surface in dark mode instead of a literal inversion.
+ */
+export function InsightBar({
+  icon: Icon = Sparkle,
+  children,
+  className,
+}: {
+  /** Defaults to `Sparkle`. Swap it for e.g. `Repeat` on a recurring-pattern insight. */
+  icon?: typeof Sparkle;
+  children: ReactNode;
+  className?: string;
+}) {
+  return (
+    <div
+      className={cn(
+        'flex items-start gap-2.5 bg-foreground px-4 py-3 text-background',
+        'dark:bg-secondary dark:text-foreground dark:ring-1 dark:ring-border',
+        className,
+      )}
+    >
+      <Icon className="mt-0.5 size-3.5 shrink-0" aria-hidden />
+      <p className="text-sm leading-snug">
+        <span className="sr-only">AI insight: </span>
+        {children}
+      </p>
+    </div>
+  );
+}
+
+/**
+ * The oversized ghost-letter watermark from the landing page's module demos.
+ * Static — no `bz-drift` parallax, apps/app's rule is motion almost never.
+ * The parent must be `relative isolate overflow-clip` for this to sit
+ * correctly behind its content (see `module-panel.tsx` for the pattern).
+ */
+export function Watermark({ text }: { text: string }) {
+  return (
+    <span
+      aria-hidden
+      className="pointer-events-none absolute -top-4 -right-4 -z-10 font-title text-[6rem] leading-none text-secondary select-none"
+    >
+      {text.slice(0, 3).toUpperCase()}
+    </span>
   );
 }
