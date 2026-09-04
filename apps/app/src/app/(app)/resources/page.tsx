@@ -1,5 +1,6 @@
 import Link from 'next/link';
-import { PageHeader, SectionHeader } from '@/components/app/primitives';
+import { Breadcrumb } from '@/components/app/breadcrumb';
+import { PageHeader, Panel } from '@/components/app/primitives';
 import { FilterBar } from '@/components/app/filter-bar';
 import { LearnNav } from '@/components/learning/learn-nav';
 import {
@@ -43,7 +44,11 @@ export default async function ResourcesPage({
   })).filter((g) => g.items.length);
 
   return (
-    <div className="max-w-3xl space-y-8">
+    <div className="max-w-3xl space-y-6">
+      <Breadcrumb
+        segments={[{ label: 'Learn', href: '/learn' }, { label: 'Guides' }]}
+      />
+
       <PageHeader
         eyebrow="Learn"
         title="Guides"
@@ -62,16 +67,21 @@ export default async function ResourcesPage({
       />
 
       {groups.map((group) => (
-        <section key={group.category} className="space-y-3">
-          <SectionHeader as="h2">
-            {CATEGORY_TITLE[group.category]}
-          </SectionHeader>
-
-          <ul className="divide-y divide-border border-y border-border">
+        <Panel
+          key={group.category}
+          headingId={`category-${group.category}`}
+          title={CATEGORY_TITLE[group.category]}
+          action={
+            <span className="font-metric text-metric-sm text-muted-foreground">
+              {group.items.length}
+            </span>
+          }
+        >
+          <ul className="-my-2.5 divide-y divide-border">
             {group.items.map((resource) => {
               const unwritten = !resource.body;
               const row = (
-                <div className="flex items-start justify-between gap-4 py-3.5">
+                <div className="flex items-start justify-between gap-4 py-2.5">
                   <div className="min-w-0">
                     <p
                       className={cn(
@@ -85,7 +95,7 @@ export default async function ResourcesPage({
                       {resource.summary}
                     </p>
                   </div>
-                  <span className="shrink-0 text-xs text-muted-foreground tabular-nums">
+                  <span className="shrink-0 self-center text-xs text-muted-foreground tabular-nums">
                     {unwritten
                       ? 'Not written yet'
                       : `${resource.minutes} min · ${resource.level}`}
@@ -100,7 +110,7 @@ export default async function ResourcesPage({
                   ) : (
                     <Link
                       href={`/resources/${resource.id}`}
-                      className="block transition-colors hover:bg-secondary/40"
+                      className="-mx-4 block px-4 transition-colors hover:bg-secondary/40"
                     >
                       {row}
                     </Link>
@@ -109,7 +119,7 @@ export default async function ResourcesPage({
               );
             })}
           </ul>
-        </section>
+        </Panel>
       ))}
     </div>
   );
