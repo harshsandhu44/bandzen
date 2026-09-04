@@ -25,6 +25,7 @@ export default async function ReadingAttemptPage({
       attemptId={attempt.id}
       startedAt={attempt.startedAt.toISOString()}
       minutes={minutesFor(data.questions.length)}
+      autoSubmit={attempt.kind !== 'practice'}
       passage={data.passage}
       headings={data.passage.headings ?? null}
       questions={data.questions}

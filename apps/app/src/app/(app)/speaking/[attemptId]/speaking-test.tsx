@@ -5,6 +5,7 @@ import { Circle, Mic, Play, Square } from 'lucide-react';
 import { Button } from '@bandzen/ui/components/button';
 import { cn } from '@bandzen/ui/lib/utils';
 import { SubmitConfirm } from '@/components/app/submit-confirm';
+import { ExamNavigator } from '@/components/exam/exam-navigator';
 import { blobToWav } from '@/lib/wav';
 import { saveSpeakingRecording, submitSpeakingAttempt } from '../actions';
 
@@ -56,6 +57,7 @@ export function SpeakingTest({ attemptId, title, prompts, saved }: Props) {
 
   const [phase, setPhase] = useState<'idle' | 'prep' | 'recording'>('idle');
   const [left, setLeft] = useState(0);
+  const [level, setLevel] = useState(0);
   const [micError, setMicError] = useState<string | null>(null);
 
   const audioRef = useRef<HTMLAudioElement>(null);
@@ -63,6 +65,8 @@ export function SpeakingTest({ attemptId, title, prompts, saved }: Props) {
   const chunksRef = useRef<Blob[]>([]);
   const startedAtRef = useRef(0);
   const deadlineRef = useRef(0);
+  const audioCtxRef = useRef<AudioContext | null>(null);
+  const analyserRef = useRef<AnalyserNode | null>(null);
 
   const prompt = prompts[current]!;
   const cap = MAX_SECONDS[prompt.part] ?? 60;
@@ -115,6 +119,18 @@ export function SpeakingTest({ attemptId, title, prompts, saved }: Props) {
       return;
     }
 
+    // A live input-level meter, off the same stream the recorder uses.
+    try {
+      const ctx = new AudioContext();
+      const analyser = ctx.createAnalyser();
+      analyser.fftSize = 256;
+      ctx.createMediaStreamSource(stream).connect(analyser);
+      audioCtxRef.current = ctx;
+      analyserRef.current = analyser;
+    } catch {
+      // No Web Audio — the meter just stays flat, recording is unaffected.
+    }
+
     const recorder = new MediaRecorder(stream);
     recorderRef.current = recorder;
     chunksRef.current = [];
@@ -125,6 +141,10 @@ export function SpeakingTest({ attemptId, title, prompts, saved }: Props) {
     };
     recorder.onstop = async () => {
       stream.getTracks().forEach((t) => t.stop());
+      void audioCtxRef.current?.close();
+      audioCtxRef.current = null;
+      analyserRef.current = null;
+      setLevel(0);
       const duration = Math.round((Date.now() - startedAtRef.current) / 1000);
       const raw = new Blob(chunksRef.current, {
         type: recorder.mimeType || 'audio/webm',
@@ -156,6 +176,16 @@ export function SpeakingTest({ attemptId, title, prompts, saved }: Props) {
         Math.ceil((deadlineRef.current - Date.now()) / 1000),
       );
       setLeft(remaining);
+
+      const analyser = analyserRef.current;
+      if (phase === 'recording' && analyser) {
+        const buf = new Uint8Array(analyser.fftSize);
+        analyser.getByteTimeDomainData(buf);
+        let sum = 0;
+        for (const v of buf) sum += (v - 128) ** 2;
+        setLevel(Math.min(1, Math.sqrt(sum / buf.length) / 40));
+      }
+
       if (remaining <= 0) {
         clearInterval(id);
         if (phase === 'prep') void beginRecording();
@@ -183,8 +213,8 @@ export function SpeakingTest({ attemptId, title, prompts, saved }: Props) {
   const busy = phase === 'prep' || phase === 'recording';
 
   return (
-    <div className="-m-6 flex min-h-svh flex-col sm:-m-10">
-      <header className="sticky top-0 z-10 flex shrink-0 items-center justify-between gap-4 border-b border-border bg-background px-6 py-3">
+    <div className="-m-6 flex h-svh flex-col overflow-hidden sm:-m-10">
+      <header className="flex shrink-0 items-center justify-between gap-4 border-b border-border bg-background px-6 py-3">
         <p className="min-w-0 truncate font-mono text-[0.6875rem] tracking-[0.18em] text-muted-foreground uppercase">
           <span className="text-foreground">{title}</span> · {savedCount} /{' '}
           {prompts.length} recorded
@@ -200,36 +230,7 @@ export function SpeakingTest({ attemptId, title, prompts, saved }: Props) {
         />
       </header>
 
-      <div className="mx-auto w-full max-w-2xl flex-1 space-y-8 px-6 py-10">
-        {/* Prompt rail */}
-        <ol className="flex flex-wrap gap-1">
-          {prompts.map((p, i) => {
-            const s = status[p.id] ?? 'none';
-            return (
-              <li key={p.id}>
-                <button
-                  type="button"
-                  disabled={busy}
-                  onClick={() => goTo(i)}
-                  aria-label={`Prompt ${p.idx}, ${s}`}
-                  aria-current={i === current ? 'step' : undefined}
-                  className={cn(
-                    'flex size-6 items-center justify-center border font-mono text-[0.5rem] tabular-nums',
-                    i === current && 'ring-1 ring-foreground',
-                    s === 'saved'
-                      ? 'border-primary bg-primary text-primary-foreground'
-                      : s === 'failed'
-                        ? 'border-destructive text-destructive'
-                        : 'border-border text-muted-foreground',
-                  )}
-                >
-                  {p.idx}
-                </button>
-              </li>
-            );
-          })}
-        </ol>
-
+      <div className="mx-auto w-full max-w-2xl flex-1 space-y-8 overflow-y-auto px-6 py-10">
         <div className="space-y-2">
           <p className="font-mono text-[0.6875rem] tracking-[0.18em] text-muted-foreground uppercase">
             {PART_TITLE[prompt.part] ?? `Part ${prompt.part}`}
@@ -280,6 +281,24 @@ export function SpeakingTest({ attemptId, title, prompts, saved }: Props) {
                 <Circle className="size-3 animate-pulse fill-destructive" />
                 Recording · {mmss(left)} left
               </p>
+              <div
+                className="flex h-6 items-end gap-1"
+                aria-hidden
+                role="presentation"
+              >
+                {Array.from({ length: 14 }, (_, i) => (
+                  <span
+                    key={i}
+                    className={cn(
+                      'w-1 rounded-full transition-[height] duration-100',
+                      level * 14 > i ? 'bg-primary' : 'bg-border',
+                    )}
+                    style={{
+                      height: `${Math.max(15, level * 100 * (1 - i / 28))}%`,
+                    }}
+                  />
+                ))}
+              </div>
               <Button type="button" onClick={stopRecording}>
                 <Square className="size-4" /> Stop
               </Button>
@@ -324,8 +343,27 @@ export function SpeakingTest({ attemptId, title, prompts, saved }: Props) {
             at the limit.
           </p>
         </div>
+      </div>
 
-        <div className="flex justify-between border-t border-border pt-6">
+      <ExamNavigator
+        kind="step"
+        items={prompts.map((p) => ({
+          id: p.id,
+          label: p.idx,
+          answered: (status[p.id] ?? 'none') === 'saved',
+          flagged: (status[p.id] ?? 'none') === 'failed',
+        }))}
+        currentId={prompt.id}
+        onJump={(id) => {
+          const i = prompts.findIndex((p) => p.id === id);
+          if (i !== -1) goTo(i);
+        }}
+        answeredCount={savedCount}
+        total={prompts.length}
+        countLabel="recorded"
+        disabled={busy}
+      >
+        <span className="flex gap-2">
           <Button
             type="button"
             variant="ghost"
@@ -344,8 +382,8 @@ export function SpeakingTest({ attemptId, title, prompts, saved }: Props) {
           >
             Next
           </Button>
-        </div>
-      </div>
+        </span>
+      </ExamNavigator>
     </div>
   );
 }

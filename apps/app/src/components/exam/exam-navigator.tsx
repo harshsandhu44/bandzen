@@ -30,6 +30,7 @@ export function ExamNavigator({
   kind = 'question',
   countLabel = 'answered',
   legend = true,
+  disabled = false,
   children,
 }: {
   items: readonly NavItem[];
@@ -40,6 +41,8 @@ export function ExamNavigator({
   kind?: 'question' | 'step';
   countLabel?: string;
   legend?: boolean;
+  /** The speaking rail locks while a recording or prep countdown runs. */
+  disabled?: boolean;
   /** Trailing slot — the submit control, or prev/next for speaking. */
   children?: ReactNode;
 }) {
@@ -60,11 +63,13 @@ export function ExamNavigator({
             <li key={item.id} className="shrink-0">
               <button
                 type="button"
+                disabled={disabled}
                 onClick={() => onJump(item.id)}
                 aria-current={
                   current ? (kind === 'step' ? 'step' : 'true') : undefined
                 }
                 className={cn(
+                  'disabled:pointer-events-none disabled:opacity-50',
                   'relative grid size-6 place-items-center border border-border font-mono text-[0.625rem] text-muted-foreground transition-colors',
                   'hover:border-foreground/40',
                   item.answered &&

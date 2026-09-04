@@ -14,6 +14,7 @@ import {
 } from '@bandzen/ui/components/dropdown-menu';
 import { ThemeToggle } from '@bandzen/ui/components/theme-toggle';
 import { cn } from '@bandzen/ui/lib/utils';
+import { EXAM_RUNNER } from './exam-route';
 import { DOCS_URL } from './nav-links';
 
 /**
@@ -59,9 +60,6 @@ const PRACTICE_CHILD = new Set([
   'diagnostic',
 ]);
 
-/** `/reading/abc123` — a runner. Not `/reading/abc123/review`. */
-const RUNNER = /^\/(reading|writing|listening|speaking)\/[^/]+$/;
-
 function crumbsFor(pathname: string): { label: string; href?: string }[] {
   if (pathname === '/') return [{ label: 'Today' }];
 
@@ -100,7 +98,7 @@ export function TopBar({
   const router = useRouter();
   const { signOut } = useClerk();
 
-  if (RUNNER.test(pathname)) return null;
+  if (EXAM_RUNNER.test(pathname)) return null;
 
   const crumbs = crumbsFor(pathname);
 
