@@ -1,4 +1,9 @@
 import type { z } from 'zod';
+import {
+  PASSAGE_SYSTEM,
+  LISTENING_SYSTEM,
+  SPEAKING_SYSTEM,
+} from '@bandzen/ai/prompts';
 import type {
   lessonSchema,
   listeningTrackSchema,
@@ -54,29 +59,15 @@ type Passage = z.infer<typeof passageSchema>;
 type Question = Passage['questions'][number];
 
 /**
- * These clipboard rules track the canonical authoring rules in
- * @bandzen/ai/prompts (PASSAGE_SYSTEM) — reworded for a paste-into-a-chatbot
- * flow rather than a strict Structured Outputs call. Keep them in step.
+ * The authoring rules are PASSAGE_SYSTEM from @bandzen/ai/prompts, the same
+ * copy the offline scripts and the in-app "Generate with AI" flow use. What
+ * follows is only what that copy doesn't cover: the paste-into-a-chatbot
+ * delivery format, and the schema/JSON-shape specifics a strict Structured
+ * Outputs call enforces automatically but a pasted-back reply does not.
  */
-const PASSAGE_BASE = `Write IELTS Academic Reading practice material as a JSON array matching the
-example below exactly. Return JSON only.
+const PASSAGE_BASE = `${PASSAGE_SYSTEM}
 
-- The passage must be original prose on a factual, academic topic, 700-900
-  words. Never reproduce copyrighted exam material.
-- Label paragraphs A, B, C… on their own line in body, exactly as the example
-  does.
-- Thirteen questions, idx 1..13 with no gaps.
-- Every question's evidence must be a sentence that appears verbatim in body.
-  For a NOT GIVEN answer, quote the nearest sentence on the topic and let the
-  explanation say what it does not establish.
-- Distractors must be plausible enough that the question cannot be answered
-  without reading the passage. An option naming a topic the passage never
-  mentions is a wasted option: build distractors from real content belonging to
-  a DIFFERENT paragraph, or from a plausible misreading of the right one.
-- headings is a single passage-level list. Where the paper has
-  matching_headings questions it is their shared option list; otherwise supply
-  one credible heading per paragraph.
-- difficulty is 1-5. "format" is optional and defaults to "academic".
+Return the result as a JSON array matching the example below exactly. Return JSON only. Aim for 700-900 words, with paragraphs labeled A, B, C… on their own line in body, exactly as the example does. Where there are no matching_headings questions, supply one credible heading per paragraph instead of a shared list. For a NOT GIVEN answer, quote the nearest sentence on the topic as evidence and let explanation say what it does not establish. difficulty is 1-5; "format" is optional and defaults to "academic".
 
 The example below shows three of the thirteen questions.`;
 
@@ -452,25 +443,10 @@ type ListeningTrack = z.infer<typeof listeningTrackSchema>;
  * is opened), and `questions` may be omitted on an audio-only row since they
  * can't be written before the transcript exists.
  */
-const LISTENING_BASE = `Write an IELTS Listening track as a JSON array matching the example below
-exactly. Return JSON only.
+/** Authoring rules are LISTENING_SYSTEM from @bandzen/ai/prompts — see the note above PASSAGE_BASE. */
+const LISTENING_BASE = `${LISTENING_SYSTEM}
 
-- transcript is an original spoken script — a monologue, or a conversation
-  with each speaker labelled "Name:" on its own line. Never reproduce
-  copyrighted exam material.
-- Ten questions, idx 1..10 with no gaps, mixing at least two of:
-  multiple_choice, sentence_completion, matching.
-- Every question's evidence must be a line that appears verbatim in the
-  transcript.
-- multiple_choice supplies four options and the answer matches one exactly.
-- matching has options: null and draws its answer from the single track-level
-  matchingOptions list. Supply at least three more matchingOptions than there
-  are matching questions; no option answers two questions.
-- sentence_completion answers are words lifted verbatim from the transcript,
-  within the word limit stated in the prompt.
-- difficulty is 1-5.
-- Provide a transcript, an audioUrl, or both. audioUrl, when given, must be a
-  real URL to an existing MP3. Omit questions if you only have the audio.`;
+Return the result as a JSON array matching the example below exactly. Return JSON only. difficulty is 1-5. Provide a transcript, an audioUrl, or both. audioUrl, when given, must be a real URL to an existing MP3. Omit questions if you only have the audio.`;
 
 export const LISTENING_TEMPLATES = build<ListeningTrack>(LISTENING_BASE, {
   general: {
@@ -605,22 +581,10 @@ still plausible. The example is shortened; a real track has ten questions.`,
 
 type SpeakingTest = z.infer<typeof speakingTestSchema>;
 
-const SPEAKING_BASE = `Write an IELTS Speaking test as a JSON array matching the example below
-exactly. Return JSON only.
+/** Authoring rules are SPEAKING_SYSTEM from @bandzen/ai/prompts — see the note above PASSAGE_BASE. */
+const SPEAKING_BASE = `${SPEAKING_SYSTEM}
 
-- The three parts are flattened into one ordered "prompts" array. idx starts
-  at 1 with no gaps. part is 1, 2 or 3.
-- Part 1: 3-4 short personal questions on ONE familiar topic, answerable in a
-  sentence or two.
-- Part 2: exactly one prompt, part 2, whose text is the "Describe ..." cue
-  card line. cueCardPoints is the 3-4 "You should say:" bullets. prepSeconds
-  is 60.
-- Part 3: 4-6 abstract discussion questions that open the Part 2 topic out —
-  opinion, comparison, cause, prediction. No yes/no questions. prepSeconds 0.
-- Every prompt is what an examiner says aloud — no stage directions.
-- cueCardPoints is null on Part 1 and Part 3 prompts. Omit audioUrl; the CMS
-  synthesizes the examiner voice when you open the draft.
-- Never reproduce copyrighted exam questions.`;
+Return the result as a JSON array matching the example below exactly. Return JSON only. The three parts are flattened into one ordered "prompts" array: idx starts at 1 with no gaps, part is 1, 2 or 3. The Part 2 prompt's cueCardPoints holds the 3-4 "You should say:" bullets and prepSeconds is 60; Part 1 and Part 3 prompts have cueCardPoints: null and prepSeconds 0. Omit audioUrl; the CMS synthesizes the examiner voice when you open the draft.`;
 
 const SPEAKING_EXAMPLE: SpeakingTest = {
   slug: 'a-place-you-return-to',
