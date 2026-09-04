@@ -12,8 +12,14 @@
 # also means a change to packages/ui or packages/db deploys nothing on its
 # own: bump each app that should carry it, in the same commit.
 #
-# Previews are never gated, so a pull request keeps a working preview URL
-# across review commits, none of which bump anything.
+# Previews gate on turbo-ignore instead: a preview builds only when this app,
+# or a workspace package it depends on, changed since the app's own last
+# deployment. A pull request scoped to one app stops rebuilding the other
+# three across every review commit. turbo-ignore reads the same dependency
+# graph turbo does, so a packages/db change still rebuilds every app that
+# imports it, and a root lockfile or turbo.json change rebuilds everything.
+# With no previous deployment to diff against it falls back to HEAD^ and
+# builds rather than guess.
 #
 # The two versions are compared as values rather than as diff lines. A line
 # diff calls it a bump when anything merely rewrites that line — adding a key
@@ -28,7 +34,7 @@ set -u
 
 app="${1:?usage: deploy-if-bumped.sh <path/to/app>}"
 
-[ "${VERCEL_ENV:-}" = 'production' ] || exit 1
+[ "${VERCEL_ENV:-}" = 'production' ] || exec npx --yes turbo-ignore --fallback=HEAD^
 
 # First deploy, or a clone too shallow to have a parent commit: build rather
 # than guess at what changed.
