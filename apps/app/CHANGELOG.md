@@ -1,3 +1,10 @@
+## app [0.16.2](https://github.com/harshsandhu44/bandzen/compare/app@0.16.1...app@0.16.2) (2026-09-04)
+
+
+### Bug Fixes
+
+* **app:** point generate-*.mts scripts at @bandzen/ai/generate ([#35](https://github.com/harshsandhu44/bandzen/issues/35)) ([5fd8d26](https://github.com/harshsandhu44/bandzen/commit/5fd8d26194774294ba051e6461c36a21b4639702)), closes [#21](https://github.com/harshsandhu44/bandzen/issues/21)
+
 ## app [0.16.1](https://github.com/harshsandhu44/bandzen/compare/app@0.16.0...app@0.16.1) (2026-09-04)
 
 
