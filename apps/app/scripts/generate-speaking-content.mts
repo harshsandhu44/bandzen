@@ -13,103 +13,15 @@
  */
 import { readFileSync, readdirSync, writeFileSync, mkdirSync } from 'node:fs';
 import { join } from 'node:path';
-import OpenAI from 'openai';
 import {
-  generatedSpeakingTestSchema,
-  type GeneratedSpeakingTest,
-} from '../src/lib/ai/schemas.ts';
-import { parseStructured, strictJsonSchema } from '../src/lib/ai/structured.ts';
+  generateSpeakingTest,
+  type SpeakingTestFile as TestFile,
+} from '@bandzen/ai/generate';
 
 const SEED_DIR = join(import.meta.dirname, '..', 'content', 'speaking');
 const SQL_OUT = join(import.meta.dirname, '..', 'content', 'speaking-seed.sql');
-const MODEL = process.env.OPENAI_CONTENT_MODEL ?? 'gpt-5.5';
-
-const TEST_SCHEMA = strictJsonSchema(generatedSpeakingTestSchema);
-
-type PromptFile = {
-  idx: number;
-  part: number;
-  text: string;
-  cueCardPoints: string[] | null;
-  prepSeconds: number;
-  audioUrl?: string;
-};
-type TestFile = {
-  slug: string;
-  title: string;
-  topic: string;
-  difficulty: number;
-  prompts: PromptFile[];
-};
-
-const SYSTEM = `You write IELTS Speaking practice tests — the examiner's side of a real interview.
-
-Rules that matter:
-- Original material only. Never reproduce copyrighted exam questions.
-- Part 1: 3-4 short questions on ONE familiar topic (home, work, study, a
-  hobby, daily routine). Plain, personal, answerable in a sentence or two.
-- Part 2: one cue card in the real format — a "Describe ..." line, then 3-4
-  "You should say:" points. The candidate speaks alone for 1-2 minutes.
-- Part 3: 4-6 questions that open out the Part 2 topic into abstract
-  discussion — opinion, comparison, cause, prediction. No yes/no questions.
-- Every question is something an examiner would actually say aloud. No
-  stage directions, no "the examiner asks", just the words.
-- Keep each question to one or two sentences.`;
-
-function flatten(t: GeneratedSpeakingTest): TestFile {
-  const prompts: PromptFile[] = [];
-  let idx = 1;
-  for (const q of t.part1) {
-    prompts.push({
-      idx: idx++,
-      part: 1,
-      text: q.text,
-      cueCardPoints: null,
-      prepSeconds: 0,
-    });
-  }
-  prompts.push({
-    idx: idx++,
-    part: 2,
-    text: t.part2.cueCard,
-    cueCardPoints: t.part2.points,
-    prepSeconds: 60,
-  });
-  for (const q of t.part3) {
-    prompts.push({
-      idx: idx++,
-      part: 3,
-      text: q.text,
-      cueCardPoints: null,
-      prepSeconds: 0,
-    });
-  }
-  return {
-    slug: t.slug,
-    title: t.title,
-    topic: t.topic,
-    difficulty: t.difficulty,
-    prompts,
-  };
-}
-
-function validate(t: TestFile): string[] {
-  const problems: string[] = [];
-  for (const part of [1, 2, 3]) {
-    if (!t.prompts.some((p) => p.part === part)) {
-      problems.push(`no Part ${part} prompts`);
-    }
-  }
-  const p2 = t.prompts.filter((p) => p.part === 2);
-  if (p2.length !== 1) problems.push(`${p2.length} Part 2 prompts, expected 1`);
-  if (p2[0] && (!p2[0].cueCardPoints || p2[0].cueCardPoints.length < 3)) {
-    problems.push('Part 2 cue card has fewer than 3 points');
-  }
-  return problems;
-}
 
 async function generate(count: number) {
-  const client = new OpenAI({ apiKey: requireKey() });
   mkdirSync(SEED_DIR, { recursive: true });
 
   const existing = new Set(
@@ -119,27 +31,11 @@ async function generate(count: number) {
   );
 
   for (let i = 0; i < count; i += 1) {
-    const response = await client.chat.completions.create({
-      model: MODEL,
-      messages: [
-        { role: 'system', content: SYSTEM },
-        {
-          role: 'user',
-          content: `Write one IELTS Speaking test. Choose a Part 2 topic unlike any of these already generated: ${[...existing].join(', ') || 'none yet'}.`,
-        },
-      ],
-      response_format: {
-        type: 'json_schema',
-        json_schema: { name: 'test', strict: true, schema: TEST_SCHEMA },
-      },
+    const { data: test, warnings } = await generateSpeakingTest({
+      avoid: [...existing],
     });
-
-    const test = flatten(
-      parseStructured(response, generatedSpeakingTestSchema),
-    );
-    const problems = validate(test);
-    if (problems.length)
-      console.warn(`  ⚠ ${test.slug}: ${problems.join('; ')}`);
+    if (warnings.length)
+      console.warn(`  ⚠ ${test.slug}: ${warnings.join('; ')}`);
 
     writeFileSync(
       join(SEED_DIR, `${test.slug}.json`),
@@ -214,15 +110,6 @@ function toSql() {
   if (missingAudio) {
     console.log(`${missingAudio} test(s) skipped for missing audio.`);
   }
-}
-
-function requireKey() {
-  const key = process.env.OPENAI_API_KEY;
-  if (!key)
-    throw new Error(
-      'Missing OPENAI_API_KEY. Try: node --env-file=.env.local ...',
-    );
-  return key;
 }
 
 const [command, ...rest] = process.argv.slice(2);
