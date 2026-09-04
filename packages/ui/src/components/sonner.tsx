@@ -2,7 +2,7 @@
 
 import type { CSSProperties } from 'react';
 import { useTheme } from 'next-themes';
-import { Toaster as Sonner, type ToasterProps } from 'sonner';
+import { Toaster as Sonner, toast, type ToasterProps } from 'sonner';
 import {
   CircleCheckIcon,
   InfoIcon,
@@ -43,4 +43,4 @@ function Toaster(props: ToasterProps) {
   );
 }
 
-export { Toaster };
+export { Toaster, toast };
