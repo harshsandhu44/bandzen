@@ -1,7 +1,8 @@
 'use client';
 
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Button } from '@bandzen/ui/components/button';
+import { Waveform } from '@bandzen/ui/components/waveform';
 import {
   ObjectiveRunner,
   type RunnerQuestion,
@@ -11,27 +12,54 @@ import { saveListeningAnswer, submitListeningAttempt } from '../actions';
 
 type Props = {
   attemptId: string;
-  track: { title: string; audioUrl: string; matchingOptions: string[] | null };
+  track: {
+    title: string;
+    audioUrl: string;
+    matchingOptions: string[] | null;
+    peaks: number[] | null;
+  };
   questions: RunnerQuestion[];
   saved: RunnerSaved[];
 };
 
 /**
  * A single-play audio element with no scrub bar — exam realism, deliberate.
- * The candidate presses once and listens; there is no going back.
+ * The candidate presses once and listens; there is no going back. The
+ * waveform below is a playback-position visual only — it never wires up
+ * `Waveform`'s `onBarClick`, so there is no way to seek.
  */
-function Player({ audioUrl }: { audioUrl: string }) {
+function Player({
+  audioUrl,
+  peaks,
+}: {
+  audioUrl: string;
+  peaks: number[] | null;
+}) {
   const ref = useRef<HTMLAudioElement>(null);
   const [state, setState] = useState<'idle' | 'playing' | 'ended'>('idle');
+  const [progress, setProgress] = useState(0);
+
+  useEffect(() => {
+    const audio = ref.current;
+    if (!audio || state !== 'playing') return;
+    const id = setInterval(() => {
+      if (audio.duration) setProgress(audio.currentTime / audio.duration);
+    }, 100);
+    return () => clearInterval(id);
+  }, [state]);
 
   return (
     <div className="space-y-3">
       <audio
         ref={ref}
         src={audioUrl}
-        onEnded={() => setState('ended')}
+        onEnded={() => {
+          setState('ended');
+          setProgress(1);
+        }}
         className="hidden"
       />
+      <Waveform data={peaks ?? undefined} progress={progress} height={48} />
       {state === 'idle' ? (
         <Button
           type="button"
@@ -66,7 +94,7 @@ export function ListeningTest({ attemptId, track, questions, saved }: Props) {
       left={
         <>
           <h1 className="mb-6 font-title text-title">{track.title}</h1>
-          <Player audioUrl={track.audioUrl} />
+          <Player audioUrl={track.audioUrl} peaks={track.peaks} />
         </>
       }
       optionsList={
