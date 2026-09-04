@@ -163,7 +163,18 @@ export function ContentList({
       ) : null}
 
       {items.length === 0 ? (
-        filtering ? (
+        page > 1 ? (
+          <p className="border-y border-border py-6 text-center text-sm text-muted-foreground">
+            Nothing on this page.{' '}
+            <button
+              type="button"
+              className="underline"
+              onClick={() => setParam('page', '')}
+            >
+              Back to page 1
+            </button>
+          </p>
+        ) : filtering ? (
           <p className="border-y border-border py-6 text-center text-sm text-muted-foreground">
             Nothing matches. Clear the filters to see everything.
           </p>
