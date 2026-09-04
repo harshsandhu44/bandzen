@@ -19,19 +19,18 @@ export default function AboutPage() {
     >
       <Clause title="What it does">
         <p>
-          Bandzen marks Reading and Writing practice, explains what cost you
-          marks, and builds a study plan from what it measured rather than from
-          a generic syllabus. A coach answers questions with your own results in
-          front of it.
+          Bandzen marks Reading, Writing, Listening and Speaking practice,
+          explains what cost you marks, and builds a study plan from what it
+          measured rather than from a generic syllabus. A coach answers
+          questions with your own results in front of it.
         </p>
       </Clause>
 
       <Clause title="What it does not do yet">
         <p>
-          Listening and Speaking are not built. There is no audio, no
-          transcription and no material for either, so they appear in the
-          product as locked states that say so. We would rather show an honest
-          gap than a feature that does not work.
+          There is no single mock test that runs all four modules back to
+          back — each module is timed and marked on its own. We would rather
+          show an honest gap than a feature that does not work.
         </p>
       </Clause>
 

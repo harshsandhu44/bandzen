@@ -127,8 +127,8 @@ test('quarterly is cheaper per month than monthly, at both prices', () => {
 
 test('the advertised saving matches the arithmetic', () => {
   const quarterly = planByKey('quarterly')!;
-  // ₹1,999 against three months at ₹799 = ₹2,397.
-  assert.equal(savingsPercent(quarterly, false), 17);
+  // ₹2,999 against three months at ₹1,499 = ₹4,497.
+  assert.equal(savingsPercent(quarterly, false), 33);
   assert.equal(savingsPercent(planByKey('monthly')!, false), 0);
 });
 

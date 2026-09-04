@@ -414,18 +414,18 @@ export const pricing = {
     },
     {
       name: 'Pro',
-      price: '₹599',
-      was: '₹799',
+      price: '₹999',
+      was: '₹1,499',
       period: 'per month',
-      alt: 'or ₹1,499 for 3 months',
+      alt: 'or ₹1,999 for 3 months',
       features: [
         { label: 'Unlimited AI Writing analysis', planned: false },
         { label: 'Unlimited Bandzen Coach', planned: false },
         { label: 'Unlimited practice', planned: false },
         { label: 'Retake the diagnostic any time', planned: false },
         { label: 'Your full band history and insights', planned: false },
+        { label: 'AI Speaking analysis', planned: false },
         { label: 'Full mock tests', planned: true },
-        { label: 'AI Speaking analysis', planned: true },
       ],
       cta: 'Start free',
       featured: true,
@@ -463,11 +463,11 @@ export const faq = {
     },
     {
       q: 'Can Bandzen analyse Speaking?',
-      a: 'Not yet. Speaking analysis needs recording and transcription we have not built, so there is nothing to try today. It is on the roadmap and it is marked as planned wherever it appears.',
+      a: 'Yes. You record a response, and Bandzen grades the audio against all four Speaking criteria, pronunciation included. Speaking analysis is a Pro feature.',
     },
     {
       q: 'Can I take complete mock tests?',
-      a: 'Not a full four-skill mock — that needs Listening and Speaking, and neither has material yet. What does exist runs under realistic timing with autosave and connection recovery: a Reading and Writing diagnostic, and timed practice in both, each followed by a complete analysis and review mode.',
+      a: 'Not yet as a single four-skill mock. What exists today is timed practice in every module — Reading, Writing, Listening, and Speaking — each under realistic conditions with autosave and connection recovery, followed by a complete analysis and review mode. A combined mock that runs all four back to back is on the roadmap.',
     },
   ],
 } as const;
