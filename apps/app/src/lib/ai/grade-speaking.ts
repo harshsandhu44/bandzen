@@ -149,8 +149,11 @@ export async function gradeSpeaking(attemptId: string) {
 
     if (userId) await checkAwards(userId);
 
+    const usage = response.usage;
     console.log(
-      `[grade-speaking] ${attemptId} band ${band} · model ${SPEAKING_GRADER_MODEL} · clips ${clips.length}`,
+      `[grade-speaking] ${attemptId} band ${band} · model ${SPEAKING_GRADER_MODEL} · clips ${clips.length} · cached_tokens ${
+        usage?.prompt_tokens_details?.cached_tokens ?? 0
+      }/${usage?.prompt_tokens ?? 0}`,
     );
   } catch (error) {
     console.error(`[grade-speaking] ${attemptId} failed`, error);
