@@ -1,15 +1,19 @@
 /**
  * The drift check.
  *
- * The documentation asserts a lot of numbers, and every one of them is a copy
- * of something `apps/app` enforces. A copy that silently stops matching is
- * worse than no documentation: a candidate reads "two essays a week" and the
- * product allows three, and nothing anywhere complains.
+ * The documentation asserts a lot of numbers and a fact about which modules
+ * exist, and most of it is a copy of something `apps/app` enforces. A copy
+ * that silently stops matching is worse than no documentation: a candidate
+ * reads "two essays a week" and the product allows three, and nothing
+ * anywhere complains — or reads "Speaking is not built" a day after it ships,
+ * which is exactly what happened here.
  *
  * So this reads the real source AS TEXT and asserts each documented value still
  * appears in it. It does not import: `apps/app` is an app rather than a package,
  * and its modules pull in a database client and a Clerk session that have no
- * business being instantiated by a docs test.
+ * business being instantiated by a docs test. (The writing/speaking criteria
+ * are the one exception — see `facts.ts` — because they live in `@bandzen/ai`,
+ * a real package, and are imported there instead of copied.)
  *
  * The same trick is already in the repo — `apps/admin`'s `import/schemas.test.ts`
  * parses the real files in `apps/app/content/` so a drift fails in CI rather
@@ -28,11 +32,11 @@ import {
   COACH_MAX_TURNS,
   FREE,
   MIN_ATTEMPTED,
+  MODULES_WITH_ENGINE,
   PLAN_HORIZON_DAYS,
   READING_BANDS,
   REFUND_DAYS,
   TRIAL_DAYS,
-  WRITING_CRITERIA,
 } from './facts.ts';
 
 const APP = join(import.meta.dirname, '../../../app/src');
@@ -46,7 +50,7 @@ const grading = read('lib/grading.ts');
 const insight = read('lib/insight.ts');
 const studyPlan = read('lib/study-plan.ts');
 const coach = read('lib/ai/coach.ts');
-const schemas = read('lib/ai/schemas.ts');
+const modules = read('lib/modules.ts');
 const progress = read('app/(app)/progress/page.tsx');
 const sections = readFileSync(join(WEB, 'content/sections.ts'), 'utf8');
 
@@ -114,8 +118,30 @@ test('thresholds cited by the docs still hold', () => {
   assert.match(sections, new RegExp(`refundDays: ${REFUND_DAYS}\\b`));
 });
 
-test('the four writing criteria are still the four', () => {
-  for (const criterion of WRITING_CRITERIA) {
-    assert.match(schemas, new RegExp(criterion), criterion);
-  }
+// The writing/speaking criteria no longer need a test here — facts.ts imports
+// them from @bandzen/ai/schemas, so drift there is a type error, not a
+// silent copy going stale.
+
+test('the modules with an engine are still exactly the documented four', () => {
+  // Anchored to the declaration itself, not the whole file: IELTS_MODULES two
+  // lines above also lists all four, and would make a whole-file count pass
+  // even if AVAILABLE_MODULES regressed to two.
+  const match = modules.match(
+    /AVAILABLE_MODULES: readonly Skill\[\] = \[([\s\S]*?)\];/,
+  );
+  assert.ok(match, 'AVAILABLE_MODULES declaration not found');
+  const listed = [...match[1].matchAll(/'(\w+)'/g)].map((m) => m[1]);
+  assert.deepEqual(
+    [...listed].sort(),
+    [...MODULES_WITH_ENGINE].sort(),
+    'a module gained or lost an engine — update facts.ts, then the pages that describe it',
+  );
+});
+
+test('no module has a stated reason to be unavailable', () => {
+  assert.match(
+    modules,
+    /UNAVAILABLE_REASON: Record<string, string> = \{\};/,
+    'a module now has a lock reason — the locked callout and "what is not built" copy need it',
+  );
 });

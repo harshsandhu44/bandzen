@@ -7,7 +7,14 @@ export const metadata = {
 # Guides
 
 A guide is a short reference piece. Unlike a [lesson](/teachers/lessons) it has
-no stages, no drill link, and nothing records whether a candidate read it.
+no stages, and nothing records whether a candidate read it — though it can end
+with a button into a drill, or into asking Coach.
+
+<Callout title="Filed as Resources in the CMS">
+  This page and the candidate-facing site both say "Guides". The CMS section,
+  its route, and its table are named "Resources" — the content is identical, the
+  name just differs by surface. Look for **Resources** in the CMS navigation.
+</Callout>
 
 ## The fields
 
@@ -26,19 +33,17 @@ no stages, no drill link, and nothing records whether a candidate read it.
 ## Module is deliberately optional
 
 Guides in the **listening** and **speaking** categories should have **no
-module** set.
+module** set — the editor only offers Reading or Writing for this field, even
+though Listening and Speaking are both practisable modules now. A listening or
+speaking guide sits in the guides list and is readable with no module attached,
+which is the only option the schema currently allows.
 
-Neither module is built in the product, so attaching a guide to one would file
-it under a locked module where nobody can reach it. Left unset, a listening
-guide sits in the guides list and is readable — which is right, because advice
-about predicting before the audio starts is useful whether or not this product
-can play you audio.
-
-<Callout tone="locked" title="Do not imply the module works">
-  A listening or speaking guide is reading, not practice. Write it as advice,
-  and do not tell the candidate to "practise this in the Listening module" —
-  there is no Listening module to practise in, and the guide would be sending
-  them at a locked screen.
+<Callout title="Category is not the same as the drill link">
+  Setting a guide's **category** to listening or speaking files it correctly. It
+  does not, and currently cannot, wire a "Practise this" button into the
+  Listening or Speaking module the way a reading or writing guide's module field
+  can — write the guide as advice rather than implying a practice link that is
+  not there.
 </Callout>
 
 ## Listed but not drafted

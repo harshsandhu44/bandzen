@@ -52,35 +52,46 @@ export async function buildDocsIndex(): Promise<DocsIndex> {
   const headings: Record<string, Heading[]> = {};
 
   for (const group of NAV) {
-    for (const page of group.pages) {
-      entries.push({
-        href: page.href,
-        title: page.title,
-        trail: group.title,
-      });
+    for (const section of group.sections) {
+      const pageTrail = section.title
+        ? `${group.title} › ${section.title}`
+        : group.title;
 
-      const file = join(process.cwd(), 'src/app/(docs)', page.href, 'page.mdx');
-
-      let source: string;
-      try {
-        source = await readFile(file, 'utf8');
-      } catch {
-        // A page in the nav with no file yet. The nav entry is still findable.
-        headings[page.href] = [];
-        continue;
-      }
-
-      const found: Heading[] = [];
-      for (const [, hashes, text] of source.matchAll(HEADING)) {
-        const id = slug(text);
-        found.push({ id, text, level: hashes.length === 2 ? 2 : 3 });
+      for (const page of section.pages) {
         entries.push({
-          href: `${page.href}#${id}`,
-          title: text,
-          trail: `${group.title} › ${page.title}`,
+          href: page.href,
+          title: page.title,
+          trail: pageTrail,
         });
+
+        const file = join(
+          process.cwd(),
+          'src/app/(docs)',
+          page.href,
+          'page.mdx',
+        );
+
+        let source: string;
+        try {
+          source = await readFile(file, 'utf8');
+        } catch {
+          // A page in the nav with no file yet. The nav entry is still findable.
+          headings[page.href] = [];
+          continue;
+        }
+
+        const found: Heading[] = [];
+        for (const [, hashes, text] of source.matchAll(HEADING)) {
+          const id = slug(text);
+          found.push({ id, text, level: hashes.length === 2 ? 2 : 3 });
+          entries.push({
+            href: `${page.href}#${id}`,
+            title: text,
+            trail: `${group.title} › ${page.title}`,
+          });
+        }
+        headings[page.href] = found;
       }
-      headings[page.href] = found;
     }
   }
 

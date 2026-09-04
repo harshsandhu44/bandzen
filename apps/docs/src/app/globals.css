@@ -1,10 +1,30 @@
 /**
- * Docs inherits the shared theme untouched.
+ * Docs inherits the shared theme, and adds exactly one token.
  *
- * This file used to override `--primary` to a green, to prove an app could
- * retheme `@bandzen/ui` without build tooling. apps/admin makes that point with
- * its plum, and it makes it on a surface that has a reason to look different.
- * Docs describes the product, so a link here is the same cobalt as the button
- * it is describing.
+ * `--primary` stays cobalt: a link to a feature is the same colour as that
+ * feature's button in the app, which is the whole reason this site exists.
+ * `apps/admin` makes itself a different room with its plum; docs is the same
+ * room as the product, described.
+ *
+ * `--docs-accent` is the one exception, and it is wayfinding, not brand: the
+ * active row in the sidebar and the active heading in the table of contents —
+ * "you are here", nothing else. It is a cool sibling of cobalt (hue 233 vs
+ * 264), dropped in chroma so it reads quieter than a real link, and it never
+ * touches a link, a callout or a button. `--chrome` still owns the ruler's
+ * band-9 tick and the wordmark tick, because those are the brand.
  */
 @import '@bandzen/ui/globals.css';
+
+@theme inline {
+  --color-docs-accent: var(--docs-accent);
+}
+
+:root {
+  --docs-accent: oklch(0.55 0.16 233);
+}
+
+.dark {
+  /* Lifted the way --cobalt is in the shared .dark block, so it stays AA
+     against the dark sidebar rather than vibrating. */
+  --docs-accent: oklch(0.72 0.13 233);
+}

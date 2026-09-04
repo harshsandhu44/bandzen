@@ -5,18 +5,26 @@
  * A quota is not a sentence — it is a value that appears in four pages, and
  * changing it should be one edit rather than a grep.
  *
- * These are copies. `apps/app` owns the originals and this app cannot import
- * them: apps are not packages, and promoting `entitlements.ts` into
+ * Most of these are copies. `apps/app` owns the originals and this app cannot
+ * import them: apps are not packages, and promoting `entitlements.ts` into
  * `packages/db` to serve a docs site would be the tail wagging the dog.
  * `facts.test.ts` reads the real source as text and fails if a value here has
  * drifted from it, which is the same trick `apps/admin`'s `schemas.test.ts`
  * uses against `apps/app/content/`.
+ *
+ * The writing and speaking criteria are the exception: they moved into
+ * `@bandzen/ai`, a real package this app can depend on, so they are imported
+ * rather than copied — drift there is now a type error, not a test failure.
  *
  * Prices are deliberately absent, and should stay absent. The root README is
  * explicit that they change without a commit, so a price written here would be
  * wrong before anyone noticed. Link to the pricing section on the marketing
  * site instead — it is already the source.
  */
+export {
+  CRITERION_NAMES as WRITING_CRITERIA,
+  SPEAKING_CRITERION_NAMES as SPEAKING_CRITERIA,
+} from '@bandzen/ai/schemas';
 
 /** What a candidate gets without paying. Sources: `apps/app/src/lib/entitlements.ts`. */
 export const FREE = {
@@ -121,12 +129,20 @@ export const AWARDS = [
   },
 ] as const;
 
-/** The four IELTS Writing criteria. Source: `apps/app/src/lib/ai/schemas.ts`. */
-export const WRITING_CRITERIA = [
-  'Task Response',
-  'Coherence and Cohesion',
-  'Lexical Resource',
-  'Grammatical Range and Accuracy',
+/**
+ * The modules with a marking engine behind them, and why a module might not
+ * be. Source: `apps/app/src/lib/modules.ts` (`AVAILABLE_MODULES`,
+ * `UNAVAILABLE_REASON`). A copy, not an import — `modules.ts` pulls in
+ * `@/lib/db/schema`, which is apps/app's, not a package's.
+ *
+ * `facts.test.ts` fails if either drifts, which is what should have caught
+ * Listening and Speaking shipping without a docs update.
+ */
+export const MODULES_WITH_ENGINE = [
+  'reading',
+  'writing',
+  'listening',
+  'speaking',
 ] as const;
 
 /** Where the prices actually live. */
