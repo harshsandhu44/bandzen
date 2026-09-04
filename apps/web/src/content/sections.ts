@@ -414,10 +414,10 @@ export const pricing = {
     },
     {
       name: 'Pro',
-      price: '₹599',
-      was: '₹799',
+      price: '₹999',
+      was: '₹1,499',
       period: 'per month',
-      alt: 'or ₹1,499 for 3 months',
+      alt: 'or ₹1,999 for 3 months',
       features: [
         { label: 'Unlimited AI Writing analysis', planned: false },
         { label: 'Unlimited Bandzen Coach', planned: false },
