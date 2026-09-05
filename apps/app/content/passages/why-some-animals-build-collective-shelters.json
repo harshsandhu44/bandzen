@@ -1,0 +1,177 @@
+{
+  "slug": "why-some-animals-build-collective-shelters",
+  "title": "Why Some Animals Build Collective Shelters",
+  "topic": "behavioral ecology",
+  "difficulty": 3,
+  "headings": [
+    "Shelters that emerge from many small actions",
+    "The temperature benefits of communal structures",
+    "How simple behavioral rules can create complex architecture",
+    "The costs of sharing a crowded shelter",
+    "Why building material depends on local conditions",
+    "Using experiments to understand construction behavior",
+    "How collective shelters alter surrounding ecosystems",
+    "The balance between individual behavior and colony-level results"
+  ],
+  "body": "A\nSome animals build shelters that are far larger or more complex than any one individual could construct alone. Social insects, colonial birds, and certain mammals create nests or burrows that serve many occupants and may persist across generations. These structures arise from repeated actions such as carrying material, digging, depositing soil, repairing damage, or responding to local cues. No single builder necessarily possesses a complete plan of the final structure. Instead, architecture can emerge from interactions among individuals, materials, and the changing conditions created by earlier construction.\n\nB\nCommunal shelters can modify temperature in ways that improve survival or reduce energy use. A large nest may warm and cool more slowly than the surrounding air, protecting occupants from rapid temperature swings. Clustering animals also produce metabolic heat, which can raise internal temperatures during cold periods. Ventilation passages may move warm air and moisture through a structure, while insulation from soil, plant fibers, feathers, or other materials slows heat exchange. The benefit depends on climate and season because a structure that retains heat effectively in winter may require additional ventilation or behavioral adjustment during hot weather.\n\nC\nComplex structures do not always require complex instructions. In some social insects, individuals respond to local signals such as the presence of building material, airflow, humidity, or chemical cues left by nestmates. One worker may deposit material where another has already placed it, gradually creating pillars, walls, or covered passages. This kind of decentralized process is often described as self-organization. The colony-level pattern can be highly ordered even though each individual follows relatively simple behavioral rules. Researchers study these systems because they offer examples of how coordinated outcomes can emerge without central supervision.\n\nD\nSharing a shelter also creates costs. Dense groups can make it easier for parasites and pathogens to spread between individuals. Competition may occur over the safest or warmest locations, and accumulated waste must be removed or isolated. A conspicuous colony can attract predators that learn where many potential prey are concentrated. Construction itself also consumes time and energy that could otherwise be spent feeding or reproducing. Collective sheltering persists when the benefits of protection, environmental control, reproduction, or cooperation outweigh these disadvantages under local ecological conditions.\n\nE\nBuilding materials vary with what animals can obtain and what the environment demands. Birds may weave grasses, fibers, or twigs, while insects can use soil, chewed plant material, wax, silk, or secretions. Burrowing mammals mainly reshape the ground itself, sometimes adding plant matter to sleeping chambers. Material choice affects strength, insulation, drainage, and resistance to weather. Animals may also change construction as conditions change; repairs after rain, for example, can differ from additions made during a dry period. Architecture is therefore partly constrained by inherited behavior and partly shaped by available resources.\n\nF\nScientists investigate construction using field observation, laboratory colonies, sensors, imaging, and controlled experiments. Researchers may alter humidity, temperature, airflow, or material availability and record how building behavior changes. Transparent artificial nests can reveal activity that would normally be hidden underground, while three-dimensional scanning can map internal chambers without destroying the structure. Experiments must be interpreted carefully because animals in laboratory settings may experience different colony sizes, predators, soils, or climates from those in nature. Combining controlled tests with field measurements helps distinguish general behavioral rules from responses specific to one setting.\n\nG\nCollective shelters can influence more than their builders. Excavation may mix soil layers, change drainage, and create spaces later used by other organisms. Accumulated organic material can alter nutrient concentrations, while discarded food or waste may support additional species. Large nesting colonies can therefore become small centers of ecological activity. The shelter is both a product of animal behavior and a modification of habitat. Understanding these structures requires researchers to connect individual decisions with physical processes and ecosystem effects rather than treating architecture as an isolated object.",
+  "questions": [
+    {
+      "idx": 1,
+      "kind": "matching_headings",
+      "prompt": "Choose the most suitable heading for paragraph B.",
+      "options": null,
+      "answer": [
+        "The temperature benefits of communal structures"
+      ],
+      "evidence": "Communal shelters can modify temperature in ways that improve survival or reduce energy use.",
+      "explanation": "The paragraph describes thermal buffering, metabolic heat, insulation, and ventilation."
+    },
+    {
+      "idx": 2,
+      "kind": "matching_headings",
+      "prompt": "Choose the most suitable heading for paragraph C.",
+      "options": null,
+      "answer": [
+        "How simple behavioral rules can create complex architecture"
+      ],
+      "evidence": "Complex structures do not always require complex instructions.",
+      "explanation": "The paragraph explains decentralized self-organization based on local cues."
+    },
+    {
+      "idx": 3,
+      "kind": "matching_headings",
+      "prompt": "Choose the most suitable heading for paragraph D.",
+      "options": null,
+      "answer": [
+        "The costs of sharing a crowded shelter"
+      ],
+      "evidence": "Sharing a shelter also creates costs.",
+      "explanation": "The paragraph discusses disease, competition, predation risk, waste, and construction costs."
+    },
+    {
+      "idx": 4,
+      "kind": "matching_headings",
+      "prompt": "Choose the most suitable heading for paragraph F.",
+      "options": null,
+      "answer": [
+        "Using experiments to understand construction behavior"
+      ],
+      "evidence": "Scientists investigate construction using field observation, laboratory colonies, sensors, imaging, and controlled experiments.",
+      "explanation": "The paragraph describes experimental and observational methods used to study collective building."
+    },
+    {
+      "idx": 5,
+      "kind": "true_false_not_given",
+      "prompt": "A communal shelter may reduce rapid changes in temperature experienced by its occupants.",
+      "options": null,
+      "answer": [
+        "TRUE"
+      ],
+      "evidence": "A large nest may warm and cool more slowly than the surrounding air, protecting occupants from rapid temperature swings.",
+      "explanation": "The passage directly describes this buffering effect."
+    },
+    {
+      "idx": 6,
+      "kind": "true_false_not_given",
+      "prompt": "Every individual builder must understand the complete final design before construction begins.",
+      "options": null,
+      "answer": [
+        "FALSE"
+      ],
+      "evidence": "No single builder necessarily possesses a complete plan of the final structure.",
+      "explanation": "The passage explicitly contradicts the claim."
+    },
+    {
+      "idx": 7,
+      "kind": "true_false_not_given",
+      "prompt": "The passage states that communal nests always contain more than one thousand animals.",
+      "options": null,
+      "answer": [
+        "NOT GIVEN"
+      ],
+      "evidence": "Some animals build shelters that are far larger or more complex than any one individual could construct alone.",
+      "explanation": "The passage discusses shared structures but provides no universal minimum number of occupants."
+    },
+    {
+      "idx": 8,
+      "kind": "multiple_choice",
+      "prompt": "What is self-organization in the context of collective building?",
+      "options": [
+        "An ordered colony-level pattern emerging from simple local behavior.",
+        "A central leader issuing detailed construction instructions.",
+        "A structure designed entirely by environmental temperature.",
+        "A building method limited to mammals."
+      ],
+      "answer": [
+        "An ordered colony-level pattern emerging from simple local behavior."
+      ],
+      "evidence": "The colony-level pattern can be highly ordered even though each individual follows relatively simple behavioral rules.",
+      "explanation": "The passage describes organized outcomes emerging from simple individual rules."
+    },
+    {
+      "idx": 9,
+      "kind": "multiple_choice",
+      "prompt": "What is one potential disadvantage of communal sheltering?",
+      "options": [
+        "Parasites may spread more easily.",
+        "All occupants lose the ability to regulate temperature.",
+        "Building materials become physically indestructible.",
+        "Predators are unable to locate colonies."
+      ],
+      "answer": [
+        "Parasites may spread more easily."
+      ],
+      "evidence": "Dense groups can make it easier for parasites and pathogens to spread between individuals.",
+      "explanation": "The passage directly identifies increased transmission as a cost."
+    },
+    {
+      "idx": 10,
+      "kind": "multiple_choice",
+      "prompt": "Why do researchers combine field measurements with controlled tests?",
+      "options": [
+        "To separate general behavioral rules from responses unique to one setting.",
+        "To ensure animals never experience natural soils.",
+        "To replace all direct observation with computer models.",
+        "To prove that laboratory colonies always behave identically to wild ones."
+      ],
+      "answer": [
+        "To separate general behavioral rules from responses unique to one setting."
+      ],
+      "evidence": "Combining controlled tests with field measurements helps distinguish general behavioral rules from responses specific to one setting.",
+      "explanation": "The passage explicitly states this purpose."
+    },
+    {
+      "idx": 11,
+      "kind": "sentence_completion",
+      "prompt": "Complete the sentence using NO MORE THAN TWO WORDS from the passage: Clustering animals can produce ______.",
+      "options": null,
+      "answer": [
+        "metabolic heat"
+      ],
+      "evidence": "Clustering animals also produce metabolic heat, which can raise internal temperatures during cold periods.",
+      "explanation": "The exact phrase is metabolic heat."
+    },
+    {
+      "idx": 12,
+      "kind": "sentence_completion",
+      "prompt": "Complete the sentence using NO MORE THAN TWO WORDS from the passage: Decentralized construction is often described as ______.",
+      "options": null,
+      "answer": [
+        "self-organization"
+      ],
+      "evidence": "This kind of decentralized process is often described as self-organization.",
+      "explanation": "The answer is taken verbatim from the passage."
+    },
+    {
+      "idx": 13,
+      "kind": "sentence_completion",
+      "prompt": "Complete the sentence using NO MORE THAN TWO WORDS from the passage: Three-dimensional scanning can map internal ______.",
+      "options": null,
+      "answer": [
+        "chambers"
+      ],
+      "evidence": "Transparent artificial nests can reveal activity that would normally be hidden underground, while three-dimensional scanning can map internal chambers without destroying the structure.",
+      "explanation": "The required word is chambers."
+    }
+  ]
+}

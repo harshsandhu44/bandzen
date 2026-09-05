@@ -1,0 +1,178 @@
+{
+  "slug": "the-science-of-bird-migration",
+  "title": "The Science of Bird Migration",
+  "topic": "animal navigation and migration",
+  "difficulty": 4,
+  "headings": [
+    "Preparing the body for a long journey",
+    "Several sources of information for navigation",
+    "How young birds can migrate without experienced guides",
+    "Why weather can transform a migration strategy",
+    "Tracking technology changes what researchers can observe",
+    "The importance of resting and refuelling sites",
+    "How migration routes remain completely unchanged",
+    "The use of ocean currents by soaring birds",
+    "Why every migratory species travels in large flocks"
+  ],
+  "body": "A\nMigration allows birds to exploit resources that vary with season, but long-distance travel requires major physiological preparation. Before departure, many species increase food intake and deposit large reserves of fat, which contains more usable energy per unit of mass than carbohydrates or protein. Some small migratory birds can substantially increase their body mass during this period. Internal organs may also change size as the demands of feeding, flight and fasting shift. These adjustments are not permanent; birds can remodel their bodies again after migration. The ability to store fuel efficiently is especially important for species that must cross deserts, seas or other regions where stopping to feed is difficult or impossible.\n\nB\nFinding the correct route involves several sources of information. Experiments suggest that migratory birds can use the position of the sun, patterns of stars, landmarks, odours and cues associated with Earth's magnetic field. Different species rely on these signals to different degrees, and an individual may switch between cues when one source becomes unreliable. A cloudy sky, for example, can obscure celestial information without eliminating magnetic information. Navigation is therefore better understood as a flexible system than as dependence on one biological compass. Researchers distinguish between knowing a direction and knowing a geographical position, because following the correct compass bearing does not necessarily tell a bird whether it has been displaced away from its normal route.\n\nC\nSome migration behaviour develops without direct instruction from experienced adults. In several species, young birds making their first journey travel separately from their parents yet still move in a seasonally appropriate direction. Experiments in captivity have shown inherited components of both migratory restlessness and directional preference. This does not mean that experience is unimportant. Older birds may follow more efficient routes, adjust timing according to local conditions or learn the locations of favourable stopping sites. Migration can therefore combine genetic programmes with learning, producing behaviour that is neither completely fixed at birth nor entirely taught by other birds.\n\nD\nWeather strongly affects the cost and safety of migration. Tailwinds can increase ground speed and reduce energy expenditure, whereas strong headwinds may delay departure or force birds to stop. Storms can push migrants far from their usual routes, sometimes carrying individuals across seas or continents. Birds do not simply respond to average seasonal climate; many make departure decisions in relation to immediate atmospheric conditions. This flexibility is particularly important for species undertaking long nonstop flights. A favourable wind at the beginning of a journey can determine whether stored fat lasts until the next suitable place to land and feed.\n\nE\nFor many migrants, the journey consists of repeated flights separated by periods of rest and refuelling. Wetlands, forests, coastal mudflats and even small urban green spaces can function as stopover sites. At these locations, birds replenish energy reserves, recover from previous flights and wait for favourable weather. Loss of habitat at a critical stopover can therefore affect populations breeding or wintering thousands of kilometres away. Conservation of migratory species often requires international cooperation because the same bird may depend on habitats in several countries during a single annual cycle. Protecting breeding grounds alone may achieve little if essential sites along the route disappear.\n\nF\nModern tracking technology has transformed migration research. Traditional metal rings provided valuable information when a marked bird was later captured or found elsewhere, but such recoveries were relatively rare. Lightweight GPS devices, satellite transmitters and miniature light-level recorders can now reveal complete or nearly complete journeys for individual birds. Researchers have discovered unexpected detours, high-altitude flights and previously unknown wintering areas. Devices still have limitations: they add weight, vary in positional accuracy and may require recapturing the bird to recover stored data. Nevertheless, tracking has shifted migration research from inference based largely on departure and arrival points toward direct observation of routes taken between them.",
+  "questions": [
+    {
+      "idx": 1,
+      "kind": "matching_headings",
+      "prompt": "Choose the most suitable heading for paragraph A.",
+      "options": null,
+      "answer": [
+        "Preparing the body for a long journey"
+      ],
+      "evidence": "Before departure, many species increase food intake and deposit large reserves of fat, which contains more usable energy per unit of mass than carbohydrates or protein.",
+      "explanation": "Paragraph A describes physiological changes that prepare birds for migration."
+    },
+    {
+      "idx": 2,
+      "kind": "matching_headings",
+      "prompt": "Choose the most suitable heading for paragraph B.",
+      "options": null,
+      "answer": [
+        "Several sources of information for navigation"
+      ],
+      "evidence": "Experiments suggest that migratory birds can use the position of the sun, patterns of stars, landmarks, odours and cues associated with Earth's magnetic field.",
+      "explanation": "The paragraph describes multiple navigational cues rather than a single compass system."
+    },
+    {
+      "idx": 3,
+      "kind": "matching_headings",
+      "prompt": "Choose the most suitable heading for paragraph C.",
+      "options": null,
+      "answer": [
+        "How young birds can migrate without experienced guides"
+      ],
+      "evidence": "In several species, young birds making their first journey travel separately from their parents yet still move in a seasonally appropriate direction.",
+      "explanation": "Paragraph C discusses inherited migration behaviour and the later contribution of experience."
+    },
+    {
+      "idx": 4,
+      "kind": "matching_headings",
+      "prompt": "Choose the most suitable heading for paragraph D.",
+      "options": null,
+      "answer": [
+        "Why weather can transform a migration strategy"
+      ],
+      "evidence": "Weather strongly affects the cost and safety of migration.",
+      "explanation": "The paragraph explains the effects of winds, storms and immediate atmospheric conditions on migration."
+    },
+    {
+      "idx": 5,
+      "kind": "true_false_not_given",
+      "prompt": "Fat provides more usable energy per unit of mass than carbohydrates or protein.",
+      "options": null,
+      "answer": [
+        "TRUE"
+      ],
+      "evidence": "Before departure, many species increase food intake and deposit large reserves of fat, which contains more usable energy per unit of mass than carbohydrates or protein.",
+      "explanation": "This is directly stated in the passage."
+    },
+    {
+      "idx": 6,
+      "kind": "true_false_not_given",
+      "prompt": "Migratory birds rely exclusively on Earth's magnetic field when the sky is cloudy.",
+      "options": null,
+      "answer": [
+        "FALSE"
+      ],
+      "evidence": "Navigation is therefore better understood as a flexible system than as dependence on one biological compass.",
+      "explanation": "The passage describes a flexible system using several cues, not exclusive dependence on magnetic information."
+    },
+    {
+      "idx": 7,
+      "kind": "true_false_not_given",
+      "prompt": "Young birds of all migratory species begin their first journey later in the day than adults.",
+      "options": null,
+      "answer": [
+        "NOT GIVEN"
+      ],
+      "evidence": "In several species, young birds making their first journey travel separately from their parents yet still move in a seasonally appropriate direction.",
+      "explanation": "The passage discusses first migrations by young birds but gives no comparison of their daily departure time with that of adults."
+    },
+    {
+      "idx": 8,
+      "kind": "multiple_choice",
+      "prompt": "Why does the passage distinguish direction from geographical position?",
+      "options": [
+        "A correct compass bearing does not necessarily reveal whether a bird has been displaced.",
+        "Birds can determine position only by following older individuals.",
+        "Magnetic information provides position but never direction.",
+        "Landmarks are useful only during the first migration."
+      ],
+      "answer": [
+        "A correct compass bearing does not necessarily reveal whether a bird has been displaced."
+      ],
+      "evidence": "Researchers distinguish between knowing a direction and knowing a geographical position, because following the correct compass bearing does not necessarily tell a bird whether it has been displaced away from its normal route.",
+      "explanation": "Direction alone does not provide full positional information."
+    },
+    {
+      "idx": 9,
+      "kind": "multiple_choice",
+      "prompt": "What can favourable winds do for a migrating bird?",
+      "options": [
+        "Reduce the energy needed to reach the next stopping place.",
+        "Eliminate the need to store fat before departure.",
+        "Prevent storms from moving birds off course.",
+        "Allow birds to navigate without sensory information."
+      ],
+      "answer": [
+        "Reduce the energy needed to reach the next stopping place."
+      ],
+      "evidence": "Tailwinds can increase ground speed and reduce energy expenditure, whereas strong headwinds may delay departure or force birds to stop.",
+      "explanation": "Tailwinds can make travel faster and energetically cheaper."
+    },
+    {
+      "idx": 10,
+      "kind": "multiple_choice",
+      "prompt": "Why can the loss of one stopover site affect birds far away?",
+      "options": [
+        "Migrants may rely on that site during journeys between distant seasonal habitats.",
+        "Stopover sites determine the genetic direction programme of young birds.",
+        "Birds use stopover sites only when tracking devices are attached.",
+        "The loss of one site permanently alters Earth's magnetic field."
+      ],
+      "answer": [
+        "Migrants may rely on that site during journeys between distant seasonal habitats."
+      ],
+      "evidence": "Loss of habitat at a critical stopover can therefore affect populations breeding or wintering thousands of kilometres away.",
+      "explanation": "Migratory populations can depend on a chain of geographically separated habitats."
+    },
+    {
+      "idx": 11,
+      "kind": "sentence_completion",
+      "prompt": "Complete the sentence using NO MORE THAN TWO WORDS from the passage: Before migration, many birds store large reserves of ______.",
+      "options": null,
+      "answer": [
+        "fat"
+      ],
+      "evidence": "Before departure, many species increase food intake and deposit large reserves of fat, which contains more usable energy per unit of mass than carbohydrates or protein.",
+      "explanation": "The answer is taken directly from the passage."
+    },
+    {
+      "idx": 12,
+      "kind": "sentence_completion",
+      "prompt": "Complete the sentence using NO MORE THAN TWO WORDS from the passage: Strong ______ may cause birds to delay departure or stop.",
+      "options": null,
+      "answer": [
+        "headwinds"
+      ],
+      "evidence": "Tailwinds can increase ground speed and reduce energy expenditure, whereas strong headwinds may delay departure or force birds to stop.",
+      "explanation": "The missing word is stated verbatim."
+    },
+    {
+      "idx": 13,
+      "kind": "sentence_completion",
+      "prompt": "Complete the sentence using NO MORE THAN THREE WORDS from the passage: Tracking has revealed some previously unknown ______ used by migrating birds.",
+      "options": null,
+      "answer": [
+        "wintering areas"
+      ],
+      "evidence": "Researchers have discovered unexpected detours, high-altitude flights and previously unknown wintering areas.",
+      "explanation": "The exact phrase 'wintering areas' appears in the passage."
+    }
+  ]
+}

@@ -1,0 +1,177 @@
+{
+  "slug": "designing-buildings-to-use-less-heating-and-cooling",
+  "title": "Designing Buildings to Use Less Heating and Cooling",
+  "topic": "building science",
+  "difficulty": 3,
+  "headings": [
+    "Reducing energy demand before adding mechanical systems",
+    "Insulation and the control of heat flow",
+    "Why unwanted air leakage wastes energy",
+    "Windows as both an opportunity and a weakness",
+    "Ventilation without throwing away useful heat",
+    "The role of orientation and shading",
+    "Why construction quality matters as much as design",
+    "Monitoring actual performance after people move in"
+  ],
+  "body": "A\nBuildings use energy not only because occupants need lighting and appliances but also because indoor conditions must be kept comfortable while outdoor temperatures change. One approach to low-energy construction is to reduce the heating or cooling demand before deciding how large the mechanical equipment should be. This means treating the building envelope as an environmental system rather than as a decorative shell. Walls, roofs, floors, windows, doors, shading devices, and ventilation pathways all affect the transfer of heat and air. When these elements are designed together, a building may maintain comfortable conditions with much smaller heating or cooling systems than a poorly insulated structure of similar size.\n\nB\nInsulation slows the flow of heat through parts of the building envelope. In cold weather, it reduces heat loss from the interior; in hot weather, it can reduce heat entering from outside. The effectiveness of insulation depends not only on its nominal rating but also on whether it is installed continuously. Gaps, compressed material, and structural elements that conduct heat easily can create thermal bridges. A metal connection passing through an insulated wall, for example, may provide a path that bypasses much of the surrounding insulation. Designers therefore examine the complete assembly rather than assuming that adding thicker insulation automatically solves every heat-loss problem.\n\nC\nAir leakage is a separate issue from heat conducted through solid materials. Small cracks around windows, service penetrations, joints, and roof connections can allow uncontrolled outdoor air to enter and conditioned indoor air to escape. In winter, this can increase heating demand; in humid climates, air leakage can also carry moisture into parts of the building where condensation may occur. Airtight construction aims to control these unintended pathways. It does not mean that occupants receive no fresh air. Instead, fresh air is supplied deliberately through a ventilation system rather than arriving unpredictably through gaps in the envelope.\n\nD\nWindows are particularly important because they admit light and solar energy while generally insulating less effectively than a well-designed wall. Multiple panes, low-emissivity coatings, insulated frames, and gas-filled cavities can reduce heat transfer. The position and size of glazing also influence seasonal energy use. Sunlight entering a window can provide useful heat in a cold season but create overheating during warmer periods. Exterior shading can block high-angle summer sun before it enters the glass, while appropriate orientation may still allow lower-angle winter sunlight where climate and site conditions make that useful.\n\nE\nA highly airtight building requires planned ventilation to remove moisture, odors, and indoor pollutants. Mechanical ventilation can supply fresh outdoor air and extract stale indoor air at controlled rates. Some systems include heat recovery, in which outgoing warm air transfers much of its heat to incoming cold air without the two air streams mixing. In hot climates, related equipment can exchange both heat and moisture under suitable conditions. Heat recovery reduces the energy penalty of ventilation, but filters, ducts, fans, and controls must be designed and maintained properly. A theoretically efficient unit cannot compensate for a badly installed distribution system.\n\nF\nDetails on drawings must survive construction. Continuous air barriers can be punctured by pipes or wiring, insulation can be left incomplete around awkward junctions, and windows can be installed with gaps around their frames. Builders therefore use techniques such as blower-door testing to measure air leakage by pressurizing or depressurizing a completed building. Thermal imaging can sometimes reveal missing insulation or unexpected heat-flow paths. These tests turn invisible defects into measurable evidence. Correcting problems during construction is usually easier than discovering them after finishes, furniture, and occupants are already in place.\n\nG\nActual energy performance still depends on how the completed building is used. Occupants may open windows, change thermostat settings, add equipment, or use rooms differently from design assumptions. Weather can also differ from the conditions used in simulations. For this reason, monitoring energy consumption and indoor temperature after occupancy can reveal a performance gap between predicted and measured results. Sensors and utility data help designers determine whether the envelope, ventilation, and mechanical systems are operating as intended. Low-energy design is therefore not a single product but a chain of decisions linking physics, detailing, construction quality, controls, maintenance, and human behavior.",
+  "questions": [
+    {
+      "idx": 1,
+      "kind": "matching_headings",
+      "prompt": "Choose the most suitable heading for paragraph B.",
+      "options": null,
+      "answer": [
+        "Insulation and the control of heat flow"
+      ],
+      "evidence": "Insulation slows the flow of heat through parts of the building envelope.",
+      "explanation": "The paragraph explains the role of insulation and the problem of thermal bridges."
+    },
+    {
+      "idx": 2,
+      "kind": "matching_headings",
+      "prompt": "Choose the most suitable heading for paragraph C.",
+      "options": null,
+      "answer": [
+        "Why unwanted air leakage wastes energy"
+      ],
+      "evidence": "Air leakage is a separate issue from heat conducted through solid materials.",
+      "explanation": "The paragraph focuses on uncontrolled air movement through cracks and joints."
+    },
+    {
+      "idx": 3,
+      "kind": "matching_headings",
+      "prompt": "Choose the most suitable heading for paragraph D.",
+      "options": null,
+      "answer": [
+        "Windows as both an opportunity and a weakness"
+      ],
+      "evidence": "Windows are particularly important because they admit light and solar energy while generally insulating less effectively than a well-designed wall.",
+      "explanation": "The paragraph explains both the benefits and thermal disadvantages of glazing."
+    },
+    {
+      "idx": 4,
+      "kind": "matching_headings",
+      "prompt": "Choose the most suitable heading for paragraph F.",
+      "options": null,
+      "answer": [
+        "Why construction quality matters as much as design"
+      ],
+      "evidence": "Details on drawings must survive construction.",
+      "explanation": "The paragraph explains how installation defects can undermine an otherwise good design."
+    },
+    {
+      "idx": 5,
+      "kind": "true_false_not_given",
+      "prompt": "Insulation can reduce heat transfer into a building during hot weather.",
+      "options": null,
+      "answer": [
+        "TRUE"
+      ],
+      "evidence": "In cold weather, it reduces heat loss from the interior; in hot weather, it can reduce heat entering from outside.",
+      "explanation": "The passage directly states that insulation can reduce inward heat flow in hot conditions."
+    },
+    {
+      "idx": 6,
+      "kind": "true_false_not_given",
+      "prompt": "Airtight construction means that a building should receive no fresh outdoor air.",
+      "options": null,
+      "answer": [
+        "FALSE"
+      ],
+      "evidence": "It does not mean that occupants receive no fresh air.",
+      "explanation": "The passage explicitly contradicts the statement."
+    },
+    {
+      "idx": 7,
+      "kind": "true_false_not_given",
+      "prompt": "The passage states that triple-glazed windows always reduce annual energy use by exactly 30 percent.",
+      "options": null,
+      "answer": [
+        "NOT GIVEN"
+      ],
+      "evidence": "Multiple panes, low-emissivity coatings, insulated frames, and gas-filled cavities can reduce heat transfer.",
+      "explanation": "The passage says several window technologies can reduce heat transfer but gives no universal percentage saving."
+    },
+    {
+      "idx": 8,
+      "kind": "multiple_choice",
+      "prompt": "What is a thermal bridge?",
+      "options": [
+        "A path that conducts heat around surrounding insulation.",
+        "A ventilation duct that supplies fresh air.",
+        "A coating that blocks visible light.",
+        "A sensor used to measure indoor temperature."
+      ],
+      "answer": [
+        "A path that conducts heat around surrounding insulation."
+      ],
+      "evidence": "A metal connection passing through an insulated wall, for example, may provide a path that bypasses much of the surrounding insulation.",
+      "explanation": "The passage describes a conductive path bypassing insulation."
+    },
+    {
+      "idx": 9,
+      "kind": "multiple_choice",
+      "prompt": "Why can exterior shading reduce cooling demand?",
+      "options": [
+        "It can block strong summer sunlight before it enters the glazing.",
+        "It increases uncontrolled air leakage.",
+        "It removes the need for all insulation.",
+        "It makes winter sunlight impossible in every orientation."
+      ],
+      "answer": [
+        "It can block strong summer sunlight before it enters the glazing."
+      ],
+      "evidence": "Exterior shading can block high-angle summer sun before it enters the glass, while appropriate orientation may still allow lower-angle winter sunlight where climate and site conditions make that useful.",
+      "explanation": "The passage identifies blocking summer solar gain before it enters the glass as the benefit."
+    },
+    {
+      "idx": 10,
+      "kind": "multiple_choice",
+      "prompt": "What does a blower-door test help measure?",
+      "options": [
+        "Air leakage.",
+        "Window color.",
+        "Annual rainfall.",
+        "Solar panel output."
+      ],
+      "answer": [
+        "Air leakage."
+      ],
+      "evidence": "Builders therefore use techniques such as blower-door testing to measure air leakage by pressurizing or depressurizing a completed building.",
+      "explanation": "The passage directly identifies air leakage as the measurement."
+    },
+    {
+      "idx": 11,
+      "kind": "sentence_completion",
+      "prompt": "Complete the sentence using NO MORE THAN TWO WORDS from the passage: Structural elements that conduct heat easily can form ______.",
+      "options": null,
+      "answer": [
+        "thermal bridges"
+      ],
+      "evidence": "Gaps, compressed material, and structural elements that conduct heat easily can create thermal bridges.",
+      "explanation": "The exact phrase is thermal bridges."
+    },
+    {
+      "idx": 12,
+      "kind": "sentence_completion",
+      "prompt": "Complete the sentence using NO MORE THAN TWO WORDS from the passage: A ventilation system can deliberately supply ______.",
+      "options": null,
+      "answer": [
+        "fresh air"
+      ],
+      "evidence": "Instead, fresh air is supplied deliberately through a ventilation system rather than arriving unpredictably through gaps in the envelope.",
+      "explanation": "The answer is lifted directly from the passage."
+    },
+    {
+      "idx": 13,
+      "kind": "sentence_completion",
+      "prompt": "Complete the sentence using NO MORE THAN TWO WORDS from the passage: Monitoring can reveal a ______ between predicted and measured performance.",
+      "options": null,
+      "answer": [
+        "performance gap"
+      ],
+      "evidence": "For this reason, monitoring energy consumption and indoor temperature after occupancy can reveal a performance gap between predicted and measured results.",
+      "explanation": "The exact phrase from the passage is performance gap."
+    }
+  ]
+}

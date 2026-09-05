@@ -1,0 +1,178 @@
+{
+  "slug": "how-container-shipping-remade-global-trade",
+  "title": "How Container Shipping Remade Global Trade",
+  "topic": "transport economics",
+  "difficulty": 3,
+  "headings": [
+    "Why break-bulk cargo made ports slow and labor-intensive",
+    "Standardization as the hidden foundation of container transport",
+    "How container terminals reshaped ports and city waterfronts",
+    "Lower handling costs and faster ship turnaround",
+    "One box moving across several transport modes",
+    "The contested reorganization of dock labor",
+    "Problems that standardized boxes did not eliminate",
+    "Why tracking systems became important for container logistics",
+    "How sealed containers can reduce some forms of cargo loss"
+  ],
+  "body": "A\nBefore standardized shipping containers, most general cargo moved as break-bulk freight. Bags, barrels, crates, machinery, and other items were carried individually or in small lots from warehouse to truck, from truck to dock, into a ship's hold, and then through the same sequence in reverse. The process demanded large gangs of workers and created many opportunities for delay, damage, and theft. Ships could spend a substantial share of a voyage waiting in port while cargo was sorted and handled. The problem was not that goods could not cross oceans; it was that every transfer between transport modes required another round of physical handling.\n\nB\nThe modern container system changed the unit being handled. Instead of moving each shipment separately at the dock, freight could be packed into a strong reusable box that remained closed through much of its journey. Early experiments used different box sizes and designs, but international standardization eventually made containers, corner fittings, cranes, ships, rail wagons, and road trailers compatible across companies and countries. Standardization was less visually dramatic than a new ship, yet it was essential. A container is valuable precisely because equipment at the next port or railway terminal can lift and secure the same box without redesigning the entire system.\n\nC\nPorts had to be rebuilt around the new method. Container terminals required large cranes, reinforced quays, storage yards, road access, and systems for tracking boxes. These investments favored ports that had enough land, capital, and transport connections to handle high volumes efficiently. Some older central-city docks lost traffic because they were cramped or poorly connected to highways and rail. New terminals often developed farther from historic waterfronts. Containerization therefore changed urban geography as well as cargo handling, shifting employment and industrial activity while freeing some former dock areas for redevelopment into offices, housing, parks, or cultural districts.\n\nD\nThe greatest economic advantage came from faster transfers and lower handling costs. A crane can move a container between ship and shore without workers unloading every carton inside it, while specialized vessels can be loaded according to carefully planned sequences. Faster turnaround lets expensive ships spend more time moving and less time at berth. The sealed box can also reduce casual pilferage and protect goods from weather, although it does not eliminate loss or damage. These savings encouraged firms to organize supply chains over longer distances because the cost and uncertainty associated with crossing a port boundary fell substantially.\n\nE\nContainerization also made intermodal transport far easier. The same box can travel by ship, rail, and truck with the cargo inside largely untouched. This does not mean every route is seamless: containers still have to be scheduled, inspected, stored, and moved through congested terminals. Yet the standardized interface allows transport operators to coordinate around a common physical unit. It also encouraged logistics companies to think about the entire journey from factory to customer rather than treating sea transport as a separate segment. Information systems later became crucial for tracking millions of boxes and matching equipment with cargo demand.\n\nF\nThe labor effects were profound and contested. Traditional dock work relied on large numbers of workers who loaded, sorted, and secured diverse cargo by hand. Container terminals required fewer workers per tonne of freight but placed greater emphasis on crane operation, vehicle movement, maintenance, planning, and information systems. In many ports, the transition produced industrial conflict over jobs, work rules, and compensation. Productivity rose sharply, but the benefits and costs were not distributed evenly. The technology did not simply remove labor; it reorganized which skills were needed, where work occurred, and how bargaining power was exercised.\n\nG\nStandard containers solved one set of problems while creating others. Global trade still faces port congestion, imbalances in the location of empty boxes, customs delays, extreme weather, accidents, and disruptions at major transport corridors. Containers can also conceal illegal or misdeclared goods, making inspection a security challenge when volumes are enormous. Even so, the standardized box remains a basic building block of modern trade because it links ships to inland transport with remarkable efficiency. Its importance lies less in the steel walls themselves than in the worldwide agreement about dimensions, handling points, equipment, procedures, and networks built around them.",
+  "questions": [
+    {
+      "idx": 1,
+      "kind": "matching_headings",
+      "prompt": "Choose the most suitable heading for paragraph B.",
+      "options": null,
+      "answer": [
+        "Standardization as the hidden foundation of container transport"
+      ],
+      "evidence": "Standardization was less visually dramatic than a new ship, yet it was essential.",
+      "explanation": "The paragraph explains that compatible dimensions, fittings and equipment made the container system work across firms and countries."
+    },
+    {
+      "idx": 2,
+      "kind": "matching_headings",
+      "prompt": "Choose the most suitable heading for paragraph C.",
+      "options": null,
+      "answer": [
+        "How container terminals reshaped ports and city waterfronts"
+      ],
+      "evidence": "Containerization therefore changed urban geography as well as cargo handling, shifting employment and industrial activity while freeing some former dock areas for redevelopment into offices, housing, parks, or cultural districts.",
+      "explanation": "The paragraph describes new terminals, declining older docks and the resulting changes in urban geography."
+    },
+    {
+      "idx": 3,
+      "kind": "matching_headings",
+      "prompt": "Choose the most suitable heading for paragraph D.",
+      "options": null,
+      "answer": [
+        "Lower handling costs and faster ship turnaround"
+      ],
+      "evidence": "The greatest economic advantage came from faster transfers and lower handling costs.",
+      "explanation": "The paragraph focuses on faster loading, reduced handling and more efficient use of ships."
+    },
+    {
+      "idx": 4,
+      "kind": "matching_headings",
+      "prompt": "Choose the most suitable heading for paragraph F.",
+      "options": null,
+      "answer": [
+        "The contested reorganization of dock labor"
+      ],
+      "evidence": "The labor effects were profound and contested.",
+      "explanation": "The paragraph explains how containerization reduced some forms of manual dock work while changing skills and industrial relations."
+    },
+    {
+      "idx": 5,
+      "kind": "true_false_not_given",
+      "prompt": "Before containerization, cargo often had to be handled again each time it moved between transport modes.",
+      "options": null,
+      "answer": [
+        "TRUE"
+      ],
+      "evidence": "The problem was not that goods could not cross oceans; it was that every transfer between transport modes required another round of physical handling.",
+      "explanation": "The passage directly states that transfers required repeated handling."
+    },
+    {
+      "idx": 6,
+      "kind": "true_false_not_given",
+      "prompt": "Containerization eliminated all damage and theft from freight transport.",
+      "options": null,
+      "answer": [
+        "FALSE"
+      ],
+      "evidence": "The sealed box can also reduce casual pilferage and protect goods from weather, although it does not eliminate loss or damage.",
+      "explanation": "The passage explicitly says that loss or damage is not eliminated."
+    },
+    {
+      "idx": 7,
+      "kind": "true_false_not_given",
+      "prompt": "The passage states that the first standardized container was exactly forty feet long.",
+      "options": null,
+      "answer": [
+        "NOT GIVEN"
+      ],
+      "evidence": "Early experiments used different box sizes and designs, but international standardization eventually made containers, corner fittings, cranes, ships, rail wagons, and road trailers compatible across companies and countries.",
+      "explanation": "The passage discusses different early sizes and later standardization but does not give the exact length of the first standardized container."
+    },
+    {
+      "idx": 8,
+      "kind": "multiple_choice",
+      "prompt": "Why did some older central-city docks lose container traffic?",
+      "options": [
+        "They lacked space or good highway and rail connections.",
+        "They had too little break-bulk cargo to justify manual handling.",
+        "Their waterfront land was already being redeveloped for housing and parks.",
+        "They were better suited to tracking empty containers than new terminals."
+      ],
+      "answer": [
+        "They lacked space or good highway and rail connections."
+      ],
+      "evidence": "Some older central-city docks lost traffic because they were cramped or poorly connected to highways and rail.",
+      "explanation": "The passage gives limited space and weak inland connections as reasons."
+    },
+    {
+      "idx": 9,
+      "kind": "multiple_choice",
+      "prompt": "What made intermodal transport easier under containerization?",
+      "options": [
+        "The same box could move by ship, rail and truck.",
+        "Every container could bypass inspection at transfer points.",
+        "Ships and trucks no longer needed compatible handling equipment.",
+        "Cargo could be repacked at each mode without affecting schedules."
+      ],
+      "answer": [
+        "The same box could move by ship, rail and truck."
+      ],
+      "evidence": "The same box can travel by ship, rail, and truck with the cargo inside largely untouched.",
+      "explanation": "The passage identifies movement of the same container across modes as the key advantage."
+    },
+    {
+      "idx": 10,
+      "kind": "multiple_choice",
+      "prompt": "What happened to labor in many container ports?",
+      "options": [
+        "Fewer workers were needed per tonne, while different skills became more important.",
+        "All dock employment disappeared immediately.",
+        "Manual sorting became more important than crane operation.",
+        "Workers no longer needed maintenance or planning skills."
+      ],
+      "answer": [
+        "Fewer workers were needed per tonne, while different skills became more important."
+      ],
+      "evidence": "Container terminals required fewer workers per tonne of freight but placed greater emphasis on crane operation, vehicle movement, maintenance, planning, and information systems.",
+      "explanation": "The passage describes both reduced labor intensity and a shift toward different skills."
+    },
+    {
+      "idx": 11,
+      "kind": "sentence_completion",
+      "prompt": "Complete the sentence using NO MORE THAN TWO WORDS from the passage: Before containers, most general cargo moved as ______ freight.",
+      "options": null,
+      "answer": [
+        "break-bulk"
+      ],
+      "evidence": "Before standardized shipping containers, most general cargo moved as break-bulk freight.",
+      "explanation": "The exact term in the passage is \"break-bulk\"."
+    },
+    {
+      "idx": 12,
+      "kind": "sentence_completion",
+      "prompt": "Complete the sentence using NO MORE THAN TWO WORDS from the passage: Container terminals required reinforced quays and large ______.",
+      "options": null,
+      "answer": [
+        "cranes"
+      ],
+      "evidence": "Container terminals required large cranes, reinforced quays, storage yards, road access, and systems for tracking boxes.",
+      "explanation": "The answer is copied directly from the passage."
+    },
+    {
+      "idx": 13,
+      "kind": "sentence_completion",
+      "prompt": "Complete the sentence using NO MORE THAN TWO WORDS from the passage: Information systems helped track millions of ______.",
+      "options": null,
+      "answer": [
+        "boxes"
+      ],
+      "evidence": "Information systems later became crucial for tracking millions of boxes and matching equipment with cargo demand.",
+      "explanation": "The exact word required is \"boxes\"."
+    }
+  ]
+}

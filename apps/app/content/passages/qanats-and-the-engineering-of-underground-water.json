@@ -1,0 +1,177 @@
+{
+  "slug": "qanats-and-the-engineering-of-underground-water",
+  "title": "Qanats and the Engineering of Underground Water",
+  "topic": "history of hydraulic engineering",
+  "difficulty": 4,
+  "headings": [
+    "Moving groundwater without mechanical pumping",
+    "How a gentle gradient keeps water flowing",
+    "Why vertical shafts were essential during construction",
+    "The advantages of keeping water underground",
+    "Maintenance as a continuing requirement",
+    "How settlements and agriculture developed around qanats",
+    "Why modern pumping can threaten traditional systems",
+    "The limits imposed by geology and groundwater recharge"
+  ],
+  "body": "A\nIn dry regions where surface water is unreliable, communities have long developed ways to reach groundwater. One of the most remarkable is the qanat, an underground channel that conveys water from an elevated aquifer toward farms or settlements at lower ground. Instead of using a mechanical pump, the system relies on gravity. A gently sloping tunnel begins near a water-bearing layer and emerges at the surface farther downhill. Water entering the tunnel then flows continuously toward the outlet. Related systems are known by different names across parts of the Middle East, North Africa, Central Asia, and beyond, reflecting centuries of adaptation to arid landscapes.\n\nB\nThe gradient of the tunnel is critical. If it is too flat, water may stagnate and sediment can accumulate; if it is too steep, fast flow can erode the channel and damage the structure. Surveyors therefore had to maintain a small but consistent downward slope over distances that could extend for many kilometres. The underground route also needed to intersect the water table at its upper end without descending so deeply that excavation became impractical. Constructing such a system required detailed knowledge of local topography and geology even before modern surveying instruments were available.\n\nC\nA line of vertical shafts usually connects the tunnel to the surface. These openings had several functions. During excavation, workers could remove spoil through the nearest shaft instead of carrying it along the entire tunnel. Shafts also provided ventilation and access for surveying, inspection, and later repairs. From the air, an old qanat may appear as a chain of circular mounds formed by material removed during digging. Excavation remained dangerous because unstable ground could collapse, and workers had to coordinate the depth and alignment of separate tunnel sections so that they eventually connected.\n\nD\nKeeping most of the water underground offers important advantages in an arid climate. A covered channel loses far less water to direct evaporation than an open canal crossing the same hot landscape. The water is also protected from some forms of surface contamination and can be delivered without fuel or external power. However, a qanat does not create water. Its long-term output depends on groundwater recharge and on the relationship between the tunnel and the changing water table. Prolonged drought or excessive pumping from nearby wells can reduce or completely stop the flow.\n\nE\nQanats require continuing maintenance because sediment accumulates and parts of the tunnel can collapse. Skilled workers periodically enter the shafts to clear obstructions, repair walls, and restore sections of channel. Maintenance can be labor-intensive and hazardous, especially in deep or unstable tunnels. Communities historically developed rules governing access to water and responsibilities for repairs because a failure upstream could affect many users downstream. The infrastructure was therefore social as well as physical: its survival depended on cooperation, local knowledge, and institutions capable of organizing work over long periods.\n\nF\nWhere reliable water emerged from a qanat, it could support gardens, fields, livestock, and domestic use in places with little dependable rainfall. Settlements sometimes developed around the outlet, and water might be distributed through smaller surface channels according to agreed schedules. The system could encourage efficient use because the available flow was limited by gravity and aquifer conditions rather than by the instantaneous capacity of a powerful pump. Yet distribution was not automatically equal. Rights to water could reflect land ownership, investment in construction, customary law, or local political power.\n\nG\nModern deep wells and electric or diesel pumps can extract groundwater much faster than a gravity-fed qanat. This can provide large short-term supplies, but it may lower the regional water table below the level of older tunnels. When that happens, a functioning qanat can dry even if its own channel remains intact. Some communities preserve or rehabilitate qanats because they require little operating energy and embody historical engineering knowledge. Their future, however, depends on groundwater management across the wider aquifer. An underground channel designed centuries ago cannot remain sustainable if modern extraction removes water faster than natural recharge replaces it.",
+  "questions": [
+    {
+      "idx": 1,
+      "kind": "matching_headings",
+      "prompt": "Choose the most suitable heading for paragraph B.",
+      "options": null,
+      "answer": [
+        "How a gentle gradient keeps water flowing"
+      ],
+      "evidence": "The gradient of the tunnel is critical.",
+      "explanation": "The paragraph explains why the tunnel slope must be carefully controlled."
+    },
+    {
+      "idx": 2,
+      "kind": "matching_headings",
+      "prompt": "Choose the most suitable heading for paragraph C.",
+      "options": null,
+      "answer": [
+        "Why vertical shafts were essential during construction"
+      ],
+      "evidence": "A line of vertical shafts usually connects the tunnel to the surface.",
+      "explanation": "The paragraph describes how shafts supported spoil removal, ventilation, surveying, access, and repair."
+    },
+    {
+      "idx": 3,
+      "kind": "matching_headings",
+      "prompt": "Choose the most suitable heading for paragraph D.",
+      "options": null,
+      "answer": [
+        "The advantages of keeping water underground"
+      ],
+      "evidence": "Keeping most of the water underground offers important advantages in an arid climate.",
+      "explanation": "The paragraph focuses on reduced evaporation, protection, and the limits imposed by groundwater availability."
+    },
+    {
+      "idx": 4,
+      "kind": "matching_headings",
+      "prompt": "Choose the most suitable heading for paragraph E.",
+      "options": null,
+      "answer": [
+        "Maintenance as a continuing requirement"
+      ],
+      "evidence": "Qanats require continuing maintenance because sediment accumulates and parts of the tunnel can collapse.",
+      "explanation": "The paragraph explains why repair and collective maintenance are essential."
+    },
+    {
+      "idx": 5,
+      "kind": "true_false_not_given",
+      "prompt": "Qanats can move water without mechanical pumps.",
+      "options": null,
+      "answer": [
+        "TRUE"
+      ],
+      "evidence": "Instead of using a mechanical pump, the system relies on gravity.",
+      "explanation": "The passage directly states that gravity replaces mechanical pumping."
+    },
+    {
+      "idx": 6,
+      "kind": "true_false_not_given",
+      "prompt": "A steeper qanat tunnel is always more efficient than a gentle one.",
+      "options": null,
+      "answer": [
+        "FALSE"
+      ],
+      "evidence": "If it is too flat, water may stagnate and sediment can accumulate; if it is too steep, fast flow can erode the channel and damage the structure.",
+      "explanation": "The passage explains that an excessively steep slope can cause damage."
+    },
+    {
+      "idx": 7,
+      "kind": "true_false_not_given",
+      "prompt": "The passage states that the longest qanat ever constructed exceeded one hundred kilometres.",
+      "options": null,
+      "answer": [
+        "NOT GIVEN"
+      ],
+      "evidence": "Surveyors therefore had to maintain a small but consistent downward slope over distances that could extend for many kilometres.",
+      "explanation": "The passage says qanats can extend for many kilometres but gives no record length."
+    },
+    {
+      "idx": 8,
+      "kind": "multiple_choice",
+      "prompt": "Why were vertical shafts useful during excavation?",
+      "options": [
+        "They allowed spoil to be removed without carrying it through the whole tunnel.",
+        "They increased evaporation from the underground channel.",
+        "They eliminated the need to align separate tunnel sections.",
+        "They pumped groundwater upward using wind power."
+      ],
+      "answer": [
+        "They allowed spoil to be removed without carrying it through the whole tunnel."
+      ],
+      "evidence": "During excavation, workers could remove spoil through the nearest shaft instead of carrying it along the entire tunnel.",
+      "explanation": "The passage explicitly gives spoil removal as one function of the shafts."
+    },
+    {
+      "idx": 9,
+      "kind": "multiple_choice",
+      "prompt": "What is one advantage of an underground qanat channel in a hot climate?",
+      "options": [
+        "Lower direct evaporation.",
+        "Unlimited groundwater production.",
+        "Automatic equality of water rights.",
+        "Complete protection from tunnel collapse."
+      ],
+      "answer": [
+        "Lower direct evaporation."
+      ],
+      "evidence": "A covered channel loses far less water to direct evaporation than an open canal crossing the same hot landscape.",
+      "explanation": "Reduced evaporation is identified directly as an advantage."
+    },
+    {
+      "idx": 10,
+      "kind": "multiple_choice",
+      "prompt": "How can modern deep wells threaten an older qanat?",
+      "options": [
+        "They can lower the water table below the tunnel.",
+        "They make gravity stop operating.",
+        "They prevent sediment from accumulating.",
+        "They always increase natural groundwater recharge."
+      ],
+      "answer": [
+        "They can lower the water table below the tunnel."
+      ],
+      "evidence": "This can provide large short-term supplies, but it may lower the regional water table below the level of older tunnels.",
+      "explanation": "The passage directly states that heavy pumping can lower groundwater beneath the qanat."
+    },
+    {
+      "idx": 11,
+      "kind": "sentence_completion",
+      "prompt": "Complete the sentence using NO MORE THAN TWO WORDS from the passage: A qanat carries water from an elevated ______.",
+      "options": null,
+      "answer": [
+        "aquifer"
+      ],
+      "evidence": "One of the most remarkable is the qanat, an underground channel that conveys water from an elevated aquifer toward farms or settlements at lower ground.",
+      "explanation": "The exact word is aquifer."
+    },
+    {
+      "idx": 12,
+      "kind": "sentence_completion",
+      "prompt": "Complete the sentence using NO MORE THAN TWO WORDS from the passage: Vertical shafts provided ventilation and access for surveying, inspection, and later ______.",
+      "options": null,
+      "answer": [
+        "repairs"
+      ],
+      "evidence": "Shafts also provided ventilation and access for surveying, inspection, and later repairs.",
+      "explanation": "The answer is taken verbatim from the passage."
+    },
+    {
+      "idx": 13,
+      "kind": "sentence_completion",
+      "prompt": "Complete the sentence using NO MORE THAN TWO WORDS from the passage: Excessive nearby pumping can stop the ______.",
+      "options": null,
+      "answer": [
+        "flow"
+      ],
+      "evidence": "Prolonged drought or excessive pumping from nearby wells can reduce or completely stop the flow.",
+      "explanation": "The required word is flow."
+    }
+  ]
+}

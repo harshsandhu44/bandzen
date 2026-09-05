@@ -1,0 +1,178 @@
+{
+  "slug": "why-some-rivers-are-being-reconnected",
+  "title": "Why Some Rivers Are Being Reconnected",
+  "topic": "river ecology and restoration",
+  "difficulty": 3,
+  "headings": [
+    "How barriers divide a river into ecological fragments",
+    "Restoring movement without removing an entire structure",
+    "The return of sediment after dam removal",
+    "Why removing a barrier can create short-term disturbance",
+    "Choosing projects by balancing ecological and social needs",
+    "The role of reservoirs in producing drinking water",
+    "Monitoring rivers after reconnection",
+    "How migratory fish navigate through the open ocean",
+    "Why every old dam should immediately be demolished"
+  ],
+  "body": "A\nRivers are naturally connected systems in which water, sediment, nutrients and organisms move over long distances. Dams, weirs and culverts interrupt that continuity. Some barriers are essential for hydropower, irrigation, water supply or flood management, while others have become obsolete. From an ecological perspective, even a relatively small structure can matter if it prevents fish and other organisms from reaching feeding, spawning or refuge habitat. Barriers can also alter the downstream transport of gravel, sand and organic material. As a result, river restoration increasingly includes efforts to improve connectivity rather than concentrating only on water quality at individual sites.\n\nB\nComplete removal is not the only way to improve passage. Where a dam must remain, engineers may construct fish ladders, bypass channels or other routes intended to help animals move around the obstacle. Their success varies widely. A passage designed for strong-swimming salmon may be unsuitable for smaller fish or species that remain close to the riverbed. Water velocity, entrance location, turbulence and seasonal flow all influence whether animals actually use the structure. Effective design therefore requires knowledge of the behaviour and swimming ability of the species that restoration is intended to help. In some cases, modifying an existing barrier can provide substantial ecological benefit while retaining its original human function.\n\nC\nWhen an obsolete dam is removed, one of the most visible changes involves sediment. Reservoirs often trap material that would otherwise travel downstream, sometimes for decades. After removal, some stored sediment may begin moving through the river again. This can rebuild gravel bars and deliver sediment to downstream habitats, but large releases can temporarily increase turbidity or cover organisms living on the riverbed. Engineers may therefore remove sediment beforehand, release it gradually or allow the river to redistribute it naturally, depending on contamination, volume and downstream conditions. Sediment management is often one of the most important practical questions in planning a dam-removal project.\n\nD\nEcological responses to reconnection are not always immediate or uniformly positive. Migratory fish may regain access to upstream habitat within a short period, while vegetation, channel shape and food webs can take much longer to adjust. Removing a structure also changes local water levels and can expose areas that were previously submerged within a reservoir. Newly exposed sediment may initially support little vegetation and can be vulnerable to erosion. Restoration teams sometimes plant native species to stabilise these surfaces, but natural colonisation may also occur. Short-term disturbance is therefore compatible with long-term ecological recovery, and a river should not necessarily be judged only by its appearance during the first months after a project.\n\nE\nDeciding whether to remove a barrier involves more than biological science. A dam may provide electricity, irrigation, recreation, cultural value or water storage, while its removal may affect bridges, property boundaries and local economies. Conversely, maintaining an ageing structure can require expensive repairs and may create safety liabilities. Restoration planners therefore compare ecological gains with social, economic and engineering consequences. Projects are especially attractive when a barrier has little remaining economic function, has high maintenance costs and blocks access to extensive upstream habitat. The best decision depends on the individual river rather than on a universal rule that all barriers are either beneficial or harmful.\n\nF\nMonitoring after reconnection is essential because predicted outcomes do not always match real ones. Scientists may track fish movement using electronic tags, survey changes in riverbed shape, measure sediment transport and record the development of vegetation. Data collected before a project provide a baseline against which later conditions can be compared. Monitoring can reveal whether fish passages need adjustment, whether unexpected erosion is occurring or whether species are using newly accessible habitat. Long-term observations are particularly valuable because some ecological changes take years to emerge. River reconnection is therefore best understood as an adaptive process in which management can be revised as evidence accumulates.",
+  "questions": [
+    {
+      "idx": 1,
+      "kind": "matching_headings",
+      "prompt": "Choose the most suitable heading for paragraph A.",
+      "options": null,
+      "answer": [
+        "How barriers divide a river into ecological fragments"
+      ],
+      "evidence": "Dams, weirs and culverts interrupt that continuity.",
+      "explanation": "Paragraph A explains how barriers disrupt the movement of organisms, sediment and other material through river systems."
+    },
+    {
+      "idx": 2,
+      "kind": "matching_headings",
+      "prompt": "Choose the most suitable heading for paragraph B.",
+      "options": null,
+      "answer": [
+        "Restoring movement without removing an entire structure"
+      ],
+      "evidence": "Complete removal is not the only way to improve passage.",
+      "explanation": "Paragraph B discusses fish ladders and bypass channels used when a barrier remains in place."
+    },
+    {
+      "idx": 3,
+      "kind": "matching_headings",
+      "prompt": "Choose the most suitable heading for paragraph C.",
+      "options": null,
+      "answer": [
+        "The return of sediment after dam removal"
+      ],
+      "evidence": "After removal, some stored sediment may begin moving through the river again.",
+      "explanation": "Paragraph C focuses on the movement and management of sediment released after a dam is removed."
+    },
+    {
+      "idx": 4,
+      "kind": "matching_headings",
+      "prompt": "Choose the most suitable heading for paragraph D.",
+      "options": null,
+      "answer": [
+        "Why removing a barrier can create short-term disturbance"
+      ],
+      "evidence": "Short-term disturbance is therefore compatible with long-term ecological recovery, and a river should not necessarily be judged only by its appearance during the first months after a project.",
+      "explanation": "The paragraph explains why temporary disruption can accompany longer-term ecological improvement."
+    },
+    {
+      "idx": 5,
+      "kind": "true_false_not_given",
+      "prompt": "Small river barriers can prevent organisms from reaching important habitat.",
+      "options": null,
+      "answer": [
+        "TRUE"
+      ],
+      "evidence": "From an ecological perspective, even a relatively small structure can matter if it prevents fish and other organisms from reaching feeding, spawning or refuge habitat.",
+      "explanation": "The statement is directly supported by the passage."
+    },
+    {
+      "idx": 6,
+      "kind": "true_false_not_given",
+      "prompt": "A fish passage suitable for salmon will necessarily work for smaller species.",
+      "options": null,
+      "answer": [
+        "FALSE"
+      ],
+      "evidence": "A passage designed for strong-swimming salmon may be unsuitable for smaller fish or species that remain close to the riverbed.",
+      "explanation": "The passage explicitly says a design suitable for salmon may not suit smaller fish."
+    },
+    {
+      "idx": 7,
+      "kind": "true_false_not_given",
+      "prompt": "Fish ladders cost less to build than bypass channels in most countries.",
+      "options": null,
+      "answer": [
+        "NOT GIVEN"
+      ],
+      "evidence": "Where a dam must remain, engineers may construct fish ladders, bypass channels or other routes intended to help animals move around the obstacle.",
+      "explanation": "The passage lists fish ladders and bypass channels but does not compare their construction costs."
+    },
+    {
+      "idx": 8,
+      "kind": "multiple_choice",
+      "prompt": "What can happen when sediment stored behind a dam is released?",
+      "options": [
+        "It may temporarily make the water more turbid.",
+        "It permanently prevents gravel bars from forming.",
+        "It stops all downstream erosion.",
+        "It immediately restores vegetation on exposed surfaces."
+      ],
+      "answer": [
+        "It may temporarily make the water more turbid."
+      ],
+      "evidence": "This can rebuild gravel bars and deliver sediment to downstream habitats, but large releases can temporarily increase turbidity or cover organisms living on the riverbed.",
+      "explanation": "The passage identifies increased turbidity as one possible short-term effect."
+    },
+    {
+      "idx": 9,
+      "kind": "multiple_choice",
+      "prompt": "Why may a river look disturbed soon after a dam is removed?",
+      "options": [
+        "Previously submerged areas can become exposed and vulnerable to erosion.",
+        "All migratory fish leave the river permanently.",
+        "Fish passages immediately become blocked by vegetation.",
+        "The river stops transporting sediment downstream."
+      ],
+      "answer": [
+        "Previously submerged areas can become exposed and vulnerable to erosion."
+      ],
+      "evidence": "Removing a structure also changes local water levels and can expose areas that were previously submerged within a reservoir.",
+      "explanation": "The newly exposed areas can initially look bare and unstable as the ecosystem adjusts."
+    },
+    {
+      "idx": 10,
+      "kind": "multiple_choice",
+      "prompt": "When is barrier removal described as particularly attractive?",
+      "options": [
+        "When a dam has little remaining economic use and blocks extensive habitat.",
+        "Whenever a dam produces hydroelectricity for a large city.",
+        "When the river contains no migratory species.",
+        "Whenever a reservoir has accumulated any sediment."
+      ],
+      "answer": [
+        "When a dam has little remaining economic use and blocks extensive habitat."
+      ],
+      "evidence": "Projects are especially attractive when a barrier has little remaining economic function, has high maintenance costs and blocks access to extensive upstream habitat.",
+      "explanation": "The passage gives this specific combination of factors as making removal especially attractive."
+    },
+    {
+      "idx": 11,
+      "kind": "sentence_completion",
+      "prompt": "Complete the sentence using NO MORE THAN TWO WORDS from the passage: Rivers transport water, nutrients, organisms and ______ over long distances.",
+      "options": null,
+      "answer": [
+        "sediment"
+      ],
+      "evidence": "Rivers are naturally connected systems in which water, sediment, nutrients and organisms move over long distances.",
+      "explanation": "The missing noun is copied directly from the passage."
+    },
+    {
+      "idx": 12,
+      "kind": "sentence_completion",
+      "prompt": "Complete the sentence using NO MORE THAN TWO WORDS from the passage: One possible response to newly exposed sediment is to plant ______.",
+      "options": null,
+      "answer": [
+        "native species"
+      ],
+      "evidence": "Restoration teams sometimes plant native species to stabilise these surfaces, but natural colonisation may also occur.",
+      "explanation": "The phrase appears verbatim in the passage."
+    },
+    {
+      "idx": 13,
+      "kind": "sentence_completion",
+      "prompt": "Complete the sentence using NO MORE THAN TWO WORDS from the passage: Measurements taken before a project provide a ______ for later comparison.",
+      "options": null,
+      "answer": [
+        "baseline"
+      ],
+      "evidence": "Data collected before a project provide a baseline against which later conditions can be compared.",
+      "explanation": "The answer is the exact term used in the passage."
+    }
+  ]
+}

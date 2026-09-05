@@ -1,0 +1,177 @@
+{
+  "slug": "how-antibiotic-resistance-moves-through-wastewater",
+  "title": "How Antibiotic Resistance Moves Through Wastewater",
+  "topic": "environmental microbiology",
+  "difficulty": 5,
+  "headings": [
+    "Why wastewater collects resistant bacteria and resistance genes",
+    "Treatment removes many microbes but not every genetic signal",
+    "How bacteria can exchange resistance traits",
+    "Why measuring resistance is technically difficult",
+    "The importance of antibiotic residues and other selective pressures",
+    "Routes from treated wastewater into the wider environment",
+    "Reducing risk through multiple interventions",
+    "Why environmental detection does not equal human infection"
+  ],
+  "body": "A\nWastewater brings together microorganisms and chemicals from homes, hospitals, industries, farms, and other sources. Among the bacteria entering sewers, some may already be resistant to one or more antibiotics, while free fragments of DNA can carry genes associated with resistance. Wastewater treatment plants were designed primarily to remove organic matter, nutrients, suspended solids, and disease-causing organisms rather than to eliminate every resistance gene. They nevertheless become important places for studying antimicrobial resistance because large and diverse microbial populations pass through the same system under changing chemical and physical conditions.\n\nB\nConventional treatment removes a substantial proportion of bacteria through settling, biological treatment, filtration, disinfection, or combinations of these processes. However, complete removal is difficult. Some living bacteria may remain in treated effluent, and DNA released from dead cells can persist for varying periods. Different treatment technologies also perform differently under different operating conditions. A reduction in the number of resistant bacteria does not necessarily produce the same reduction in every resistance gene. Researchers therefore examine both viable organisms and genetic material when assessing how treatment changes the resistance profile of wastewater.\n\nC\nBacteria can acquire resistance through mutation, but they can also receive genetic material from other bacteria. This process, known collectively as horizontal gene transfer, can occur through several mechanisms. Plasmids are small DNA molecules that may move between cells and sometimes carry multiple resistance genes. Viruses that infect bacteria can transfer genetic material, and some bacteria can take up DNA directly from their surroundings. The presence of a resistance gene does not guarantee that it will transfer successfully or be expressed in a new host. Even so, mobile genetic elements are important because they can connect resistance traits with bacterial populations that were not originally exposed to the same antibiotic.\n\nD\nAntibiotic residues entering wastewater may create selective pressure when concentrations are high enough to disadvantage susceptible bacteria while allowing resistant organisms to survive more successfully. Other chemicals, including some metals and disinfectants, may also influence microbial communities or select for genetic elements carrying several protective traits. The relationships are complex because concentrations vary across plants and over time, and laboratory effects do not always predict what happens in full-scale treatment systems. Researchers therefore avoid assuming that every detected chemical automatically increases resistance in the same way.\n\nE\nMeasuring environmental resistance presents technical challenges. Scientists may culture bacteria on laboratory media containing antibiotics, but many environmental organisms do not grow readily under standard laboratory conditions. DNA-based techniques can detect particular genes without culturing the organisms that contain them, yet detecting a gene does not reveal whether it is expressed or whether the host bacterium is alive. Metagenomic sequencing can survey large numbers of genes at once, but interpretation requires substantial computation and careful control for contamination. Results from different studies may also be difficult to compare when sampling, extraction, and reporting methods differ.\n\nF\nAfter treatment, effluent may enter rivers, lakes, coastal waters, or soils through irrigation and reuse. Resistant bacteria or genes can therefore mix with environmental microbial communities. Sludge produced during treatment may also contain resistance determinants and can reach soils if processed biosolids are applied to land. Environmental detection, however, is not the same as demonstrating a direct human health outcome. For a detected resistance gene to contribute to disease, several additional steps may be required, such as transfer into a relevant pathogen, survival, human exposure, and successful infection. Understanding those pathways is a major research challenge.\n\nG\nReducing environmental antimicrobial resistance requires action at more than one point in the system. Responsible antibiotic use in medicine and agriculture can reduce the selective pressure that produces and maintains resistant populations before they reach wastewater. Hospitals and industries may need targeted controls for concentrated waste streams. Treatment plants can improve removal through optimized biological processes, filtration, advanced oxidation, ultraviolet disinfection, or other technologies where appropriate. Surveillance can track trends and identify unusual changes. No single treatment step can solve the wider problem because resistance arises from connected human, animal, industrial, and environmental systems.",
+  "questions": [
+    {
+      "idx": 1,
+      "kind": "matching_headings",
+      "prompt": "Choose the most suitable heading for paragraph B.",
+      "options": null,
+      "answer": [
+        "Treatment removes many microbes but not every genetic signal"
+      ],
+      "evidence": "Conventional treatment removes a substantial proportion of bacteria through settling, biological treatment, filtration, disinfection, or combinations of these processes.",
+      "explanation": "The paragraph explains that treatment reduces bacteria but does not necessarily remove all cells or resistance genes."
+    },
+    {
+      "idx": 2,
+      "kind": "matching_headings",
+      "prompt": "Choose the most suitable heading for paragraph C.",
+      "options": null,
+      "answer": [
+        "How bacteria can exchange resistance traits"
+      ],
+      "evidence": "Bacteria can acquire resistance through mutation, but they can also receive genetic material from other bacteria.",
+      "explanation": "The paragraph explains horizontal gene transfer and several mechanisms by which resistance genes can move."
+    },
+    {
+      "idx": 3,
+      "kind": "matching_headings",
+      "prompt": "Choose the most suitable heading for paragraph E.",
+      "options": null,
+      "answer": [
+        "Why measuring resistance is technically difficult"
+      ],
+      "evidence": "Measuring environmental resistance presents technical challenges.",
+      "explanation": "The paragraph compares culture, DNA-based methods, and sequencing while describing their limitations."
+    },
+    {
+      "idx": 4,
+      "kind": "matching_headings",
+      "prompt": "Choose the most suitable heading for paragraph F.",
+      "options": null,
+      "answer": [
+        "Why environmental detection does not equal human infection"
+      ],
+      "evidence": "Environmental detection, however, is not the same as demonstrating a direct human health outcome.",
+      "explanation": "The paragraph explains the additional steps required before environmental resistance contributes to disease."
+    },
+    {
+      "idx": 5,
+      "kind": "true_false_not_given",
+      "prompt": "Wastewater treatment plants were originally designed to remove every antibiotic resistance gene.",
+      "options": null,
+      "answer": [
+        "FALSE"
+      ],
+      "evidence": "Wastewater treatment plants were designed primarily to remove organic matter, nutrients, suspended solids, and disease-causing organisms rather than to eliminate every resistance gene.",
+      "explanation": "The passage explicitly states that removing every resistance gene was not their primary design purpose."
+    },
+    {
+      "idx": 6,
+      "kind": "true_false_not_given",
+      "prompt": "DNA from dead bacterial cells can sometimes remain after treatment.",
+      "options": null,
+      "answer": [
+        "TRUE"
+      ],
+      "evidence": "Some living bacteria may remain in treated effluent, and DNA released from dead cells can persist for varying periods.",
+      "explanation": "The passage directly states that DNA from dead cells can persist."
+    },
+    {
+      "idx": 7,
+      "kind": "true_false_not_given",
+      "prompt": "The passage states that resistance genes detected in rivers cause exactly ten percent of all human infections.",
+      "options": null,
+      "answer": [
+        "NOT GIVEN"
+      ],
+      "evidence": "Environmental detection, however, is not the same as demonstrating a direct human health outcome.",
+      "explanation": "The passage discusses uncertainty between environmental detection and infection but gives no percentage of human infections."
+    },
+    {
+      "idx": 8,
+      "kind": "multiple_choice",
+      "prompt": "What are plasmids?",
+      "options": [
+        "Small DNA molecules that may move between bacterial cells.",
+        "Antibiotics produced only in wastewater plants.",
+        "Filters that remove suspended solids.",
+        "Human cells used to measure infection."
+      ],
+      "answer": [
+        "Small DNA molecules that may move between bacterial cells."
+      ],
+      "evidence": "Plasmids are small DNA molecules that may move between cells and sometimes carry multiple resistance genes.",
+      "explanation": "The passage directly defines plasmids."
+    },
+    {
+      "idx": 9,
+      "kind": "multiple_choice",
+      "prompt": "What is one limitation of DNA-based detection methods?",
+      "options": [
+        "They may detect a gene without showing whether its host is alive.",
+        "They can measure only organisms that grow on laboratory media.",
+        "They cannot identify any resistance genes.",
+        "They automatically prove that a human infection will occur."
+      ],
+      "answer": [
+        "They may detect a gene without showing whether its host is alive."
+      ],
+      "evidence": "DNA-based techniques can detect particular genes without culturing the organisms that contain them, yet detecting a gene does not reveal whether it is expressed or whether the host bacterium is alive.",
+      "explanation": "The passage states that gene detection alone does not establish whether the host is living or expressing the gene."
+    },
+    {
+      "idx": 10,
+      "kind": "multiple_choice",
+      "prompt": "Why is no single wastewater treatment step sufficient to solve antimicrobial resistance?",
+      "options": [
+        "Resistance emerges across connected human, animal, industrial, and environmental systems.",
+        "Wastewater plants contain no bacteria.",
+        "All resistance is caused only by ultraviolet light.",
+        "Treatment technologies cannot remove any microbes."
+      ],
+      "answer": [
+        "Resistance emerges across connected human, animal, industrial, and environmental systems."
+      ],
+      "evidence": "No single treatment step can solve the wider problem because resistance arises from connected human, animal, industrial, and environmental systems.",
+      "explanation": "The final paragraph directly gives this reason."
+    },
+    {
+      "idx": 11,
+      "kind": "sentence_completion",
+      "prompt": "Complete the sentence using NO MORE THAN THREE WORDS from the passage: Transfer of genetic material between bacteria is known collectively as ______.",
+      "options": null,
+      "answer": [
+        "horizontal gene transfer"
+      ],
+      "evidence": "This process, known collectively as horizontal gene transfer, can occur through several mechanisms.",
+      "explanation": "The answer is copied verbatim from the passage."
+    },
+    {
+      "idx": 12,
+      "kind": "sentence_completion",
+      "prompt": "Complete the sentence using NO MORE THAN TWO WORDS from the passage: Antibiotic residues may create ______ in wastewater.",
+      "options": null,
+      "answer": [
+        "selective pressure"
+      ],
+      "evidence": "Antibiotic residues entering wastewater may create selective pressure when concentrations are high enough to disadvantage susceptible bacteria while allowing resistant organisms to survive more successfully.",
+      "explanation": "The exact phrase is selective pressure."
+    },
+    {
+      "idx": 13,
+      "kind": "sentence_completion",
+      "prompt": "Complete the sentence using NO MORE THAN TWO WORDS from the passage: Processed ______ may carry resistance determinants into soils.",
+      "options": null,
+      "answer": [
+        "biosolids"
+      ],
+      "evidence": "Sludge produced during treatment may also contain resistance determinants and can reach soils if processed biosolids are applied to land.",
+      "explanation": "The required word appears directly in the passage."
+    }
+  ]
+}

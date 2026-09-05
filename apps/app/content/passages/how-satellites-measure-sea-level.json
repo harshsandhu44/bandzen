@@ -1,0 +1,178 @@
+{
+  "slug": "how-satellites-measure-sea-level",
+  "title": "How Satellites Measure Sea Level",
+  "topic": "earth observation",
+  "difficulty": 4,
+  "headings": [
+    "Turning radar travel time into sea-surface height",
+    "Corrections required before altimeter data can be trusted",
+    "Why global rise produces different regional outcomes",
+    "Maintaining consistency across successive satellite missions",
+    "Why tide gauges still matter in the satellite era",
+    "Combining altimetry with measurements of sea-level causes",
+    "The difficulty of defining what sea level is measured against",
+    "How land subsidence can amplify coastal sea-level rise",
+    "Why several independent observing systems increase confidence"
+  ],
+  "body": "A\nMeasuring the height of the ocean sounds simple until the reference point is defined. Sea level changes with tides, waves, air pressure, winds, ocean currents, temperature, salinity, and the movement of the land itself. Traditional tide gauges measure water relative to a fixed point on the coast, which is extremely useful locally but cannot by itself separate ocean change from land rising or sinking beneath the instrument. Satellite radar altimetry added a different view by measuring the sea surface over most of the open ocean. The method transformed sea-level science because repeated global measurements could be compared within a consistent observing system.\n\nB\nA radar altimeter sends a short microwave pulse toward the ocean and measures the time taken for the echo to return. Because electromagnetic waves travel at a known speed, the travel time can be converted into the distance between the satellite and the sea surface. That distance alone is not sea level. Scientists also need the satellite's precise position relative to a reference shape of Earth, derived from careful orbit determination. Subtracting the measured ocean distance from the satellite altitude gives an estimate of sea-surface height. Repeating this calculation along many orbital tracks builds a map that can be compared from one cycle to the next.\n\nC\nThe raw measurement needs numerous corrections before it is scientifically useful. Water vapor and dry gases in the atmosphere alter the radar signal's travel time, while electrons in the ionosphere produce another delay. Waves affect the shape of the returning pulse, and tides move the sea surface by amounts far larger than the long-term trend researchers are trying to detect. Atmospheric pressure and wind can also push water around. Instruments aboard the satellite and models based on weather and ocean data are used to estimate these effects. Sea-level records are therefore products of measurement plus correction, not untouched readings from a single sensor.\n\nD\nSatellite altimetry revealed that global mean sea level is rising, but the ocean does not rise uniformly everywhere. Regional patterns are created by winds, currents, uneven heating, changes in salinity, and shifts in Earth's gravity field associated with moving ice and water. A place can therefore experience a trend above or below the global average for years or decades. Coastal impacts depend on relative sea level, which also includes vertical land motion. Land subsidence from groundwater withdrawal or sediment compaction can amplify the rise experienced locally, while geological uplift can partly offset it.\n\nE\nTo estimate a global mean, researchers combine measurements across huge areas and account for differences among satellite missions. Successive altimetry satellites have overlapping operating periods so that their measurements can be compared and biases can be identified. Stable reference frames and precise orbit calculations are essential because a small error in satellite height can resemble a change in the ocean. Scientists also examine whether instrumental behavior changes over time. The objective is a climate-quality record in which apparent trends are not artifacts of switching spacecraft, drifting sensors, or changing analysis methods.\n\nF\nTide gauges remain important in the satellite era. Where a satellite track passes near a well-maintained gauge, the two observing systems can be compared, especially after vertical land motion is considered. Networks of coastal gauges provide long records that began many decades before satellite altimetry and offer direct evidence of what communities experience at shorelines. Global navigation satellite system receivers installed near gauges can measure whether the land itself is moving. Combining these observations helps researchers connect the broad oceanic picture from space with local relative sea-level change at the coast.\n\nG\nSea-level rise has more than one physical cause, so altimetry is often combined with other measurements. Warmer seawater expands, adding to ocean volume through thermal expansion. Melting glaciers and ice sheets transfer water stored on land into the ocean. Satellite gravity missions can estimate changes in the mass of ice and water, while arrays of profiling floats measure temperature and salinity through the upper ocean. When these independent observations are brought together, scientists can test whether the measured rise is consistent with its expected components. Agreement among different methods strengthens confidence because each observing system has different sources of error. This cross-checking is especially important for detecting slow trends over decades.",
+  "questions": [
+    {
+      "idx": 1,
+      "kind": "matching_headings",
+      "prompt": "Choose the most suitable heading for paragraph B.",
+      "options": null,
+      "answer": [
+        "Turning radar travel time into sea-surface height"
+      ],
+      "evidence": "A radar altimeter sends a short microwave pulse toward the ocean and measures the time taken for the echo to return.",
+      "explanation": "The paragraph explains how travel time, satellite altitude and orbit position are combined to estimate sea-surface height."
+    },
+    {
+      "idx": 2,
+      "kind": "matching_headings",
+      "prompt": "Choose the most suitable heading for paragraph C.",
+      "options": null,
+      "answer": [
+        "Corrections required before altimeter data can be trusted"
+      ],
+      "evidence": "The raw measurement needs numerous corrections before it is scientifically useful.",
+      "explanation": "The paragraph lists atmospheric, ionospheric, wave, tide, pressure and wind effects that must be corrected."
+    },
+    {
+      "idx": 3,
+      "kind": "matching_headings",
+      "prompt": "Choose the most suitable heading for paragraph D.",
+      "options": null,
+      "answer": [
+        "Why global rise produces different regional outcomes"
+      ],
+      "evidence": "Satellite altimetry revealed that global mean sea level is rising, but the ocean does not rise uniformly everywhere.",
+      "explanation": "The paragraph explains regional patterns and the role of local vertical land motion."
+    },
+    {
+      "idx": 4,
+      "kind": "matching_headings",
+      "prompt": "Choose the most suitable heading for paragraph F.",
+      "options": null,
+      "answer": [
+        "Why tide gauges still matter in the satellite era"
+      ],
+      "evidence": "Tide gauges remain important in the satellite era.",
+      "explanation": "The paragraph explains how coastal gauges complement satellite observations and provide longer local records."
+    },
+    {
+      "idx": 5,
+      "kind": "true_false_not_given",
+      "prompt": "A tide gauge by itself cannot distinguish ocean change from vertical movement of the land beneath it.",
+      "options": null,
+      "answer": [
+        "TRUE"
+      ],
+      "evidence": "Traditional tide gauges measure water relative to a fixed point on the coast, which is extremely useful locally but cannot by itself separate ocean change from land rising or sinking beneath the instrument.",
+      "explanation": "The passage directly states this limitation of tide gauges."
+    },
+    {
+      "idx": 6,
+      "kind": "true_false_not_given",
+      "prompt": "Sea level rises by exactly the same amount in every ocean region.",
+      "options": null,
+      "answer": [
+        "FALSE"
+      ],
+      "evidence": "Satellite altimetry revealed that global mean sea level is rising, but the ocean does not rise uniformly everywhere.",
+      "explanation": "The passage explicitly says the rise is not spatially uniform."
+    },
+    {
+      "idx": 7,
+      "kind": "true_false_not_given",
+      "prompt": "The passage states that every altimetry satellite follows precisely the same orbital track.",
+      "options": null,
+      "answer": [
+        "NOT GIVEN"
+      ],
+      "evidence": "Successive altimetry satellites have overlapping operating periods so that their measurements can be compared and biases can be identified.",
+      "explanation": "The passage discusses overlapping missions but does not state that all satellites use exactly the same orbital track."
+    },
+    {
+      "idx": 8,
+      "kind": "multiple_choice",
+      "prompt": "What additional information is needed besides the radar-measured distance to the ocean?",
+      "options": [
+        "The satellite's precise position relative to a reference shape of Earth.",
+        "The local tide correction applied to the radar measurement.",
+        "The atmospheric pressure over the measured ocean area.",
+        "The vertical land motion recorded by a nearby coastal gauge."
+      ],
+      "answer": [
+        "The satellite's precise position relative to a reference shape of Earth."
+      ],
+      "evidence": "Scientists also need the satellite's precise position relative to a reference shape of Earth, derived from careful orbit determination.",
+      "explanation": "The passage says precise orbit position is necessary to convert range into sea-surface height."
+    },
+    {
+      "idx": 9,
+      "kind": "multiple_choice",
+      "prompt": "Which factor can make local relative sea-level rise greater than the global average?",
+      "options": [
+        "Land subsidence.",
+        "Geological uplift.",
+        "Reduced radar pulse speed in a vacuum.",
+        "Fewer tide gauges."
+      ],
+      "answer": [
+        "Land subsidence."
+      ],
+      "evidence": "Land subsidence from groundwater withdrawal or sediment compaction can amplify the rise experienced locally, while geological uplift can partly offset it.",
+      "explanation": "The passage identifies subsidence as a process that can amplify local relative rise."
+    },
+    {
+      "idx": 10,
+      "kind": "multiple_choice",
+      "prompt": "Why are overlapping periods between satellite missions useful?",
+      "options": [
+        "They allow measurements to be compared and biases identified.",
+        "They prevent tides from occurring during observations.",
+        "They eliminate the need for orbit calculations.",
+        "They make all regional sea-level trends identical."
+      ],
+      "answer": [
+        "They allow measurements to be compared and biases identified."
+      ],
+      "evidence": "Successive altimetry satellites have overlapping operating periods so that their measurements can be compared and biases can be identified.",
+      "explanation": "The passage gives comparison and bias detection as the purpose of overlap."
+    },
+    {
+      "idx": 11,
+      "kind": "sentence_completion",
+      "prompt": "Complete the sentence using NO MORE THAN TWO WORDS from the passage: Water vapor and dry gases alter the radar signal's ______.",
+      "options": null,
+      "answer": [
+        "travel time"
+      ],
+      "evidence": "Water vapor and dry gases in the atmosphere alter the radar signal's travel time, while electrons in the ionosphere produce another delay.",
+      "explanation": "The exact phrase is \"travel time\"."
+    },
+    {
+      "idx": 12,
+      "kind": "sentence_completion",
+      "prompt": "Complete the sentence using NO MORE THAN TWO WORDS from the passage: Groundwater withdrawal can contribute to land ______.",
+      "options": null,
+      "answer": [
+        "subsidence"
+      ],
+      "evidence": "Land subsidence from groundwater withdrawal or sediment compaction can amplify the rise experienced locally, while geological uplift can partly offset it.",
+      "explanation": "The required word appears verbatim in the passage."
+    },
+    {
+      "idx": 13,
+      "kind": "sentence_completion",
+      "prompt": "Complete the sentence using NO MORE THAN TWO WORDS from the passage: Warming seawater increases ocean volume through ______.",
+      "options": null,
+      "answer": [
+        "thermal expansion"
+      ],
+      "evidence": "Warmer seawater expands, adding to ocean volume through thermal expansion.",
+      "explanation": "The answer is the exact two-word phrase used in the passage."
+    }
+  ]
+}

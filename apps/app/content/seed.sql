@@ -3,6 +3,448 @@
 
 begin;
 
+-- Designing Buildings to Use Less Heating and Cooling
+insert into public.passages (slug, title, body, topic, headings, difficulty)
+values ('designing-buildings-to-use-less-heating-and-cooling', 'Designing Buildings to Use Less Heating and Cooling', 'A
+Buildings use energy not only because occupants need lighting and appliances but also because indoor conditions must be kept comfortable while outdoor temperatures change. One approach to low-energy construction is to reduce the heating or cooling demand before deciding how large the mechanical equipment should be. This means treating the building envelope as an environmental system rather than as a decorative shell. Walls, roofs, floors, windows, doors, shading devices, and ventilation pathways all affect the transfer of heat and air. When these elements are designed together, a building may maintain comfortable conditions with much smaller heating or cooling systems than a poorly insulated structure of similar size.
+
+B
+Insulation slows the flow of heat through parts of the building envelope. In cold weather, it reduces heat loss from the interior; in hot weather, it can reduce heat entering from outside. The effectiveness of insulation depends not only on its nominal rating but also on whether it is installed continuously. Gaps, compressed material, and structural elements that conduct heat easily can create thermal bridges. A metal connection passing through an insulated wall, for example, may provide a path that bypasses much of the surrounding insulation. Designers therefore examine the complete assembly rather than assuming that adding thicker insulation automatically solves every heat-loss problem.
+
+C
+Air leakage is a separate issue from heat conducted through solid materials. Small cracks around windows, service penetrations, joints, and roof connections can allow uncontrolled outdoor air to enter and conditioned indoor air to escape. In winter, this can increase heating demand; in humid climates, air leakage can also carry moisture into parts of the building where condensation may occur. Airtight construction aims to control these unintended pathways. It does not mean that occupants receive no fresh air. Instead, fresh air is supplied deliberately through a ventilation system rather than arriving unpredictably through gaps in the envelope.
+
+D
+Windows are particularly important because they admit light and solar energy while generally insulating less effectively than a well-designed wall. Multiple panes, low-emissivity coatings, insulated frames, and gas-filled cavities can reduce heat transfer. The position and size of glazing also influence seasonal energy use. Sunlight entering a window can provide useful heat in a cold season but create overheating during warmer periods. Exterior shading can block high-angle summer sun before it enters the glass, while appropriate orientation may still allow lower-angle winter sunlight where climate and site conditions make that useful.
+
+E
+A highly airtight building requires planned ventilation to remove moisture, odors, and indoor pollutants. Mechanical ventilation can supply fresh outdoor air and extract stale indoor air at controlled rates. Some systems include heat recovery, in which outgoing warm air transfers much of its heat to incoming cold air without the two air streams mixing. In hot climates, related equipment can exchange both heat and moisture under suitable conditions. Heat recovery reduces the energy penalty of ventilation, but filters, ducts, fans, and controls must be designed and maintained properly. A theoretically efficient unit cannot compensate for a badly installed distribution system.
+
+F
+Details on drawings must survive construction. Continuous air barriers can be punctured by pipes or wiring, insulation can be left incomplete around awkward junctions, and windows can be installed with gaps around their frames. Builders therefore use techniques such as blower-door testing to measure air leakage by pressurizing or depressurizing a completed building. Thermal imaging can sometimes reveal missing insulation or unexpected heat-flow paths. These tests turn invisible defects into measurable evidence. Correcting problems during construction is usually easier than discovering them after finishes, furniture, and occupants are already in place.
+
+G
+Actual energy performance still depends on how the completed building is used. Occupants may open windows, change thermostat settings, add equipment, or use rooms differently from design assumptions. Weather can also differ from the conditions used in simulations. For this reason, monitoring energy consumption and indoor temperature after occupancy can reveal a performance gap between predicted and measured results. Sensors and utility data help designers determine whether the envelope, ventilation, and mechanical systems are operating as intended. Low-energy design is therefore not a single product but a chain of decisions linking physics, detailing, construction quality, controls, maintenance, and human behavior.', 'building science', '["Reducing energy demand before adding mechanical systems","Insulation and the control of heat flow","Why unwanted air leakage wastes energy","Windows as both an opportunity and a weakness","Ventilation without throwing away useful heat","The role of orientation and shading","Why construction quality matters as much as design","Monitoring actual performance after people move in"]'::jsonb, 3)
+on conflict (slug) do update set
+  title = excluded.title, body = excluded.body, topic = excluded.topic,
+  headings = excluded.headings, difficulty = excluded.difficulty;
+
+with p as (select id from public.passages where slug = 'designing-buildings-to-use-less-heating-and-cooling'),
+     q as (
+       insert into public.questions (passage_id, idx, kind, prompt, options, evidence, explanation)
+       select p.id, 1, 'matching_headings'::public.question_kind, 'Choose the most suitable heading for paragraph B.',
+              null, 'Insulation slows the flow of heat through parts of the building envelope.', 'The paragraph explains the role of insulation and the problem of thermal bridges.'
+       from p
+       on conflict (passage_id, idx) do update set
+         kind = excluded.kind, prompt = excluded.prompt, options = excluded.options,
+         evidence = excluded.evidence, explanation = excluded.explanation
+       returning id
+     )
+insert into public.question_answers (question_id, answer)
+select q.id, '["Insulation and the control of heat flow"]'::jsonb from q
+on conflict (question_id) do update set answer = excluded.answer;
+
+with p as (select id from public.passages where slug = 'designing-buildings-to-use-less-heating-and-cooling'),
+     q as (
+       insert into public.questions (passage_id, idx, kind, prompt, options, evidence, explanation)
+       select p.id, 2, 'matching_headings'::public.question_kind, 'Choose the most suitable heading for paragraph C.',
+              null, 'Air leakage is a separate issue from heat conducted through solid materials.', 'The paragraph focuses on uncontrolled air movement through cracks and joints.'
+       from p
+       on conflict (passage_id, idx) do update set
+         kind = excluded.kind, prompt = excluded.prompt, options = excluded.options,
+         evidence = excluded.evidence, explanation = excluded.explanation
+       returning id
+     )
+insert into public.question_answers (question_id, answer)
+select q.id, '["Why unwanted air leakage wastes energy"]'::jsonb from q
+on conflict (question_id) do update set answer = excluded.answer;
+
+with p as (select id from public.passages where slug = 'designing-buildings-to-use-less-heating-and-cooling'),
+     q as (
+       insert into public.questions (passage_id, idx, kind, prompt, options, evidence, explanation)
+       select p.id, 3, 'matching_headings'::public.question_kind, 'Choose the most suitable heading for paragraph D.',
+              null, 'Windows are particularly important because they admit light and solar energy while generally insulating less effectively than a well-designed wall.', 'The paragraph explains both the benefits and thermal disadvantages of glazing.'
+       from p
+       on conflict (passage_id, idx) do update set
+         kind = excluded.kind, prompt = excluded.prompt, options = excluded.options,
+         evidence = excluded.evidence, explanation = excluded.explanation
+       returning id
+     )
+insert into public.question_answers (question_id, answer)
+select q.id, '["Windows as both an opportunity and a weakness"]'::jsonb from q
+on conflict (question_id) do update set answer = excluded.answer;
+
+with p as (select id from public.passages where slug = 'designing-buildings-to-use-less-heating-and-cooling'),
+     q as (
+       insert into public.questions (passage_id, idx, kind, prompt, options, evidence, explanation)
+       select p.id, 4, 'matching_headings'::public.question_kind, 'Choose the most suitable heading for paragraph F.',
+              null, 'Details on drawings must survive construction.', 'The paragraph explains how installation defects can undermine an otherwise good design.'
+       from p
+       on conflict (passage_id, idx) do update set
+         kind = excluded.kind, prompt = excluded.prompt, options = excluded.options,
+         evidence = excluded.evidence, explanation = excluded.explanation
+       returning id
+     )
+insert into public.question_answers (question_id, answer)
+select q.id, '["Why construction quality matters as much as design"]'::jsonb from q
+on conflict (question_id) do update set answer = excluded.answer;
+
+with p as (select id from public.passages where slug = 'designing-buildings-to-use-less-heating-and-cooling'),
+     q as (
+       insert into public.questions (passage_id, idx, kind, prompt, options, evidence, explanation)
+       select p.id, 5, 'true_false_not_given'::public.question_kind, 'Insulation can reduce heat transfer into a building during hot weather.',
+              null, 'In cold weather, it reduces heat loss from the interior; in hot weather, it can reduce heat entering from outside.', 'The passage directly states that insulation can reduce inward heat flow in hot conditions.'
+       from p
+       on conflict (passage_id, idx) do update set
+         kind = excluded.kind, prompt = excluded.prompt, options = excluded.options,
+         evidence = excluded.evidence, explanation = excluded.explanation
+       returning id
+     )
+insert into public.question_answers (question_id, answer)
+select q.id, '["TRUE"]'::jsonb from q
+on conflict (question_id) do update set answer = excluded.answer;
+
+with p as (select id from public.passages where slug = 'designing-buildings-to-use-less-heating-and-cooling'),
+     q as (
+       insert into public.questions (passage_id, idx, kind, prompt, options, evidence, explanation)
+       select p.id, 6, 'true_false_not_given'::public.question_kind, 'Airtight construction means that a building should receive no fresh outdoor air.',
+              null, 'It does not mean that occupants receive no fresh air.', 'The passage explicitly contradicts the statement.'
+       from p
+       on conflict (passage_id, idx) do update set
+         kind = excluded.kind, prompt = excluded.prompt, options = excluded.options,
+         evidence = excluded.evidence, explanation = excluded.explanation
+       returning id
+     )
+insert into public.question_answers (question_id, answer)
+select q.id, '["FALSE"]'::jsonb from q
+on conflict (question_id) do update set answer = excluded.answer;
+
+with p as (select id from public.passages where slug = 'designing-buildings-to-use-less-heating-and-cooling'),
+     q as (
+       insert into public.questions (passage_id, idx, kind, prompt, options, evidence, explanation)
+       select p.id, 7, 'true_false_not_given'::public.question_kind, 'The passage states that triple-glazed windows always reduce annual energy use by exactly 30 percent.',
+              null, 'Multiple panes, low-emissivity coatings, insulated frames, and gas-filled cavities can reduce heat transfer.', 'The passage says several window technologies can reduce heat transfer but gives no universal percentage saving.'
+       from p
+       on conflict (passage_id, idx) do update set
+         kind = excluded.kind, prompt = excluded.prompt, options = excluded.options,
+         evidence = excluded.evidence, explanation = excluded.explanation
+       returning id
+     )
+insert into public.question_answers (question_id, answer)
+select q.id, '["NOT GIVEN"]'::jsonb from q
+on conflict (question_id) do update set answer = excluded.answer;
+
+with p as (select id from public.passages where slug = 'designing-buildings-to-use-less-heating-and-cooling'),
+     q as (
+       insert into public.questions (passage_id, idx, kind, prompt, options, evidence, explanation)
+       select p.id, 8, 'multiple_choice'::public.question_kind, 'What is a thermal bridge?',
+              '["A path that conducts heat around surrounding insulation.","A ventilation duct that supplies fresh air.","A coating that blocks visible light.","A sensor used to measure indoor temperature."]'::jsonb, 'A metal connection passing through an insulated wall, for example, may provide a path that bypasses much of the surrounding insulation.', 'The passage describes a conductive path bypassing insulation.'
+       from p
+       on conflict (passage_id, idx) do update set
+         kind = excluded.kind, prompt = excluded.prompt, options = excluded.options,
+         evidence = excluded.evidence, explanation = excluded.explanation
+       returning id
+     )
+insert into public.question_answers (question_id, answer)
+select q.id, '["A path that conducts heat around surrounding insulation."]'::jsonb from q
+on conflict (question_id) do update set answer = excluded.answer;
+
+with p as (select id from public.passages where slug = 'designing-buildings-to-use-less-heating-and-cooling'),
+     q as (
+       insert into public.questions (passage_id, idx, kind, prompt, options, evidence, explanation)
+       select p.id, 9, 'multiple_choice'::public.question_kind, 'Why can exterior shading reduce cooling demand?',
+              '["It can block strong summer sunlight before it enters the glazing.","It increases uncontrolled air leakage.","It removes the need for all insulation.","It makes winter sunlight impossible in every orientation."]'::jsonb, 'Exterior shading can block high-angle summer sun before it enters the glass, while appropriate orientation may still allow lower-angle winter sunlight where climate and site conditions make that useful.', 'The passage identifies blocking summer solar gain before it enters the glass as the benefit.'
+       from p
+       on conflict (passage_id, idx) do update set
+         kind = excluded.kind, prompt = excluded.prompt, options = excluded.options,
+         evidence = excluded.evidence, explanation = excluded.explanation
+       returning id
+     )
+insert into public.question_answers (question_id, answer)
+select q.id, '["It can block strong summer sunlight before it enters the glazing."]'::jsonb from q
+on conflict (question_id) do update set answer = excluded.answer;
+
+with p as (select id from public.passages where slug = 'designing-buildings-to-use-less-heating-and-cooling'),
+     q as (
+       insert into public.questions (passage_id, idx, kind, prompt, options, evidence, explanation)
+       select p.id, 10, 'multiple_choice'::public.question_kind, 'What does a blower-door test help measure?',
+              '["Air leakage.","Window color.","Annual rainfall.","Solar panel output."]'::jsonb, 'Builders therefore use techniques such as blower-door testing to measure air leakage by pressurizing or depressurizing a completed building.', 'The passage directly identifies air leakage as the measurement.'
+       from p
+       on conflict (passage_id, idx) do update set
+         kind = excluded.kind, prompt = excluded.prompt, options = excluded.options,
+         evidence = excluded.evidence, explanation = excluded.explanation
+       returning id
+     )
+insert into public.question_answers (question_id, answer)
+select q.id, '["Air leakage."]'::jsonb from q
+on conflict (question_id) do update set answer = excluded.answer;
+
+with p as (select id from public.passages where slug = 'designing-buildings-to-use-less-heating-and-cooling'),
+     q as (
+       insert into public.questions (passage_id, idx, kind, prompt, options, evidence, explanation)
+       select p.id, 11, 'sentence_completion'::public.question_kind, 'Complete the sentence using NO MORE THAN TWO WORDS from the passage: Structural elements that conduct heat easily can form ______.',
+              null, 'Gaps, compressed material, and structural elements that conduct heat easily can create thermal bridges.', 'The exact phrase is thermal bridges.'
+       from p
+       on conflict (passage_id, idx) do update set
+         kind = excluded.kind, prompt = excluded.prompt, options = excluded.options,
+         evidence = excluded.evidence, explanation = excluded.explanation
+       returning id
+     )
+insert into public.question_answers (question_id, answer)
+select q.id, '["thermal bridges"]'::jsonb from q
+on conflict (question_id) do update set answer = excluded.answer;
+
+with p as (select id from public.passages where slug = 'designing-buildings-to-use-less-heating-and-cooling'),
+     q as (
+       insert into public.questions (passage_id, idx, kind, prompt, options, evidence, explanation)
+       select p.id, 12, 'sentence_completion'::public.question_kind, 'Complete the sentence using NO MORE THAN TWO WORDS from the passage: A ventilation system can deliberately supply ______.',
+              null, 'Instead, fresh air is supplied deliberately through a ventilation system rather than arriving unpredictably through gaps in the envelope.', 'The answer is lifted directly from the passage.'
+       from p
+       on conflict (passage_id, idx) do update set
+         kind = excluded.kind, prompt = excluded.prompt, options = excluded.options,
+         evidence = excluded.evidence, explanation = excluded.explanation
+       returning id
+     )
+insert into public.question_answers (question_id, answer)
+select q.id, '["fresh air"]'::jsonb from q
+on conflict (question_id) do update set answer = excluded.answer;
+
+with p as (select id from public.passages where slug = 'designing-buildings-to-use-less-heating-and-cooling'),
+     q as (
+       insert into public.questions (passage_id, idx, kind, prompt, options, evidence, explanation)
+       select p.id, 13, 'sentence_completion'::public.question_kind, 'Complete the sentence using NO MORE THAN TWO WORDS from the passage: Monitoring can reveal a ______ between predicted and measured performance.',
+              null, 'For this reason, monitoring energy consumption and indoor temperature after occupancy can reveal a performance gap between predicted and measured results.', 'The exact phrase from the passage is performance gap.'
+       from p
+       on conflict (passage_id, idx) do update set
+         kind = excluded.kind, prompt = excluded.prompt, options = excluded.options,
+         evidence = excluded.evidence, explanation = excluded.explanation
+       returning id
+     )
+insert into public.question_answers (question_id, answer)
+select q.id, '["performance gap"]'::jsonb from q
+on conflict (question_id) do update set answer = excluded.answer;
+
+-- Forensic Entomology and the Timing of Death
+insert into public.passages (slug, title, body, topic, headings, difficulty)
+values ('forensic-entomology-and-the-timing-of-death', 'Forensic Entomology and the Timing of Death', 'A
+Forensic entomology applies the study of insects and other arthropods to legal investigations. One of its best-known uses is estimating how long a person or animal has been dead, particularly when the usual signs of early decomposition are no longer informative. A dead body becomes a temporary habitat that attracts insects seeking food or a place to reproduce. Blow flies are often among the earliest arrivals when a body is accessible, and females may lay eggs in moist openings or wounds. The resulting larvae feed and grow through recognizable stages. Their development can provide a biological clock, although interpreting that clock requires knowledge of temperature, species, and the conditions surrounding the remains.
+
+B
+Insect development is strongly controlled by temperature. Within a suitable range, larvae generally develop faster in warmer conditions and more slowly when it is cooler. Researchers rear particular species under controlled temperatures to measure the time required to reach each developmental stage. These data can be expressed using accumulated thermal units that combine temperature and time. If investigators identify the species and determine the age of the oldest larvae, they can estimate when eggs were probably laid. This estimate describes the minimum period of insect activity rather than automatically giving the exact time of death, because insects may not have reached the body immediately.
+
+C
+A second approach examines succession, the changing community of insects associated with decomposition. Fresh remains attract a different mixture of species from remains that have dried or entered later stages of decay. Carrion beetles, flies, predatory insects, and other arthropods may become more or less common as tissues and environmental conditions change. Researchers build regional datasets from field experiments and case records to understand typical patterns. Succession can be useful when decomposition has continued for longer than the full development period of a single generation of flies, but its interpretation is strongly influenced by season, climate, habitat, and accessibility.
+
+D
+Careful collection at the scene is essential because poorly handled specimens can destroy information. Investigators may collect larvae from several body regions, record where each sample was found, and preserve some specimens immediately so their developmental stage does not change. Other live specimens may be transported for rearing. Temperatures are recorded at the scene and, where possible, weather records are obtained for the relevant period. Investigators also note whether remains were indoors, buried, wrapped, exposed to sunlight, or accessible to insects. These observations matter because the same species can develop differently under different thermal conditions.
+
+E
+Some larvae are difficult to identify reliably from external appearance alone. Rearing them until adulthood can reveal clearer anatomical characteristics and confirm species identification. Modern laboratories may also use DNA-based methods when specimens are damaged or closely related species are difficult to separate morphologically. Correct identification matters because development rates are species-specific. Using growth data from the wrong species could shift an estimate substantially. Laboratories therefore maintain reference collections and experimental datasets for insects commonly encountered in their region rather than assuming that a developmental schedule measured elsewhere will always apply locally.
+
+F
+Real cases contain complications that laboratory experiments cannot reproduce perfectly. A large mass of feeding larvae can generate heat and become warmer than the surrounding air. Drugs or toxins in tissues may alter development in some species. Clothing, burial, closed rooms, rain, shade, and access through windows can affect when insects arrive and which species can reach the remains. A body may also have been moved from one environment to another. These factors do not make insect evidence useless, but they increase uncertainty. Forensic entomologists therefore reconstruct the thermal and environmental history as carefully as possible instead of relying on a single recorded air temperature.
+
+G
+The strongest conclusions combine insect evidence with pathology, scene observations, weather data, and other forensic findings. Entomologists usually report an estimated interval and the assumptions behind it rather than claiming a perfectly precise hour of death. In some cases, insect evidence may also indicate that a body was moved or that wounds were colonized before other areas, but such interpretations require caution. The scientific value of forensic entomology comes from its ability to convert patterns of insect growth and succession into testable time constraints. Its reliability depends less on a dramatic discovery than on careful species identification, environmental reconstruction, and transparent treatment of uncertainty.', 'forensic science', '["Why insects become useful after death","Temperature and the predictable pace of larval growth","Succession as evidence from changing insect communities","How investigators collect samples at a scene","Why laboratory rearing can improve identification","Environmental factors that complicate estimates","Combining insect evidence with other forensic information","The limits of turning insect age into an exact time of death"]'::jsonb, 4)
+on conflict (slug) do update set
+  title = excluded.title, body = excluded.body, topic = excluded.topic,
+  headings = excluded.headings, difficulty = excluded.difficulty;
+
+with p as (select id from public.passages where slug = 'forensic-entomology-and-the-timing-of-death'),
+     q as (
+       insert into public.questions (passage_id, idx, kind, prompt, options, evidence, explanation)
+       select p.id, 1, 'matching_headings'::public.question_kind, 'Choose the most suitable heading for paragraph B.',
+              null, 'Insect development is strongly controlled by temperature.', 'The paragraph explains how temperature affects development and how thermal data are used to estimate larval age.'
+       from p
+       on conflict (passage_id, idx) do update set
+         kind = excluded.kind, prompt = excluded.prompt, options = excluded.options,
+         evidence = excluded.evidence, explanation = excluded.explanation
+       returning id
+     )
+insert into public.question_answers (question_id, answer)
+select q.id, '["Temperature and the predictable pace of larval growth"]'::jsonb from q
+on conflict (question_id) do update set answer = excluded.answer;
+
+with p as (select id from public.passages where slug = 'forensic-entomology-and-the-timing-of-death'),
+     q as (
+       insert into public.questions (passage_id, idx, kind, prompt, options, evidence, explanation)
+       select p.id, 2, 'matching_headings'::public.question_kind, 'Choose the most suitable heading for paragraph C.',
+              null, 'A second approach examines succession, the changing community of insects associated with decomposition.', 'The paragraph focuses on changes in insect communities through different stages of decomposition.'
+       from p
+       on conflict (passage_id, idx) do update set
+         kind = excluded.kind, prompt = excluded.prompt, options = excluded.options,
+         evidence = excluded.evidence, explanation = excluded.explanation
+       returning id
+     )
+insert into public.question_answers (question_id, answer)
+select q.id, '["Succession as evidence from changing insect communities"]'::jsonb from q
+on conflict (question_id) do update set answer = excluded.answer;
+
+with p as (select id from public.passages where slug = 'forensic-entomology-and-the-timing-of-death'),
+     q as (
+       insert into public.questions (passage_id, idx, kind, prompt, options, evidence, explanation)
+       select p.id, 3, 'matching_headings'::public.question_kind, 'Choose the most suitable heading for paragraph D.',
+              null, 'Careful collection at the scene is essential because poorly handled specimens can destroy information.', 'The paragraph describes specimen collection, preservation, environmental recording, and scene observations.'
+       from p
+       on conflict (passage_id, idx) do update set
+         kind = excluded.kind, prompt = excluded.prompt, options = excluded.options,
+         evidence = excluded.evidence, explanation = excluded.explanation
+       returning id
+     )
+insert into public.question_answers (question_id, answer)
+select q.id, '["How investigators collect samples at a scene"]'::jsonb from q
+on conflict (question_id) do update set answer = excluded.answer;
+
+with p as (select id from public.passages where slug = 'forensic-entomology-and-the-timing-of-death'),
+     q as (
+       insert into public.questions (passage_id, idx, kind, prompt, options, evidence, explanation)
+       select p.id, 4, 'matching_headings'::public.question_kind, 'Choose the most suitable heading for paragraph F.',
+              null, 'Real cases contain complications that laboratory experiments cannot reproduce perfectly.', 'The paragraph lists several environmental and biological factors that can alter development or insect access.'
+       from p
+       on conflict (passage_id, idx) do update set
+         kind = excluded.kind, prompt = excluded.prompt, options = excluded.options,
+         evidence = excluded.evidence, explanation = excluded.explanation
+       returning id
+     )
+insert into public.question_answers (question_id, answer)
+select q.id, '["Environmental factors that complicate estimates"]'::jsonb from q
+on conflict (question_id) do update set answer = excluded.answer;
+
+with p as (select id from public.passages where slug = 'forensic-entomology-and-the-timing-of-death'),
+     q as (
+       insert into public.questions (passage_id, idx, kind, prompt, options, evidence, explanation)
+       select p.id, 5, 'true_false_not_given'::public.question_kind, 'Larvae usually develop more quickly when temperatures are warmer, provided conditions remain suitable.',
+              null, 'Within a suitable range, larvae generally develop faster in warmer conditions and more slowly when it is cooler.', 'The passage directly states this relationship.'
+       from p
+       on conflict (passage_id, idx) do update set
+         kind = excluded.kind, prompt = excluded.prompt, options = excluded.options,
+         evidence = excluded.evidence, explanation = excluded.explanation
+       returning id
+     )
+insert into public.question_answers (question_id, answer)
+select q.id, '["TRUE"]'::jsonb from q
+on conflict (question_id) do update set answer = excluded.answer;
+
+with p as (select id from public.passages where slug = 'forensic-entomology-and-the-timing-of-death'),
+     q as (
+       insert into public.questions (passage_id, idx, kind, prompt, options, evidence, explanation)
+       select p.id, 6, 'true_false_not_given'::public.question_kind, 'The age of the oldest larvae always reveals the exact time of death.',
+              null, 'This estimate describes the minimum period of insect activity rather than automatically giving the exact time of death, because insects may not have reached the body immediately.', 'The passage explicitly states that larval age does not automatically equal the exact time since death.'
+       from p
+       on conflict (passage_id, idx) do update set
+         kind = excluded.kind, prompt = excluded.prompt, options = excluded.options,
+         evidence = excluded.evidence, explanation = excluded.explanation
+       returning id
+     )
+insert into public.question_answers (question_id, answer)
+select q.id, '["FALSE"]'::jsonb from q
+on conflict (question_id) do update set answer = excluded.answer;
+
+with p as (select id from public.passages where slug = 'forensic-entomology-and-the-timing-of-death'),
+     q as (
+       insert into public.questions (passage_id, idx, kind, prompt, options, evidence, explanation)
+       select p.id, 7, 'true_false_not_given'::public.question_kind, 'The passage states that blow flies always arrive within ten minutes of death.',
+              null, 'Blow flies are often among the earliest arrivals when a body is accessible, and females may lay eggs in moist openings or wounds.', 'The passage says blow flies are often early arrivals but gives no fixed ten-minute interval.'
+       from p
+       on conflict (passage_id, idx) do update set
+         kind = excluded.kind, prompt = excluded.prompt, options = excluded.options,
+         evidence = excluded.evidence, explanation = excluded.explanation
+       returning id
+     )
+insert into public.question_answers (question_id, answer)
+select q.id, '["NOT GIVEN"]'::jsonb from q
+on conflict (question_id) do update set answer = excluded.answer;
+
+with p as (select id from public.passages where slug = 'forensic-entomology-and-the-timing-of-death'),
+     q as (
+       insert into public.questions (passage_id, idx, kind, prompt, options, evidence, explanation)
+       select p.id, 8, 'multiple_choice'::public.question_kind, 'What do accumulated thermal units combine?',
+              '["Temperature and time.","Species and body weight.","Rainfall and wind direction.","Larval mass and DNA sequence."]'::jsonb, 'These data can be expressed using accumulated thermal units that combine temperature and time.', 'The passage directly defines what the units combine.'
+       from p
+       on conflict (passage_id, idx) do update set
+         kind = excluded.kind, prompt = excluded.prompt, options = excluded.options,
+         evidence = excluded.evidence, explanation = excluded.explanation
+       returning id
+     )
+insert into public.question_answers (question_id, answer)
+select q.id, '["Temperature and time."]'::jsonb from q
+on conflict (question_id) do update set answer = excluded.answer;
+
+with p as (select id from public.passages where slug = 'forensic-entomology-and-the-timing-of-death'),
+     q as (
+       insert into public.questions (passage_id, idx, kind, prompt, options, evidence, explanation)
+       select p.id, 9, 'multiple_choice'::public.question_kind, 'Why may some larvae be reared until adulthood?',
+              '["Adult characteristics may make species identification easier.","Adults always reveal the exact location of death.","Rearing removes the effect of temperature from development.","Adult insects contain no DNA variation."]'::jsonb, 'Rearing them until adulthood can reveal clearer anatomical characteristics and confirm species identification.', 'The passage says adulthood can provide clearer features for identification.'
+       from p
+       on conflict (passage_id, idx) do update set
+         kind = excluded.kind, prompt = excluded.prompt, options = excluded.options,
+         evidence = excluded.evidence, explanation = excluded.explanation
+       returning id
+     )
+insert into public.question_answers (question_id, answer)
+select q.id, '["Adult characteristics may make species identification easier."]'::jsonb from q
+on conflict (question_id) do update set answer = excluded.answer;
+
+with p as (select id from public.passages where slug = 'forensic-entomology-and-the-timing-of-death'),
+     q as (
+       insert into public.questions (passage_id, idx, kind, prompt, options, evidence, explanation)
+       select p.id, 10, 'multiple_choice'::public.question_kind, 'Why can a mass of feeding larvae complicate temperature reconstruction?',
+              '["It can generate its own heat.","It prevents all insects from reaching the body.","It always cools the surrounding tissue.","It eliminates species differences in growth."]'::jsonb, 'A large mass of feeding larvae can generate heat and become warmer than the surrounding air.', 'The passage directly identifies heat produced by larval masses as a complication.'
+       from p
+       on conflict (passage_id, idx) do update set
+         kind = excluded.kind, prompt = excluded.prompt, options = excluded.options,
+         evidence = excluded.evidence, explanation = excluded.explanation
+       returning id
+     )
+insert into public.question_answers (question_id, answer)
+select q.id, '["It can generate its own heat."]'::jsonb from q
+on conflict (question_id) do update set answer = excluded.answer;
+
+with p as (select id from public.passages where slug = 'forensic-entomology-and-the-timing-of-death'),
+     q as (
+       insert into public.questions (passage_id, idx, kind, prompt, options, evidence, explanation)
+       select p.id, 11, 'sentence_completion'::public.question_kind, 'Complete the sentence using NO MORE THAN TWO WORDS from the passage: Blow flies may lay eggs in moist openings or ______.',
+              null, 'Blow flies are often among the earliest arrivals when a body is accessible, and females may lay eggs in moist openings or wounds.', 'The answer is lifted verbatim from the passage.'
+       from p
+       on conflict (passage_id, idx) do update set
+         kind = excluded.kind, prompt = excluded.prompt, options = excluded.options,
+         evidence = excluded.evidence, explanation = excluded.explanation
+       returning id
+     )
+insert into public.question_answers (question_id, answer)
+select q.id, '["wounds"]'::jsonb from q
+on conflict (question_id) do update set answer = excluded.answer;
+
+with p as (select id from public.passages where slug = 'forensic-entomology-and-the-timing-of-death'),
+     q as (
+       insert into public.questions (passage_id, idx, kind, prompt, options, evidence, explanation)
+       select p.id, 12, 'sentence_completion'::public.question_kind, 'Complete the sentence using NO MORE THAN TWO WORDS from the passage: Some collected specimens are preserved immediately to prevent changes in their ______.',
+              null, 'Investigators may collect larvae from several body regions, record where each sample was found, and preserve some specimens immediately so their developmental stage does not change.', 'The exact phrase is developmental stage.'
+       from p
+       on conflict (passage_id, idx) do update set
+         kind = excluded.kind, prompt = excluded.prompt, options = excluded.options,
+         evidence = excluded.evidence, explanation = excluded.explanation
+       returning id
+     )
+insert into public.question_answers (question_id, answer)
+select q.id, '["developmental stage"]'::jsonb from q
+on conflict (question_id) do update set answer = excluded.answer;
+
+with p as (select id from public.passages where slug = 'forensic-entomology-and-the-timing-of-death'),
+     q as (
+       insert into public.questions (passage_id, idx, kind, prompt, options, evidence, explanation)
+       select p.id, 13, 'sentence_completion'::public.question_kind, 'Complete the sentence using NO MORE THAN TWO WORDS from the passage: Laboratories may maintain ______ for commonly encountered insects.',
+              null, 'Laboratories therefore maintain reference collections and experimental datasets for insects commonly encountered in their region rather than assuming that a developmental schedule measured elsewhere will always apply locally.', 'The answer appears exactly in the passage.'
+       from p
+       on conflict (passage_id, idx) do update set
+         kind = excluded.kind, prompt = excluded.prompt, options = excluded.options,
+         evidence = excluded.evidence, explanation = excluded.explanation
+       returning id
+     )
+insert into public.question_answers (question_id, answer)
+select q.id, '["reference collections"]'::jsonb from q
+on conflict (question_id) do update set answer = excluded.answer;
+
 -- Fungi Beneath City Trees
 insert into public.passages (slug, title, body, topic, headings, difficulty)
 values ('fungi-beneath-city-trees', 'Fungi Beneath City Trees', 'A
@@ -219,6 +661,1547 @@ with p as (select id from public.passages where slug = 'fungi-beneath-city-trees
      )
 insert into public.question_answers (question_id, answer)
 select q.id, '["Because fungal contributions are indirect and interact with irrigation, pruning and the genetics of the tree."]'::jsonb from q
+on conflict (question_id) do update set answer = excluded.answer;
+
+-- How Antibiotic Resistance Moves Through Wastewater
+insert into public.passages (slug, title, body, topic, headings, difficulty)
+values ('how-antibiotic-resistance-moves-through-wastewater', 'How Antibiotic Resistance Moves Through Wastewater', 'A
+Wastewater brings together microorganisms and chemicals from homes, hospitals, industries, farms, and other sources. Among the bacteria entering sewers, some may already be resistant to one or more antibiotics, while free fragments of DNA can carry genes associated with resistance. Wastewater treatment plants were designed primarily to remove organic matter, nutrients, suspended solids, and disease-causing organisms rather than to eliminate every resistance gene. They nevertheless become important places for studying antimicrobial resistance because large and diverse microbial populations pass through the same system under changing chemical and physical conditions.
+
+B
+Conventional treatment removes a substantial proportion of bacteria through settling, biological treatment, filtration, disinfection, or combinations of these processes. However, complete removal is difficult. Some living bacteria may remain in treated effluent, and DNA released from dead cells can persist for varying periods. Different treatment technologies also perform differently under different operating conditions. A reduction in the number of resistant bacteria does not necessarily produce the same reduction in every resistance gene. Researchers therefore examine both viable organisms and genetic material when assessing how treatment changes the resistance profile of wastewater.
+
+C
+Bacteria can acquire resistance through mutation, but they can also receive genetic material from other bacteria. This process, known collectively as horizontal gene transfer, can occur through several mechanisms. Plasmids are small DNA molecules that may move between cells and sometimes carry multiple resistance genes. Viruses that infect bacteria can transfer genetic material, and some bacteria can take up DNA directly from their surroundings. The presence of a resistance gene does not guarantee that it will transfer successfully or be expressed in a new host. Even so, mobile genetic elements are important because they can connect resistance traits with bacterial populations that were not originally exposed to the same antibiotic.
+
+D
+Antibiotic residues entering wastewater may create selective pressure when concentrations are high enough to disadvantage susceptible bacteria while allowing resistant organisms to survive more successfully. Other chemicals, including some metals and disinfectants, may also influence microbial communities or select for genetic elements carrying several protective traits. The relationships are complex because concentrations vary across plants and over time, and laboratory effects do not always predict what happens in full-scale treatment systems. Researchers therefore avoid assuming that every detected chemical automatically increases resistance in the same way.
+
+E
+Measuring environmental resistance presents technical challenges. Scientists may culture bacteria on laboratory media containing antibiotics, but many environmental organisms do not grow readily under standard laboratory conditions. DNA-based techniques can detect particular genes without culturing the organisms that contain them, yet detecting a gene does not reveal whether it is expressed or whether the host bacterium is alive. Metagenomic sequencing can survey large numbers of genes at once, but interpretation requires substantial computation and careful control for contamination. Results from different studies may also be difficult to compare when sampling, extraction, and reporting methods differ.
+
+F
+After treatment, effluent may enter rivers, lakes, coastal waters, or soils through irrigation and reuse. Resistant bacteria or genes can therefore mix with environmental microbial communities. Sludge produced during treatment may also contain resistance determinants and can reach soils if processed biosolids are applied to land. Environmental detection, however, is not the same as demonstrating a direct human health outcome. For a detected resistance gene to contribute to disease, several additional steps may be required, such as transfer into a relevant pathogen, survival, human exposure, and successful infection. Understanding those pathways is a major research challenge.
+
+G
+Reducing environmental antimicrobial resistance requires action at more than one point in the system. Responsible antibiotic use in medicine and agriculture can reduce the selective pressure that produces and maintains resistant populations before they reach wastewater. Hospitals and industries may need targeted controls for concentrated waste streams. Treatment plants can improve removal through optimized biological processes, filtration, advanced oxidation, ultraviolet disinfection, or other technologies where appropriate. Surveillance can track trends and identify unusual changes. No single treatment step can solve the wider problem because resistance arises from connected human, animal, industrial, and environmental systems.', 'environmental microbiology', '["Why wastewater collects resistant bacteria and resistance genes","Treatment removes many microbes but not every genetic signal","How bacteria can exchange resistance traits","Why measuring resistance is technically difficult","The importance of antibiotic residues and other selective pressures","Routes from treated wastewater into the wider environment","Reducing risk through multiple interventions","Why environmental detection does not equal human infection"]'::jsonb, 5)
+on conflict (slug) do update set
+  title = excluded.title, body = excluded.body, topic = excluded.topic,
+  headings = excluded.headings, difficulty = excluded.difficulty;
+
+with p as (select id from public.passages where slug = 'how-antibiotic-resistance-moves-through-wastewater'),
+     q as (
+       insert into public.questions (passage_id, idx, kind, prompt, options, evidence, explanation)
+       select p.id, 1, 'matching_headings'::public.question_kind, 'Choose the most suitable heading for paragraph B.',
+              null, 'Conventional treatment removes a substantial proportion of bacteria through settling, biological treatment, filtration, disinfection, or combinations of these processes.', 'The paragraph explains that treatment reduces bacteria but does not necessarily remove all cells or resistance genes.'
+       from p
+       on conflict (passage_id, idx) do update set
+         kind = excluded.kind, prompt = excluded.prompt, options = excluded.options,
+         evidence = excluded.evidence, explanation = excluded.explanation
+       returning id
+     )
+insert into public.question_answers (question_id, answer)
+select q.id, '["Treatment removes many microbes but not every genetic signal"]'::jsonb from q
+on conflict (question_id) do update set answer = excluded.answer;
+
+with p as (select id from public.passages where slug = 'how-antibiotic-resistance-moves-through-wastewater'),
+     q as (
+       insert into public.questions (passage_id, idx, kind, prompt, options, evidence, explanation)
+       select p.id, 2, 'matching_headings'::public.question_kind, 'Choose the most suitable heading for paragraph C.',
+              null, 'Bacteria can acquire resistance through mutation, but they can also receive genetic material from other bacteria.', 'The paragraph explains horizontal gene transfer and several mechanisms by which resistance genes can move.'
+       from p
+       on conflict (passage_id, idx) do update set
+         kind = excluded.kind, prompt = excluded.prompt, options = excluded.options,
+         evidence = excluded.evidence, explanation = excluded.explanation
+       returning id
+     )
+insert into public.question_answers (question_id, answer)
+select q.id, '["How bacteria can exchange resistance traits"]'::jsonb from q
+on conflict (question_id) do update set answer = excluded.answer;
+
+with p as (select id from public.passages where slug = 'how-antibiotic-resistance-moves-through-wastewater'),
+     q as (
+       insert into public.questions (passage_id, idx, kind, prompt, options, evidence, explanation)
+       select p.id, 3, 'matching_headings'::public.question_kind, 'Choose the most suitable heading for paragraph E.',
+              null, 'Measuring environmental resistance presents technical challenges.', 'The paragraph compares culture, DNA-based methods, and sequencing while describing their limitations.'
+       from p
+       on conflict (passage_id, idx) do update set
+         kind = excluded.kind, prompt = excluded.prompt, options = excluded.options,
+         evidence = excluded.evidence, explanation = excluded.explanation
+       returning id
+     )
+insert into public.question_answers (question_id, answer)
+select q.id, '["Why measuring resistance is technically difficult"]'::jsonb from q
+on conflict (question_id) do update set answer = excluded.answer;
+
+with p as (select id from public.passages where slug = 'how-antibiotic-resistance-moves-through-wastewater'),
+     q as (
+       insert into public.questions (passage_id, idx, kind, prompt, options, evidence, explanation)
+       select p.id, 4, 'matching_headings'::public.question_kind, 'Choose the most suitable heading for paragraph F.',
+              null, 'Environmental detection, however, is not the same as demonstrating a direct human health outcome.', 'The paragraph explains the additional steps required before environmental resistance contributes to disease.'
+       from p
+       on conflict (passage_id, idx) do update set
+         kind = excluded.kind, prompt = excluded.prompt, options = excluded.options,
+         evidence = excluded.evidence, explanation = excluded.explanation
+       returning id
+     )
+insert into public.question_answers (question_id, answer)
+select q.id, '["Why environmental detection does not equal human infection"]'::jsonb from q
+on conflict (question_id) do update set answer = excluded.answer;
+
+with p as (select id from public.passages where slug = 'how-antibiotic-resistance-moves-through-wastewater'),
+     q as (
+       insert into public.questions (passage_id, idx, kind, prompt, options, evidence, explanation)
+       select p.id, 5, 'true_false_not_given'::public.question_kind, 'Wastewater treatment plants were originally designed to remove every antibiotic resistance gene.',
+              null, 'Wastewater treatment plants were designed primarily to remove organic matter, nutrients, suspended solids, and disease-causing organisms rather than to eliminate every resistance gene.', 'The passage explicitly states that removing every resistance gene was not their primary design purpose.'
+       from p
+       on conflict (passage_id, idx) do update set
+         kind = excluded.kind, prompt = excluded.prompt, options = excluded.options,
+         evidence = excluded.evidence, explanation = excluded.explanation
+       returning id
+     )
+insert into public.question_answers (question_id, answer)
+select q.id, '["FALSE"]'::jsonb from q
+on conflict (question_id) do update set answer = excluded.answer;
+
+with p as (select id from public.passages where slug = 'how-antibiotic-resistance-moves-through-wastewater'),
+     q as (
+       insert into public.questions (passage_id, idx, kind, prompt, options, evidence, explanation)
+       select p.id, 6, 'true_false_not_given'::public.question_kind, 'DNA from dead bacterial cells can sometimes remain after treatment.',
+              null, 'Some living bacteria may remain in treated effluent, and DNA released from dead cells can persist for varying periods.', 'The passage directly states that DNA from dead cells can persist.'
+       from p
+       on conflict (passage_id, idx) do update set
+         kind = excluded.kind, prompt = excluded.prompt, options = excluded.options,
+         evidence = excluded.evidence, explanation = excluded.explanation
+       returning id
+     )
+insert into public.question_answers (question_id, answer)
+select q.id, '["TRUE"]'::jsonb from q
+on conflict (question_id) do update set answer = excluded.answer;
+
+with p as (select id from public.passages where slug = 'how-antibiotic-resistance-moves-through-wastewater'),
+     q as (
+       insert into public.questions (passage_id, idx, kind, prompt, options, evidence, explanation)
+       select p.id, 7, 'true_false_not_given'::public.question_kind, 'The passage states that resistance genes detected in rivers cause exactly ten percent of all human infections.',
+              null, 'Environmental detection, however, is not the same as demonstrating a direct human health outcome.', 'The passage discusses uncertainty between environmental detection and infection but gives no percentage of human infections.'
+       from p
+       on conflict (passage_id, idx) do update set
+         kind = excluded.kind, prompt = excluded.prompt, options = excluded.options,
+         evidence = excluded.evidence, explanation = excluded.explanation
+       returning id
+     )
+insert into public.question_answers (question_id, answer)
+select q.id, '["NOT GIVEN"]'::jsonb from q
+on conflict (question_id) do update set answer = excluded.answer;
+
+with p as (select id from public.passages where slug = 'how-antibiotic-resistance-moves-through-wastewater'),
+     q as (
+       insert into public.questions (passage_id, idx, kind, prompt, options, evidence, explanation)
+       select p.id, 8, 'multiple_choice'::public.question_kind, 'What are plasmids?',
+              '["Small DNA molecules that may move between bacterial cells.","Antibiotics produced only in wastewater plants.","Filters that remove suspended solids.","Human cells used to measure infection."]'::jsonb, 'Plasmids are small DNA molecules that may move between cells and sometimes carry multiple resistance genes.', 'The passage directly defines plasmids.'
+       from p
+       on conflict (passage_id, idx) do update set
+         kind = excluded.kind, prompt = excluded.prompt, options = excluded.options,
+         evidence = excluded.evidence, explanation = excluded.explanation
+       returning id
+     )
+insert into public.question_answers (question_id, answer)
+select q.id, '["Small DNA molecules that may move between bacterial cells."]'::jsonb from q
+on conflict (question_id) do update set answer = excluded.answer;
+
+with p as (select id from public.passages where slug = 'how-antibiotic-resistance-moves-through-wastewater'),
+     q as (
+       insert into public.questions (passage_id, idx, kind, prompt, options, evidence, explanation)
+       select p.id, 9, 'multiple_choice'::public.question_kind, 'What is one limitation of DNA-based detection methods?',
+              '["They may detect a gene without showing whether its host is alive.","They can measure only organisms that grow on laboratory media.","They cannot identify any resistance genes.","They automatically prove that a human infection will occur."]'::jsonb, 'DNA-based techniques can detect particular genes without culturing the organisms that contain them, yet detecting a gene does not reveal whether it is expressed or whether the host bacterium is alive.', 'The passage states that gene detection alone does not establish whether the host is living or expressing the gene.'
+       from p
+       on conflict (passage_id, idx) do update set
+         kind = excluded.kind, prompt = excluded.prompt, options = excluded.options,
+         evidence = excluded.evidence, explanation = excluded.explanation
+       returning id
+     )
+insert into public.question_answers (question_id, answer)
+select q.id, '["They may detect a gene without showing whether its host is alive."]'::jsonb from q
+on conflict (question_id) do update set answer = excluded.answer;
+
+with p as (select id from public.passages where slug = 'how-antibiotic-resistance-moves-through-wastewater'),
+     q as (
+       insert into public.questions (passage_id, idx, kind, prompt, options, evidence, explanation)
+       select p.id, 10, 'multiple_choice'::public.question_kind, 'Why is no single wastewater treatment step sufficient to solve antimicrobial resistance?',
+              '["Resistance emerges across connected human, animal, industrial, and environmental systems.","Wastewater plants contain no bacteria.","All resistance is caused only by ultraviolet light.","Treatment technologies cannot remove any microbes."]'::jsonb, 'No single treatment step can solve the wider problem because resistance arises from connected human, animal, industrial, and environmental systems.', 'The final paragraph directly gives this reason.'
+       from p
+       on conflict (passage_id, idx) do update set
+         kind = excluded.kind, prompt = excluded.prompt, options = excluded.options,
+         evidence = excluded.evidence, explanation = excluded.explanation
+       returning id
+     )
+insert into public.question_answers (question_id, answer)
+select q.id, '["Resistance emerges across connected human, animal, industrial, and environmental systems."]'::jsonb from q
+on conflict (question_id) do update set answer = excluded.answer;
+
+with p as (select id from public.passages where slug = 'how-antibiotic-resistance-moves-through-wastewater'),
+     q as (
+       insert into public.questions (passage_id, idx, kind, prompt, options, evidence, explanation)
+       select p.id, 11, 'sentence_completion'::public.question_kind, 'Complete the sentence using NO MORE THAN THREE WORDS from the passage: Transfer of genetic material between bacteria is known collectively as ______.',
+              null, 'This process, known collectively as horizontal gene transfer, can occur through several mechanisms.', 'The answer is copied verbatim from the passage.'
+       from p
+       on conflict (passage_id, idx) do update set
+         kind = excluded.kind, prompt = excluded.prompt, options = excluded.options,
+         evidence = excluded.evidence, explanation = excluded.explanation
+       returning id
+     )
+insert into public.question_answers (question_id, answer)
+select q.id, '["horizontal gene transfer"]'::jsonb from q
+on conflict (question_id) do update set answer = excluded.answer;
+
+with p as (select id from public.passages where slug = 'how-antibiotic-resistance-moves-through-wastewater'),
+     q as (
+       insert into public.questions (passage_id, idx, kind, prompt, options, evidence, explanation)
+       select p.id, 12, 'sentence_completion'::public.question_kind, 'Complete the sentence using NO MORE THAN TWO WORDS from the passage: Antibiotic residues may create ______ in wastewater.',
+              null, 'Antibiotic residues entering wastewater may create selective pressure when concentrations are high enough to disadvantage susceptible bacteria while allowing resistant organisms to survive more successfully.', 'The exact phrase is selective pressure.'
+       from p
+       on conflict (passage_id, idx) do update set
+         kind = excluded.kind, prompt = excluded.prompt, options = excluded.options,
+         evidence = excluded.evidence, explanation = excluded.explanation
+       returning id
+     )
+insert into public.question_answers (question_id, answer)
+select q.id, '["selective pressure"]'::jsonb from q
+on conflict (question_id) do update set answer = excluded.answer;
+
+with p as (select id from public.passages where slug = 'how-antibiotic-resistance-moves-through-wastewater'),
+     q as (
+       insert into public.questions (passage_id, idx, kind, prompt, options, evidence, explanation)
+       select p.id, 13, 'sentence_completion'::public.question_kind, 'Complete the sentence using NO MORE THAN TWO WORDS from the passage: Processed ______ may carry resistance determinants into soils.',
+              null, 'Sludge produced during treatment may also contain resistance determinants and can reach soils if processed biosolids are applied to land.', 'The required word appears directly in the passage.'
+       from p
+       on conflict (passage_id, idx) do update set
+         kind = excluded.kind, prompt = excluded.prompt, options = excluded.options,
+         evidence = excluded.evidence, explanation = excluded.explanation
+       returning id
+     )
+insert into public.question_answers (question_id, answer)
+select q.id, '["biosolids"]'::jsonb from q
+on conflict (question_id) do update set answer = excluded.answer;
+
+-- How Cities Manage Extreme Heat
+insert into public.passages (slug, title, body, topic, headings, difficulty)
+values ('how-cities-manage-extreme-heat', 'How Cities Manage Extreme Heat', 'A
+Cities often experience higher temperatures than nearby rural areas, a phenomenon known as the urban heat island effect. The difference is produced by several processes rather than a single cause. Dark roofs and paved surfaces absorb substantial amounts of solar energy during the day, while buildings reduce the movement of cooling winds and create surfaces that store heat. Vegetation is also usually less abundant than in surrounding countryside, so less water is available for evaporative cooling. The effect can persist after sunset because concrete, brick and asphalt release heat that they absorbed earlier. As a result, the greatest urban-rural temperature contrast is sometimes observed at night rather than during the hottest part of the afternoon.
+
+B
+Planting trees is one of the most widely promoted responses to urban heat. Trees cool streets by providing shade and by transferring water from the soil to the atmosphere through transpiration. Their effectiveness, however, depends on species, age, canopy size, local water supply and where they are planted. A narrow strip of young trees may provide little immediate protection to pedestrians, whereas a mature canopy over a pavement can reduce direct solar exposure substantially. Trees can also create management difficulties: roots may damage infrastructure, pollen can affect some residents, and irrigation can be difficult in dry climates. For these reasons, urban forestry programmes increasingly focus not simply on the number of trees planted but on whether those trees survive long enough to provide useful shade.
+
+C
+Cities can also modify the materials covering buildings and streets. Conventional dark roofs may reach very high surface temperatures in strong sunlight, while reflective roofs return a larger fraction of incoming solar radiation to the atmosphere. Some cities have therefore introduced programmes encouraging pale or specially coated roofs. Permeable pavements can provide another benefit when moisture stored within or beneath them evaporates, although their performance depends on water availability. Reflective materials are not automatically beneficial in every location because reflected sunlight may increase glare or transfer heat toward nearby pedestrians and buildings. Consequently, engineers increasingly evaluate materials at the scale of streets and neighbourhoods rather than assuming that a cooler individual surface will always produce a cooler environment for people.
+
+D
+Temperature alone does not determine the human consequences of a heatwave. Older people, outdoor workers, individuals living alone and people with certain medical conditions may be especially vulnerable. Housing quality matters as well: a poorly ventilated top-floor apartment can remain dangerously warm long after outdoor temperatures have fallen. Income influences whether households can afford air conditioning, adequate insulation or even the electricity required to operate cooling equipment. Heat exposure is therefore partly a question of social inequality. Two neighbourhoods experiencing the same official temperature may have very different levels of illness if one has shaded streets, well-insulated homes and accessible public services while the other lacks these protections.
+
+E
+Understanding these differences requires measurements at a much finer scale than those supplied by a city''s main weather station. Researchers increasingly use networks of inexpensive sensors, mobile instruments mounted on bicycles or vehicles, and satellite observations to map temperature variations between neighbourhoods. Yet each method has limitations. A sensor attached to a sunny wall may record conditions that are not representative of the air experienced by pedestrians, while satellites generally measure surface temperature rather than air temperature. Researchers must therefore pay close attention to instrument placement and to what exactly a measurement represents. Maps that appear highly precise can otherwise give a misleading impression of which streets or communities face the greatest danger.
+
+F
+During severe heat, cities also rely on emergency measures. Public libraries, community centres and other air-conditioned buildings may be designated as cooling centres where residents can spend the hottest hours of the day. Authorities sometimes extend swimming-pool hours, provide drinking-water stations or contact people known to be particularly vulnerable. Air conditioning remains highly effective at reducing indoor heat exposure, but widespread use can increase electricity demand and release additional heat outdoors through cooling equipment. If electricity systems fail during a heatwave, residents who depend heavily on mechanical cooling can suddenly become more exposed. Long-term heat planning therefore combines emergency services with changes to buildings, vegetation, infrastructure and energy systems rather than depending on a single technological solution.', 'urban climate adaptation', '["Why cities can remain warmer after sunset","The cooling value and limitations of urban trees","Changing the thermal behaviour of roofs and streets","Why heat risk depends on social conditions","The challenge of measuring neighbourhood temperatures","Air conditioning as both protection and a source of heat","Designing cities around winter rather than summer","Using public facilities during dangerous heat","How underground transport systems affect street temperatures"]'::jsonb, 3)
+on conflict (slug) do update set
+  title = excluded.title, body = excluded.body, topic = excluded.topic,
+  headings = excluded.headings, difficulty = excluded.difficulty;
+
+with p as (select id from public.passages where slug = 'how-cities-manage-extreme-heat'),
+     q as (
+       insert into public.questions (passage_id, idx, kind, prompt, options, evidence, explanation)
+       select p.id, 1, 'matching_headings'::public.question_kind, 'Choose the most suitable heading for paragraph A.',
+              null, 'The effect can persist after sunset because concrete, brick and asphalt release heat that they absorbed earlier.', 'Paragraph A explains the mechanisms behind the urban heat island effect, including the release of stored heat after sunset.'
+       from p
+       on conflict (passage_id, idx) do update set
+         kind = excluded.kind, prompt = excluded.prompt, options = excluded.options,
+         evidence = excluded.evidence, explanation = excluded.explanation
+       returning id
+     )
+insert into public.question_answers (question_id, answer)
+select q.id, '["Why cities can remain warmer after sunset"]'::jsonb from q
+on conflict (question_id) do update set answer = excluded.answer;
+
+with p as (select id from public.passages where slug = 'how-cities-manage-extreme-heat'),
+     q as (
+       insert into public.questions (passage_id, idx, kind, prompt, options, evidence, explanation)
+       select p.id, 2, 'matching_headings'::public.question_kind, 'Choose the most suitable heading for paragraph B.',
+              null, 'Their effectiveness, however, depends on species, age, canopy size, local water supply and where they are planted.', 'Paragraph B discusses both the cooling benefits of trees and practical limitations affecting their performance.'
+       from p
+       on conflict (passage_id, idx) do update set
+         kind = excluded.kind, prompt = excluded.prompt, options = excluded.options,
+         evidence = excluded.evidence, explanation = excluded.explanation
+       returning id
+     )
+insert into public.question_answers (question_id, answer)
+select q.id, '["The cooling value and limitations of urban trees"]'::jsonb from q
+on conflict (question_id) do update set answer = excluded.answer;
+
+with p as (select id from public.passages where slug = 'how-cities-manage-extreme-heat'),
+     q as (
+       insert into public.questions (passage_id, idx, kind, prompt, options, evidence, explanation)
+       select p.id, 3, 'matching_headings'::public.question_kind, 'Choose the most suitable heading for paragraph C.',
+              null, 'Cities can also modify the materials covering buildings and streets.', 'Paragraph C focuses on reflective roofs, permeable pavements and other material-based approaches to managing heat.'
+       from p
+       on conflict (passage_id, idx) do update set
+         kind = excluded.kind, prompt = excluded.prompt, options = excluded.options,
+         evidence = excluded.evidence, explanation = excluded.explanation
+       returning id
+     )
+insert into public.question_answers (question_id, answer)
+select q.id, '["Changing the thermal behaviour of roofs and streets"]'::jsonb from q
+on conflict (question_id) do update set answer = excluded.answer;
+
+with p as (select id from public.passages where slug = 'how-cities-manage-extreme-heat'),
+     q as (
+       insert into public.questions (passage_id, idx, kind, prompt, options, evidence, explanation)
+       select p.id, 4, 'matching_headings'::public.question_kind, 'Choose the most suitable heading for paragraph D.',
+              null, 'Heat exposure is therefore partly a question of social inequality.', 'The paragraph explains why housing, income, age and access to services affect vulnerability even under similar temperatures.'
+       from p
+       on conflict (passage_id, idx) do update set
+         kind = excluded.kind, prompt = excluded.prompt, options = excluded.options,
+         evidence = excluded.evidence, explanation = excluded.explanation
+       returning id
+     )
+insert into public.question_answers (question_id, answer)
+select q.id, '["Why heat risk depends on social conditions"]'::jsonb from q
+on conflict (question_id) do update set answer = excluded.answer;
+
+with p as (select id from public.passages where slug = 'how-cities-manage-extreme-heat'),
+     q as (
+       insert into public.questions (passage_id, idx, kind, prompt, options, evidence, explanation)
+       select p.id, 5, 'true_false_not_given'::public.question_kind, 'The greatest difference between urban and rural temperatures always occurs in the afternoon.',
+              null, 'As a result, the greatest urban-rural temperature contrast is sometimes observed at night rather than during the hottest part of the afternoon.', 'The passage explicitly says that the largest difference can occur at night.'
+       from p
+       on conflict (passage_id, idx) do update set
+         kind = excluded.kind, prompt = excluded.prompt, options = excluded.options,
+         evidence = excluded.evidence, explanation = excluded.explanation
+       returning id
+     )
+insert into public.question_answers (question_id, answer)
+select q.id, '["FALSE"]'::jsonb from q
+on conflict (question_id) do update set answer = excluded.answer;
+
+with p as (select id from public.passages where slug = 'how-cities-manage-extreme-heat'),
+     q as (
+       insert into public.questions (passage_id, idx, kind, prompt, options, evidence, explanation)
+       select p.id, 6, 'true_false_not_given'::public.question_kind, 'Urban tree-planting programmes are increasingly concerned with whether trees remain alive long enough to become useful.',
+              null, 'For these reasons, urban forestry programmes increasingly focus not simply on the number of trees planted but on whether those trees survive long enough to provide useful shade.', 'This statement directly matches the passage.'
+       from p
+       on conflict (passage_id, idx) do update set
+         kind = excluded.kind, prompt = excluded.prompt, options = excluded.options,
+         evidence = excluded.evidence, explanation = excluded.explanation
+       returning id
+     )
+insert into public.question_answers (question_id, answer)
+select q.id, '["TRUE"]'::jsonb from q
+on conflict (question_id) do update set answer = excluded.answer;
+
+with p as (select id from public.passages where slug = 'how-cities-manage-extreme-heat'),
+     q as (
+       insert into public.questions (passage_id, idx, kind, prompt, options, evidence, explanation)
+       select p.id, 7, 'true_false_not_given'::public.question_kind, 'Most cities require new commercial buildings to install reflective roofs.',
+              null, 'Some cities have therefore introduced programmes encouraging pale or specially coated roofs.', 'The passage says some cities encourage reflective roofs, but it does not state that most cities require them on new commercial buildings.'
+       from p
+       on conflict (passage_id, idx) do update set
+         kind = excluded.kind, prompt = excluded.prompt, options = excluded.options,
+         evidence = excluded.evidence, explanation = excluded.explanation
+       returning id
+     )
+insert into public.question_answers (question_id, answer)
+select q.id, '["NOT GIVEN"]'::jsonb from q
+on conflict (question_id) do update set answer = excluded.answer;
+
+with p as (select id from public.passages where slug = 'how-cities-manage-extreme-heat'),
+     q as (
+       insert into public.questions (passage_id, idx, kind, prompt, options, evidence, explanation)
+       select p.id, 8, 'multiple_choice'::public.question_kind, 'Why may reflective materials fail to improve conditions for pedestrians?',
+              '["They may direct additional heat or light toward nearby people.","They can prevent rainfall from entering drainage systems.","They require mature trees to work effectively.","They absorb more solar energy than dark materials."]'::jsonb, 'Reflective materials are not automatically beneficial in every location because reflected sunlight may increase glare or transfer heat toward nearby pedestrians and buildings.', 'The passage warns that reflected energy may worsen glare or heat exposure at pedestrian level.'
+       from p
+       on conflict (passage_id, idx) do update set
+         kind = excluded.kind, prompt = excluded.prompt, options = excluded.options,
+         evidence = excluded.evidence, explanation = excluded.explanation
+       returning id
+     )
+insert into public.question_answers (question_id, answer)
+select q.id, '["They may direct additional heat or light toward nearby people."]'::jsonb from q
+on conflict (question_id) do update set answer = excluded.answer;
+
+with p as (select id from public.passages where slug = 'how-cities-manage-extreme-heat'),
+     q as (
+       insert into public.questions (passage_id, idx, kind, prompt, options, evidence, explanation)
+       select p.id, 9, 'multiple_choice'::public.question_kind, 'What problem can arise when neighbourhood temperatures are mapped using satellites?',
+              '["Satellites cannot observe cities after sunset.","They usually measure surfaces rather than the air around people.","They provide data only for wealthy neighbourhoods.","Their measurements are affected mainly by underground transport."]'::jsonb, 'A sensor attached to a sunny wall may record conditions that are not representative of the air experienced by pedestrians, while satellites generally measure surface temperature rather than air temperature.', 'The key limitation identified is the distinction between surface temperature and the air temperature experienced by people.'
+       from p
+       on conflict (passage_id, idx) do update set
+         kind = excluded.kind, prompt = excluded.prompt, options = excluded.options,
+         evidence = excluded.evidence, explanation = excluded.explanation
+       returning id
+     )
+insert into public.question_answers (question_id, answer)
+select q.id, '["They usually measure surfaces rather than the air around people."]'::jsonb from q
+on conflict (question_id) do update set answer = excluded.answer;
+
+with p as (select id from public.passages where slug = 'how-cities-manage-extreme-heat'),
+     q as (
+       insert into public.questions (passage_id, idx, kind, prompt, options, evidence, explanation)
+       select p.id, 10, 'multiple_choice'::public.question_kind, 'Why can heavy dependence on air conditioning create additional risk during heatwaves?',
+              '["Cooling centres may refuse residents who own air conditioners.","Trees stop transpiring near mechanically cooled buildings.","Power failure can remove a major source of protection.","Air conditioners make indoor humidity permanently increase."]'::jsonb, 'If electricity systems fail during a heatwave, residents who depend heavily on mechanical cooling can suddenly become more exposed.', 'The passage specifically identifies electricity failure as a vulnerability for residents dependent on air conditioning.'
+       from p
+       on conflict (passage_id, idx) do update set
+         kind = excluded.kind, prompt = excluded.prompt, options = excluded.options,
+         evidence = excluded.evidence, explanation = excluded.explanation
+       returning id
+     )
+insert into public.question_answers (question_id, answer)
+select q.id, '["Power failure can remove a major source of protection."]'::jsonb from q
+on conflict (question_id) do update set answer = excluded.answer;
+
+with p as (select id from public.passages where slug = 'how-cities-manage-extreme-heat'),
+     q as (
+       insert into public.questions (passage_id, idx, kind, prompt, options, evidence, explanation)
+       select p.id, 11, 'sentence_completion'::public.question_kind, 'Complete the sentence using NO MORE THAN TWO WORDS from the passage: Trees transfer water from soil to the atmosphere through ______.',
+              null, 'Trees cool streets by providing shade and by transferring water from the soil to the atmosphere through transpiration.', 'The missing word is taken directly from the passage.'
+       from p
+       on conflict (passage_id, idx) do update set
+         kind = excluded.kind, prompt = excluded.prompt, options = excluded.options,
+         evidence = excluded.evidence, explanation = excluded.explanation
+       returning id
+     )
+insert into public.question_answers (question_id, answer)
+select q.id, '["transpiration"]'::jsonb from q
+on conflict (question_id) do update set answer = excluded.answer;
+
+with p as (select id from public.passages where slug = 'how-cities-manage-extreme-heat'),
+     q as (
+       insert into public.questions (passage_id, idx, kind, prompt, options, evidence, explanation)
+       select p.id, 12, 'sentence_completion'::public.question_kind, 'Complete the sentence using NO MORE THAN TWO WORDS from the passage: A poorly ventilated apartment on the ______ may stay dangerously hot after outdoor temperatures fall.',
+              null, 'Housing quality matters as well: a poorly ventilated top-floor apartment can remain dangerously warm long after outdoor temperatures have fallen.', 'The answer is the exact word used in the passage.'
+       from p
+       on conflict (passage_id, idx) do update set
+         kind = excluded.kind, prompt = excluded.prompt, options = excluded.options,
+         evidence = excluded.evidence, explanation = excluded.explanation
+       returning id
+     )
+insert into public.question_answers (question_id, answer)
+select q.id, '["top-floor"]'::jsonb from q
+on conflict (question_id) do update set answer = excluded.answer;
+
+with p as (select id from public.passages where slug = 'how-cities-manage-extreme-heat'),
+     q as (
+       insert into public.questions (passage_id, idx, kind, prompt, options, evidence, explanation)
+       select p.id, 13, 'sentence_completion'::public.question_kind, 'Complete the sentence using NO MORE THAN TWO WORDS from the passage: Public libraries and community centres may be used as ______ during severe heat.',
+              null, 'Public libraries, community centres and other air-conditioned buildings may be designated as cooling centres where residents can spend the hottest hours of the day.', 'The phrase appears verbatim in the passage.'
+       from p
+       on conflict (passage_id, idx) do update set
+         kind = excluded.kind, prompt = excluded.prompt, options = excluded.options,
+         evidence = excluded.evidence, explanation = excluded.explanation
+       returning id
+     )
+insert into public.question_answers (question_id, answer)
+select q.id, '["cooling centres"]'::jsonb from q
+on conflict (question_id) do update set answer = excluded.answer;
+
+-- How Container Shipping Remade Global Trade
+insert into public.passages (slug, title, body, topic, headings, difficulty)
+values ('how-container-shipping-remade-global-trade', 'How Container Shipping Remade Global Trade', 'A
+Before standardized shipping containers, most general cargo moved as break-bulk freight. Bags, barrels, crates, machinery, and other items were carried individually or in small lots from warehouse to truck, from truck to dock, into a ship''s hold, and then through the same sequence in reverse. The process demanded large gangs of workers and created many opportunities for delay, damage, and theft. Ships could spend a substantial share of a voyage waiting in port while cargo was sorted and handled. The problem was not that goods could not cross oceans; it was that every transfer between transport modes required another round of physical handling.
+
+B
+The modern container system changed the unit being handled. Instead of moving each shipment separately at the dock, freight could be packed into a strong reusable box that remained closed through much of its journey. Early experiments used different box sizes and designs, but international standardization eventually made containers, corner fittings, cranes, ships, rail wagons, and road trailers compatible across companies and countries. Standardization was less visually dramatic than a new ship, yet it was essential. A container is valuable precisely because equipment at the next port or railway terminal can lift and secure the same box without redesigning the entire system.
+
+C
+Ports had to be rebuilt around the new method. Container terminals required large cranes, reinforced quays, storage yards, road access, and systems for tracking boxes. These investments favored ports that had enough land, capital, and transport connections to handle high volumes efficiently. Some older central-city docks lost traffic because they were cramped or poorly connected to highways and rail. New terminals often developed farther from historic waterfronts. Containerization therefore changed urban geography as well as cargo handling, shifting employment and industrial activity while freeing some former dock areas for redevelopment into offices, housing, parks, or cultural districts.
+
+D
+The greatest economic advantage came from faster transfers and lower handling costs. A crane can move a container between ship and shore without workers unloading every carton inside it, while specialized vessels can be loaded according to carefully planned sequences. Faster turnaround lets expensive ships spend more time moving and less time at berth. The sealed box can also reduce casual pilferage and protect goods from weather, although it does not eliminate loss or damage. These savings encouraged firms to organize supply chains over longer distances because the cost and uncertainty associated with crossing a port boundary fell substantially.
+
+E
+Containerization also made intermodal transport far easier. The same box can travel by ship, rail, and truck with the cargo inside largely untouched. This does not mean every route is seamless: containers still have to be scheduled, inspected, stored, and moved through congested terminals. Yet the standardized interface allows transport operators to coordinate around a common physical unit. It also encouraged logistics companies to think about the entire journey from factory to customer rather than treating sea transport as a separate segment. Information systems later became crucial for tracking millions of boxes and matching equipment with cargo demand.
+
+F
+The labor effects were profound and contested. Traditional dock work relied on large numbers of workers who loaded, sorted, and secured diverse cargo by hand. Container terminals required fewer workers per tonne of freight but placed greater emphasis on crane operation, vehicle movement, maintenance, planning, and information systems. In many ports, the transition produced industrial conflict over jobs, work rules, and compensation. Productivity rose sharply, but the benefits and costs were not distributed evenly. The technology did not simply remove labor; it reorganized which skills were needed, where work occurred, and how bargaining power was exercised.
+
+G
+Standard containers solved one set of problems while creating others. Global trade still faces port congestion, imbalances in the location of empty boxes, customs delays, extreme weather, accidents, and disruptions at major transport corridors. Containers can also conceal illegal or misdeclared goods, making inspection a security challenge when volumes are enormous. Even so, the standardized box remains a basic building block of modern trade because it links ships to inland transport with remarkable efficiency. Its importance lies less in the steel walls themselves than in the worldwide agreement about dimensions, handling points, equipment, procedures, and networks built around them.', 'transport economics', '["Why break-bulk cargo made ports slow and labor-intensive","Standardization as the hidden foundation of container transport","How container terminals reshaped ports and city waterfronts","Lower handling costs and faster ship turnaround","One box moving across several transport modes","The contested reorganization of dock labor","Problems that standardized boxes did not eliminate","Why tracking systems became important for container logistics","How sealed containers can reduce some forms of cargo loss"]'::jsonb, 3)
+on conflict (slug) do update set
+  title = excluded.title, body = excluded.body, topic = excluded.topic,
+  headings = excluded.headings, difficulty = excluded.difficulty;
+
+with p as (select id from public.passages where slug = 'how-container-shipping-remade-global-trade'),
+     q as (
+       insert into public.questions (passage_id, idx, kind, prompt, options, evidence, explanation)
+       select p.id, 1, 'matching_headings'::public.question_kind, 'Choose the most suitable heading for paragraph B.',
+              null, 'Standardization was less visually dramatic than a new ship, yet it was essential.', 'The paragraph explains that compatible dimensions, fittings and equipment made the container system work across firms and countries.'
+       from p
+       on conflict (passage_id, idx) do update set
+         kind = excluded.kind, prompt = excluded.prompt, options = excluded.options,
+         evidence = excluded.evidence, explanation = excluded.explanation
+       returning id
+     )
+insert into public.question_answers (question_id, answer)
+select q.id, '["Standardization as the hidden foundation of container transport"]'::jsonb from q
+on conflict (question_id) do update set answer = excluded.answer;
+
+with p as (select id from public.passages where slug = 'how-container-shipping-remade-global-trade'),
+     q as (
+       insert into public.questions (passage_id, idx, kind, prompt, options, evidence, explanation)
+       select p.id, 2, 'matching_headings'::public.question_kind, 'Choose the most suitable heading for paragraph C.',
+              null, 'Containerization therefore changed urban geography as well as cargo handling, shifting employment and industrial activity while freeing some former dock areas for redevelopment into offices, housing, parks, or cultural districts.', 'The paragraph describes new terminals, declining older docks and the resulting changes in urban geography.'
+       from p
+       on conflict (passage_id, idx) do update set
+         kind = excluded.kind, prompt = excluded.prompt, options = excluded.options,
+         evidence = excluded.evidence, explanation = excluded.explanation
+       returning id
+     )
+insert into public.question_answers (question_id, answer)
+select q.id, '["How container terminals reshaped ports and city waterfronts"]'::jsonb from q
+on conflict (question_id) do update set answer = excluded.answer;
+
+with p as (select id from public.passages where slug = 'how-container-shipping-remade-global-trade'),
+     q as (
+       insert into public.questions (passage_id, idx, kind, prompt, options, evidence, explanation)
+       select p.id, 3, 'matching_headings'::public.question_kind, 'Choose the most suitable heading for paragraph D.',
+              null, 'The greatest economic advantage came from faster transfers and lower handling costs.', 'The paragraph focuses on faster loading, reduced handling and more efficient use of ships.'
+       from p
+       on conflict (passage_id, idx) do update set
+         kind = excluded.kind, prompt = excluded.prompt, options = excluded.options,
+         evidence = excluded.evidence, explanation = excluded.explanation
+       returning id
+     )
+insert into public.question_answers (question_id, answer)
+select q.id, '["Lower handling costs and faster ship turnaround"]'::jsonb from q
+on conflict (question_id) do update set answer = excluded.answer;
+
+with p as (select id from public.passages where slug = 'how-container-shipping-remade-global-trade'),
+     q as (
+       insert into public.questions (passage_id, idx, kind, prompt, options, evidence, explanation)
+       select p.id, 4, 'matching_headings'::public.question_kind, 'Choose the most suitable heading for paragraph F.',
+              null, 'The labor effects were profound and contested.', 'The paragraph explains how containerization reduced some forms of manual dock work while changing skills and industrial relations.'
+       from p
+       on conflict (passage_id, idx) do update set
+         kind = excluded.kind, prompt = excluded.prompt, options = excluded.options,
+         evidence = excluded.evidence, explanation = excluded.explanation
+       returning id
+     )
+insert into public.question_answers (question_id, answer)
+select q.id, '["The contested reorganization of dock labor"]'::jsonb from q
+on conflict (question_id) do update set answer = excluded.answer;
+
+with p as (select id from public.passages where slug = 'how-container-shipping-remade-global-trade'),
+     q as (
+       insert into public.questions (passage_id, idx, kind, prompt, options, evidence, explanation)
+       select p.id, 5, 'true_false_not_given'::public.question_kind, 'Before containerization, cargo often had to be handled again each time it moved between transport modes.',
+              null, 'The problem was not that goods could not cross oceans; it was that every transfer between transport modes required another round of physical handling.', 'The passage directly states that transfers required repeated handling.'
+       from p
+       on conflict (passage_id, idx) do update set
+         kind = excluded.kind, prompt = excluded.prompt, options = excluded.options,
+         evidence = excluded.evidence, explanation = excluded.explanation
+       returning id
+     )
+insert into public.question_answers (question_id, answer)
+select q.id, '["TRUE"]'::jsonb from q
+on conflict (question_id) do update set answer = excluded.answer;
+
+with p as (select id from public.passages where slug = 'how-container-shipping-remade-global-trade'),
+     q as (
+       insert into public.questions (passage_id, idx, kind, prompt, options, evidence, explanation)
+       select p.id, 6, 'true_false_not_given'::public.question_kind, 'Containerization eliminated all damage and theft from freight transport.',
+              null, 'The sealed box can also reduce casual pilferage and protect goods from weather, although it does not eliminate loss or damage.', 'The passage explicitly says that loss or damage is not eliminated.'
+       from p
+       on conflict (passage_id, idx) do update set
+         kind = excluded.kind, prompt = excluded.prompt, options = excluded.options,
+         evidence = excluded.evidence, explanation = excluded.explanation
+       returning id
+     )
+insert into public.question_answers (question_id, answer)
+select q.id, '["FALSE"]'::jsonb from q
+on conflict (question_id) do update set answer = excluded.answer;
+
+with p as (select id from public.passages where slug = 'how-container-shipping-remade-global-trade'),
+     q as (
+       insert into public.questions (passage_id, idx, kind, prompt, options, evidence, explanation)
+       select p.id, 7, 'true_false_not_given'::public.question_kind, 'The passage states that the first standardized container was exactly forty feet long.',
+              null, 'Early experiments used different box sizes and designs, but international standardization eventually made containers, corner fittings, cranes, ships, rail wagons, and road trailers compatible across companies and countries.', 'The passage discusses different early sizes and later standardization but does not give the exact length of the first standardized container.'
+       from p
+       on conflict (passage_id, idx) do update set
+         kind = excluded.kind, prompt = excluded.prompt, options = excluded.options,
+         evidence = excluded.evidence, explanation = excluded.explanation
+       returning id
+     )
+insert into public.question_answers (question_id, answer)
+select q.id, '["NOT GIVEN"]'::jsonb from q
+on conflict (question_id) do update set answer = excluded.answer;
+
+with p as (select id from public.passages where slug = 'how-container-shipping-remade-global-trade'),
+     q as (
+       insert into public.questions (passage_id, idx, kind, prompt, options, evidence, explanation)
+       select p.id, 8, 'multiple_choice'::public.question_kind, 'Why did some older central-city docks lose container traffic?',
+              '["They lacked space or good highway and rail connections.","They had too little break-bulk cargo to justify manual handling.","Their waterfront land was already being redeveloped for housing and parks.","They were better suited to tracking empty containers than new terminals."]'::jsonb, 'Some older central-city docks lost traffic because they were cramped or poorly connected to highways and rail.', 'The passage gives limited space and weak inland connections as reasons.'
+       from p
+       on conflict (passage_id, idx) do update set
+         kind = excluded.kind, prompt = excluded.prompt, options = excluded.options,
+         evidence = excluded.evidence, explanation = excluded.explanation
+       returning id
+     )
+insert into public.question_answers (question_id, answer)
+select q.id, '["They lacked space or good highway and rail connections."]'::jsonb from q
+on conflict (question_id) do update set answer = excluded.answer;
+
+with p as (select id from public.passages where slug = 'how-container-shipping-remade-global-trade'),
+     q as (
+       insert into public.questions (passage_id, idx, kind, prompt, options, evidence, explanation)
+       select p.id, 9, 'multiple_choice'::public.question_kind, 'What made intermodal transport easier under containerization?',
+              '["The same box could move by ship, rail and truck.","Every container could bypass inspection at transfer points.","Ships and trucks no longer needed compatible handling equipment.","Cargo could be repacked at each mode without affecting schedules."]'::jsonb, 'The same box can travel by ship, rail, and truck with the cargo inside largely untouched.', 'The passage identifies movement of the same container across modes as the key advantage.'
+       from p
+       on conflict (passage_id, idx) do update set
+         kind = excluded.kind, prompt = excluded.prompt, options = excluded.options,
+         evidence = excluded.evidence, explanation = excluded.explanation
+       returning id
+     )
+insert into public.question_answers (question_id, answer)
+select q.id, '["The same box could move by ship, rail and truck."]'::jsonb from q
+on conflict (question_id) do update set answer = excluded.answer;
+
+with p as (select id from public.passages where slug = 'how-container-shipping-remade-global-trade'),
+     q as (
+       insert into public.questions (passage_id, idx, kind, prompt, options, evidence, explanation)
+       select p.id, 10, 'multiple_choice'::public.question_kind, 'What happened to labor in many container ports?',
+              '["Fewer workers were needed per tonne, while different skills became more important.","All dock employment disappeared immediately.","Manual sorting became more important than crane operation.","Workers no longer needed maintenance or planning skills."]'::jsonb, 'Container terminals required fewer workers per tonne of freight but placed greater emphasis on crane operation, vehicle movement, maintenance, planning, and information systems.', 'The passage describes both reduced labor intensity and a shift toward different skills.'
+       from p
+       on conflict (passage_id, idx) do update set
+         kind = excluded.kind, prompt = excluded.prompt, options = excluded.options,
+         evidence = excluded.evidence, explanation = excluded.explanation
+       returning id
+     )
+insert into public.question_answers (question_id, answer)
+select q.id, '["Fewer workers were needed per tonne, while different skills became more important."]'::jsonb from q
+on conflict (question_id) do update set answer = excluded.answer;
+
+with p as (select id from public.passages where slug = 'how-container-shipping-remade-global-trade'),
+     q as (
+       insert into public.questions (passage_id, idx, kind, prompt, options, evidence, explanation)
+       select p.id, 11, 'sentence_completion'::public.question_kind, 'Complete the sentence using NO MORE THAN TWO WORDS from the passage: Before containers, most general cargo moved as ______ freight.',
+              null, 'Before standardized shipping containers, most general cargo moved as break-bulk freight.', 'The exact term in the passage is "break-bulk".'
+       from p
+       on conflict (passage_id, idx) do update set
+         kind = excluded.kind, prompt = excluded.prompt, options = excluded.options,
+         evidence = excluded.evidence, explanation = excluded.explanation
+       returning id
+     )
+insert into public.question_answers (question_id, answer)
+select q.id, '["break-bulk"]'::jsonb from q
+on conflict (question_id) do update set answer = excluded.answer;
+
+with p as (select id from public.passages where slug = 'how-container-shipping-remade-global-trade'),
+     q as (
+       insert into public.questions (passage_id, idx, kind, prompt, options, evidence, explanation)
+       select p.id, 12, 'sentence_completion'::public.question_kind, 'Complete the sentence using NO MORE THAN TWO WORDS from the passage: Container terminals required reinforced quays and large ______.',
+              null, 'Container terminals required large cranes, reinforced quays, storage yards, road access, and systems for tracking boxes.', 'The answer is copied directly from the passage.'
+       from p
+       on conflict (passage_id, idx) do update set
+         kind = excluded.kind, prompt = excluded.prompt, options = excluded.options,
+         evidence = excluded.evidence, explanation = excluded.explanation
+       returning id
+     )
+insert into public.question_answers (question_id, answer)
+select q.id, '["cranes"]'::jsonb from q
+on conflict (question_id) do update set answer = excluded.answer;
+
+with p as (select id from public.passages where slug = 'how-container-shipping-remade-global-trade'),
+     q as (
+       insert into public.questions (passage_id, idx, kind, prompt, options, evidence, explanation)
+       select p.id, 13, 'sentence_completion'::public.question_kind, 'Complete the sentence using NO MORE THAN TWO WORDS from the passage: Information systems helped track millions of ______.',
+              null, 'Information systems later became crucial for tracking millions of boxes and matching equipment with cargo demand.', 'The exact word required is "boxes".'
+       from p
+       on conflict (passage_id, idx) do update set
+         kind = excluded.kind, prompt = excluded.prompt, options = excluded.options,
+         evidence = excluded.evidence, explanation = excluded.explanation
+       returning id
+     )
+insert into public.question_answers (question_id, answer)
+select q.id, '["boxes"]'::jsonb from q
+on conflict (question_id) do update set answer = excluded.answer;
+
+-- How Mangroves Reduce Coastal Risk
+insert into public.passages (slug, title, body, topic, headings, difficulty)
+values ('how-mangroves-reduce-coastal-risk', 'How Mangroves Reduce Coastal Risk', 'A
+Mangroves are communities of salt-tolerant trees and shrubs that occupy sheltered tropical and subtropical coasts. They grow in environments that challenge most land plants: soils may be waterlogged, oxygen-poor, saline, and repeatedly flooded by tides. Different mangrove species have evolved roots that stabilize them in soft sediment and structures that help them exchange gases when the soil contains little oxygen. Some species also exclude salt at their roots or remove it through leaves. These adaptations allow mangrove forests to occupy the boundary between land and sea, where they influence sediment movement, provide habitat, store carbon, and alter the way waves and currents reach the shoreline.
+
+B
+One reason mangroves attract attention in coastal engineering is that their trunks, branches, and roots create resistance to flowing water. As waves pass through a forest, part of their energy is lost through friction and turbulence around this vegetation. The reduction is usually greater across wider and denser stands, although the exact effect depends on water depth, wave period, tree structure, and the arrangement of roots and stems. Mangroves therefore do not act like a solid wall. They gradually weaken wave energy as water moves through them, and the amount of protection changes with both forest condition and the characteristics of an incoming storm.
+
+C
+The limits of this protection matter. A narrow or degraded mangrove belt may provide only modest reduction during an extreme event, and very deep storm surge can submerge much of the vegetation that normally creates resistance. Trees can also be broken, uprooted, or stripped of branches by severe winds and waves. Mangroves cannot prevent the regional rise in water level produced by a large cyclone. Their contribution is better understood as one part of risk reduction rather than a guarantee against flooding. Coastal planning therefore needs to consider evacuation, building design, warning systems, and engineered structures alongside ecosystem-based protection.
+
+D
+Mangroves also alter shorelines over longer timescales by trapping suspended sediment. Water slows among roots, allowing some particles to settle instead of being carried offshore. Organic material from roots and fallen leaves can also contribute to soil formation. If sediment accumulation and root production raise the soil surface quickly enough, a mangrove wetland may keep pace with a moderate increase in relative sea level. This capacity is not unlimited. Where sediment supply is low, the land is subsiding rapidly, or development blocks the forest from moving inland, mangroves may gradually lose suitable habitat as water levels rise.
+
+E
+Human alteration has removed or fragmented mangroves in many regions. Forests have been cleared for aquaculture, agriculture, roads, ports, housing, and other coastal development. Dams and embankments can also change the delivery of freshwater and sediment even when trees are not cut directly. The loss is ecological as well as physical because mangrove habitats support juvenile fish, crustaceans, birds, and other organisms. Clearing may also expose carbon-rich soils to erosion or decomposition. Protecting an existing forest can therefore preserve several functions at once, whereas replacing a mature ecosystem after it has been destroyed is much more difficult.
+
+F
+Mangrove restoration is not simply a matter of planting large numbers of seedlings. Many unsuccessful projects have placed trees where tidal flooding, elevation, salinity, or wave exposure does not match the requirements of the chosen species. In some cases, natural recolonization occurs once blocked tidal channels are reopened or inappropriate barriers are removed. Restoring hydrology can be more important than planting because it recreates the physical conditions in which seedlings can establish without continuous human assistance. Site selection also requires attention to land ownership and future shoreline movement, especially where a recovering forest may need space to migrate inland.
+
+G
+Researchers evaluate coastal protection using field observations, laboratory experiments, remote sensing, and numerical models. Instruments can record wave heights before and after water passes through vegetation, while satellite images reveal changes in forest width and shoreline position. Models help explore conditions that are too dangerous or rare to measure directly, but their results depend on assumptions about vegetation density, storm characteristics, and seabed shape. For practical planning, mangroves are increasingly treated as components of hybrid defenses that may also include dunes, levees, elevated buildings, or seawalls. The objective is not to choose between nature and engineering in every case, but to understand where each layer of protection is most effective.', 'coastal ecology', '["A forest adapted to unstable coastal ground","How roots and trunks weaken waves","Why mangroves cannot stop every storm","Sediment trapping and the changing height of a coast","The ecological consequences of coastal development","Restoration depends on recovering the right physical conditions","Measuring protection in the field and with models","Combining natural defenses with engineered protection"]'::jsonb, 3)
+on conflict (slug) do update set
+  title = excluded.title, body = excluded.body, topic = excluded.topic,
+  headings = excluded.headings, difficulty = excluded.difficulty;
+
+with p as (select id from public.passages where slug = 'how-mangroves-reduce-coastal-risk'),
+     q as (
+       insert into public.questions (passage_id, idx, kind, prompt, options, evidence, explanation)
+       select p.id, 1, 'matching_headings'::public.question_kind, 'Choose the most suitable heading for paragraph B.',
+              null, 'As waves pass through a forest, part of their energy is lost through friction and turbulence around this vegetation.', 'The paragraph explains how mangrove structures reduce wave energy as water moves through the forest.'
+       from p
+       on conflict (passage_id, idx) do update set
+         kind = excluded.kind, prompt = excluded.prompt, options = excluded.options,
+         evidence = excluded.evidence, explanation = excluded.explanation
+       returning id
+     )
+insert into public.question_answers (question_id, answer)
+select q.id, '["How roots and trunks weaken waves"]'::jsonb from q
+on conflict (question_id) do update set answer = excluded.answer;
+
+with p as (select id from public.passages where slug = 'how-mangroves-reduce-coastal-risk'),
+     q as (
+       insert into public.questions (passage_id, idx, kind, prompt, options, evidence, explanation)
+       select p.id, 2, 'matching_headings'::public.question_kind, 'Choose the most suitable heading for paragraph C.',
+              null, 'Mangroves cannot prevent the regional rise in water level produced by a large cyclone.', 'The paragraph describes the limits of mangrove protection during severe storms.'
+       from p
+       on conflict (passage_id, idx) do update set
+         kind = excluded.kind, prompt = excluded.prompt, options = excluded.options,
+         evidence = excluded.evidence, explanation = excluded.explanation
+       returning id
+     )
+insert into public.question_answers (question_id, answer)
+select q.id, '["Why mangroves cannot stop every storm"]'::jsonb from q
+on conflict (question_id) do update set answer = excluded.answer;
+
+with p as (select id from public.passages where slug = 'how-mangroves-reduce-coastal-risk'),
+     q as (
+       insert into public.questions (passage_id, idx, kind, prompt, options, evidence, explanation)
+       select p.id, 3, 'matching_headings'::public.question_kind, 'Choose the most suitable heading for paragraph D.',
+              null, 'Mangroves also alter shorelines over longer timescales by trapping suspended sediment.', 'The paragraph focuses on sediment deposition, soil formation, and whether mangrove surfaces can keep pace with rising water.'
+       from p
+       on conflict (passage_id, idx) do update set
+         kind = excluded.kind, prompt = excluded.prompt, options = excluded.options,
+         evidence = excluded.evidence, explanation = excluded.explanation
+       returning id
+     )
+insert into public.question_answers (question_id, answer)
+select q.id, '["Sediment trapping and the changing height of a coast"]'::jsonb from q
+on conflict (question_id) do update set answer = excluded.answer;
+
+with p as (select id from public.passages where slug = 'how-mangroves-reduce-coastal-risk'),
+     q as (
+       insert into public.questions (passage_id, idx, kind, prompt, options, evidence, explanation)
+       select p.id, 4, 'matching_headings'::public.question_kind, 'Choose the most suitable heading for paragraph F.',
+              null, 'Restoring hydrology can be more important than planting because it recreates the physical conditions in which seedlings can establish without continuous human assistance.', 'The paragraph explains why appropriate tidal and hydrological conditions are central to successful restoration.'
+       from p
+       on conflict (passage_id, idx) do update set
+         kind = excluded.kind, prompt = excluded.prompt, options = excluded.options,
+         evidence = excluded.evidence, explanation = excluded.explanation
+       returning id
+     )
+insert into public.question_answers (question_id, answer)
+select q.id, '["Restoration depends on recovering the right physical conditions"]'::jsonb from q
+on conflict (question_id) do update set answer = excluded.answer;
+
+with p as (select id from public.passages where slug = 'how-mangroves-reduce-coastal-risk'),
+     q as (
+       insert into public.questions (passage_id, idx, kind, prompt, options, evidence, explanation)
+       select p.id, 5, 'true_false_not_given'::public.question_kind, 'Mangroves reduce wave energy partly because water encounters resistance from vegetation.',
+              null, 'One reason mangroves attract attention in coastal engineering is that their trunks, branches, and roots create resistance to flowing water.', 'The passage directly states that mangrove structures resist flowing water.'
+       from p
+       on conflict (passage_id, idx) do update set
+         kind = excluded.kind, prompt = excluded.prompt, options = excluded.options,
+         evidence = excluded.evidence, explanation = excluded.explanation
+       returning id
+     )
+insert into public.question_answers (question_id, answer)
+select q.id, '["TRUE"]'::jsonb from q
+on conflict (question_id) do update set answer = excluded.answer;
+
+with p as (select id from public.passages where slug = 'how-mangroves-reduce-coastal-risk'),
+     q as (
+       insert into public.questions (passage_id, idx, kind, prompt, options, evidence, explanation)
+       select p.id, 6, 'true_false_not_given'::public.question_kind, 'A mangrove forest can completely prevent storm surge from a large cyclone.',
+              null, 'Mangroves cannot prevent the regional rise in water level produced by a large cyclone.', 'The passage explicitly contradicts the claim.'
+       from p
+       on conflict (passage_id, idx) do update set
+         kind = excluded.kind, prompt = excluded.prompt, options = excluded.options,
+         evidence = excluded.evidence, explanation = excluded.explanation
+       returning id
+     )
+insert into public.question_answers (question_id, answer)
+select q.id, '["FALSE"]'::jsonb from q
+on conflict (question_id) do update set answer = excluded.answer;
+
+with p as (select id from public.passages where slug = 'how-mangroves-reduce-coastal-risk'),
+     q as (
+       insert into public.questions (passage_id, idx, kind, prompt, options, evidence, explanation)
+       select p.id, 7, 'true_false_not_given'::public.question_kind, 'The passage states that mangrove restoration always becomes successful within five years.',
+              null, 'Mangrove restoration is not simply a matter of planting large numbers of seedlings.', 'The passage discusses factors affecting restoration but gives no universal five-year timescale.'
+       from p
+       on conflict (passage_id, idx) do update set
+         kind = excluded.kind, prompt = excluded.prompt, options = excluded.options,
+         evidence = excluded.evidence, explanation = excluded.explanation
+       returning id
+     )
+insert into public.question_answers (question_id, answer)
+select q.id, '["NOT GIVEN"]'::jsonb from q
+on conflict (question_id) do update set answer = excluded.answer;
+
+with p as (select id from public.passages where slug = 'how-mangroves-reduce-coastal-risk'),
+     q as (
+       insert into public.questions (passage_id, idx, kind, prompt, options, evidence, explanation)
+       select p.id, 8, 'multiple_choice'::public.question_kind, 'Why can water moving through a mangrove forest lose wave energy?',
+              '["Vegetation creates friction and turbulence.","Roots permanently lower regional sea level.","Leaves prevent tides from entering the coast.","Sediment eliminates all incoming currents."]'::jsonb, 'As waves pass through a forest, part of their energy is lost through friction and turbulence around this vegetation.', 'The passage identifies friction and turbulence around vegetation as the mechanism.'
+       from p
+       on conflict (passage_id, idx) do update set
+         kind = excluded.kind, prompt = excluded.prompt, options = excluded.options,
+         evidence = excluded.evidence, explanation = excluded.explanation
+       returning id
+     )
+insert into public.question_answers (question_id, answer)
+select q.id, '["Vegetation creates friction and turbulence."]'::jsonb from q
+on conflict (question_id) do update set answer = excluded.answer;
+
+with p as (select id from public.passages where slug = 'how-mangroves-reduce-coastal-risk'),
+     q as (
+       insert into public.questions (passage_id, idx, kind, prompt, options, evidence, explanation)
+       select p.id, 9, 'multiple_choice'::public.question_kind, 'What can prevent a mangrove wetland from keeping pace with rising relative sea level?',
+              '["Low sediment supply.","Dense juvenile fish populations.","Gas exchange through specialized roots.","The presence of satellite monitoring."]'::jsonb, 'Where sediment supply is low, the land is subsiding rapidly, or development blocks the forest from moving inland, mangroves may gradually lose suitable habitat as water levels rise.', 'Low sediment supply is directly identified as one factor that can make adjustment difficult.'
+       from p
+       on conflict (passage_id, idx) do update set
+         kind = excluded.kind, prompt = excluded.prompt, options = excluded.options,
+         evidence = excluded.evidence, explanation = excluded.explanation
+       returning id
+     )
+insert into public.question_answers (question_id, answer)
+select q.id, '["Low sediment supply."]'::jsonb from q
+on conflict (question_id) do update set answer = excluded.answer;
+
+with p as (select id from public.passages where slug = 'how-mangroves-reduce-coastal-risk'),
+     q as (
+       insert into public.questions (passage_id, idx, kind, prompt, options, evidence, explanation)
+       select p.id, 10, 'multiple_choice'::public.question_kind, 'According to the passage, what may be more important than planting seedlings in some restoration projects?',
+              '["Restoring hydrology.","Building a port.","Removing all suspended sediment.","Increasing wave exposure."]'::jsonb, 'Restoring hydrology can be more important than planting because it recreates the physical conditions in which seedlings can establish without continuous human assistance.', 'The passage explicitly gives restoration of hydrology priority in some situations.'
+       from p
+       on conflict (passage_id, idx) do update set
+         kind = excluded.kind, prompt = excluded.prompt, options = excluded.options,
+         evidence = excluded.evidence, explanation = excluded.explanation
+       returning id
+     )
+insert into public.question_answers (question_id, answer)
+select q.id, '["Restoring hydrology."]'::jsonb from q
+on conflict (question_id) do update set answer = excluded.answer;
+
+with p as (select id from public.passages where slug = 'how-mangroves-reduce-coastal-risk'),
+     q as (
+       insert into public.questions (passage_id, idx, kind, prompt, options, evidence, explanation)
+       select p.id, 11, 'sentence_completion'::public.question_kind, 'Complete the sentence using NO MORE THAN TWO WORDS from the passage: Mangroves grow in soils that may be waterlogged, saline, and ______.',
+              null, 'They grow in environments that challenge most land plants: soils may be waterlogged, oxygen-poor, saline, and repeatedly flooded by tides.', 'The answer is copied directly from the passage.'
+       from p
+       on conflict (passage_id, idx) do update set
+         kind = excluded.kind, prompt = excluded.prompt, options = excluded.options,
+         evidence = excluded.evidence, explanation = excluded.explanation
+       returning id
+     )
+insert into public.question_answers (question_id, answer)
+select q.id, '["oxygen-poor"]'::jsonb from q
+on conflict (question_id) do update set answer = excluded.answer;
+
+with p as (select id from public.passages where slug = 'how-mangroves-reduce-coastal-risk'),
+     q as (
+       insert into public.questions (passage_id, idx, kind, prompt, options, evidence, explanation)
+       select p.id, 12, 'sentence_completion'::public.question_kind, 'Complete the sentence using NO MORE THAN TWO WORDS from the passage: Mangrove roots can trap suspended ______.',
+              null, 'Mangroves also alter shorelines over longer timescales by trapping suspended sediment.', 'The required word appears verbatim in the passage.'
+       from p
+       on conflict (passage_id, idx) do update set
+         kind = excluded.kind, prompt = excluded.prompt, options = excluded.options,
+         evidence = excluded.evidence, explanation = excluded.explanation
+       returning id
+     )
+insert into public.question_answers (question_id, answer)
+select q.id, '["sediment"]'::jsonb from q
+on conflict (question_id) do update set answer = excluded.answer;
+
+with p as (select id from public.passages where slug = 'how-mangroves-reduce-coastal-risk'),
+     q as (
+       insert into public.questions (passage_id, idx, kind, prompt, options, evidence, explanation)
+       select p.id, 13, 'sentence_completion'::public.question_kind, 'Complete the sentence using NO MORE THAN TWO WORDS from the passage: Instruments can compare ______ before and after water crosses vegetation.',
+              null, 'Instruments can record wave heights before and after water passes through vegetation, while satellite images reveal changes in forest width and shoreline position.', 'The exact phrase from the passage is wave heights.'
+       from p
+       on conflict (passage_id, idx) do update set
+         kind = excluded.kind, prompt = excluded.prompt, options = excluded.options,
+         evidence = excluded.evidence, explanation = excluded.explanation
+       returning id
+     )
+insert into public.question_answers (question_id, answer)
+select q.id, '["wave heights"]'::jsonb from q
+on conflict (question_id) do update set answer = excluded.answer;
+
+-- How Satellites Measure Sea Level
+insert into public.passages (slug, title, body, topic, headings, difficulty)
+values ('how-satellites-measure-sea-level', 'How Satellites Measure Sea Level', 'A
+Measuring the height of the ocean sounds simple until the reference point is defined. Sea level changes with tides, waves, air pressure, winds, ocean currents, temperature, salinity, and the movement of the land itself. Traditional tide gauges measure water relative to a fixed point on the coast, which is extremely useful locally but cannot by itself separate ocean change from land rising or sinking beneath the instrument. Satellite radar altimetry added a different view by measuring the sea surface over most of the open ocean. The method transformed sea-level science because repeated global measurements could be compared within a consistent observing system.
+
+B
+A radar altimeter sends a short microwave pulse toward the ocean and measures the time taken for the echo to return. Because electromagnetic waves travel at a known speed, the travel time can be converted into the distance between the satellite and the sea surface. That distance alone is not sea level. Scientists also need the satellite''s precise position relative to a reference shape of Earth, derived from careful orbit determination. Subtracting the measured ocean distance from the satellite altitude gives an estimate of sea-surface height. Repeating this calculation along many orbital tracks builds a map that can be compared from one cycle to the next.
+
+C
+The raw measurement needs numerous corrections before it is scientifically useful. Water vapor and dry gases in the atmosphere alter the radar signal''s travel time, while electrons in the ionosphere produce another delay. Waves affect the shape of the returning pulse, and tides move the sea surface by amounts far larger than the long-term trend researchers are trying to detect. Atmospheric pressure and wind can also push water around. Instruments aboard the satellite and models based on weather and ocean data are used to estimate these effects. Sea-level records are therefore products of measurement plus correction, not untouched readings from a single sensor.
+
+D
+Satellite altimetry revealed that global mean sea level is rising, but the ocean does not rise uniformly everywhere. Regional patterns are created by winds, currents, uneven heating, changes in salinity, and shifts in Earth''s gravity field associated with moving ice and water. A place can therefore experience a trend above or below the global average for years or decades. Coastal impacts depend on relative sea level, which also includes vertical land motion. Land subsidence from groundwater withdrawal or sediment compaction can amplify the rise experienced locally, while geological uplift can partly offset it.
+
+E
+To estimate a global mean, researchers combine measurements across huge areas and account for differences among satellite missions. Successive altimetry satellites have overlapping operating periods so that their measurements can be compared and biases can be identified. Stable reference frames and precise orbit calculations are essential because a small error in satellite height can resemble a change in the ocean. Scientists also examine whether instrumental behavior changes over time. The objective is a climate-quality record in which apparent trends are not artifacts of switching spacecraft, drifting sensors, or changing analysis methods.
+
+F
+Tide gauges remain important in the satellite era. Where a satellite track passes near a well-maintained gauge, the two observing systems can be compared, especially after vertical land motion is considered. Networks of coastal gauges provide long records that began many decades before satellite altimetry and offer direct evidence of what communities experience at shorelines. Global navigation satellite system receivers installed near gauges can measure whether the land itself is moving. Combining these observations helps researchers connect the broad oceanic picture from space with local relative sea-level change at the coast.
+
+G
+Sea-level rise has more than one physical cause, so altimetry is often combined with other measurements. Warmer seawater expands, adding to ocean volume through thermal expansion. Melting glaciers and ice sheets transfer water stored on land into the ocean. Satellite gravity missions can estimate changes in the mass of ice and water, while arrays of profiling floats measure temperature and salinity through the upper ocean. When these independent observations are brought together, scientists can test whether the measured rise is consistent with its expected components. Agreement among different methods strengthens confidence because each observing system has different sources of error. This cross-checking is especially important for detecting slow trends over decades.', 'earth observation', '["Turning radar travel time into sea-surface height","Corrections required before altimeter data can be trusted","Why global rise produces different regional outcomes","Maintaining consistency across successive satellite missions","Why tide gauges still matter in the satellite era","Combining altimetry with measurements of sea-level causes","The difficulty of defining what sea level is measured against","How land subsidence can amplify coastal sea-level rise","Why several independent observing systems increase confidence"]'::jsonb, 4)
+on conflict (slug) do update set
+  title = excluded.title, body = excluded.body, topic = excluded.topic,
+  headings = excluded.headings, difficulty = excluded.difficulty;
+
+with p as (select id from public.passages where slug = 'how-satellites-measure-sea-level'),
+     q as (
+       insert into public.questions (passage_id, idx, kind, prompt, options, evidence, explanation)
+       select p.id, 1, 'matching_headings'::public.question_kind, 'Choose the most suitable heading for paragraph B.',
+              null, 'A radar altimeter sends a short microwave pulse toward the ocean and measures the time taken for the echo to return.', 'The paragraph explains how travel time, satellite altitude and orbit position are combined to estimate sea-surface height.'
+       from p
+       on conflict (passage_id, idx) do update set
+         kind = excluded.kind, prompt = excluded.prompt, options = excluded.options,
+         evidence = excluded.evidence, explanation = excluded.explanation
+       returning id
+     )
+insert into public.question_answers (question_id, answer)
+select q.id, '["Turning radar travel time into sea-surface height"]'::jsonb from q
+on conflict (question_id) do update set answer = excluded.answer;
+
+with p as (select id from public.passages where slug = 'how-satellites-measure-sea-level'),
+     q as (
+       insert into public.questions (passage_id, idx, kind, prompt, options, evidence, explanation)
+       select p.id, 2, 'matching_headings'::public.question_kind, 'Choose the most suitable heading for paragraph C.',
+              null, 'The raw measurement needs numerous corrections before it is scientifically useful.', 'The paragraph lists atmospheric, ionospheric, wave, tide, pressure and wind effects that must be corrected.'
+       from p
+       on conflict (passage_id, idx) do update set
+         kind = excluded.kind, prompt = excluded.prompt, options = excluded.options,
+         evidence = excluded.evidence, explanation = excluded.explanation
+       returning id
+     )
+insert into public.question_answers (question_id, answer)
+select q.id, '["Corrections required before altimeter data can be trusted"]'::jsonb from q
+on conflict (question_id) do update set answer = excluded.answer;
+
+with p as (select id from public.passages where slug = 'how-satellites-measure-sea-level'),
+     q as (
+       insert into public.questions (passage_id, idx, kind, prompt, options, evidence, explanation)
+       select p.id, 3, 'matching_headings'::public.question_kind, 'Choose the most suitable heading for paragraph D.',
+              null, 'Satellite altimetry revealed that global mean sea level is rising, but the ocean does not rise uniformly everywhere.', 'The paragraph explains regional patterns and the role of local vertical land motion.'
+       from p
+       on conflict (passage_id, idx) do update set
+         kind = excluded.kind, prompt = excluded.prompt, options = excluded.options,
+         evidence = excluded.evidence, explanation = excluded.explanation
+       returning id
+     )
+insert into public.question_answers (question_id, answer)
+select q.id, '["Why global rise produces different regional outcomes"]'::jsonb from q
+on conflict (question_id) do update set answer = excluded.answer;
+
+with p as (select id from public.passages where slug = 'how-satellites-measure-sea-level'),
+     q as (
+       insert into public.questions (passage_id, idx, kind, prompt, options, evidence, explanation)
+       select p.id, 4, 'matching_headings'::public.question_kind, 'Choose the most suitable heading for paragraph F.',
+              null, 'Tide gauges remain important in the satellite era.', 'The paragraph explains how coastal gauges complement satellite observations and provide longer local records.'
+       from p
+       on conflict (passage_id, idx) do update set
+         kind = excluded.kind, prompt = excluded.prompt, options = excluded.options,
+         evidence = excluded.evidence, explanation = excluded.explanation
+       returning id
+     )
+insert into public.question_answers (question_id, answer)
+select q.id, '["Why tide gauges still matter in the satellite era"]'::jsonb from q
+on conflict (question_id) do update set answer = excluded.answer;
+
+with p as (select id from public.passages where slug = 'how-satellites-measure-sea-level'),
+     q as (
+       insert into public.questions (passage_id, idx, kind, prompt, options, evidence, explanation)
+       select p.id, 5, 'true_false_not_given'::public.question_kind, 'A tide gauge by itself cannot distinguish ocean change from vertical movement of the land beneath it.',
+              null, 'Traditional tide gauges measure water relative to a fixed point on the coast, which is extremely useful locally but cannot by itself separate ocean change from land rising or sinking beneath the instrument.', 'The passage directly states this limitation of tide gauges.'
+       from p
+       on conflict (passage_id, idx) do update set
+         kind = excluded.kind, prompt = excluded.prompt, options = excluded.options,
+         evidence = excluded.evidence, explanation = excluded.explanation
+       returning id
+     )
+insert into public.question_answers (question_id, answer)
+select q.id, '["TRUE"]'::jsonb from q
+on conflict (question_id) do update set answer = excluded.answer;
+
+with p as (select id from public.passages where slug = 'how-satellites-measure-sea-level'),
+     q as (
+       insert into public.questions (passage_id, idx, kind, prompt, options, evidence, explanation)
+       select p.id, 6, 'true_false_not_given'::public.question_kind, 'Sea level rises by exactly the same amount in every ocean region.',
+              null, 'Satellite altimetry revealed that global mean sea level is rising, but the ocean does not rise uniformly everywhere.', 'The passage explicitly says the rise is not spatially uniform.'
+       from p
+       on conflict (passage_id, idx) do update set
+         kind = excluded.kind, prompt = excluded.prompt, options = excluded.options,
+         evidence = excluded.evidence, explanation = excluded.explanation
+       returning id
+     )
+insert into public.question_answers (question_id, answer)
+select q.id, '["FALSE"]'::jsonb from q
+on conflict (question_id) do update set answer = excluded.answer;
+
+with p as (select id from public.passages where slug = 'how-satellites-measure-sea-level'),
+     q as (
+       insert into public.questions (passage_id, idx, kind, prompt, options, evidence, explanation)
+       select p.id, 7, 'true_false_not_given'::public.question_kind, 'The passage states that every altimetry satellite follows precisely the same orbital track.',
+              null, 'Successive altimetry satellites have overlapping operating periods so that their measurements can be compared and biases can be identified.', 'The passage discusses overlapping missions but does not state that all satellites use exactly the same orbital track.'
+       from p
+       on conflict (passage_id, idx) do update set
+         kind = excluded.kind, prompt = excluded.prompt, options = excluded.options,
+         evidence = excluded.evidence, explanation = excluded.explanation
+       returning id
+     )
+insert into public.question_answers (question_id, answer)
+select q.id, '["NOT GIVEN"]'::jsonb from q
+on conflict (question_id) do update set answer = excluded.answer;
+
+with p as (select id from public.passages where slug = 'how-satellites-measure-sea-level'),
+     q as (
+       insert into public.questions (passage_id, idx, kind, prompt, options, evidence, explanation)
+       select p.id, 8, 'multiple_choice'::public.question_kind, 'What additional information is needed besides the radar-measured distance to the ocean?',
+              '["The satellite''s precise position relative to a reference shape of Earth.","The local tide correction applied to the radar measurement.","The atmospheric pressure over the measured ocean area.","The vertical land motion recorded by a nearby coastal gauge."]'::jsonb, 'Scientists also need the satellite''s precise position relative to a reference shape of Earth, derived from careful orbit determination.', 'The passage says precise orbit position is necessary to convert range into sea-surface height.'
+       from p
+       on conflict (passage_id, idx) do update set
+         kind = excluded.kind, prompt = excluded.prompt, options = excluded.options,
+         evidence = excluded.evidence, explanation = excluded.explanation
+       returning id
+     )
+insert into public.question_answers (question_id, answer)
+select q.id, '["The satellite''s precise position relative to a reference shape of Earth."]'::jsonb from q
+on conflict (question_id) do update set answer = excluded.answer;
+
+with p as (select id from public.passages where slug = 'how-satellites-measure-sea-level'),
+     q as (
+       insert into public.questions (passage_id, idx, kind, prompt, options, evidence, explanation)
+       select p.id, 9, 'multiple_choice'::public.question_kind, 'Which factor can make local relative sea-level rise greater than the global average?',
+              '["Land subsidence.","Geological uplift.","Reduced radar pulse speed in a vacuum.","Fewer tide gauges."]'::jsonb, 'Land subsidence from groundwater withdrawal or sediment compaction can amplify the rise experienced locally, while geological uplift can partly offset it.', 'The passage identifies subsidence as a process that can amplify local relative rise.'
+       from p
+       on conflict (passage_id, idx) do update set
+         kind = excluded.kind, prompt = excluded.prompt, options = excluded.options,
+         evidence = excluded.evidence, explanation = excluded.explanation
+       returning id
+     )
+insert into public.question_answers (question_id, answer)
+select q.id, '["Land subsidence."]'::jsonb from q
+on conflict (question_id) do update set answer = excluded.answer;
+
+with p as (select id from public.passages where slug = 'how-satellites-measure-sea-level'),
+     q as (
+       insert into public.questions (passage_id, idx, kind, prompt, options, evidence, explanation)
+       select p.id, 10, 'multiple_choice'::public.question_kind, 'Why are overlapping periods between satellite missions useful?',
+              '["They allow measurements to be compared and biases identified.","They prevent tides from occurring during observations.","They eliminate the need for orbit calculations.","They make all regional sea-level trends identical."]'::jsonb, 'Successive altimetry satellites have overlapping operating periods so that their measurements can be compared and biases can be identified.', 'The passage gives comparison and bias detection as the purpose of overlap.'
+       from p
+       on conflict (passage_id, idx) do update set
+         kind = excluded.kind, prompt = excluded.prompt, options = excluded.options,
+         evidence = excluded.evidence, explanation = excluded.explanation
+       returning id
+     )
+insert into public.question_answers (question_id, answer)
+select q.id, '["They allow measurements to be compared and biases identified."]'::jsonb from q
+on conflict (question_id) do update set answer = excluded.answer;
+
+with p as (select id from public.passages where slug = 'how-satellites-measure-sea-level'),
+     q as (
+       insert into public.questions (passage_id, idx, kind, prompt, options, evidence, explanation)
+       select p.id, 11, 'sentence_completion'::public.question_kind, 'Complete the sentence using NO MORE THAN TWO WORDS from the passage: Water vapor and dry gases alter the radar signal''s ______.',
+              null, 'Water vapor and dry gases in the atmosphere alter the radar signal''s travel time, while electrons in the ionosphere produce another delay.', 'The exact phrase is "travel time".'
+       from p
+       on conflict (passage_id, idx) do update set
+         kind = excluded.kind, prompt = excluded.prompt, options = excluded.options,
+         evidence = excluded.evidence, explanation = excluded.explanation
+       returning id
+     )
+insert into public.question_answers (question_id, answer)
+select q.id, '["travel time"]'::jsonb from q
+on conflict (question_id) do update set answer = excluded.answer;
+
+with p as (select id from public.passages where slug = 'how-satellites-measure-sea-level'),
+     q as (
+       insert into public.questions (passage_id, idx, kind, prompt, options, evidence, explanation)
+       select p.id, 12, 'sentence_completion'::public.question_kind, 'Complete the sentence using NO MORE THAN TWO WORDS from the passage: Groundwater withdrawal can contribute to land ______.',
+              null, 'Land subsidence from groundwater withdrawal or sediment compaction can amplify the rise experienced locally, while geological uplift can partly offset it.', 'The required word appears verbatim in the passage.'
+       from p
+       on conflict (passage_id, idx) do update set
+         kind = excluded.kind, prompt = excluded.prompt, options = excluded.options,
+         evidence = excluded.evidence, explanation = excluded.explanation
+       returning id
+     )
+insert into public.question_answers (question_id, answer)
+select q.id, '["subsidence"]'::jsonb from q
+on conflict (question_id) do update set answer = excluded.answer;
+
+with p as (select id from public.passages where slug = 'how-satellites-measure-sea-level'),
+     q as (
+       insert into public.questions (passage_id, idx, kind, prompt, options, evidence, explanation)
+       select p.id, 13, 'sentence_completion'::public.question_kind, 'Complete the sentence using NO MORE THAN TWO WORDS from the passage: Warming seawater increases ocean volume through ______.',
+              null, 'Warmer seawater expands, adding to ocean volume through thermal expansion.', 'The answer is the exact two-word phrase used in the passage.'
+       from p
+       on conflict (passage_id, idx) do update set
+         kind = excluded.kind, prompt = excluded.prompt, options = excluded.options,
+         evidence = excluded.evidence, explanation = excluded.explanation
+       returning id
+     )
+insert into public.question_answers (question_id, answer)
+select q.id, '["thermal expansion"]'::jsonb from q
+on conflict (question_id) do update set answer = excluded.answer;
+
+-- How Whales Use Sound in the Ocean
+insert into public.passages (slug, title, body, topic, headings, difficulty)
+values ('how-whales-use-sound-in-the-ocean', 'How Whales Use Sound in the Ocean', 'A
+Sound travels through seawater far more effectively than light, especially across long distances or at depth. That physical fact has shaped the sensory world of whales, whose lives often unfold where vision is limited by darkness, suspended particles, or simple distance. Different whale groups use sound in very different ways. Baleen whales are known for powerful, often low-frequency calls that may travel over large areas, while many toothed whales produce rapid high-frequency clicks. These sounds are not decorative additions to behavior. They can help animals maintain contact, advertise, coordinate, navigate, or locate prey in an environment where a visual signal may disappear within metres.
+
+B
+Low-frequency sound is particularly useful for long-range communication because lower frequencies are generally absorbed less rapidly by seawater than high ones. Some large baleen whales produce calls that can be detected many kilometres from the caller under favorable ocean conditions. The exact distance is not fixed, because sound propagation depends on water temperature, depth, salinity, seafloor shape, and background noise. Whales may also change calling behavior with context. A call that travels efficiently through deep water may behave differently near a coast or in a shallow shelf sea. Researchers therefore study both the animal''s signal and the acoustic structure of the water through which it passes.
+
+C
+Toothed whales such as dolphins and sperm whales use echolocation, a system in which an animal emits clicks and listens for returning echoes. The interval between a click and its echo provides information about distance, while the strength and spectral details of the return can reveal features of the target. Rapid click sequences are often produced during prey pursuit. Echolocation is especially valuable where prey cannot be seen clearly. It is not, however, a passive sense: the whale is actively creating the signal that makes the target acoustically visible. This gives researchers a way to infer moments of searching and capture attempts from recordings made on or near the animals.
+
+D
+The ocean is not acoustically empty when whales call. Wind, waves, rain, cracking ice, other animals, ships, construction, and seismic surveys can all contribute sound. When noise overlaps the frequencies that an animal uses, it can reduce the distance over which a call is detectable, a process often described as masking. Some whales respond by calling more loudly, altering timing, or shifting frequency, but these adjustments do not guarantee that communication remains unaffected. The biological consequence depends on the species, the sound source, the duration of exposure, and what the whale was trying to do at the time.
+
+E
+Scientists cannot usually watch a whale continuously beneath the surface, so acoustic research relies on several complementary tools. Fixed hydrophones can listen at one location for months, revealing seasonal patterns in calling activity. Arrays of hydrophones can estimate the direction or position of a sound by comparing when it reaches different sensors. Animal-borne tags add another perspective by recording sound together with depth, movement, and sometimes acceleration. A tag can show, for example, whether a burst of clicks occurred during a deep dive or close to a rapid movement associated with prey capture. Each method samples only part of the animal''s behavior.
+
+F
+Interpreting recordings requires caution because hearing a call is not the same as counting whales. One individual may call repeatedly, while another may remain silent. A quiet recording period may mean that animals left the area, stopped vocalizing, or moved beyond the detector''s effective range. Detection also changes with sea conditions and equipment. Researchers therefore combine acoustic records with visual surveys, tagging, photographic identification, or environmental measurements when possible. Statistical models can then estimate how observation conditions affect the probability of detecting a signal. This prevents a convenient stream of audio data from being mistaken for a complete census.
+
+G
+Acoustic science has become important in conservation because many human activities introduce sound into whale habitat. Regulators and researchers may use listening networks to detect seasonal presence, identify heavily used areas, or evaluate how animals respond to particular noise sources. Such information can support measures such as changing vessel routes, reducing speed, or limiting especially noisy work at sensitive times. Acoustic monitoring does not remove every uncertainty, and not every detected change in behavior implies lasting harm. Its strength is that it makes otherwise hidden activity measurable, allowing decisions to be based on when, where, and how whales actually use sound.', 'marine bioacoustics', '["Why low frequencies can support communication over distance","Echolocation as an active way of sensing prey","How human and natural noise can mask whale signals","Combining hydrophones and tags to study hidden behavior","Why recordings cannot be treated as a direct whale count","Using acoustic evidence in conservation decisions","The physical advantage of sound in dark ocean environments","Environmental factors that alter how calls travel","The limits of interpreting behavioral responses to noise"]'::jsonb, 3)
+on conflict (slug) do update set
+  title = excluded.title, body = excluded.body, topic = excluded.topic,
+  headings = excluded.headings, difficulty = excluded.difficulty;
+
+with p as (select id from public.passages where slug = 'how-whales-use-sound-in-the-ocean'),
+     q as (
+       insert into public.questions (passage_id, idx, kind, prompt, options, evidence, explanation)
+       select p.id, 1, 'matching_headings'::public.question_kind, 'Choose the most suitable heading for paragraph B.',
+              null, 'Low-frequency sound is particularly useful for long-range communication because lower frequencies are generally absorbed less rapidly by seawater than high ones.', 'The paragraph centers on why low-frequency calls can travel far and what affects that travel.'
+       from p
+       on conflict (passage_id, idx) do update set
+         kind = excluded.kind, prompt = excluded.prompt, options = excluded.options,
+         evidence = excluded.evidence, explanation = excluded.explanation
+       returning id
+     )
+insert into public.question_answers (question_id, answer)
+select q.id, '["Why low frequencies can support communication over distance"]'::jsonb from q
+on conflict (question_id) do update set answer = excluded.answer;
+
+with p as (select id from public.passages where slug = 'how-whales-use-sound-in-the-ocean'),
+     q as (
+       insert into public.questions (passage_id, idx, kind, prompt, options, evidence, explanation)
+       select p.id, 2, 'matching_headings'::public.question_kind, 'Choose the most suitable heading for paragraph C.',
+              null, 'Toothed whales such as dolphins and sperm whales use echolocation, a system in which an animal emits clicks and listens for returning echoes.', 'The paragraph explains how toothed whales actively produce clicks and interpret returning echoes.'
+       from p
+       on conflict (passage_id, idx) do update set
+         kind = excluded.kind, prompt = excluded.prompt, options = excluded.options,
+         evidence = excluded.evidence, explanation = excluded.explanation
+       returning id
+     )
+insert into public.question_answers (question_id, answer)
+select q.id, '["Echolocation as an active way of sensing prey"]'::jsonb from q
+on conflict (question_id) do update set answer = excluded.answer;
+
+with p as (select id from public.passages where slug = 'how-whales-use-sound-in-the-ocean'),
+     q as (
+       insert into public.questions (passage_id, idx, kind, prompt, options, evidence, explanation)
+       select p.id, 3, 'matching_headings'::public.question_kind, 'Choose the most suitable heading for paragraph D.',
+              null, 'When noise overlaps the frequencies that an animal uses, it can reduce the distance over which a call is detectable, a process often described as masking.', 'The paragraph describes sources of ocean noise and the masking of whale communication.'
+       from p
+       on conflict (passage_id, idx) do update set
+         kind = excluded.kind, prompt = excluded.prompt, options = excluded.options,
+         evidence = excluded.evidence, explanation = excluded.explanation
+       returning id
+     )
+insert into public.question_answers (question_id, answer)
+select q.id, '["How human and natural noise can mask whale signals"]'::jsonb from q
+on conflict (question_id) do update set answer = excluded.answer;
+
+with p as (select id from public.passages where slug = 'how-whales-use-sound-in-the-ocean'),
+     q as (
+       insert into public.questions (passage_id, idx, kind, prompt, options, evidence, explanation)
+       select p.id, 4, 'matching_headings'::public.question_kind, 'Choose the most suitable heading for paragraph E.',
+              null, 'Scientists cannot usually watch a whale continuously beneath the surface, so acoustic research relies on several complementary tools.', 'The paragraph compares fixed hydrophones, arrays and animal-borne tags as complementary research tools.'
+       from p
+       on conflict (passage_id, idx) do update set
+         kind = excluded.kind, prompt = excluded.prompt, options = excluded.options,
+         evidence = excluded.evidence, explanation = excluded.explanation
+       returning id
+     )
+insert into public.question_answers (question_id, answer)
+select q.id, '["Combining hydrophones and tags to study hidden behavior"]'::jsonb from q
+on conflict (question_id) do update set answer = excluded.answer;
+
+with p as (select id from public.passages where slug = 'how-whales-use-sound-in-the-ocean'),
+     q as (
+       insert into public.questions (passage_id, idx, kind, prompt, options, evidence, explanation)
+       select p.id, 5, 'true_false_not_given'::public.question_kind, 'Lower-frequency whale sounds are generally absorbed by seawater more slowly than higher-frequency sounds.',
+              null, 'Low-frequency sound is particularly useful for long-range communication because lower frequencies are generally absorbed less rapidly by seawater than high ones.', 'The statement restates the passage''s explanation of lower absorption at low frequencies.'
+       from p
+       on conflict (passage_id, idx) do update set
+         kind = excluded.kind, prompt = excluded.prompt, options = excluded.options,
+         evidence = excluded.evidence, explanation = excluded.explanation
+       returning id
+     )
+insert into public.question_answers (question_id, answer)
+select q.id, '["TRUE"]'::jsonb from q
+on conflict (question_id) do update set answer = excluded.answer;
+
+with p as (select id from public.passages where slug = 'how-whales-use-sound-in-the-ocean'),
+     q as (
+       insert into public.questions (passage_id, idx, kind, prompt, options, evidence, explanation)
+       select p.id, 6, 'true_false_not_given'::public.question_kind, 'A quiet hydrophone recording always means that whales have left the area.',
+              null, 'A quiet recording period may mean that animals left the area, stopped vocalizing, or moved beyond the detector''s effective range.', 'The passage gives several possible explanations, so departure is not the only one.'
+       from p
+       on conflict (passage_id, idx) do update set
+         kind = excluded.kind, prompt = excluded.prompt, options = excluded.options,
+         evidence = excluded.evidence, explanation = excluded.explanation
+       returning id
+     )
+insert into public.question_answers (question_id, answer)
+select q.id, '["FALSE"]'::jsonb from q
+on conflict (question_id) do update set answer = excluded.answer;
+
+with p as (select id from public.passages where slug = 'how-whales-use-sound-in-the-ocean'),
+     q as (
+       insert into public.questions (passage_id, idx, kind, prompt, options, evidence, explanation)
+       select p.id, 7, 'true_false_not_given'::public.question_kind, 'The passage states that sperm whales can identify the exact species of every prey item from a single echo.',
+              null, 'The interval between a click and its echo provides information about distance, while the strength and spectral details of the return can reveal features of the target.', 'The passage says echoes reveal target features but does not state that sperm whales can identify every prey species from one echo.'
+       from p
+       on conflict (passage_id, idx) do update set
+         kind = excluded.kind, prompt = excluded.prompt, options = excluded.options,
+         evidence = excluded.evidence, explanation = excluded.explanation
+       returning id
+     )
+insert into public.question_answers (question_id, answer)
+select q.id, '["NOT GIVEN"]'::jsonb from q
+on conflict (question_id) do update set answer = excluded.answer;
+
+with p as (select id from public.passages where slug = 'how-whales-use-sound-in-the-ocean'),
+     q as (
+       insert into public.questions (passage_id, idx, kind, prompt, options, evidence, explanation)
+       select p.id, 8, 'multiple_choice'::public.question_kind, 'What can an array of hydrophones estimate by comparing arrival times?',
+              '["The direction or position of a sound.","Seasonal patterns in calling activity at one fixed site.","The depth and movement of a tagged whale.","Whether a quiet period represents a complete census."]'::jsonb, 'Arrays of hydrophones can estimate the direction or position of a sound by comparing when it reaches different sensors.', 'The passage directly identifies direction or position as the information derived from arrival-time differences.'
+       from p
+       on conflict (passage_id, idx) do update set
+         kind = excluded.kind, prompt = excluded.prompt, options = excluded.options,
+         evidence = excluded.evidence, explanation = excluded.explanation
+       returning id
+     )
+insert into public.question_answers (question_id, answer)
+select q.id, '["The direction or position of a sound."]'::jsonb from q
+on conflict (question_id) do update set answer = excluded.answer;
+
+with p as (select id from public.passages where slug = 'how-whales-use-sound-in-the-ocean'),
+     q as (
+       insert into public.questions (passage_id, idx, kind, prompt, options, evidence, explanation)
+       select p.id, 9, 'multiple_choice'::public.question_kind, 'Why is echolocation described as an active sense?',
+              '["The whale produces the signal used to detect the target.","The whale listens only to sounds produced naturally by prey.","The whale depends on a fixed hydrophone to create the signal.","The whale changes the ocean''s background noise before listening."]'::jsonb, 'It is not, however, a passive sense: the whale is actively creating the signal that makes the target acoustically visible.', 'The whale creates the outgoing signal itself, which distinguishes echolocation from passive listening.'
+       from p
+       on conflict (passage_id, idx) do update set
+         kind = excluded.kind, prompt = excluded.prompt, options = excluded.options,
+         evidence = excluded.evidence, explanation = excluded.explanation
+       returning id
+     )
+insert into public.question_answers (question_id, answer)
+select q.id, '["The whale produces the signal used to detect the target."]'::jsonb from q
+on conflict (question_id) do update set answer = excluded.answer;
+
+with p as (select id from public.passages where slug = 'how-whales-use-sound-in-the-ocean'),
+     q as (
+       insert into public.questions (passage_id, idx, kind, prompt, options, evidence, explanation)
+       select p.id, 10, 'multiple_choice'::public.question_kind, 'According to the passage, which action can acoustic information help support?',
+              '["Changing vessel routes in heavily used whale areas.","Replacing all visual surveys with underwater microphones.","Increasing ship speed so vessels leave whale habitat sooner.","Treating every short-term behavior change as evidence of lasting harm."]'::jsonb, 'Such information can support measures such as changing vessel routes, reducing speed, or limiting especially noisy work at sensitive times.', 'Changing vessel routes is explicitly listed as a possible conservation measure.'
+       from p
+       on conflict (passage_id, idx) do update set
+         kind = excluded.kind, prompt = excluded.prompt, options = excluded.options,
+         evidence = excluded.evidence, explanation = excluded.explanation
+       returning id
+     )
+insert into public.question_answers (question_id, answer)
+select q.id, '["Changing vessel routes in heavily used whale areas."]'::jsonb from q
+on conflict (question_id) do update set answer = excluded.answer;
+
+with p as (select id from public.passages where slug = 'how-whales-use-sound-in-the-ocean'),
+     q as (
+       insert into public.questions (passage_id, idx, kind, prompt, options, evidence, explanation)
+       select p.id, 11, 'sentence_completion'::public.question_kind, 'Complete the sentence using NO MORE THAN TWO WORDS from the passage: Overlapping noise can cause a process known as ______.',
+              null, 'When noise overlaps the frequencies that an animal uses, it can reduce the distance over which a call is detectable, a process often described as masking.', 'The required word appears exactly in the passage.'
+       from p
+       on conflict (passage_id, idx) do update set
+         kind = excluded.kind, prompt = excluded.prompt, options = excluded.options,
+         evidence = excluded.evidence, explanation = excluded.explanation
+       returning id
+     )
+insert into public.question_answers (question_id, answer)
+select q.id, '["masking"]'::jsonb from q
+on conflict (question_id) do update set answer = excluded.answer;
+
+with p as (select id from public.passages where slug = 'how-whales-use-sound-in-the-ocean'),
+     q as (
+       insert into public.questions (passage_id, idx, kind, prompt, options, evidence, explanation)
+       select p.id, 12, 'sentence_completion'::public.question_kind, 'Complete the sentence using NO MORE THAN TWO WORDS from the passage: Fixed ______ can listen at one location for months.',
+              null, 'Fixed hydrophones can listen at one location for months, revealing seasonal patterns in calling activity.', 'The answer is copied directly from the passage.'
+       from p
+       on conflict (passage_id, idx) do update set
+         kind = excluded.kind, prompt = excluded.prompt, options = excluded.options,
+         evidence = excluded.evidence, explanation = excluded.explanation
+       returning id
+     )
+insert into public.question_answers (question_id, answer)
+select q.id, '["hydrophones"]'::jsonb from q
+on conflict (question_id) do update set answer = excluded.answer;
+
+with p as (select id from public.passages where slug = 'how-whales-use-sound-in-the-ocean'),
+     q as (
+       insert into public.questions (passage_id, idx, kind, prompt, options, evidence, explanation)
+       select p.id, 13, 'sentence_completion'::public.question_kind, 'Complete the sentence using NO MORE THAN TWO WORDS from the passage: Researchers may use statistical models to estimate the probability of detecting a ______.',
+              null, 'Statistical models can then estimate how observation conditions affect the probability of detecting a signal.', 'The exact word required by the sentence is "signal".'
+       from p
+       on conflict (passage_id, idx) do update set
+         kind = excluded.kind, prompt = excluded.prompt, options = excluded.options,
+         evidence = excluded.evidence, explanation = excluded.explanation
+       returning id
+     )
+insert into public.question_answers (question_id, answer)
+select q.id, '["signal"]'::jsonb from q
+on conflict (question_id) do update set answer = excluded.answer;
+
+-- Life Around Hydrothermal Vents
+insert into public.passages (slug, title, body, topic, headings, difficulty)
+values ('life-around-hydrothermal-vents', 'Life Around Hydrothermal Vents', 'A
+Hydrothermal vents were first observed directly on the deep ocean floor in the late 1970s, and the discovery changed ideas about where abundant life could exist. At depths where sunlight does not support photosynthesis, researchers found dense communities of worms, shellfish, crustaceans and microorganisms clustered around places where heated water emerged from the seabed. The water had circulated through cracks in the oceanic crust, where it was warmed by underlying geological activity and reacted chemically with surrounding rock. When the altered fluid returned to the seafloor, its temperature and chemistry differed sharply from those of ordinary deep-ocean water. These unusual conditions created habitats unlike most environments previously studied by biologists.
+
+B
+The ecological foundation of many vent communities is chemosynthesis. Certain bacteria and archaea obtain energy from chemical reactions involving substances such as hydrogen sulfide, hydrogen and methane rather than from sunlight. They use this energy to build organic matter from carbon-containing compounds, providing food that can support larger organisms. Some microbes grow freely on surfaces or in the water, where they are consumed by animals. Others live inside or on the bodies of specialised hosts. Because chemical conditions vary among vents, different microbial metabolisms may dominate at different locations. The result is not one identical vent ecosystem but a range of communities shaped partly by the chemical energy available.
+
+C
+The giant tubeworm Riftia pachyptila provides a striking example of dependence on microbial partners. As adults, these animals have no functional mouth or digestive tract. Instead, bacteria living in a specialised internal organ use compounds delivered by the worm''s blood to produce organic nutrients. The animal supplies the microbes with access to hydrogen sulfide, oxygen and carbon dioxide, while receiving nutrition in return. This relationship allows tubeworms to grow rapidly in suitable vent environments. Other vent animals also form partnerships with microbes, although the details differ among species. Such symbioses demonstrate that an animal can obtain a major portion of its nutrition indirectly through chemical reactions carried out by microorganisms.
+
+D
+Vent habitats are highly productive but often temporary. Individual vents can change or shut down when geological activity redirects the flow of heated fluid beneath the seabed. Volcanic eruptions may destroy established communities, covering organisms with lava or altering the pattern of fluid discharge. New vents can then appear nearby or at considerable distances. As a result, many vent species live in a landscape of habitats that repeatedly form, disappear and re-form. Rapid growth, high reproductive output or effective dispersal may therefore be valuable traits. Ecologists are especially interested in how populations remain connected when suitable sites are separated by kilometres or even hundreds of kilometres of cold deep ocean.
+
+E
+Many vent animals release larvae that spend part of their development in the water column. Ocean currents can transport these larvae away from their birthplace, potentially allowing them to reach new vent fields. However, dispersal is not unlimited. Larvae must survive long enough, encounter appropriate currents and locate suitable chemical and physical conditions before settlement. Seafloor ridges, current patterns and distances between active vents can therefore influence genetic connections among populations. Researchers combine oceanographic models, genetic data and observations of larval biology to estimate these patterns. Even species that appear widely distributed may consist of populations that exchange individuals only occasionally.
+
+F
+Interest in hydrothermal vents now extends beyond biology because some vent systems produce mineral-rich deposits containing metals of economic value. This has contributed to debate over possible deep-sea mining. Disturbance could directly remove organisms and alter vent structures, while sediment plumes and equipment might affect nearby habitats. At the same time, the ecological consequences remain difficult to predict because vent systems differ greatly in age, chemistry, species composition and natural disturbance frequency. Some scientists argue that strong protection is necessary for rare or poorly understood sites, whereas others emphasise the need for more mapping and baseline research before risks can be evaluated reliably. The debate illustrates the difficulty of managing environments that are scientifically important, geographically remote and still incompletely known.', 'deep-sea biology', '["An ecosystem discovered where sunlight cannot reach","Chemical energy at the base of the food web","Animals that depend on microbial partners","Why vent communities repeatedly disappear and return","How larvae may travel between isolated vent fields","The early assumption that the deep sea was lifeless","Mineral deposits created by hot vent fluids","Threats created by possible seabed mining","Why every vent species occurs throughout the world''s oceans"]'::jsonb, 3)
+on conflict (slug) do update set
+  title = excluded.title, body = excluded.body, topic = excluded.topic,
+  headings = excluded.headings, difficulty = excluded.difficulty;
+
+with p as (select id from public.passages where slug = 'life-around-hydrothermal-vents'),
+     q as (
+       insert into public.questions (passage_id, idx, kind, prompt, options, evidence, explanation)
+       select p.id, 1, 'matching_headings'::public.question_kind, 'Choose the most suitable heading for paragraph A.',
+              null, 'At depths where sunlight does not support photosynthesis, researchers found dense communities of worms, shellfish, crustaceans and microorganisms clustered around places where heated water emerged from the seabed.', 'Paragraph A introduces the discovery of unexpectedly rich ecosystems in the dark deep ocean.'
+       from p
+       on conflict (passage_id, idx) do update set
+         kind = excluded.kind, prompt = excluded.prompt, options = excluded.options,
+         evidence = excluded.evidence, explanation = excluded.explanation
+       returning id
+     )
+insert into public.question_answers (question_id, answer)
+select q.id, '["An ecosystem discovered where sunlight cannot reach"]'::jsonb from q
+on conflict (question_id) do update set answer = excluded.answer;
+
+with p as (select id from public.passages where slug = 'life-around-hydrothermal-vents'),
+     q as (
+       insert into public.questions (passage_id, idx, kind, prompt, options, evidence, explanation)
+       select p.id, 2, 'matching_headings'::public.question_kind, 'Choose the most suitable heading for paragraph B.',
+              null, 'The ecological foundation of many vent communities is chemosynthesis.', 'The paragraph explains how microbes use chemical reactions rather than sunlight to support vent food webs.'
+       from p
+       on conflict (passage_id, idx) do update set
+         kind = excluded.kind, prompt = excluded.prompt, options = excluded.options,
+         evidence = excluded.evidence, explanation = excluded.explanation
+       returning id
+     )
+insert into public.question_answers (question_id, answer)
+select q.id, '["Chemical energy at the base of the food web"]'::jsonb from q
+on conflict (question_id) do update set answer = excluded.answer;
+
+with p as (select id from public.passages where slug = 'life-around-hydrothermal-vents'),
+     q as (
+       insert into public.questions (passage_id, idx, kind, prompt, options, evidence, explanation)
+       select p.id, 3, 'matching_headings'::public.question_kind, 'Choose the most suitable heading for paragraph C.',
+              null, 'The giant tubeworm Riftia pachyptila provides a striking example of dependence on microbial partners.', 'Paragraph C centres on symbiosis between animals and microorganisms.'
+       from p
+       on conflict (passage_id, idx) do update set
+         kind = excluded.kind, prompt = excluded.prompt, options = excluded.options,
+         evidence = excluded.evidence, explanation = excluded.explanation
+       returning id
+     )
+insert into public.question_answers (question_id, answer)
+select q.id, '["Animals that depend on microbial partners"]'::jsonb from q
+on conflict (question_id) do update set answer = excluded.answer;
+
+with p as (select id from public.passages where slug = 'life-around-hydrothermal-vents'),
+     q as (
+       insert into public.questions (passage_id, idx, kind, prompt, options, evidence, explanation)
+       select p.id, 4, 'matching_headings'::public.question_kind, 'Choose the most suitable heading for paragraph D.',
+              null, 'As a result, many vent species live in a landscape of habitats that repeatedly form, disappear and re-form.', 'The paragraph explains how geological change continually destroys and creates vent habitats.'
+       from p
+       on conflict (passage_id, idx) do update set
+         kind = excluded.kind, prompt = excluded.prompt, options = excluded.options,
+         evidence = excluded.evidence, explanation = excluded.explanation
+       returning id
+     )
+insert into public.question_answers (question_id, answer)
+select q.id, '["Why vent communities repeatedly disappear and return"]'::jsonb from q
+on conflict (question_id) do update set answer = excluded.answer;
+
+with p as (select id from public.passages where slug = 'life-around-hydrothermal-vents'),
+     q as (
+       insert into public.questions (passage_id, idx, kind, prompt, options, evidence, explanation)
+       select p.id, 5, 'true_false_not_given'::public.question_kind, 'Hydrothermal vent fluid has the same chemical composition as ordinary deep-ocean water.',
+              null, 'When the altered fluid returned to the seafloor, its temperature and chemistry differed sharply from those of ordinary deep-ocean water.', 'The passage explicitly states that vent fluid differs significantly from ordinary deep-ocean water.'
+       from p
+       on conflict (passage_id, idx) do update set
+         kind = excluded.kind, prompt = excluded.prompt, options = excluded.options,
+         evidence = excluded.evidence, explanation = excluded.explanation
+       returning id
+     )
+insert into public.question_answers (question_id, answer)
+select q.id, '["FALSE"]'::jsonb from q
+on conflict (question_id) do update set answer = excluded.answer;
+
+with p as (select id from public.passages where slug = 'life-around-hydrothermal-vents'),
+     q as (
+       insert into public.questions (passage_id, idx, kind, prompt, options, evidence, explanation)
+       select p.id, 6, 'true_false_not_given'::public.question_kind, 'Some microorganisms at hydrothermal vents live inside animals.',
+              null, 'Others live inside or on the bodies of specialised hosts.', 'The statement is directly supported by the passage.'
+       from p
+       on conflict (passage_id, idx) do update set
+         kind = excluded.kind, prompt = excluded.prompt, options = excluded.options,
+         evidence = excluded.evidence, explanation = excluded.explanation
+       returning id
+     )
+insert into public.question_answers (question_id, answer)
+select q.id, '["TRUE"]'::jsonb from q
+on conflict (question_id) do update set answer = excluded.answer;
+
+with p as (select id from public.passages where slug = 'life-around-hydrothermal-vents'),
+     q as (
+       insert into public.questions (passage_id, idx, kind, prompt, options, evidence, explanation)
+       select p.id, 7, 'true_false_not_given'::public.question_kind, 'Most vent larvae remain within ten kilometres of the place where they were released.',
+              null, 'Ocean currents can transport these larvae away from their birthplace, potentially allowing them to reach new vent fields.', 'The passage says larvae can be transported away but gives no figure for the distance travelled by most larvae.'
+       from p
+       on conflict (passage_id, idx) do update set
+         kind = excluded.kind, prompt = excluded.prompt, options = excluded.options,
+         evidence = excluded.evidence, explanation = excluded.explanation
+       returning id
+     )
+insert into public.question_answers (question_id, answer)
+select q.id, '["NOT GIVEN"]'::jsonb from q
+on conflict (question_id) do update set answer = excluded.answer;
+
+with p as (select id from public.passages where slug = 'life-around-hydrothermal-vents'),
+     q as (
+       insert into public.questions (passage_id, idx, kind, prompt, options, evidence, explanation)
+       select p.id, 8, 'multiple_choice'::public.question_kind, 'How do adult Riftia pachyptila obtain nutrition?',
+              '["They filter free-swimming bacteria through a digestive tract.","They consume mineral particles released from the seabed.","Internal bacteria produce nutrients using chemicals supplied by the worm.","They carry out photosynthesis using light emitted by vent minerals."]'::jsonb, 'Instead, bacteria living in a specialised internal organ use compounds delivered by the worm''s blood to produce organic nutrients.', 'The tubeworm relies on internal symbiotic bacteria rather than feeding through a normal digestive system.'
+       from p
+       on conflict (passage_id, idx) do update set
+         kind = excluded.kind, prompt = excluded.prompt, options = excluded.options,
+         evidence = excluded.evidence, explanation = excluded.explanation
+       returning id
+     )
+insert into public.question_answers (question_id, answer)
+select q.id, '["Internal bacteria produce nutrients using chemicals supplied by the worm."]'::jsonb from q
+on conflict (question_id) do update set answer = excluded.answer;
+
+with p as (select id from public.passages where slug = 'life-around-hydrothermal-vents'),
+     q as (
+       insert into public.questions (passage_id, idx, kind, prompt, options, evidence, explanation)
+       select p.id, 9, 'multiple_choice'::public.question_kind, 'Why may effective dispersal be particularly useful for vent species?',
+              '["Vent habitats can disappear and new ones can form elsewhere.","Sunlight levels at vents change rapidly during the day.","Most vent organisms cannot reproduce near volcanic rocks.","Deep-sea currents prevent larvae from leaving their birthplace."]'::jsonb, 'As a result, many vent species live in a landscape of habitats that repeatedly form, disappear and re-form.', 'Because vent habitats are temporary and spatially shifting, species benefit from reaching new suitable sites.'
+       from p
+       on conflict (passage_id, idx) do update set
+         kind = excluded.kind, prompt = excluded.prompt, options = excluded.options,
+         evidence = excluded.evidence, explanation = excluded.explanation
+       returning id
+     )
+insert into public.question_answers (question_id, answer)
+select q.id, '["Vent habitats can disappear and new ones can form elsewhere."]'::jsonb from q
+on conflict (question_id) do update set answer = excluded.answer;
+
+with p as (select id from public.passages where slug = 'life-around-hydrothermal-vents'),
+     q as (
+       insert into public.questions (passage_id, idx, kind, prompt, options, evidence, explanation)
+       select p.id, 10, 'multiple_choice'::public.question_kind, 'Why are the environmental effects of potential vent mining hard to predict?',
+              '["All vent ecosystems contain exactly the same species.","Vent systems differ considerably and many remain poorly understood.","Mining equipment cannot operate at deep-ocean temperatures.","Mineral deposits occur only at inactive vent sites."]'::jsonb, 'At the same time, the ecological consequences remain difficult to predict because vent systems differ greatly in age, chemistry, species composition and natural disturbance frequency.', 'Variation among vent systems makes it difficult to generalise about ecological impacts.'
+       from p
+       on conflict (passage_id, idx) do update set
+         kind = excluded.kind, prompt = excluded.prompt, options = excluded.options,
+         evidence = excluded.evidence, explanation = excluded.explanation
+       returning id
+     )
+insert into public.question_answers (question_id, answer)
+select q.id, '["Vent systems differ considerably and many remain poorly understood."]'::jsonb from q
+on conflict (question_id) do update set answer = excluded.answer;
+
+with p as (select id from public.passages where slug = 'life-around-hydrothermal-vents'),
+     q as (
+       insert into public.questions (passage_id, idx, kind, prompt, options, evidence, explanation)
+       select p.id, 11, 'sentence_completion'::public.question_kind, 'Complete the sentence using NO MORE THAN ONE WORD from the passage: The process forming the ecological foundation of many vent communities is ______.',
+              null, 'The ecological foundation of many vent communities is chemosynthesis.', 'The required term appears exactly in the passage.'
+       from p
+       on conflict (passage_id, idx) do update set
+         kind = excluded.kind, prompt = excluded.prompt, options = excluded.options,
+         evidence = excluded.evidence, explanation = excluded.explanation
+       returning id
+     )
+insert into public.question_answers (question_id, answer)
+select q.id, '["chemosynthesis"]'::jsonb from q
+on conflict (question_id) do update set answer = excluded.answer;
+
+with p as (select id from public.passages where slug = 'life-around-hydrothermal-vents'),
+     q as (
+       insert into public.questions (passage_id, idx, kind, prompt, options, evidence, explanation)
+       select p.id, 12, 'sentence_completion'::public.question_kind, 'Complete the sentence using NO MORE THAN TWO WORDS from the passage: Adult Riftia pachyptila have no functional mouth or ______.',
+              null, 'As adults, these animals have no functional mouth or digestive tract.', 'The two-word answer is copied verbatim.'
+       from p
+       on conflict (passage_id, idx) do update set
+         kind = excluded.kind, prompt = excluded.prompt, options = excluded.options,
+         evidence = excluded.evidence, explanation = excluded.explanation
+       returning id
+     )
+insert into public.question_answers (question_id, answer)
+select q.id, '["digestive tract"]'::jsonb from q
+on conflict (question_id) do update set answer = excluded.answer;
+
+with p as (select id from public.passages where slug = 'life-around-hydrothermal-vents'),
+     q as (
+       insert into public.questions (passage_id, idx, kind, prompt, options, evidence, explanation)
+       select p.id, 13, 'sentence_completion'::public.question_kind, 'Complete the sentence using NO MORE THAN TWO WORDS from the passage: Potential mining could generate ______ that affect habitats beyond the immediate extraction site.',
+              null, 'Disturbance could directly remove organisms and alter vent structures, while sediment plumes and equipment might affect nearby habitats.', 'The phrase ''sediment plumes'' is stated directly in the passage.'
+       from p
+       on conflict (passage_id, idx) do update set
+         kind = excluded.kind, prompt = excluded.prompt, options = excluded.options,
+         evidence = excluded.evidence, explanation = excluded.explanation
+       returning id
+     )
+insert into public.question_answers (question_id, answer)
+select q.id, '["sediment plumes"]'::jsonb from q
 on conflict (question_id) do update set answer = excluded.answer;
 
 -- Mapping Drowned Prehistoric Landscapes
@@ -439,6 +2422,1547 @@ insert into public.question_answers (question_id, answer)
 select q.id, '["YES"]'::jsonb from q
 on conflict (question_id) do update set answer = excluded.answer;
 
+-- Qanats and the Engineering of Underground Water
+insert into public.passages (slug, title, body, topic, headings, difficulty)
+values ('qanats-and-the-engineering-of-underground-water', 'Qanats and the Engineering of Underground Water', 'A
+In dry regions where surface water is unreliable, communities have long developed ways to reach groundwater. One of the most remarkable is the qanat, an underground channel that conveys water from an elevated aquifer toward farms or settlements at lower ground. Instead of using a mechanical pump, the system relies on gravity. A gently sloping tunnel begins near a water-bearing layer and emerges at the surface farther downhill. Water entering the tunnel then flows continuously toward the outlet. Related systems are known by different names across parts of the Middle East, North Africa, Central Asia, and beyond, reflecting centuries of adaptation to arid landscapes.
+
+B
+The gradient of the tunnel is critical. If it is too flat, water may stagnate and sediment can accumulate; if it is too steep, fast flow can erode the channel and damage the structure. Surveyors therefore had to maintain a small but consistent downward slope over distances that could extend for many kilometres. The underground route also needed to intersect the water table at its upper end without descending so deeply that excavation became impractical. Constructing such a system required detailed knowledge of local topography and geology even before modern surveying instruments were available.
+
+C
+A line of vertical shafts usually connects the tunnel to the surface. These openings had several functions. During excavation, workers could remove spoil through the nearest shaft instead of carrying it along the entire tunnel. Shafts also provided ventilation and access for surveying, inspection, and later repairs. From the air, an old qanat may appear as a chain of circular mounds formed by material removed during digging. Excavation remained dangerous because unstable ground could collapse, and workers had to coordinate the depth and alignment of separate tunnel sections so that they eventually connected.
+
+D
+Keeping most of the water underground offers important advantages in an arid climate. A covered channel loses far less water to direct evaporation than an open canal crossing the same hot landscape. The water is also protected from some forms of surface contamination and can be delivered without fuel or external power. However, a qanat does not create water. Its long-term output depends on groundwater recharge and on the relationship between the tunnel and the changing water table. Prolonged drought or excessive pumping from nearby wells can reduce or completely stop the flow.
+
+E
+Qanats require continuing maintenance because sediment accumulates and parts of the tunnel can collapse. Skilled workers periodically enter the shafts to clear obstructions, repair walls, and restore sections of channel. Maintenance can be labor-intensive and hazardous, especially in deep or unstable tunnels. Communities historically developed rules governing access to water and responsibilities for repairs because a failure upstream could affect many users downstream. The infrastructure was therefore social as well as physical: its survival depended on cooperation, local knowledge, and institutions capable of organizing work over long periods.
+
+F
+Where reliable water emerged from a qanat, it could support gardens, fields, livestock, and domestic use in places with little dependable rainfall. Settlements sometimes developed around the outlet, and water might be distributed through smaller surface channels according to agreed schedules. The system could encourage efficient use because the available flow was limited by gravity and aquifer conditions rather than by the instantaneous capacity of a powerful pump. Yet distribution was not automatically equal. Rights to water could reflect land ownership, investment in construction, customary law, or local political power.
+
+G
+Modern deep wells and electric or diesel pumps can extract groundwater much faster than a gravity-fed qanat. This can provide large short-term supplies, but it may lower the regional water table below the level of older tunnels. When that happens, a functioning qanat can dry even if its own channel remains intact. Some communities preserve or rehabilitate qanats because they require little operating energy and embody historical engineering knowledge. Their future, however, depends on groundwater management across the wider aquifer. An underground channel designed centuries ago cannot remain sustainable if modern extraction removes water faster than natural recharge replaces it.', 'history of hydraulic engineering', '["Moving groundwater without mechanical pumping","How a gentle gradient keeps water flowing","Why vertical shafts were essential during construction","The advantages of keeping water underground","Maintenance as a continuing requirement","How settlements and agriculture developed around qanats","Why modern pumping can threaten traditional systems","The limits imposed by geology and groundwater recharge"]'::jsonb, 4)
+on conflict (slug) do update set
+  title = excluded.title, body = excluded.body, topic = excluded.topic,
+  headings = excluded.headings, difficulty = excluded.difficulty;
+
+with p as (select id from public.passages where slug = 'qanats-and-the-engineering-of-underground-water'),
+     q as (
+       insert into public.questions (passage_id, idx, kind, prompt, options, evidence, explanation)
+       select p.id, 1, 'matching_headings'::public.question_kind, 'Choose the most suitable heading for paragraph B.',
+              null, 'The gradient of the tunnel is critical.', 'The paragraph explains why the tunnel slope must be carefully controlled.'
+       from p
+       on conflict (passage_id, idx) do update set
+         kind = excluded.kind, prompt = excluded.prompt, options = excluded.options,
+         evidence = excluded.evidence, explanation = excluded.explanation
+       returning id
+     )
+insert into public.question_answers (question_id, answer)
+select q.id, '["How a gentle gradient keeps water flowing"]'::jsonb from q
+on conflict (question_id) do update set answer = excluded.answer;
+
+with p as (select id from public.passages where slug = 'qanats-and-the-engineering-of-underground-water'),
+     q as (
+       insert into public.questions (passage_id, idx, kind, prompt, options, evidence, explanation)
+       select p.id, 2, 'matching_headings'::public.question_kind, 'Choose the most suitable heading for paragraph C.',
+              null, 'A line of vertical shafts usually connects the tunnel to the surface.', 'The paragraph describes how shafts supported spoil removal, ventilation, surveying, access, and repair.'
+       from p
+       on conflict (passage_id, idx) do update set
+         kind = excluded.kind, prompt = excluded.prompt, options = excluded.options,
+         evidence = excluded.evidence, explanation = excluded.explanation
+       returning id
+     )
+insert into public.question_answers (question_id, answer)
+select q.id, '["Why vertical shafts were essential during construction"]'::jsonb from q
+on conflict (question_id) do update set answer = excluded.answer;
+
+with p as (select id from public.passages where slug = 'qanats-and-the-engineering-of-underground-water'),
+     q as (
+       insert into public.questions (passage_id, idx, kind, prompt, options, evidence, explanation)
+       select p.id, 3, 'matching_headings'::public.question_kind, 'Choose the most suitable heading for paragraph D.',
+              null, 'Keeping most of the water underground offers important advantages in an arid climate.', 'The paragraph focuses on reduced evaporation, protection, and the limits imposed by groundwater availability.'
+       from p
+       on conflict (passage_id, idx) do update set
+         kind = excluded.kind, prompt = excluded.prompt, options = excluded.options,
+         evidence = excluded.evidence, explanation = excluded.explanation
+       returning id
+     )
+insert into public.question_answers (question_id, answer)
+select q.id, '["The advantages of keeping water underground"]'::jsonb from q
+on conflict (question_id) do update set answer = excluded.answer;
+
+with p as (select id from public.passages where slug = 'qanats-and-the-engineering-of-underground-water'),
+     q as (
+       insert into public.questions (passage_id, idx, kind, prompt, options, evidence, explanation)
+       select p.id, 4, 'matching_headings'::public.question_kind, 'Choose the most suitable heading for paragraph E.',
+              null, 'Qanats require continuing maintenance because sediment accumulates and parts of the tunnel can collapse.', 'The paragraph explains why repair and collective maintenance are essential.'
+       from p
+       on conflict (passage_id, idx) do update set
+         kind = excluded.kind, prompt = excluded.prompt, options = excluded.options,
+         evidence = excluded.evidence, explanation = excluded.explanation
+       returning id
+     )
+insert into public.question_answers (question_id, answer)
+select q.id, '["Maintenance as a continuing requirement"]'::jsonb from q
+on conflict (question_id) do update set answer = excluded.answer;
+
+with p as (select id from public.passages where slug = 'qanats-and-the-engineering-of-underground-water'),
+     q as (
+       insert into public.questions (passage_id, idx, kind, prompt, options, evidence, explanation)
+       select p.id, 5, 'true_false_not_given'::public.question_kind, 'Qanats can move water without mechanical pumps.',
+              null, 'Instead of using a mechanical pump, the system relies on gravity.', 'The passage directly states that gravity replaces mechanical pumping.'
+       from p
+       on conflict (passage_id, idx) do update set
+         kind = excluded.kind, prompt = excluded.prompt, options = excluded.options,
+         evidence = excluded.evidence, explanation = excluded.explanation
+       returning id
+     )
+insert into public.question_answers (question_id, answer)
+select q.id, '["TRUE"]'::jsonb from q
+on conflict (question_id) do update set answer = excluded.answer;
+
+with p as (select id from public.passages where slug = 'qanats-and-the-engineering-of-underground-water'),
+     q as (
+       insert into public.questions (passage_id, idx, kind, prompt, options, evidence, explanation)
+       select p.id, 6, 'true_false_not_given'::public.question_kind, 'A steeper qanat tunnel is always more efficient than a gentle one.',
+              null, 'If it is too flat, water may stagnate and sediment can accumulate; if it is too steep, fast flow can erode the channel and damage the structure.', 'The passage explains that an excessively steep slope can cause damage.'
+       from p
+       on conflict (passage_id, idx) do update set
+         kind = excluded.kind, prompt = excluded.prompt, options = excluded.options,
+         evidence = excluded.evidence, explanation = excluded.explanation
+       returning id
+     )
+insert into public.question_answers (question_id, answer)
+select q.id, '["FALSE"]'::jsonb from q
+on conflict (question_id) do update set answer = excluded.answer;
+
+with p as (select id from public.passages where slug = 'qanats-and-the-engineering-of-underground-water'),
+     q as (
+       insert into public.questions (passage_id, idx, kind, prompt, options, evidence, explanation)
+       select p.id, 7, 'true_false_not_given'::public.question_kind, 'The passage states that the longest qanat ever constructed exceeded one hundred kilometres.',
+              null, 'Surveyors therefore had to maintain a small but consistent downward slope over distances that could extend for many kilometres.', 'The passage says qanats can extend for many kilometres but gives no record length.'
+       from p
+       on conflict (passage_id, idx) do update set
+         kind = excluded.kind, prompt = excluded.prompt, options = excluded.options,
+         evidence = excluded.evidence, explanation = excluded.explanation
+       returning id
+     )
+insert into public.question_answers (question_id, answer)
+select q.id, '["NOT GIVEN"]'::jsonb from q
+on conflict (question_id) do update set answer = excluded.answer;
+
+with p as (select id from public.passages where slug = 'qanats-and-the-engineering-of-underground-water'),
+     q as (
+       insert into public.questions (passage_id, idx, kind, prompt, options, evidence, explanation)
+       select p.id, 8, 'multiple_choice'::public.question_kind, 'Why were vertical shafts useful during excavation?',
+              '["They allowed spoil to be removed without carrying it through the whole tunnel.","They increased evaporation from the underground channel.","They eliminated the need to align separate tunnel sections.","They pumped groundwater upward using wind power."]'::jsonb, 'During excavation, workers could remove spoil through the nearest shaft instead of carrying it along the entire tunnel.', 'The passage explicitly gives spoil removal as one function of the shafts.'
+       from p
+       on conflict (passage_id, idx) do update set
+         kind = excluded.kind, prompt = excluded.prompt, options = excluded.options,
+         evidence = excluded.evidence, explanation = excluded.explanation
+       returning id
+     )
+insert into public.question_answers (question_id, answer)
+select q.id, '["They allowed spoil to be removed without carrying it through the whole tunnel."]'::jsonb from q
+on conflict (question_id) do update set answer = excluded.answer;
+
+with p as (select id from public.passages where slug = 'qanats-and-the-engineering-of-underground-water'),
+     q as (
+       insert into public.questions (passage_id, idx, kind, prompt, options, evidence, explanation)
+       select p.id, 9, 'multiple_choice'::public.question_kind, 'What is one advantage of an underground qanat channel in a hot climate?',
+              '["Lower direct evaporation.","Unlimited groundwater production.","Automatic equality of water rights.","Complete protection from tunnel collapse."]'::jsonb, 'A covered channel loses far less water to direct evaporation than an open canal crossing the same hot landscape.', 'Reduced evaporation is identified directly as an advantage.'
+       from p
+       on conflict (passage_id, idx) do update set
+         kind = excluded.kind, prompt = excluded.prompt, options = excluded.options,
+         evidence = excluded.evidence, explanation = excluded.explanation
+       returning id
+     )
+insert into public.question_answers (question_id, answer)
+select q.id, '["Lower direct evaporation."]'::jsonb from q
+on conflict (question_id) do update set answer = excluded.answer;
+
+with p as (select id from public.passages where slug = 'qanats-and-the-engineering-of-underground-water'),
+     q as (
+       insert into public.questions (passage_id, idx, kind, prompt, options, evidence, explanation)
+       select p.id, 10, 'multiple_choice'::public.question_kind, 'How can modern deep wells threaten an older qanat?',
+              '["They can lower the water table below the tunnel.","They make gravity stop operating.","They prevent sediment from accumulating.","They always increase natural groundwater recharge."]'::jsonb, 'This can provide large short-term supplies, but it may lower the regional water table below the level of older tunnels.', 'The passage directly states that heavy pumping can lower groundwater beneath the qanat.'
+       from p
+       on conflict (passage_id, idx) do update set
+         kind = excluded.kind, prompt = excluded.prompt, options = excluded.options,
+         evidence = excluded.evidence, explanation = excluded.explanation
+       returning id
+     )
+insert into public.question_answers (question_id, answer)
+select q.id, '["They can lower the water table below the tunnel."]'::jsonb from q
+on conflict (question_id) do update set answer = excluded.answer;
+
+with p as (select id from public.passages where slug = 'qanats-and-the-engineering-of-underground-water'),
+     q as (
+       insert into public.questions (passage_id, idx, kind, prompt, options, evidence, explanation)
+       select p.id, 11, 'sentence_completion'::public.question_kind, 'Complete the sentence using NO MORE THAN TWO WORDS from the passage: A qanat carries water from an elevated ______.',
+              null, 'One of the most remarkable is the qanat, an underground channel that conveys water from an elevated aquifer toward farms or settlements at lower ground.', 'The exact word is aquifer.'
+       from p
+       on conflict (passage_id, idx) do update set
+         kind = excluded.kind, prompt = excluded.prompt, options = excluded.options,
+         evidence = excluded.evidence, explanation = excluded.explanation
+       returning id
+     )
+insert into public.question_answers (question_id, answer)
+select q.id, '["aquifer"]'::jsonb from q
+on conflict (question_id) do update set answer = excluded.answer;
+
+with p as (select id from public.passages where slug = 'qanats-and-the-engineering-of-underground-water'),
+     q as (
+       insert into public.questions (passage_id, idx, kind, prompt, options, evidence, explanation)
+       select p.id, 12, 'sentence_completion'::public.question_kind, 'Complete the sentence using NO MORE THAN TWO WORDS from the passage: Vertical shafts provided ventilation and access for surveying, inspection, and later ______.',
+              null, 'Shafts also provided ventilation and access for surveying, inspection, and later repairs.', 'The answer is taken verbatim from the passage.'
+       from p
+       on conflict (passage_id, idx) do update set
+         kind = excluded.kind, prompt = excluded.prompt, options = excluded.options,
+         evidence = excluded.evidence, explanation = excluded.explanation
+       returning id
+     )
+insert into public.question_answers (question_id, answer)
+select q.id, '["repairs"]'::jsonb from q
+on conflict (question_id) do update set answer = excluded.answer;
+
+with p as (select id from public.passages where slug = 'qanats-and-the-engineering-of-underground-water'),
+     q as (
+       insert into public.questions (passage_id, idx, kind, prompt, options, evidence, explanation)
+       select p.id, 13, 'sentence_completion'::public.question_kind, 'Complete the sentence using NO MORE THAN TWO WORDS from the passage: Excessive nearby pumping can stop the ______.',
+              null, 'Prolonged drought or excessive pumping from nearby wells can reduce or completely stop the flow.', 'The required word is flow.'
+       from p
+       on conflict (passage_id, idx) do update set
+         kind = excluded.kind, prompt = excluded.prompt, options = excluded.options,
+         evidence = excluded.evidence, explanation = excluded.explanation
+       returning id
+     )
+insert into public.question_answers (question_id, answer)
+select q.id, '["flow"]'::jsonb from q
+on conflict (question_id) do update set answer = excluded.answer;
+
+-- Reading Climate History from Ice Cores
+insert into public.passages (slug, title, body, topic, headings, difficulty)
+values ('reading-climate-history-from-ice-cores', 'Reading Climate History from Ice Cores', 'A
+An ice sheet is not simply frozen water piled in one place. Snow that survives summer is buried by later snowfall, compressed into firn, and eventually transformed into dense glacial ice. During this slow compaction, spaces between grains become isolated bubbles. Those bubbles contain small samples of the atmosphere that existed when the pores finally closed. Scientists drill cylinders of ice from Greenland, Antarctica, and high mountain glaciers because the ice preserves several kinds of evidence at once: snowfall chemistry, windblown dust, volcanic products, isotopic ratios, and ancient air. A single core can therefore link environmental changes that would otherwise be studied in separate archives.
+
+B
+Dating the ice is easiest near the surface, where seasonal differences in snowfall chemistry or dust can form visible or measurable annual layers. Researchers may count these layers much as dendrochronologists count tree rings, although the task becomes harder with depth as layers thin under pressure. Volcanic ash and sulfate peaks can provide additional markers when an eruption is independently dated elsewhere. In very old ice, scientists often combine several dating methods and use models of ice flow to estimate ages between known points. An ice-core age scale is therefore a reconstruction built from multiple lines of evidence rather than a simple depth-to-year conversion.
+
+C
+One of the most important temperature clues comes from the isotopic composition of the ice itself. Water molecules containing heavier isotopes of oxygen or hydrogen behave slightly differently during evaporation and condensation. In polar regions, the relative abundance of these isotopes in snowfall changes with temperature and with the route taken by moisture through the atmosphere. Researchers calibrate these relationships using modern observations and physical models. The isotope signal is not a direct thermometer reading, because it can also be influenced by seasonality and moisture source. Even so, carefully interpreted isotope records reveal large shifts between glacial and warmer interglacial conditions.
+
+D
+The bubbles and the surrounding ice preserve different clocks. Air can continue moving through porous firn for decades or centuries after the snow itself fell, so the trapped gas is usually younger than the ice enclosing it. Once the pores close, however, the bubbles preserve greenhouse gases such as carbon dioxide and methane. Measurements from Antarctic cores show that these gases varied strongly across past glacial cycles. The records demonstrate a close relationship between greenhouse-gas concentrations and large-scale climate changes, while also allowing scientists to investigate the sequence and timing of those changes rather than treating correlation alone as an explanation.
+
+E
+Other impurities broaden the story beyond temperature and gases. Dust concentrations can indicate stronger winds, drier source regions, or changes in exposed land, although the interpretation depends on where the particles came from. Sea salts can reflect marine aerosols and changing atmospheric circulation. Distinct layers rich in sulfate may mark large volcanic eruptions whose aerosols spread over wide areas. Chemical traces from modern industrial pollution can also appear in younger ice. Because many signals are carried by the atmosphere, an event occurring far from the drilling site may leave a detectable layer, turning remote ice sheets into records of processes that crossed continents and oceans.
+
+F
+Recovering the oldest ice creates engineering and interpretive problems. A drill retrieves a cylindrical section of core, but deep drilling may require several kilometres of cable, fluid to balance pressure, and repeated trips down the borehole. Near the bedrock, ice has been squeezed and stretched by centuries of flow. Layers can become extremely thin, folded, or disturbed, making their original order difficult to reconstruct. In some places, melting at the base removes old ice entirely. For this reason, researchers search carefully for locations where snowfall, temperature, bedrock shape, and ice flow may preserve a long and relatively undisturbed sequence.
+
+G
+After recovery, the core becomes a carefully managed scientific resource. Sections are logged, packed, transported in frozen conditions, and stored in cold facilities so that future teams can make measurements that may not yet have been invented. Different laboratories may receive slices from the same depth for gas, isotope, dust, or chemical analysis. Replication matters because concentrations can be tiny and contamination can alter results. Modern ice-core projects therefore depend on international collaboration as much as on drilling technology. The real value of a core lies not in a single dramatic graph, but in the ability to compare multiple signals within a shared chronological framework.', 'paleoclimatology', '["How annual layers and external markers build an age scale","Using isotopes as an indirect record of temperature","Why the air in bubbles is younger than the surrounding ice","How dust, salts and sulfate expand the environmental record","Engineering difficulties near the bottom of an ice sheet","Why frozen archives are preserved for future research","The transformation of buried snow into a multi-purpose archive","Evidence connecting greenhouse gases with glacial cycles","Choosing sites where very old ice may remain ordered"]'::jsonb, 4)
+on conflict (slug) do update set
+  title = excluded.title, body = excluded.body, topic = excluded.topic,
+  headings = excluded.headings, difficulty = excluded.difficulty;
+
+with p as (select id from public.passages where slug = 'reading-climate-history-from-ice-cores'),
+     q as (
+       insert into public.questions (passage_id, idx, kind, prompt, options, evidence, explanation)
+       select p.id, 1, 'matching_headings'::public.question_kind, 'Choose the most suitable heading for paragraph B.',
+              null, 'An ice-core age scale is therefore a reconstruction built from multiple lines of evidence rather than a simple depth-to-year conversion.', 'The paragraph explains how annual layers, volcanic markers and flow models are combined to construct an age scale.'
+       from p
+       on conflict (passage_id, idx) do update set
+         kind = excluded.kind, prompt = excluded.prompt, options = excluded.options,
+         evidence = excluded.evidence, explanation = excluded.explanation
+       returning id
+     )
+insert into public.question_answers (question_id, answer)
+select q.id, '["How annual layers and external markers build an age scale"]'::jsonb from q
+on conflict (question_id) do update set answer = excluded.answer;
+
+with p as (select id from public.passages where slug = 'reading-climate-history-from-ice-cores'),
+     q as (
+       insert into public.questions (passage_id, idx, kind, prompt, options, evidence, explanation)
+       select p.id, 2, 'matching_headings'::public.question_kind, 'Choose the most suitable heading for paragraph C.',
+              null, 'The isotope signal is not a direct thermometer reading, because it can also be influenced by seasonality and moisture source.', 'The paragraph explains how isotope ratios provide temperature information while requiring careful interpretation.'
+       from p
+       on conflict (passage_id, idx) do update set
+         kind = excluded.kind, prompt = excluded.prompt, options = excluded.options,
+         evidence = excluded.evidence, explanation = excluded.explanation
+       returning id
+     )
+insert into public.question_answers (question_id, answer)
+select q.id, '["Using isotopes as an indirect record of temperature"]'::jsonb from q
+on conflict (question_id) do update set answer = excluded.answer;
+
+with p as (select id from public.passages where slug = 'reading-climate-history-from-ice-cores'),
+     q as (
+       insert into public.questions (passage_id, idx, kind, prompt, options, evidence, explanation)
+       select p.id, 3, 'matching_headings'::public.question_kind, 'Choose the most suitable heading for paragraph D.',
+              null, 'Air can continue moving through porous firn for decades or centuries after the snow itself fell, so the trapped gas is usually younger than the ice enclosing it.', 'The paragraph focuses on the age difference between the ice and the air trapped within it.'
+       from p
+       on conflict (passage_id, idx) do update set
+         kind = excluded.kind, prompt = excluded.prompt, options = excluded.options,
+         evidence = excluded.evidence, explanation = excluded.explanation
+       returning id
+     )
+insert into public.question_answers (question_id, answer)
+select q.id, '["Why the air in bubbles is younger than the surrounding ice"]'::jsonb from q
+on conflict (question_id) do update set answer = excluded.answer;
+
+with p as (select id from public.passages where slug = 'reading-climate-history-from-ice-cores'),
+     q as (
+       insert into public.questions (passage_id, idx, kind, prompt, options, evidence, explanation)
+       select p.id, 4, 'matching_headings'::public.question_kind, 'Choose the most suitable heading for paragraph E.',
+              null, 'Other impurities broaden the story beyond temperature and gases.', 'The paragraph describes several impurities that reveal winds, marine influence, eruptions and pollution.'
+       from p
+       on conflict (passage_id, idx) do update set
+         kind = excluded.kind, prompt = excluded.prompt, options = excluded.options,
+         evidence = excluded.evidence, explanation = excluded.explanation
+       returning id
+     )
+insert into public.question_answers (question_id, answer)
+select q.id, '["How dust, salts and sulfate expand the environmental record"]'::jsonb from q
+on conflict (question_id) do update set answer = excluded.answer;
+
+with p as (select id from public.passages where slug = 'reading-climate-history-from-ice-cores'),
+     q as (
+       insert into public.questions (passage_id, idx, kind, prompt, options, evidence, explanation)
+       select p.id, 5, 'true_false_not_given'::public.question_kind, 'Near the surface, seasonal chemical differences can help researchers identify individual years.',
+              null, 'Dating the ice is easiest near the surface, where seasonal differences in snowfall chemistry or dust can form visible or measurable annual layers.', 'The passage states that seasonal differences can form annual layers, which can be used for dating.'
+       from p
+       on conflict (passage_id, idx) do update set
+         kind = excluded.kind, prompt = excluded.prompt, options = excluded.options,
+         evidence = excluded.evidence, explanation = excluded.explanation
+       returning id
+     )
+insert into public.question_answers (question_id, answer)
+select q.id, '["TRUE"]'::jsonb from q
+on conflict (question_id) do update set answer = excluded.answer;
+
+with p as (select id from public.passages where slug = 'reading-climate-history-from-ice-cores'),
+     q as (
+       insert into public.questions (passage_id, idx, kind, prompt, options, evidence, explanation)
+       select p.id, 6, 'true_false_not_given'::public.question_kind, 'Ice-core isotope measurements provide a completely direct reading of past air temperature.',
+              null, 'The isotope signal is not a direct thermometer reading, because it can also be influenced by seasonality and moisture source.', 'The passage explicitly says the isotope signal is not a direct thermometer reading.'
+       from p
+       on conflict (passage_id, idx) do update set
+         kind = excluded.kind, prompt = excluded.prompt, options = excluded.options,
+         evidence = excluded.evidence, explanation = excluded.explanation
+       returning id
+     )
+insert into public.question_answers (question_id, answer)
+select q.id, '["FALSE"]'::jsonb from q
+on conflict (question_id) do update set answer = excluded.answer;
+
+with p as (select id from public.passages where slug = 'reading-climate-history-from-ice-cores'),
+     q as (
+       insert into public.questions (passage_id, idx, kind, prompt, options, evidence, explanation)
+       select p.id, 7, 'true_false_not_given'::public.question_kind, 'Every ice-core drilling project uses cylinders of exactly the same diameter.',
+              null, 'A drill retrieves a cylindrical section of core, but deep drilling may require several kilometres of cable, fluid to balance pressure, and repeated trips down the borehole.', 'The passage says the drill retrieves a cylindrical core but gives no information about whether all projects use the same diameter.'
+       from p
+       on conflict (passage_id, idx) do update set
+         kind = excluded.kind, prompt = excluded.prompt, options = excluded.options,
+         evidence = excluded.evidence, explanation = excluded.explanation
+       returning id
+     )
+insert into public.question_answers (question_id, answer)
+select q.id, '["NOT GIVEN"]'::jsonb from q
+on conflict (question_id) do update set answer = excluded.answer;
+
+with p as (select id from public.passages where slug = 'reading-climate-history-from-ice-cores'),
+     q as (
+       insert into public.questions (passage_id, idx, kind, prompt, options, evidence, explanation)
+       select p.id, 8, 'multiple_choice'::public.question_kind, 'Why can volcanic sulfate layers help with ice-core dating?',
+              '["They can be linked to eruptions independently dated elsewhere.","They reveal the exact speed of ice flow at every depth.","They show when the pores in firn first opened.","They identify the laboratory that stored the core."]'::jsonb, 'Volcanic ash and sulfate peaks can provide additional markers when an eruption is independently dated elsewhere.', 'The passage says independently dated eruptions can provide chronological markers in the ice.'
+       from p
+       on conflict (passage_id, idx) do update set
+         kind = excluded.kind, prompt = excluded.prompt, options = excluded.options,
+         evidence = excluded.evidence, explanation = excluded.explanation
+       returning id
+     )
+insert into public.question_answers (question_id, answer)
+select q.id, '["They can be linked to eruptions independently dated elsewhere."]'::jsonb from q
+on conflict (question_id) do update set answer = excluded.answer;
+
+with p as (select id from public.passages where slug = 'reading-climate-history-from-ice-cores'),
+     q as (
+       insert into public.questions (passage_id, idx, kind, prompt, options, evidence, explanation)
+       select p.id, 9, 'multiple_choice'::public.question_kind, 'What is one problem with ice close to bedrock?',
+              '["It contains no chemical impurities.","Its layers may be folded or disturbed.","It always melts immediately after drilling.","It contains only modern air bubbles."]'::jsonb, 'Layers can become extremely thin, folded, or disturbed, making their original order difficult to reconstruct.', 'The passage identifies deformation of deep layers as a problem for reconstructing their sequence.'
+       from p
+       on conflict (passage_id, idx) do update set
+         kind = excluded.kind, prompt = excluded.prompt, options = excluded.options,
+         evidence = excluded.evidence, explanation = excluded.explanation
+       returning id
+     )
+insert into public.question_answers (question_id, answer)
+select q.id, '["Its layers may be folded or disturbed."]'::jsonb from q
+on conflict (question_id) do update set answer = excluded.answer;
+
+with p as (select id from public.passages where slug = 'reading-climate-history-from-ice-cores'),
+     q as (
+       insert into public.questions (passage_id, idx, kind, prompt, options, evidence, explanation)
+       select p.id, 10, 'multiple_choice'::public.question_kind, 'Why are recovered cores kept in cold storage?',
+              '["To increase the concentration of greenhouse gases.","To allow future teams to use new measurement methods.","To make annual layers become thicker.","To prevent volcanic sulfate from entering the ice."]'::jsonb, 'Sections are logged, packed, transported in frozen conditions, and stored in cold facilities so that future teams can make measurements that may not yet have been invented.', 'The stated reason is to preserve the core for future analytical techniques.'
+       from p
+       on conflict (passage_id, idx) do update set
+         kind = excluded.kind, prompt = excluded.prompt, options = excluded.options,
+         evidence = excluded.evidence, explanation = excluded.explanation
+       returning id
+     )
+insert into public.question_answers (question_id, answer)
+select q.id, '["To allow future teams to use new measurement methods."]'::jsonb from q
+on conflict (question_id) do update set answer = excluded.answer;
+
+with p as (select id from public.passages where slug = 'reading-climate-history-from-ice-cores'),
+     q as (
+       insert into public.questions (passage_id, idx, kind, prompt, options, evidence, explanation)
+       select p.id, 11, 'sentence_completion'::public.question_kind, 'Complete the sentence using NO MORE THAN TWO WORDS from the passage: Buried snow is compressed into ______ before becoming dense glacial ice.',
+              null, 'Snow that survives summer is buried by later snowfall, compressed into firn, and eventually transformed into dense glacial ice.', 'The exact word used in the passage is "firn".'
+       from p
+       on conflict (passage_id, idx) do update set
+         kind = excluded.kind, prompt = excluded.prompt, options = excluded.options,
+         evidence = excluded.evidence, explanation = excluded.explanation
+       returning id
+     )
+insert into public.question_answers (question_id, answer)
+select q.id, '["firn"]'::jsonb from q
+on conflict (question_id) do update set answer = excluded.answer;
+
+with p as (select id from public.passages where slug = 'reading-climate-history-from-ice-cores'),
+     q as (
+       insert into public.questions (passage_id, idx, kind, prompt, options, evidence, explanation)
+       select p.id, 12, 'sentence_completion'::public.question_kind, 'Complete the sentence using NO MORE THAN TWO WORDS from the passage: Near the bed, melting can remove ______ entirely.',
+              null, 'In some places, melting at the base removes old ice entirely.', 'The words "old ice" are taken directly from the passage.'
+       from p
+       on conflict (passage_id, idx) do update set
+         kind = excluded.kind, prompt = excluded.prompt, options = excluded.options,
+         evidence = excluded.evidence, explanation = excluded.explanation
+       returning id
+     )
+insert into public.question_answers (question_id, answer)
+select q.id, '["old ice"]'::jsonb from q
+on conflict (question_id) do update set answer = excluded.answer;
+
+with p as (select id from public.passages where slug = 'reading-climate-history-from-ice-cores'),
+     q as (
+       insert into public.questions (passage_id, idx, kind, prompt, options, evidence, explanation)
+       select p.id, 13, 'sentence_completion'::public.question_kind, 'Complete the sentence using NO MORE THAN TWO WORDS from the passage: Scientists may compare several signals within a shared ______.',
+              null, 'The real value of a core lies not in a single dramatic graph, but in the ability to compare multiple signals within a shared chronological framework.', 'The answer is the exact two-word phrase used in the passage.'
+       from p
+       on conflict (passage_id, idx) do update set
+         kind = excluded.kind, prompt = excluded.prompt, options = excluded.options,
+         evidence = excluded.evidence, explanation = excluded.explanation
+       returning id
+     )
+insert into public.question_answers (question_id, answer)
+select q.id, '["chronological framework"]'::jsonb from q
+on conflict (question_id) do update set answer = excluded.answer;
+
+-- Reconstructing Past Climates from Pollen
+insert into public.passages (slug, title, body, topic, headings, difficulty)
+values ('reconstructing-past-climates-from-pollen', 'Reconstructing Past Climates from Pollen', 'A
+Long before thermometers and satellites, landscapes responded to climate, and their vegetation left traces that can still be recovered. One of the most useful traces is pollen, the microscopic material produced by seed plants for reproduction. Pollen grains have resistant outer walls and distinctive shapes, so many can survive for thousands of years in lake mud, peat, and other sediments. Because different plants prefer different temperature, moisture, and soil conditions, changes in fossil pollen can reveal shifts in past vegetation. Researchers do not read a pollen record as a direct weather diary; they reconstruct ecological change and then infer the environmental conditions that best explain it.
+
+B
+The first requirement is an archive that accumulates sediment in a reasonably ordered sequence. Lakes are especially valuable because pollen carried by wind, water, or animals settles onto the surface and becomes buried by later material. Researchers extract cylindrical sediment cores so that deeper layers generally represent earlier periods. Peat bogs can preserve similar sequences. The source area is not perfectly local: some plants release enormous quantities of easily transported pollen, while others contribute little beyond their immediate surroundings. A sample therefore reflects both the vegetation near the site and a wider regional pollen rain.
+
+C
+Identification depends on the architecture of the pollen grain. Under a microscope, analysts examine features such as size, surface texture, pores, and furrows, comparing unknown grains with reference collections. Some plants can be distinguished to species, but many can only be assigned confidently to a genus, family, or broader group. Analysts count hundreds of grains from a sample and calculate the relative abundance of different pollen types. A percentage diagram plotted against depth can then show vegetation changing through time. The method is laborious because reliable interpretation depends on consistent identification, adequate counts, and careful laboratory preparation.
+
+D
+A pollen sequence becomes far more useful when it has an independent chronology. Radiocarbon dating of suitable organic material can anchor parts of a core to calendar ages, while known volcanic ash layers may provide additional time markers. Researchers build an age-depth model between dated horizons rather than assuming that sediment accumulated at a perfectly constant rate. Disturbance, erosion, or a period with little deposition can create gaps. The age of a pollen change is therefore accompanied by uncertainty, especially where dated material is sparse. Chronology is a model supported by evidence, not a printed timescale hidden inside the mud.
+
+E
+Interpretation focuses on assemblages rather than a single pollen type. An increase in tree pollen might suggest woodland expansion, but the climatic meaning depends on which trees increased and what happened to grasses, herbs, and wetland plants at the same time. Researchers compare fossil assemblages with modern vegetation and with ecological knowledge of plant tolerances. They may also combine pollen with charcoal, insect remains, lake chemistry, or stable isotopes. Multiple proxies are valuable because the same vegetation change can have more than one cause. Cooling, altered rainfall, fire, grazing, and human land clearance can all reorganize plant communities.
+
+F
+Human activity is one reason pollen records cannot be translated mechanically into climate. Farming may reduce tree cover even during a climate favorable to forests, and cultivated plants or weeds can appear as signals of land use. Differences in pollen production create another bias: a plant that releases abundant airborne pollen may appear disproportionately important compared with an insect-pollinated species. Preservation also varies among sediments and pollen types. Analysts correct some biases statistically, but they still report uncertainty and consider alternative explanations. The strength of pollen analysis lies in patterns across many samples, not in treating every percentage change as a precise map of vegetation.
+
+G
+Modern quantitative methods can estimate past climate by comparing fossil assemblages with large databases of modern pollen samples collected under known conditions. If a fossil sample resembles modern communities associated with a particular temperature range, researchers can infer a likely climatic interval, while accounting for uncertainty and the possibility of no close modern analogue. These reconstructions are most convincing when they agree with independent evidence. Pollen records have helped reveal the timing of forest recovery after ice ages, regional droughts, and the growing influence of agriculture. Their power comes from converting countless microscopic grains into a dated history of changing ecosystems.', 'paleoecology', '["Why pollen can preserve a history of vegetation","How lakes collect both local and regional pollen","Microscopic features used to identify pollen","Building a chronology for a sediment core","Reading assemblages instead of single pollen types","Why human land use and pollen production create bias","Turning modern pollen databases into climate estimates","Combining pollen with other environmental proxies","Why sediment accumulation is not always constant"]'::jsonb, 4)
+on conflict (slug) do update set
+  title = excluded.title, body = excluded.body, topic = excluded.topic,
+  headings = excluded.headings, difficulty = excluded.difficulty;
+
+with p as (select id from public.passages where slug = 'reconstructing-past-climates-from-pollen'),
+     q as (
+       insert into public.questions (passage_id, idx, kind, prompt, options, evidence, explanation)
+       select p.id, 1, 'matching_headings'::public.question_kind, 'Choose the most suitable heading for paragraph B.',
+              null, 'The source area is not perfectly local: some plants release enormous quantities of easily transported pollen, while others contribute little beyond their immediate surroundings.', 'The paragraph explains how sediment archives receive pollen from both nearby and broader regional sources.'
+       from p
+       on conflict (passage_id, idx) do update set
+         kind = excluded.kind, prompt = excluded.prompt, options = excluded.options,
+         evidence = excluded.evidence, explanation = excluded.explanation
+       returning id
+     )
+insert into public.question_answers (question_id, answer)
+select q.id, '["How lakes collect both local and regional pollen"]'::jsonb from q
+on conflict (question_id) do update set answer = excluded.answer;
+
+with p as (select id from public.passages where slug = 'reconstructing-past-climates-from-pollen'),
+     q as (
+       insert into public.questions (passage_id, idx, kind, prompt, options, evidence, explanation)
+       select p.id, 2, 'matching_headings'::public.question_kind, 'Choose the most suitable heading for paragraph C.',
+              null, 'Under a microscope, analysts examine features such as size, surface texture, pores, and furrows, comparing unknown grains with reference collections.', 'The paragraph focuses on microscopic identification and counting methods.'
+       from p
+       on conflict (passage_id, idx) do update set
+         kind = excluded.kind, prompt = excluded.prompt, options = excluded.options,
+         evidence = excluded.evidence, explanation = excluded.explanation
+       returning id
+     )
+insert into public.question_answers (question_id, answer)
+select q.id, '["Microscopic features used to identify pollen"]'::jsonb from q
+on conflict (question_id) do update set answer = excluded.answer;
+
+with p as (select id from public.passages where slug = 'reconstructing-past-climates-from-pollen'),
+     q as (
+       insert into public.questions (passage_id, idx, kind, prompt, options, evidence, explanation)
+       select p.id, 3, 'matching_headings'::public.question_kind, 'Choose the most suitable heading for paragraph D.',
+              null, 'A pollen sequence becomes far more useful when it has an independent chronology.', 'The paragraph describes radiocarbon dates, ash layers and age-depth models used to date the sequence.'
+       from p
+       on conflict (passage_id, idx) do update set
+         kind = excluded.kind, prompt = excluded.prompt, options = excluded.options,
+         evidence = excluded.evidence, explanation = excluded.explanation
+       returning id
+     )
+insert into public.question_answers (question_id, answer)
+select q.id, '["Building a chronology for a sediment core"]'::jsonb from q
+on conflict (question_id) do update set answer = excluded.answer;
+
+with p as (select id from public.passages where slug = 'reconstructing-past-climates-from-pollen'),
+     q as (
+       insert into public.questions (passage_id, idx, kind, prompt, options, evidence, explanation)
+       select p.id, 4, 'matching_headings'::public.question_kind, 'Choose the most suitable heading for paragraph F.',
+              null, 'Human activity is one reason pollen records cannot be translated mechanically into climate.', 'The paragraph explains how farming, uneven pollen production and preservation complicate interpretation.'
+       from p
+       on conflict (passage_id, idx) do update set
+         kind = excluded.kind, prompt = excluded.prompt, options = excluded.options,
+         evidence = excluded.evidence, explanation = excluded.explanation
+       returning id
+     )
+insert into public.question_answers (question_id, answer)
+select q.id, '["Why human land use and pollen production create bias"]'::jsonb from q
+on conflict (question_id) do update set answer = excluded.answer;
+
+with p as (select id from public.passages where slug = 'reconstructing-past-climates-from-pollen'),
+     q as (
+       insert into public.questions (passage_id, idx, kind, prompt, options, evidence, explanation)
+       select p.id, 5, 'true_false_not_given'::public.question_kind, 'Pollen grains can remain preserved for thousands of years in some sediments.',
+              null, 'Pollen grains have resistant outer walls and distinctive shapes, so many can survive for thousands of years in lake mud, peat, and other sediments.', 'The passage directly states that many pollen grains can survive for thousands of years.'
+       from p
+       on conflict (passage_id, idx) do update set
+         kind = excluded.kind, prompt = excluded.prompt, options = excluded.options,
+         evidence = excluded.evidence, explanation = excluded.explanation
+       returning id
+     )
+insert into public.question_answers (question_id, answer)
+select q.id, '["TRUE"]'::jsonb from q
+on conflict (question_id) do update set answer = excluded.answer;
+
+with p as (select id from public.passages where slug = 'reconstructing-past-climates-from-pollen'),
+     q as (
+       insert into public.questions (passage_id, idx, kind, prompt, options, evidence, explanation)
+       select p.id, 6, 'true_false_not_given'::public.question_kind, 'Researchers assume that sediment accumulated at a perfectly constant rate between the top and bottom of a core.',
+              null, 'Researchers build an age-depth model between dated horizons rather than assuming that sediment accumulated at a perfectly constant rate.', 'The passage explicitly says researchers do not make that assumption.'
+       from p
+       on conflict (passage_id, idx) do update set
+         kind = excluded.kind, prompt = excluded.prompt, options = excluded.options,
+         evidence = excluded.evidence, explanation = excluded.explanation
+       returning id
+     )
+insert into public.question_answers (question_id, answer)
+select q.id, '["FALSE"]'::jsonb from q
+on conflict (question_id) do update set answer = excluded.answer;
+
+with p as (select id from public.passages where slug = 'reconstructing-past-climates-from-pollen'),
+     q as (
+       insert into public.questions (passage_id, idx, kind, prompt, options, evidence, explanation)
+       select p.id, 7, 'true_false_not_given'::public.question_kind, 'The passage states that every pollen laboratory uses exactly 500 grains per sample.',
+              null, 'Analysts count hundreds of grains from a sample and calculate the relative abundance of different pollen types.', 'The passage says analysts count hundreds of grains but does not specify a universal count of exactly 500.'
+       from p
+       on conflict (passage_id, idx) do update set
+         kind = excluded.kind, prompt = excluded.prompt, options = excluded.options,
+         evidence = excluded.evidence, explanation = excluded.explanation
+       returning id
+     )
+insert into public.question_answers (question_id, answer)
+select q.id, '["NOT GIVEN"]'::jsonb from q
+on conflict (question_id) do update set answer = excluded.answer;
+
+with p as (select id from public.passages where slug = 'reconstructing-past-climates-from-pollen'),
+     q as (
+       insert into public.questions (passage_id, idx, kind, prompt, options, evidence, explanation)
+       select p.id, 8, 'multiple_choice'::public.question_kind, 'Why is a pollen sample not a perfectly local record?',
+              '["Some pollen can travel well beyond the immediate surroundings.","Lake sediments contain only tree pollen.","Radiocarbon dating removes local pollen.","All plants produce identical amounts of pollen."]'::jsonb, 'The source area is not perfectly local: some plants release enormous quantities of easily transported pollen, while others contribute little beyond their immediate surroundings.', 'The passage explains that transport differences allow some pollen to represent a wider region.'
+       from p
+       on conflict (passage_id, idx) do update set
+         kind = excluded.kind, prompt = excluded.prompt, options = excluded.options,
+         evidence = excluded.evidence, explanation = excluded.explanation
+       returning id
+     )
+insert into public.question_answers (question_id, answer)
+select q.id, '["Some pollen can travel well beyond the immediate surroundings."]'::jsonb from q
+on conflict (question_id) do update set answer = excluded.answer;
+
+with p as (select id from public.passages where slug = 'reconstructing-past-climates-from-pollen'),
+     q as (
+       insert into public.questions (passage_id, idx, kind, prompt, options, evidence, explanation)
+       select p.id, 9, 'multiple_choice'::public.question_kind, 'Why do researchers prefer to interpret pollen assemblages rather than one pollen type alone?',
+              '["Several causes can produce similar vegetation changes.","Single pollen grains cannot be seen with microscopes.","Assemblages eliminate the need for dating.","Only assemblages can survive in peat."]'::jsonb, 'Multiple proxies are valuable because the same vegetation change can have more than one cause.', 'The passage emphasizes that different environmental or human processes can produce similar ecological changes.'
+       from p
+       on conflict (passage_id, idx) do update set
+         kind = excluded.kind, prompt = excluded.prompt, options = excluded.options,
+         evidence = excluded.evidence, explanation = excluded.explanation
+       returning id
+     )
+insert into public.question_answers (question_id, answer)
+select q.id, '["Several causes can produce similar vegetation changes."]'::jsonb from q
+on conflict (question_id) do update set answer = excluded.answer;
+
+with p as (select id from public.passages where slug = 'reconstructing-past-climates-from-pollen'),
+     q as (
+       insert into public.questions (passage_id, idx, kind, prompt, options, evidence, explanation)
+       select p.id, 10, 'multiple_choice'::public.question_kind, 'What is a purpose of comparing fossil pollen with modern pollen databases?',
+              '["To estimate likely past climatic conditions.","To identify the manufacturer of a microscope.","To make sediment accumulate faster.","To remove all uncertainty from the record."]'::jsonb, 'If a fossil sample resembles modern communities associated with a particular temperature range, researchers can infer a likely climatic interval, while accounting for uncertainty and the possibility of no close modern analogue.', 'The comparison is used to infer likely climatic conditions while retaining uncertainty.'
+       from p
+       on conflict (passage_id, idx) do update set
+         kind = excluded.kind, prompt = excluded.prompt, options = excluded.options,
+         evidence = excluded.evidence, explanation = excluded.explanation
+       returning id
+     )
+insert into public.question_answers (question_id, answer)
+select q.id, '["To estimate likely past climatic conditions."]'::jsonb from q
+on conflict (question_id) do update set answer = excluded.answer;
+
+with p as (select id from public.passages where slug = 'reconstructing-past-climates-from-pollen'),
+     q as (
+       insert into public.questions (passage_id, idx, kind, prompt, options, evidence, explanation)
+       select p.id, 11, 'sentence_completion'::public.question_kind, 'Complete the sentence using NO MORE THAN TWO WORDS from the passage: Analysts compare unknown grains with ______.',
+              null, 'Under a microscope, analysts examine features such as size, surface texture, pores, and furrows, comparing unknown grains with reference collections.', 'The exact phrase from the passage is "reference collections".'
+       from p
+       on conflict (passage_id, idx) do update set
+         kind = excluded.kind, prompt = excluded.prompt, options = excluded.options,
+         evidence = excluded.evidence, explanation = excluded.explanation
+       returning id
+     )
+insert into public.question_answers (question_id, answer)
+select q.id, '["reference collections"]'::jsonb from q
+on conflict (question_id) do update set answer = excluded.answer;
+
+with p as (select id from public.passages where slug = 'reconstructing-past-climates-from-pollen'),
+     q as (
+       insert into public.questions (passage_id, idx, kind, prompt, options, evidence, explanation)
+       select p.id, 12, 'sentence_completion'::public.question_kind, 'Complete the sentence using NO MORE THAN TWO WORDS from the passage: Known layers of ______ can provide additional time markers.',
+              null, 'Radiocarbon dating of suitable organic material can anchor parts of a core to calendar ages, while known volcanic ash layers may provide additional time markers.', 'The words "volcanic ash" are taken directly from the passage.'
+       from p
+       on conflict (passage_id, idx) do update set
+         kind = excluded.kind, prompt = excluded.prompt, options = excluded.options,
+         evidence = excluded.evidence, explanation = excluded.explanation
+       returning id
+     )
+insert into public.question_answers (question_id, answer)
+select q.id, '["volcanic ash"]'::jsonb from q
+on conflict (question_id) do update set answer = excluded.answer;
+
+with p as (select id from public.passages where slug = 'reconstructing-past-climates-from-pollen'),
+     q as (
+       insert into public.questions (passage_id, idx, kind, prompt, options, evidence, explanation)
+       select p.id, 13, 'sentence_completion'::public.question_kind, 'Complete the sentence using NO MORE THAN TWO WORDS from the passage: Farming may reduce ______ even when climate favors forests.',
+              null, 'Farming may reduce tree cover even during a climate favorable to forests, and cultivated plants or weeds can appear as signals of land use.', 'The answer is the exact phrase used in the passage.'
+       from p
+       on conflict (passage_id, idx) do update set
+         kind = excluded.kind, prompt = excluded.prompt, options = excluded.options,
+         evidence = excluded.evidence, explanation = excluded.explanation
+       returning id
+     )
+insert into public.question_answers (question_id, answer)
+select q.id, '["tree cover"]'::jsonb from q
+on conflict (question_id) do update set answer = excluded.answer;
+
+-- Recovering History from Ancient DNA
+insert into public.passages (slug, title, body, topic, headings, difficulty)
+values ('recovering-history-from-ancient-dna', 'Recovering History from Ancient DNA', 'A
+DNA begins to break down after an organism dies. Water, heat, microorganisms and chemical reactions fragment the long molecules that once existed in living cells, and over time the surviving pieces become shorter and rarer. This creates an obvious difficulty for researchers attempting to recover genetic information from ancient human remains. Samples can also contain large quantities of DNA from soil organisms and from people who handled the material after excavation. In many ancient specimens, the proportion of authentic human DNA is therefore extremely small. Successful analysis depends not only on detecting DNA but on distinguishing genuinely ancient molecules from modern contamination and other genetic material present in the sample.
+
+B
+To reduce contamination, specialised ancient-DNA laboratories operate under conditions very different from ordinary molecular biology facilities. Researchers wear protective clothing, clean surfaces carefully and often work in rooms where air pressure and filtration are controlled. Samples may be treated to remove contamination from their outer surfaces before material is taken from the interior. Scientists also examine characteristic patterns of molecular damage that accumulate in old DNA. These patterns cannot by themselves prove that every sequence is ancient, but they provide evidence that helps distinguish old fragments from recent contamination. Independent replication and comparisons with DNA from laboratory personnel can provide additional safeguards.
+
+C
+The choice of skeletal material can greatly affect the amount of usable DNA recovered. For many years, researchers commonly sampled teeth and long bones, but studies later showed that the dense petrous portion of the temporal bone often preserves unusually high concentrations of ancient DNA. This discovery dramatically increased the success rate of genetic analysis from some poorly preserved remains. However, taking a sample is destructive because a small quantity of bone must be drilled or cut away. Researchers therefore have to balance the scientific value of testing against preservation of the specimen, particularly when remains are rare, culturally significant or held in museum collections.
+
+D
+When sufficient DNA is obtained, researchers can compare genetic similarities among individuals from different places and periods. Such comparisons have transformed understanding of prehistoric population movement. In Europe, for example, genetic evidence has shown that major demographic changes accompanied the spread of farming and later movements from the Eurasian steppe. These findings demonstrated that cultural changes visible in archaeological remains were sometimes associated with substantial migration rather than being caused only by the transfer of ideas. Ancient DNA can also reveal close biological relationships between individuals buried at the same site, allowing researchers to investigate family structure and patterns of residence that would be difficult to detect from artefacts alone.
+
+E
+Genetic evidence nevertheless has important limits. Similar DNA does not tell researchers what language a person spoke, what political identity they claimed or how they understood their community. Archaeological context remains essential for interpreting how people lived, while written sources, where available, provide forms of information that genomes cannot contain. Even biological ancestry requires careful description because ancient populations rarely correspond neatly to modern national or ethnic categories. Genetic data are therefore most informative when combined with evidence from archaeology, anthropology, history, isotope analysis and other fields rather than treated as a complete explanation of the past.
+
+F
+Ethical questions have become increasingly prominent as ancient-DNA research has expanded. Human remains may have cultural, spiritual or familial significance for living communities, and destructive sampling can create conflict if research proceeds without consultation. Some institutions and research groups now place greater emphasis on collaboration with descendant or affiliated communities when projects are planned. Questions also arise over where samples should be stored, who controls genetic data and how findings about ancestry are communicated to the public. There is no single policy that applies to every region or community, but the broader trend is toward recognising that technical ability to extract DNA does not automatically provide an unrestricted right to study human remains.', 'archaeogenetics', '["Why ancient genetic material is difficult to recover","Laboratory methods designed to limit contamination","Choosing bones that preserve more genetic material","How genetic evidence can reveal population movement","Why DNA cannot replace archaeology and history","The growing importance of ethical consultation","Early failures caused by inaccurate radiocarbon dating","What ancient DNA reveals about individual personalities","Using modern genomes to reconstruct extinct languages"]'::jsonb, 4)
+on conflict (slug) do update set
+  title = excluded.title, body = excluded.body, topic = excluded.topic,
+  headings = excluded.headings, difficulty = excluded.difficulty;
+
+with p as (select id from public.passages where slug = 'recovering-history-from-ancient-dna'),
+     q as (
+       insert into public.questions (passage_id, idx, kind, prompt, options, evidence, explanation)
+       select p.id, 1, 'matching_headings'::public.question_kind, 'Choose the most suitable heading for paragraph A.',
+              null, 'Water, heat, microorganisms and chemical reactions fragment the long molecules that once existed in living cells, and over time the surviving pieces become shorter and rarer.', 'Paragraph A outlines degradation and contamination problems that make ancient DNA difficult to analyse.'
+       from p
+       on conflict (passage_id, idx) do update set
+         kind = excluded.kind, prompt = excluded.prompt, options = excluded.options,
+         evidence = excluded.evidence, explanation = excluded.explanation
+       returning id
+     )
+insert into public.question_answers (question_id, answer)
+select q.id, '["Why ancient genetic material is difficult to recover"]'::jsonb from q
+on conflict (question_id) do update set answer = excluded.answer;
+
+with p as (select id from public.passages where slug = 'recovering-history-from-ancient-dna'),
+     q as (
+       insert into public.questions (passage_id, idx, kind, prompt, options, evidence, explanation)
+       select p.id, 2, 'matching_headings'::public.question_kind, 'Choose the most suitable heading for paragraph B.',
+              null, 'To reduce contamination, specialised ancient-DNA laboratories operate under conditions very different from ordinary molecular biology facilities.', 'The paragraph describes protective clothing, cleaning, filtration and other measures used against contamination.'
+       from p
+       on conflict (passage_id, idx) do update set
+         kind = excluded.kind, prompt = excluded.prompt, options = excluded.options,
+         evidence = excluded.evidence, explanation = excluded.explanation
+       returning id
+     )
+insert into public.question_answers (question_id, answer)
+select q.id, '["Laboratory methods designed to limit contamination"]'::jsonb from q
+on conflict (question_id) do update set answer = excluded.answer;
+
+with p as (select id from public.passages where slug = 'recovering-history-from-ancient-dna'),
+     q as (
+       insert into public.questions (passage_id, idx, kind, prompt, options, evidence, explanation)
+       select p.id, 3, 'matching_headings'::public.question_kind, 'Choose the most suitable heading for paragraph C.',
+              null, 'The choice of skeletal material can greatly affect the amount of usable DNA recovered.', 'Paragraph C focuses on which skeletal elements preserve DNA especially well.'
+       from p
+       on conflict (passage_id, idx) do update set
+         kind = excluded.kind, prompt = excluded.prompt, options = excluded.options,
+         evidence = excluded.evidence, explanation = excluded.explanation
+       returning id
+     )
+insert into public.question_answers (question_id, answer)
+select q.id, '["Choosing bones that preserve more genetic material"]'::jsonb from q
+on conflict (question_id) do update set answer = excluded.answer;
+
+with p as (select id from public.passages where slug = 'recovering-history-from-ancient-dna'),
+     q as (
+       insert into public.questions (passage_id, idx, kind, prompt, options, evidence, explanation)
+       select p.id, 4, 'matching_headings'::public.question_kind, 'Choose the most suitable heading for paragraph D.',
+              null, 'Such comparisons have transformed understanding of prehistoric population movement.', 'Paragraph D explains how comparisons among ancient genomes reveal migration and demographic change.'
+       from p
+       on conflict (passage_id, idx) do update set
+         kind = excluded.kind, prompt = excluded.prompt, options = excluded.options,
+         evidence = excluded.evidence, explanation = excluded.explanation
+       returning id
+     )
+insert into public.question_answers (question_id, answer)
+select q.id, '["How genetic evidence can reveal population movement"]'::jsonb from q
+on conflict (question_id) do update set answer = excluded.answer;
+
+with p as (select id from public.passages where slug = 'recovering-history-from-ancient-dna'),
+     q as (
+       insert into public.questions (passage_id, idx, kind, prompt, options, evidence, explanation)
+       select p.id, 5, 'true_false_not_given'::public.question_kind, 'Ancient human samples may contain DNA from organisms living in the surrounding soil.',
+              null, 'Samples can also contain large quantities of DNA from soil organisms and from people who handled the material after excavation.', 'The passage explicitly identifies soil organisms as a source of DNA in ancient samples.'
+       from p
+       on conflict (passage_id, idx) do update set
+         kind = excluded.kind, prompt = excluded.prompt, options = excluded.options,
+         evidence = excluded.evidence, explanation = excluded.explanation
+       returning id
+     )
+insert into public.question_answers (question_id, answer)
+select q.id, '["TRUE"]'::jsonb from q
+on conflict (question_id) do update set answer = excluded.answer;
+
+with p as (select id from public.passages where slug = 'recovering-history-from-ancient-dna'),
+     q as (
+       insert into public.questions (passage_id, idx, kind, prompt, options, evidence, explanation)
+       select p.id, 6, 'true_false_not_given'::public.question_kind, 'Damage patterns in DNA are sufficient on their own to prove that every recovered sequence is ancient.',
+              null, 'These patterns cannot by themselves prove that every sequence is ancient, but they provide evidence that helps distinguish old fragments from recent contamination.', 'The passage directly rejects the idea that damage patterns alone provide complete proof.'
+       from p
+       on conflict (passage_id, idx) do update set
+         kind = excluded.kind, prompt = excluded.prompt, options = excluded.options,
+         evidence = excluded.evidence, explanation = excluded.explanation
+       returning id
+     )
+insert into public.question_answers (question_id, answer)
+select q.id, '["FALSE"]'::jsonb from q
+on conflict (question_id) do update set answer = excluded.answer;
+
+with p as (select id from public.passages where slug = 'recovering-history-from-ancient-dna'),
+     q as (
+       insert into public.questions (passage_id, idx, kind, prompt, options, evidence, explanation)
+       select p.id, 7, 'true_false_not_given'::public.question_kind, 'The petrous portion of the temporal bone was first identified as a useful DNA source by researchers working in Scandinavia.',
+              null, 'For many years, researchers commonly sampled teeth and long bones, but studies later showed that the dense petrous portion of the temporal bone often preserves unusually high concentrations of ancient DNA.', 'The passage identifies the petrous bone as useful but does not say where the discovery was first made.'
+       from p
+       on conflict (passage_id, idx) do update set
+         kind = excluded.kind, prompt = excluded.prompt, options = excluded.options,
+         evidence = excluded.evidence, explanation = excluded.explanation
+       returning id
+     )
+insert into public.question_answers (question_id, answer)
+select q.id, '["NOT GIVEN"]'::jsonb from q
+on conflict (question_id) do update set answer = excluded.answer;
+
+with p as (select id from public.passages where slug = 'recovering-history-from-ancient-dna'),
+     q as (
+       insert into public.questions (passage_id, idx, kind, prompt, options, evidence, explanation)
+       select p.id, 8, 'multiple_choice'::public.question_kind, 'Why does sampling ancient skeletal material create a preservation issue?',
+              '["The analysis requires some bone to be removed or drilled.","Bones must be exposed to high temperatures during testing.","Samples cannot be returned to museum collections.","Genetic analysis permanently changes the age of the specimen."]'::jsonb, 'However, taking a sample is destructive because a small quantity of bone must be drilled or cut away.', 'The destructive aspect of sampling comes from physically removing part of the specimen.'
+       from p
+       on conflict (passage_id, idx) do update set
+         kind = excluded.kind, prompt = excluded.prompt, options = excluded.options,
+         evidence = excluded.evidence, explanation = excluded.explanation
+       returning id
+     )
+insert into public.question_answers (question_id, answer)
+select q.id, '["The analysis requires some bone to be removed or drilled."]'::jsonb from q
+on conflict (question_id) do update set answer = excluded.answer;
+
+with p as (select id from public.passages where slug = 'recovering-history-from-ancient-dna'),
+     q as (
+       insert into public.questions (passage_id, idx, kind, prompt, options, evidence, explanation)
+       select p.id, 9, 'multiple_choice'::public.question_kind, 'What has ancient DNA shown about some cultural changes in prehistoric Europe?',
+              '["They were sometimes accompanied by large-scale migration.","They occurred without any movement of people.","They were caused mainly by changes in spoken language.","They can be explained entirely through family relationships."]'::jsonb, 'These findings demonstrated that cultural changes visible in archaeological remains were sometimes associated with substantial migration rather than being caused only by the transfer of ideas.', 'The genetic evidence indicates that migration sometimes accompanied cultural change.'
+       from p
+       on conflict (passage_id, idx) do update set
+         kind = excluded.kind, prompt = excluded.prompt, options = excluded.options,
+         evidence = excluded.evidence, explanation = excluded.explanation
+       returning id
+     )
+insert into public.question_answers (question_id, answer)
+select q.id, '["They were sometimes accompanied by large-scale migration."]'::jsonb from q
+on conflict (question_id) do update set answer = excluded.answer;
+
+with p as (select id from public.passages where slug = 'recovering-history-from-ancient-dna'),
+     q as (
+       insert into public.questions (passage_id, idx, kind, prompt, options, evidence, explanation)
+       select p.id, 10, 'multiple_choice'::public.question_kind, 'Why does the author argue that genetic evidence should be combined with other disciplines?',
+              '["Genomes contain no information about biological relationships.","DNA cannot reveal every social and cultural aspect of past lives.","Archaeological evidence is always more precise than genetic evidence.","Written sources can determine the exact ancestry of every individual."]'::jsonb, 'Similar DNA does not tell researchers what language a person spoke, what political identity they claimed or how they understood their community.', 'The passage stresses that genetic similarity cannot answer many cultural and social questions.'
+       from p
+       on conflict (passage_id, idx) do update set
+         kind = excluded.kind, prompt = excluded.prompt, options = excluded.options,
+         evidence = excluded.evidence, explanation = excluded.explanation
+       returning id
+     )
+insert into public.question_answers (question_id, answer)
+select q.id, '["DNA cannot reveal every social and cultural aspect of past lives."]'::jsonb from q
+on conflict (question_id) do update set answer = excluded.answer;
+
+with p as (select id from public.passages where slug = 'recovering-history-from-ancient-dna'),
+     q as (
+       insert into public.questions (passage_id, idx, kind, prompt, options, evidence, explanation)
+       select p.id, 11, 'sentence_completion'::public.question_kind, 'Complete the sentence using NO MORE THAN TWO WORDS from the passage: Ancient DNA fragments become progressively shorter and ______ over time.',
+              null, 'Water, heat, microorganisms and chemical reactions fragment the long molecules that once existed in living cells, and over time the surviving pieces become shorter and rarer.', 'The missing word is taken directly from the passage.'
+       from p
+       on conflict (passage_id, idx) do update set
+         kind = excluded.kind, prompt = excluded.prompt, options = excluded.options,
+         evidence = excluded.evidence, explanation = excluded.explanation
+       returning id
+     )
+insert into public.question_answers (question_id, answer)
+select q.id, '["rarer"]'::jsonb from q
+on conflict (question_id) do update set answer = excluded.answer;
+
+with p as (select id from public.passages where slug = 'recovering-history-from-ancient-dna'),
+     q as (
+       insert into public.questions (passage_id, idx, kind, prompt, options, evidence, explanation)
+       select p.id, 12, 'sentence_completion'::public.question_kind, 'Complete the sentence using NO MORE THAN THREE WORDS from the passage: The ______ of the temporal bone often contains high concentrations of ancient DNA.',
+              null, 'For many years, researchers commonly sampled teeth and long bones, but studies later showed that the dense petrous portion of the temporal bone often preserves unusually high concentrations of ancient DNA.', 'The three-word answer appears verbatim in the passage.'
+       from p
+       on conflict (passage_id, idx) do update set
+         kind = excluded.kind, prompt = excluded.prompt, options = excluded.options,
+         evidence = excluded.evidence, explanation = excluded.explanation
+       returning id
+     )
+insert into public.question_answers (question_id, answer)
+select q.id, '["dense petrous portion"]'::jsonb from q
+on conflict (question_id) do update set answer = excluded.answer;
+
+with p as (select id from public.passages where slug = 'recovering-history-from-ancient-dna'),
+     q as (
+       insert into public.questions (passage_id, idx, kind, prompt, options, evidence, explanation)
+       select p.id, 13, 'sentence_completion'::public.question_kind, 'Complete the sentence using NO MORE THAN TWO WORDS from the passage: Some researchers increasingly collaborate with ______ when planning ancient-DNA projects.',
+              null, 'Some institutions and research groups now place greater emphasis on collaboration with descendant or affiliated communities when projects are planned.', 'The required word is stated directly in the passage.'
+       from p
+       on conflict (passage_id, idx) do update set
+         kind = excluded.kind, prompt = excluded.prompt, options = excluded.options,
+         evidence = excluded.evidence, explanation = excluded.explanation
+       returning id
+     )
+insert into public.question_answers (question_id, answer)
+select q.id, '["descendant"]'::jsonb from q
+on conflict (question_id) do update set answer = excluded.answer;
+
+-- Restoring Peatlands for Carbon and Biodiversity
+insert into public.passages (slug, title, body, topic, headings, difficulty)
+values ('restoring-peatlands-for-carbon-and-biodiversity', 'Restoring Peatlands for Carbon and Biodiversity', 'A
+Peatlands are wetlands in which partially decayed plant material accumulates faster than it decomposes. They cover only a modest share of the world''s land surface, yet they store exceptionally large quantities of carbon in their soils. The reason is water. When the ground remains saturated, oxygen moves slowly into the soil and microbial decomposition is restricted. Dead mosses, sedges, shrubs, and other plants can therefore persist and build layers of peat over centuries or millennia. This slow accumulation turns a living wetland into a long-term carbon store, but the same carbon can become vulnerable when drainage, burning, extraction, or warming changes the conditions that preserved it.
+
+B
+Drainage is one of the most important disturbances because it lowers the water table and exposes previously saturated peat to air. Oxygen allows decomposer organisms to break down organic matter more rapidly, releasing carbon dioxide. The soil can also shrink and subside as it dries, creating physical changes that make restoration harder. Drained peat is often used for farming, forestry, or peat extraction, so the hydrological alteration may be tied to an economic land use rather than a single damaged ditch. In tropical peatlands, drainage can also increase fire risk because dry peat can smoulder below the surface and continue burning after visible flames have disappeared.
+
+C
+The central technique in many restoration projects is rewetting. Managers block drainage channels, raise water levels, or alter water-control structures so that peat becomes saturated again. The goal is not simply to create open water. A successful project tries to restore a water table that supports peat-forming vegetation without causing unacceptable flooding elsewhere. Hydrology can be surprisingly local: a ditch, road, slope, or compacted layer may redirect water over short distances. For that reason, restoration planning often begins with maps of elevation and drainage rather than with planting. If the water regime remains wrong, vegetation treatments alone are unlikely to recreate a functioning peatland.
+
+D
+Rewetting changes greenhouse-gas emissions in complicated ways. Carbon dioxide emissions from decomposing peat generally fall when oxygen is excluded, but methane can rise because methane-producing microbes thrive in waterlogged, oxygen-poor conditions. Methane is a powerful greenhouse gas, although it remains in the atmosphere for a much shorter time than carbon dioxide. The balance therefore depends on the timescale considered, the previous condition of the site, vegetation, temperature, and water level. Restored peatlands are not expected to become climate-neutral instantly. Their value is usually assessed over years or decades, as avoided carbon loss and renewed peat formation accumulate.
+
+E
+Plants matter because peat is ultimately built from plant material. In many northern bogs, Sphagnum mosses are especially important because they can hold large amounts of water and create acidic, nutrient-poor conditions that slow decomposition. Restoration may involve reducing grazing pressure, removing trees that increase water loss, or reintroducing peat-forming vegetation where natural recovery is slow. Yet importing plants without fixing hydrology is rarely sufficient. Managers also have to consider whether the site was originally a bog, fen, swamp, or another peatland type, because each depends on a different relationship among rainfall, groundwater, nutrients, and vegetation.
+
+F
+Monitoring determines whether restoration is actually working. Water-table depth can be measured with wells or automated sensors, while vegetation surveys track the return of characteristic species. Instruments can measure exchanges of carbon dioxide and methane between the land and atmosphere, and repeated elevation surveys can reveal whether the surface is subsiding or stabilizing. Satellite data increasingly help researchers observe moisture, fire damage, and vegetation change over large regions. No single measurement captures the whole process. A site may look greener while still losing carbon, or show improved carbon balance before its original plant community has returned.
+
+G
+Peatland restoration also has a social dimension because damaged peatlands are often productive landscapes for local communities. Rewetting can conflict with conventional drainage-based farming or forestry, and water raised on one property may affect neighboring land. Some projects therefore explore forms of wet agriculture, sometimes called paludiculture, in which crops adapted to high water tables are harvested without deeply draining the peat. Whether such systems are economically competitive varies by crop, market, and region. Long-term restoration succeeds most reliably when hydrological goals, carbon benefits, biodiversity, fire risk, and local livelihoods are considered together rather than treated as separate problems.', 'wetland ecology', '["Why waterlogged soils can preserve carbon for millennia","Drainage as a trigger for decomposition, subsidence and fire","Rewetting as a hydrological rather than purely botanical repair","The methane trade-off after water levels are restored","The role of peat-forming plants in recovery","Measuring restoration with several kinds of evidence","Balancing ecological recovery with local land use","How different peatland types depend on different water and nutrient sources","Wet agriculture as an alternative to deep drainage"]'::jsonb, 4)
+on conflict (slug) do update set
+  title = excluded.title, body = excluded.body, topic = excluded.topic,
+  headings = excluded.headings, difficulty = excluded.difficulty;
+
+with p as (select id from public.passages where slug = 'restoring-peatlands-for-carbon-and-biodiversity'),
+     q as (
+       insert into public.questions (passage_id, idx, kind, prompt, options, evidence, explanation)
+       select p.id, 1, 'matching_headings'::public.question_kind, 'Choose the most suitable heading for paragraph B.',
+              null, 'Drainage is one of the most important disturbances because it lowers the water table and exposes previously saturated peat to air.', 'The paragraph explains several consequences of drainage, including faster decay, subsidence and greater fire risk.'
+       from p
+       on conflict (passage_id, idx) do update set
+         kind = excluded.kind, prompt = excluded.prompt, options = excluded.options,
+         evidence = excluded.evidence, explanation = excluded.explanation
+       returning id
+     )
+insert into public.question_answers (question_id, answer)
+select q.id, '["Drainage as a trigger for decomposition, subsidence and fire"]'::jsonb from q
+on conflict (question_id) do update set answer = excluded.answer;
+
+with p as (select id from public.passages where slug = 'restoring-peatlands-for-carbon-and-biodiversity'),
+     q as (
+       insert into public.questions (passage_id, idx, kind, prompt, options, evidence, explanation)
+       select p.id, 2, 'matching_headings'::public.question_kind, 'Choose the most suitable heading for paragraph C.',
+              null, 'The central technique in many restoration projects is rewetting.', 'The paragraph focuses on restoring water levels and explains why hydrology must be corrected before vegetation alone can succeed.'
+       from p
+       on conflict (passage_id, idx) do update set
+         kind = excluded.kind, prompt = excluded.prompt, options = excluded.options,
+         evidence = excluded.evidence, explanation = excluded.explanation
+       returning id
+     )
+insert into public.question_answers (question_id, answer)
+select q.id, '["Rewetting as a hydrological rather than purely botanical repair"]'::jsonb from q
+on conflict (question_id) do update set answer = excluded.answer;
+
+with p as (select id from public.passages where slug = 'restoring-peatlands-for-carbon-and-biodiversity'),
+     q as (
+       insert into public.questions (passage_id, idx, kind, prompt, options, evidence, explanation)
+       select p.id, 3, 'matching_headings'::public.question_kind, 'Choose the most suitable heading for paragraph D.',
+              null, 'Rewetting changes greenhouse-gas emissions in complicated ways.', 'The paragraph contrasts falling carbon dioxide emissions with potentially rising methane emissions.'
+       from p
+       on conflict (passage_id, idx) do update set
+         kind = excluded.kind, prompt = excluded.prompt, options = excluded.options,
+         evidence = excluded.evidence, explanation = excluded.explanation
+       returning id
+     )
+insert into public.question_answers (question_id, answer)
+select q.id, '["The methane trade-off after water levels are restored"]'::jsonb from q
+on conflict (question_id) do update set answer = excluded.answer;
+
+with p as (select id from public.passages where slug = 'restoring-peatlands-for-carbon-and-biodiversity'),
+     q as (
+       insert into public.questions (passage_id, idx, kind, prompt, options, evidence, explanation)
+       select p.id, 4, 'matching_headings'::public.question_kind, 'Choose the most suitable heading for paragraph F.',
+              null, 'Monitoring determines whether restoration is actually working.', 'The paragraph lists water-table, vegetation, gas-flux, elevation and satellite measurements used to evaluate recovery.'
+       from p
+       on conflict (passage_id, idx) do update set
+         kind = excluded.kind, prompt = excluded.prompt, options = excluded.options,
+         evidence = excluded.evidence, explanation = excluded.explanation
+       returning id
+     )
+insert into public.question_answers (question_id, answer)
+select q.id, '["Measuring restoration with several kinds of evidence"]'::jsonb from q
+on conflict (question_id) do update set answer = excluded.answer;
+
+with p as (select id from public.passages where slug = 'restoring-peatlands-for-carbon-and-biodiversity'),
+     q as (
+       insert into public.questions (passage_id, idx, kind, prompt, options, evidence, explanation)
+       select p.id, 5, 'true_false_not_given'::public.question_kind, 'Saturated peat tends to decompose slowly because oxygen enters the soil slowly.',
+              null, 'When the ground remains saturated, oxygen moves slowly into the soil and microbial decomposition is restricted.', 'The passage directly links saturation, slow oxygen movement and restricted decomposition.'
+       from p
+       on conflict (passage_id, idx) do update set
+         kind = excluded.kind, prompt = excluded.prompt, options = excluded.options,
+         evidence = excluded.evidence, explanation = excluded.explanation
+       returning id
+     )
+insert into public.question_answers (question_id, answer)
+select q.id, '["TRUE"]'::jsonb from q
+on conflict (question_id) do update set answer = excluded.answer;
+
+with p as (select id from public.passages where slug = 'restoring-peatlands-for-carbon-and-biodiversity'),
+     q as (
+       insert into public.questions (passage_id, idx, kind, prompt, options, evidence, explanation)
+       select p.id, 6, 'true_false_not_given'::public.question_kind, 'Rewetting is intended simply to convert damaged peatland into permanent open water.',
+              null, 'The goal is not simply to create open water.', 'The passage explicitly rejects this description of the goal.'
+       from p
+       on conflict (passage_id, idx) do update set
+         kind = excluded.kind, prompt = excluded.prompt, options = excluded.options,
+         evidence = excluded.evidence, explanation = excluded.explanation
+       returning id
+     )
+insert into public.question_answers (question_id, answer)
+select q.id, '["FALSE"]'::jsonb from q
+on conflict (question_id) do update set answer = excluded.answer;
+
+with p as (select id from public.passages where slug = 'restoring-peatlands-for-carbon-and-biodiversity'),
+     q as (
+       insert into public.questions (passage_id, idx, kind, prompt, options, evidence, explanation)
+       select p.id, 7, 'true_false_not_given'::public.question_kind, 'The passage states that every paludiculture crop is more profitable than conventional farming.',
+              null, 'Whether such systems are economically competitive varies by crop, market, and region.', 'The passage says competitiveness varies and gives no claim that every crop is more profitable.'
+       from p
+       on conflict (passage_id, idx) do update set
+         kind = excluded.kind, prompt = excluded.prompt, options = excluded.options,
+         evidence = excluded.evidence, explanation = excluded.explanation
+       returning id
+     )
+insert into public.question_answers (question_id, answer)
+select q.id, '["NOT GIVEN"]'::jsonb from q
+on conflict (question_id) do update set answer = excluded.answer;
+
+with p as (select id from public.passages where slug = 'restoring-peatlands-for-carbon-and-biodiversity'),
+     q as (
+       insert into public.questions (passage_id, idx, kind, prompt, options, evidence, explanation)
+       select p.id, 8, 'multiple_choice'::public.question_kind, 'Why can drained peat continue burning after surface flames are gone?',
+              '["Dry peat can smoulder below the surface.","Drainage can expose peat to oxygen and speed decomposition.","Waterlogged peat can support methane-producing microbes.","Tree removal can reduce water loss from a restoration site."]'::jsonb, 'In tropical peatlands, drainage can also increase fire risk because dry peat can smoulder below the surface and continue burning after visible flames have disappeared.', 'The passage specifically attributes the persistence of fire to subsurface smouldering.'
+       from p
+       on conflict (passage_id, idx) do update set
+         kind = excluded.kind, prompt = excluded.prompt, options = excluded.options,
+         evidence = excluded.evidence, explanation = excluded.explanation
+       returning id
+     )
+insert into public.question_answers (question_id, answer)
+select q.id, '["Dry peat can smoulder below the surface."]'::jsonb from q
+on conflict (question_id) do update set answer = excluded.answer;
+
+with p as (select id from public.passages where slug = 'restoring-peatlands-for-carbon-and-biodiversity'),
+     q as (
+       insert into public.questions (passage_id, idx, kind, prompt, options, evidence, explanation)
+       select p.id, 9, 'multiple_choice'::public.question_kind, 'Why may vegetation treatment fail if used without hydrological repair?',
+              '["The site may remain under the wrong water regime.","All peat-forming plants require seawater.","Vegetation always increases oxygen in the soil.","Plants prevent managers from mapping elevation."]'::jsonb, 'If the water regime remains wrong, vegetation treatments alone are unlikely to recreate a functioning peatland.', 'The passage directly states that an unsuitable water regime can undermine vegetation-only restoration.'
+       from p
+       on conflict (passage_id, idx) do update set
+         kind = excluded.kind, prompt = excluded.prompt, options = excluded.options,
+         evidence = excluded.evidence, explanation = excluded.explanation
+       returning id
+     )
+insert into public.question_answers (question_id, answer)
+select q.id, '["The site may remain under the wrong water regime."]'::jsonb from q
+on conflict (question_id) do update set answer = excluded.answer;
+
+with p as (select id from public.passages where slug = 'restoring-peatlands-for-carbon-and-biodiversity'),
+     q as (
+       insert into public.questions (passage_id, idx, kind, prompt, options, evidence, explanation)
+       select p.id, 10, 'multiple_choice'::public.question_kind, 'Which plant group is highlighted as especially important in many northern bogs?',
+              '["Sphagnum mosses","Sedges","Shrubs","Trees"]'::jsonb, 'In many northern bogs, Sphagnum mosses are especially important because they can hold large amounts of water and create acidic, nutrient-poor conditions that slow decomposition.', 'The passage names Sphagnum mosses specifically.'
+       from p
+       on conflict (passage_id, idx) do update set
+         kind = excluded.kind, prompt = excluded.prompt, options = excluded.options,
+         evidence = excluded.evidence, explanation = excluded.explanation
+       returning id
+     )
+insert into public.question_answers (question_id, answer)
+select q.id, '["Sphagnum mosses"]'::jsonb from q
+on conflict (question_id) do update set answer = excluded.answer;
+
+with p as (select id from public.passages where slug = 'restoring-peatlands-for-carbon-and-biodiversity'),
+     q as (
+       insert into public.questions (passage_id, idx, kind, prompt, options, evidence, explanation)
+       select p.id, 11, 'sentence_completion'::public.question_kind, 'Complete the sentence using NO MORE THAN TWO WORDS from the passage: Rewetting often begins by raising the ______.',
+              null, 'Managers block drainage channels, raise water levels, or alter water-control structures so that peat becomes saturated again.', 'The phrase "water levels" is lifted directly from the passage.'
+       from p
+       on conflict (passage_id, idx) do update set
+         kind = excluded.kind, prompt = excluded.prompt, options = excluded.options,
+         evidence = excluded.evidence, explanation = excluded.explanation
+       returning id
+     )
+insert into public.question_answers (question_id, answer)
+select q.id, '["water levels"]'::jsonb from q
+on conflict (question_id) do update set answer = excluded.answer;
+
+with p as (select id from public.passages where slug = 'restoring-peatlands-for-carbon-and-biodiversity'),
+     q as (
+       insert into public.questions (passage_id, idx, kind, prompt, options, evidence, explanation)
+       select p.id, 12, 'sentence_completion'::public.question_kind, 'Complete the sentence using NO MORE THAN TWO WORDS from the passage: Restored peatlands may initially emit more ______.',
+              null, 'Carbon dioxide emissions from decomposing peat generally fall when oxygen is excluded, but methane can rise because methane-producing microbes thrive in waterlogged, oxygen-poor conditions.', 'The exact gas named in the passage is methane.'
+       from p
+       on conflict (passage_id, idx) do update set
+         kind = excluded.kind, prompt = excluded.prompt, options = excluded.options,
+         evidence = excluded.evidence, explanation = excluded.explanation
+       returning id
+     )
+insert into public.question_answers (question_id, answer)
+select q.id, '["methane"]'::jsonb from q
+on conflict (question_id) do update set answer = excluded.answer;
+
+with p as (select id from public.passages where slug = 'restoring-peatlands-for-carbon-and-biodiversity'),
+     q as (
+       insert into public.questions (passage_id, idx, kind, prompt, options, evidence, explanation)
+       select p.id, 13, 'sentence_completion'::public.question_kind, 'Complete the sentence using NO MORE THAN TWO WORDS from the passage: Repeated elevation surveys can show whether the peat surface is subsiding or ______.',
+              null, 'Instruments can measure exchanges of carbon dioxide and methane between the land and atmosphere, and repeated elevation surveys can reveal whether the surface is subsiding or stabilizing.', 'The required word is taken verbatim from the sentence.'
+       from p
+       on conflict (passage_id, idx) do update set
+         kind = excluded.kind, prompt = excluded.prompt, options = excluded.options,
+         evidence = excluded.evidence, explanation = excluded.explanation
+       returning id
+     )
+insert into public.question_answers (question_id, answer)
+select q.id, '["stabilizing"]'::jsonb from q
+on conflict (question_id) do update set answer = excluded.answer;
+
+-- The Hidden Engineering of Termite Mounds
+insert into public.passages (slug, title, body, topic, headings, difficulty)
+values ('the-hidden-engineering-of-termite-mounds', 'The Hidden Engineering of Termite Mounds', 'A
+Termite mounds are among the most conspicuous structures built by insects, yet the part visible above ground is only one component of a much larger nest system. Depending on the species, the colony may occupy underground chambers connected by tunnels to a mound that can rise several metres above the soil. The mound is not simply a protective wall around the insects. Its passages, porous surfaces and internal cavities influence the movement of gases between the colony and the surrounding air. Because termites live in large groups and maintain concentrated biological activity inside the nest, managing heat, moisture, oxygen and carbon dioxide is an important engineering problem created by the colony itself.
+
+B
+Termites, their developing young and associated biological processes consume oxygen and release carbon dioxide. In a large colony, these exchanges can alter the composition of air inside the nest. Heat is also generated by metabolism, while water enters the nest through soil, food and biological activity. The colony must therefore maintain conditions that are suitable for its inhabitants without possessing mechanical fans or pumps. Early descriptions often treated termite mounds as simple chimneys in which warm air rose continuously and escaped from the top. Research has shown that this picture is too simple for many species. Air movement can change direction over the course of a day and may be driven by several interacting forces.
+
+C
+Temperature differences between the mound and the surrounding air are particularly important. During the day, the outer surface of a mound exposed to sunlight may heat much faster than its interior. At night, the surface can cool rapidly while deeper soil changes temperature more slowly. These shifting temperature gradients can create pressure differences that move air through the mound''s porous walls and internal channels. Wind can contribute as well by producing different pressures on opposite sides of the structure. Consequently, ventilation may emerge from a combination of solar heating, thermal storage, wind and the geometry of the nest rather than from one permanent upward flow of warm air.
+
+D
+Not all termite mounds look or function alike. Species living in different climates construct nests with different shapes, wall thicknesses, orientations and degrees of porosity. Even within one species, local soil properties and exposure to sun or wind can affect construction. Some famous mounds in northern Australia are extremely narrow and aligned roughly north-south, reducing the surface exposed to intense midday sunlight while allowing warming in the morning and evening. Other species build broad domes or tall irregular towers. Such diversity warns against treating the phrase ''termite mound'' as if it referred to a single architectural design with one universal ventilation system.
+
+E
+Internal temperature is often described in popular accounts as being kept almost perfectly constant, but measurements show a more complicated pattern. Conditions inside nests can fluctuate, although usually less dramatically than temperatures on exposed outer surfaces. Different zones of a nest may also have different microclimates. Termites can respond behaviourally by moving within the nest, opening or closing passages, repairing walls and changing where construction occurs. These actions mean that environmental control is produced jointly by the physical structure and by the insects'' behaviour. The mound should therefore be understood as part of an active biological system rather than as a passive machine that maintains one fixed temperature automatically.
+
+F
+Termite mounds have attracted architects interested in low-energy building design, especially because the nests regulate gas exchange and temperature without conventional air-conditioning equipment. The useful lesson is not that office buildings should reproduce the exact shape of a mound. Human buildings contain different materials, heat sources, occupants and safety requirements, and they operate at a completely different scale. Instead, researchers have examined broader principles such as using natural pressure differences, thermal mass, carefully placed openings and the daily cycle of outdoor temperatures to reduce mechanical cooling demand. Biomimicry is most productive when it identifies a transferable process rather than copying the appearance of a biological structure.', 'animal architecture and environmental physiology', '["A visible structure with an invisible purpose","How colony metabolism changes the nest atmosphere","Moving air without relying on a single ventilation model","Why mound design varies between habitats","What architects can learn without copying a mound","Maintaining suitable conditions for developing young","The importance of soil in mound construction","How rainfall destroys abandoned colonies","A mistaken idea about permanently stable nest temperatures"]'::jsonb, 3)
+on conflict (slug) do update set
+  title = excluded.title, body = excluded.body, topic = excluded.topic,
+  headings = excluded.headings, difficulty = excluded.difficulty;
+
+with p as (select id from public.passages where slug = 'the-hidden-engineering-of-termite-mounds'),
+     q as (
+       insert into public.questions (passage_id, idx, kind, prompt, options, evidence, explanation)
+       select p.id, 1, 'matching_headings'::public.question_kind, 'Choose the most suitable heading for paragraph A.',
+              null, 'Its passages, porous surfaces and internal cavities influence the movement of gases between the colony and the surrounding air.', 'Paragraph A explains that the visible mound is part of a larger nest and plays an important role in environmental regulation.'
+       from p
+       on conflict (passage_id, idx) do update set
+         kind = excluded.kind, prompt = excluded.prompt, options = excluded.options,
+         evidence = excluded.evidence, explanation = excluded.explanation
+       returning id
+     )
+insert into public.question_answers (question_id, answer)
+select q.id, '["A visible structure with an invisible purpose"]'::jsonb from q
+on conflict (question_id) do update set answer = excluded.answer;
+
+with p as (select id from public.passages where slug = 'the-hidden-engineering-of-termite-mounds'),
+     q as (
+       insert into public.questions (passage_id, idx, kind, prompt, options, evidence, explanation)
+       select p.id, 2, 'matching_headings'::public.question_kind, 'Choose the most suitable heading for paragraph B.',
+              null, 'Termites, their developing young and associated biological processes consume oxygen and release carbon dioxide.', 'The paragraph focuses on how biological activity alters gases, heat and moisture inside the nest.'
+       from p
+       on conflict (passage_id, idx) do update set
+         kind = excluded.kind, prompt = excluded.prompt, options = excluded.options,
+         evidence = excluded.evidence, explanation = excluded.explanation
+       returning id
+     )
+insert into public.question_answers (question_id, answer)
+select q.id, '["How colony metabolism changes the nest atmosphere"]'::jsonb from q
+on conflict (question_id) do update set answer = excluded.answer;
+
+with p as (select id from public.passages where slug = 'the-hidden-engineering-of-termite-mounds'),
+     q as (
+       insert into public.questions (passage_id, idx, kind, prompt, options, evidence, explanation)
+       select p.id, 3, 'matching_headings'::public.question_kind, 'Choose the most suitable heading for paragraph C.',
+              null, 'Consequently, ventilation may emerge from a combination of solar heating, thermal storage, wind and the geometry of the nest rather than from one permanent upward flow of warm air.', 'Paragraph C describes several interacting physical processes responsible for ventilation.'
+       from p
+       on conflict (passage_id, idx) do update set
+         kind = excluded.kind, prompt = excluded.prompt, options = excluded.options,
+         evidence = excluded.evidence, explanation = excluded.explanation
+       returning id
+     )
+insert into public.question_answers (question_id, answer)
+select q.id, '["Moving air without relying on a single ventilation model"]'::jsonb from q
+on conflict (question_id) do update set answer = excluded.answer;
+
+with p as (select id from public.passages where slug = 'the-hidden-engineering-of-termite-mounds'),
+     q as (
+       insert into public.questions (passage_id, idx, kind, prompt, options, evidence, explanation)
+       select p.id, 4, 'matching_headings'::public.question_kind, 'Choose the most suitable heading for paragraph D.',
+              null, 'Species living in different climates construct nests with different shapes, wall thicknesses, orientations and degrees of porosity.', 'The paragraph emphasises variation in mound architecture according to species, climate and local conditions.'
+       from p
+       on conflict (passage_id, idx) do update set
+         kind = excluded.kind, prompt = excluded.prompt, options = excluded.options,
+         evidence = excluded.evidence, explanation = excluded.explanation
+       returning id
+     )
+insert into public.question_answers (question_id, answer)
+select q.id, '["Why mound design varies between habitats"]'::jsonb from q
+on conflict (question_id) do update set answer = excluded.answer;
+
+with p as (select id from public.passages where slug = 'the-hidden-engineering-of-termite-mounds'),
+     q as (
+       insert into public.questions (passage_id, idx, kind, prompt, options, evidence, explanation)
+       select p.id, 5, 'true_false_not_given'::public.question_kind, 'The above-ground mound contains the entire termite colony.',
+              null, 'Termite mounds are among the most conspicuous structures built by insects, yet the part visible above ground is only one component of a much larger nest system.', 'The passage states that the visible mound is only part of the complete nest.'
+       from p
+       on conflict (passage_id, idx) do update set
+         kind = excluded.kind, prompt = excluded.prompt, options = excluded.options,
+         evidence = excluded.evidence, explanation = excluded.explanation
+       returning id
+     )
+insert into public.question_answers (question_id, answer)
+select q.id, '["FALSE"]'::jsonb from q
+on conflict (question_id) do update set answer = excluded.answer;
+
+with p as (select id from public.passages where slug = 'the-hidden-engineering-of-termite-mounds'),
+     q as (
+       insert into public.questions (passage_id, idx, kind, prompt, options, evidence, explanation)
+       select p.id, 6, 'true_false_not_given'::public.question_kind, 'Air inside some termite nests can move in different directions at different times.',
+              null, 'Air movement can change direction over the course of a day and may be driven by several interacting forces.', 'This is directly stated in the passage.'
+       from p
+       on conflict (passage_id, idx) do update set
+         kind = excluded.kind, prompt = excluded.prompt, options = excluded.options,
+         evidence = excluded.evidence, explanation = excluded.explanation
+       returning id
+     )
+insert into public.question_answers (question_id, answer)
+select q.id, '["TRUE"]'::jsonb from q
+on conflict (question_id) do update set answer = excluded.answer;
+
+with p as (select id from public.passages where slug = 'the-hidden-engineering-of-termite-mounds'),
+     q as (
+       insert into public.questions (passage_id, idx, kind, prompt, options, evidence, explanation)
+       select p.id, 7, 'true_false_not_given'::public.question_kind, 'Termites detect carbon dioxide using specialised organs located on their antennae.',
+              null, 'In a large colony, these exchanges can alter the composition of air inside the nest.', 'The passage discusses changes in air composition but does not explain the sensory organs termites use to detect carbon dioxide.'
+       from p
+       on conflict (passage_id, idx) do update set
+         kind = excluded.kind, prompt = excluded.prompt, options = excluded.options,
+         evidence = excluded.evidence, explanation = excluded.explanation
+       returning id
+     )
+insert into public.question_answers (question_id, answer)
+select q.id, '["NOT GIVEN"]'::jsonb from q
+on conflict (question_id) do update set answer = excluded.answer;
+
+with p as (select id from public.passages where slug = 'the-hidden-engineering-of-termite-mounds'),
+     q as (
+       insert into public.questions (passage_id, idx, kind, prompt, options, evidence, explanation)
+       select p.id, 8, 'multiple_choice'::public.question_kind, 'Why is the simple chimney model inadequate for many termite mounds?',
+              '["The nests contain mechanical pumps rather than air passages.","Airflow may reverse and respond to several different forces.","The insects prevent any warm air from reaching the surface.","Most mounds remain entirely underground during the day."]'::jsonb, 'Research has shown that this picture is too simple for many species. Air movement can change direction over the course of a day and may be driven by several interacting forces.', 'The passage rejects a simple continuous upward flow because ventilation is variable and multi-causal.'
+       from p
+       on conflict (passage_id, idx) do update set
+         kind = excluded.kind, prompt = excluded.prompt, options = excluded.options,
+         evidence = excluded.evidence, explanation = excluded.explanation
+       returning id
+     )
+insert into public.question_answers (question_id, answer)
+select q.id, '["Airflow may reverse and respond to several different forces."]'::jsonb from q
+on conflict (question_id) do update set answer = excluded.answer;
+
+with p as (select id from public.passages where slug = 'the-hidden-engineering-of-termite-mounds'),
+     q as (
+       insert into public.questions (passage_id, idx, kind, prompt, options, evidence, explanation)
+       select p.id, 9, 'multiple_choice'::public.question_kind, 'What is one advantage of the orientation of some narrow Australian termite mounds?',
+              '["It prevents wind from creating pressure differences.","It maximises exposure to midday sunlight.","It limits intense midday heating while permitting morning and evening warming.","It keeps all parts of the nest at exactly the same temperature."]'::jsonb, 'Some famous mounds in northern Australia are extremely narrow and aligned roughly north-south, reducing the surface exposed to intense midday sunlight while allowing warming in the morning and evening.', 'The orientation changes solar exposure across the day.'
+       from p
+       on conflict (passage_id, idx) do update set
+         kind = excluded.kind, prompt = excluded.prompt, options = excluded.options,
+         evidence = excluded.evidence, explanation = excluded.explanation
+       returning id
+     )
+insert into public.question_answers (question_id, answer)
+select q.id, '["It limits intense midday heating while permitting morning and evening warming."]'::jsonb from q
+on conflict (question_id) do update set answer = excluded.answer;
+
+with p as (select id from public.passages where slug = 'the-hidden-engineering-of-termite-mounds'),
+     q as (
+       insert into public.questions (passage_id, idx, kind, prompt, options, evidence, explanation)
+       select p.id, 10, 'multiple_choice'::public.question_kind, 'According to paragraph F, what is the most useful approach to biomimicry?',
+              '["Copying the visible shape of an animal structure exactly.","Identifying a biological process that can be adapted to human design.","Replacing building materials with natural soil.","Designing offices at the same scale as insect nests."]'::jsonb, 'Biomimicry is most productive when it identifies a transferable process rather than copying the appearance of a biological structure.', 'The passage explicitly favours transferring functional principles over copying form.'
+       from p
+       on conflict (passage_id, idx) do update set
+         kind = excluded.kind, prompt = excluded.prompt, options = excluded.options,
+         evidence = excluded.evidence, explanation = excluded.explanation
+       returning id
+     )
+insert into public.question_answers (question_id, answer)
+select q.id, '["Identifying a biological process that can be adapted to human design."]'::jsonb from q
+on conflict (question_id) do update set answer = excluded.answer;
+
+with p as (select id from public.passages where slug = 'the-hidden-engineering-of-termite-mounds'),
+     q as (
+       insert into public.questions (passage_id, idx, kind, prompt, options, evidence, explanation)
+       select p.id, 11, 'sentence_completion'::public.question_kind, 'Complete the sentence using NO MORE THAN TWO WORDS from the passage: The movement of gases is affected by the mound''s passages, internal cavities and ______.',
+              null, 'Its passages, porous surfaces and internal cavities influence the movement of gases between the colony and the surrounding air.', 'The phrase appears exactly in the passage.'
+       from p
+       on conflict (passage_id, idx) do update set
+         kind = excluded.kind, prompt = excluded.prompt, options = excluded.options,
+         evidence = excluded.evidence, explanation = excluded.explanation
+       returning id
+     )
+insert into public.question_answers (question_id, answer)
+select q.id, '["porous surfaces"]'::jsonb from q
+on conflict (question_id) do update set answer = excluded.answer;
+
+with p as (select id from public.passages where slug = 'the-hidden-engineering-of-termite-mounds'),
+     q as (
+       insert into public.questions (passage_id, idx, kind, prompt, options, evidence, explanation)
+       select p.id, 12, 'sentence_completion'::public.question_kind, 'Complete the sentence using NO MORE THAN TWO WORDS from the passage: Pressure differences in a mound can be created by changing ______ between the mound and outside air.',
+              null, 'Temperature differences between the mound and the surrounding air are particularly important.', 'The answer is lifted verbatim from the passage.'
+       from p
+       on conflict (passage_id, idx) do update set
+         kind = excluded.kind, prompt = excluded.prompt, options = excluded.options,
+         evidence = excluded.evidence, explanation = excluded.explanation
+       returning id
+     )
+insert into public.question_answers (question_id, answer)
+select q.id, '["temperature differences"]'::jsonb from q
+on conflict (question_id) do update set answer = excluded.answer;
+
+with p as (select id from public.passages where slug = 'the-hidden-engineering-of-termite-mounds'),
+     q as (
+       insert into public.questions (passage_id, idx, kind, prompt, options, evidence, explanation)
+       select p.id, 13, 'sentence_completion'::public.question_kind, 'Complete the sentence using NO MORE THAN TWO WORDS from the passage: Architects have studied termite mounds as inspiration for ______ building design.',
+              null, 'Termite mounds have attracted architects interested in low-energy building design, especially because the nests regulate gas exchange and temperature without conventional air-conditioning equipment.', 'The exact term used is ''low-energy''.'
+       from p
+       on conflict (passage_id, idx) do update set
+         kind = excluded.kind, prompt = excluded.prompt, options = excluded.options,
+         evidence = excluded.evidence, explanation = excluded.explanation
+       returning id
+     )
+insert into public.question_answers (question_id, answer)
+select q.id, '["low-energy"]'::jsonb from q
+on conflict (question_id) do update set answer = excluded.answer;
+
+-- The Hidden Life of Soil Seed Banks
+insert into public.passages (slug, title, body, topic, headings, difficulty)
+values ('the-hidden-life-of-soil-seed-banks', 'The Hidden Life of Soil Seed Banks', 'A
+A patch of bare soil may contain the beginnings of a future plant community. Seeds released in previous seasons can remain buried after the adult plants that produced them have disappeared, forming what ecologists call a soil seed bank. Some seeds survive only briefly, while others remain viable for years or even decades. The seed bank is therefore both a record of earlier reproduction and a reserve for future growth. Its composition can differ greatly from the vegetation visible above ground because some species produce many persistent seeds while others depend on fresh dispersal each year. This hidden population influences how ecosystems respond to disturbance, management, and environmental change.
+
+B
+Dormancy allows a viable seed to delay germination even when it encounters water. The mechanism differs among species. A hard seed coat may prevent water from entering, chemical inhibitors may suppress growth, or an embryo may require a period of cold or warm conditions before it can develop. These delays can be advantageous because germinating at the first brief rainfall might expose a seedling to drought soon afterward. By spreading germination across different times, a population reduces the risk that every offspring will encounter the same unfavorable season. Dormancy therefore acts as a form of biological risk distribution rather than simple inactivity.
+
+C
+Seeds reach the soil in many ways. Some fall close to the parent plant, while others are carried by wind, water, animals, or human activity. Once on the ground, they may be buried by soil movement, earthworms, trampling, or sediment deposition. Burial can protect seeds from predators and fire, but it may also place them too deep to receive the light or temperature cues required for germination. Seeds leave the bank when they germinate, die, decay, or are eaten. The size of a seed bank at any moment reflects the balance among new inputs, losses, and the different survival rates of species already present.
+
+D
+Disturbance can reveal the seed bank dramatically. Fire, ploughing, flood erosion, tree fall, or deliberate soil disturbance may remove vegetation and change light, temperature, moisture, or chemical conditions at the surface. Seeds that were previously dormant can then germinate in large numbers. This response helps explain why plants absent from a site for several years may suddenly reappear after disturbance. However, not every post-disturbance species comes from buried seeds. Some arrive rapidly from nearby populations, so researchers need evidence before attributing vegetation recovery entirely to the seed bank.
+
+E
+Ecologists use two main approaches to study buried seeds. In a germination method, soil samples are placed under suitable conditions and emerging seedlings are counted and identified over time. This reveals viable seeds capable of germination under the experimental conditions but may miss dormant seeds whose cues are not provided. A second method separates seeds physically from soil using sieves, flotation, or careful sorting. Those seeds can then be identified and tested for viability. Both approaches have limitations, and researchers often take many samples because seed distribution can be extremely patchy even within a small area.
+
+F
+A soil seed bank is not a perfect archive of past vegetation. Species differ greatly in how many seeds they produce, how far those seeds travel, and how long they remain viable. Many forest trees, for example, produce seeds that germinate quickly or survive poorly in soil, even though the adult trees dominate the vegetation above. Small annual plants may contribute enormous numbers of persistent seeds despite covering little ground in a particular year. As a result, finding abundant seeds of one species does not prove that it was historically the most abundant adult plant at the site.
+
+G
+Seed banks can assist restoration after farming, grazing, fire, or other disturbance, but their usefulness depends on what remains viable. If characteristic native species persist underground, reducing disturbance or restoring suitable environmental conditions may allow some vegetation to recover without extensive planting. Where the seed bank is dominated by weeds or lacks important species, active reintroduction may be necessary. Restoration practitioners therefore sample soils before deciding whether natural regeneration is likely to be sufficient. The seed bank should be treated as one source of ecological resilience, not an unlimited backup copy of the original ecosystem.', 'plant ecology', '["Seeds waiting beneath an apparently empty surface","Dormancy as a strategy for surviving unfavorable periods","How seeds enter, move through, and leave the soil","Why disturbance can release a hidden plant community","Methods used to measure buried seed populations","Why seed banks do not perfectly preserve former vegetation","The importance of seed banks in ecological restoration","How seed longevity varies among species"]'::jsonb, 3)
+on conflict (slug) do update set
+  title = excluded.title, body = excluded.body, topic = excluded.topic,
+  headings = excluded.headings, difficulty = excluded.difficulty;
+
+with p as (select id from public.passages where slug = 'the-hidden-life-of-soil-seed-banks'),
+     q as (
+       insert into public.questions (passage_id, idx, kind, prompt, options, evidence, explanation)
+       select p.id, 1, 'matching_headings'::public.question_kind, 'Choose the most suitable heading for paragraph B.',
+              null, 'Dormancy therefore acts as a form of biological risk distribution rather than simple inactivity.', 'The paragraph explains how delayed germination can spread risk across changing environmental conditions.'
+       from p
+       on conflict (passage_id, idx) do update set
+         kind = excluded.kind, prompt = excluded.prompt, options = excluded.options,
+         evidence = excluded.evidence, explanation = excluded.explanation
+       returning id
+     )
+insert into public.question_answers (question_id, answer)
+select q.id, '["Dormancy as a strategy for surviving unfavorable periods"]'::jsonb from q
+on conflict (question_id) do update set answer = excluded.answer;
+
+with p as (select id from public.passages where slug = 'the-hidden-life-of-soil-seed-banks'),
+     q as (
+       insert into public.questions (passage_id, idx, kind, prompt, options, evidence, explanation)
+       select p.id, 2, 'matching_headings'::public.question_kind, 'Choose the most suitable heading for paragraph C.',
+              null, 'The size of a seed bank at any moment reflects the balance among new inputs, losses, and the different survival rates of species already present.', 'The paragraph describes dispersal, burial, germination, death, predation, and other processes affecting the seed bank.'
+       from p
+       on conflict (passage_id, idx) do update set
+         kind = excluded.kind, prompt = excluded.prompt, options = excluded.options,
+         evidence = excluded.evidence, explanation = excluded.explanation
+       returning id
+     )
+insert into public.question_answers (question_id, answer)
+select q.id, '["How seeds enter, move through, and leave the soil"]'::jsonb from q
+on conflict (question_id) do update set answer = excluded.answer;
+
+with p as (select id from public.passages where slug = 'the-hidden-life-of-soil-seed-banks'),
+     q as (
+       insert into public.questions (passage_id, idx, kind, prompt, options, evidence, explanation)
+       select p.id, 3, 'matching_headings'::public.question_kind, 'Choose the most suitable heading for paragraph D.',
+              null, 'Seeds that were previously dormant can then germinate in large numbers.', 'The paragraph focuses on how disturbance changes conditions and triggers germination.'
+       from p
+       on conflict (passage_id, idx) do update set
+         kind = excluded.kind, prompt = excluded.prompt, options = excluded.options,
+         evidence = excluded.evidence, explanation = excluded.explanation
+       returning id
+     )
+insert into public.question_answers (question_id, answer)
+select q.id, '["Why disturbance can release a hidden plant community"]'::jsonb from q
+on conflict (question_id) do update set answer = excluded.answer;
+
+with p as (select id from public.passages where slug = 'the-hidden-life-of-soil-seed-banks'),
+     q as (
+       insert into public.questions (passage_id, idx, kind, prompt, options, evidence, explanation)
+       select p.id, 4, 'matching_headings'::public.question_kind, 'Choose the most suitable heading for paragraph F.',
+              null, 'A soil seed bank is not a perfect archive of past vegetation.', 'The paragraph explains several biases that make buried seeds an incomplete representation of earlier plant communities.'
+       from p
+       on conflict (passage_id, idx) do update set
+         kind = excluded.kind, prompt = excluded.prompt, options = excluded.options,
+         evidence = excluded.evidence, explanation = excluded.explanation
+       returning id
+     )
+insert into public.question_answers (question_id, answer)
+select q.id, '["Why seed banks do not perfectly preserve former vegetation"]'::jsonb from q
+on conflict (question_id) do update set answer = excluded.answer;
+
+with p as (select id from public.passages where slug = 'the-hidden-life-of-soil-seed-banks'),
+     q as (
+       insert into public.questions (passage_id, idx, kind, prompt, options, evidence, explanation)
+       select p.id, 5, 'true_false_not_given'::public.question_kind, 'The species found in a soil seed bank may differ from the plants currently visible above ground.',
+              null, 'Its composition can differ greatly from the vegetation visible above ground because some species produce many persistent seeds while others depend on fresh dispersal each year.', 'The passage directly states that below-ground and above-ground composition can differ.'
+       from p
+       on conflict (passage_id, idx) do update set
+         kind = excluded.kind, prompt = excluded.prompt, options = excluded.options,
+         evidence = excluded.evidence, explanation = excluded.explanation
+       returning id
+     )
+insert into public.question_answers (question_id, answer)
+select q.id, '["TRUE"]'::jsonb from q
+on conflict (question_id) do update set answer = excluded.answer;
+
+with p as (select id from public.passages where slug = 'the-hidden-life-of-soil-seed-banks'),
+     q as (
+       insert into public.questions (passage_id, idx, kind, prompt, options, evidence, explanation)
+       select p.id, 6, 'true_false_not_given'::public.question_kind, 'Burial always improves the probability that a seed will germinate.',
+              null, 'Burial can protect seeds from predators and fire, but it may also place them too deep to receive the light or temperature cues required for germination.', 'The passage says burial can both help and hinder seeds.'
+       from p
+       on conflict (passage_id, idx) do update set
+         kind = excluded.kind, prompt = excluded.prompt, options = excluded.options,
+         evidence = excluded.evidence, explanation = excluded.explanation
+       returning id
+     )
+insert into public.question_answers (question_id, answer)
+select q.id, '["FALSE"]'::jsonb from q
+on conflict (question_id) do update set answer = excluded.answer;
+
+with p as (select id from public.passages where slug = 'the-hidden-life-of-soil-seed-banks'),
+     q as (
+       insert into public.questions (passage_id, idx, kind, prompt, options, evidence, explanation)
+       select p.id, 7, 'true_false_not_given'::public.question_kind, 'The passage states that the oldest viable seed ever discovered was more than two thousand years old.',
+              null, 'Some seeds survive only briefly, while others remain viable for years or even decades.', 'The passage discusses differences in longevity but provides no record age for the oldest viable seed.'
+       from p
+       on conflict (passage_id, idx) do update set
+         kind = excluded.kind, prompt = excluded.prompt, options = excluded.options,
+         evidence = excluded.evidence, explanation = excluded.explanation
+       returning id
+     )
+insert into public.question_answers (question_id, answer)
+select q.id, '["NOT GIVEN"]'::jsonb from q
+on conflict (question_id) do update set answer = excluded.answer;
+
+with p as (select id from public.passages where slug = 'the-hidden-life-of-soil-seed-banks'),
+     q as (
+       insert into public.questions (passage_id, idx, kind, prompt, options, evidence, explanation)
+       select p.id, 8, 'multiple_choice'::public.question_kind, 'Why can dormancy be advantageous to a plant population?',
+              '["It reduces the chance that all offspring face the same bad season.","It guarantees that every seed remains viable for decades.","It prevents seeds from being transported by animals.","It makes seedlings independent of water."]'::jsonb, 'By spreading germination across different times, a population reduces the risk that every offspring will encounter the same unfavorable season.', 'The paragraph explicitly describes dormancy as a way of distributing environmental risk.'
+       from p
+       on conflict (passage_id, idx) do update set
+         kind = excluded.kind, prompt = excluded.prompt, options = excluded.options,
+         evidence = excluded.evidence, explanation = excluded.explanation
+       returning id
+     )
+insert into public.question_answers (question_id, answer)
+select q.id, '["It reduces the chance that all offspring face the same bad season."]'::jsonb from q
+on conflict (question_id) do update set answer = excluded.answer;
+
+with p as (select id from public.passages where slug = 'the-hidden-life-of-soil-seed-banks'),
+     q as (
+       insert into public.questions (passage_id, idx, kind, prompt, options, evidence, explanation)
+       select p.id, 9, 'multiple_choice'::public.question_kind, 'What is a limitation of the germination method used to study seed banks?',
+              '["It may miss dormant seeds whose germination cues are absent.","It can identify only dead seeds.","It cannot use soil collected from the field.","It requires every seed to be separated physically first."]'::jsonb, 'This reveals viable seeds capable of germination under the experimental conditions but may miss dormant seeds whose cues are not provided.', 'The passage directly states this limitation.'
+       from p
+       on conflict (passage_id, idx) do update set
+         kind = excluded.kind, prompt = excluded.prompt, options = excluded.options,
+         evidence = excluded.evidence, explanation = excluded.explanation
+       returning id
+     )
+insert into public.question_answers (question_id, answer)
+select q.id, '["It may miss dormant seeds whose germination cues are absent."]'::jsonb from q
+on conflict (question_id) do update set answer = excluded.answer;
+
+with p as (select id from public.passages where slug = 'the-hidden-life-of-soil-seed-banks'),
+     q as (
+       insert into public.questions (passage_id, idx, kind, prompt, options, evidence, explanation)
+       select p.id, 10, 'multiple_choice'::public.question_kind, 'Why might active reintroduction be necessary during restoration?',
+              '["Important native species may be missing from the remaining seed bank.","Natural regeneration always eliminates native species.","All disturbed soils lose every viable seed.","Sampling automatically destroys the entire seed bank."]'::jsonb, 'Where the seed bank is dominated by weeds or lacks important species, active reintroduction may be necessary.', 'The passage states that missing important species can make reintroduction necessary.'
+       from p
+       on conflict (passage_id, idx) do update set
+         kind = excluded.kind, prompt = excluded.prompt, options = excluded.options,
+         evidence = excluded.evidence, explanation = excluded.explanation
+       returning id
+     )
+insert into public.question_answers (question_id, answer)
+select q.id, '["Important native species may be missing from the remaining seed bank."]'::jsonb from q
+on conflict (question_id) do update set answer = excluded.answer;
+
+with p as (select id from public.passages where slug = 'the-hidden-life-of-soil-seed-banks'),
+     q as (
+       insert into public.questions (passage_id, idx, kind, prompt, options, evidence, explanation)
+       select p.id, 11, 'sentence_completion'::public.question_kind, 'Complete the sentence using NO MORE THAN TWO WORDS from the passage: A buried population of viable seeds is called a soil ______.',
+              null, 'Seeds released in previous seasons can remain buried after the adult plants that produced them have disappeared, forming what ecologists call a soil seed bank.', 'The exact phrase in the passage is seed bank.'
+       from p
+       on conflict (passage_id, idx) do update set
+         kind = excluded.kind, prompt = excluded.prompt, options = excluded.options,
+         evidence = excluded.evidence, explanation = excluded.explanation
+       returning id
+     )
+insert into public.question_answers (question_id, answer)
+select q.id, '["seed bank"]'::jsonb from q
+on conflict (question_id) do update set answer = excluded.answer;
+
+with p as (select id from public.passages where slug = 'the-hidden-life-of-soil-seed-banks'),
+     q as (
+       insert into public.questions (passage_id, idx, kind, prompt, options, evidence, explanation)
+       select p.id, 12, 'sentence_completion'::public.question_kind, 'Complete the sentence using NO MORE THAN TWO WORDS from the passage: A hard seed coat may prevent ______ from entering.',
+              null, 'A hard seed coat may prevent water from entering, chemical inhibitors may suppress growth, or an embryo may require a period of cold or warm conditions before it can develop.', 'The required word is water.'
+       from p
+       on conflict (passage_id, idx) do update set
+         kind = excluded.kind, prompt = excluded.prompt, options = excluded.options,
+         evidence = excluded.evidence, explanation = excluded.explanation
+       returning id
+     )
+insert into public.question_answers (question_id, answer)
+select q.id, '["water"]'::jsonb from q
+on conflict (question_id) do update set answer = excluded.answer;
+
+with p as (select id from public.passages where slug = 'the-hidden-life-of-soil-seed-banks'),
+     q as (
+       insert into public.questions (passage_id, idx, kind, prompt, options, evidence, explanation)
+       select p.id, 13, 'sentence_completion'::public.question_kind, 'Complete the sentence using NO MORE THAN TWO WORDS from the passage: Researchers often take many samples because buried seeds can be extremely ______.',
+              null, 'Both approaches have limitations, and researchers often take many samples because seed distribution can be extremely patchy even within a small area.', 'The answer is copied directly from the passage.'
+       from p
+       on conflict (passage_id, idx) do update set
+         kind = excluded.kind, prompt = excluded.prompt, options = excluded.options,
+         evidence = excluded.evidence, explanation = excluded.explanation
+       returning id
+     )
+insert into public.question_answers (question_id, answer)
+select q.id, '["patchy"]'::jsonb from q
+on conflict (question_id) do update set answer = excluded.answer;
+
 -- The Invention of Clock Time
 insert into public.passages (slug, title, body, topic, headings, difficulty)
 values ('the-invention-of-clock-time', 'The Invention of Clock Time', 'A
@@ -657,6 +4181,1323 @@ insert into public.question_answers (question_id, answer)
 select q.id, '["Reaching international agreement on a prime meridian"]'::jsonb from q
 on conflict (question_id) do update set answer = excluded.answer;
 
+-- The Physics of Moving Sand Dunes
+insert into public.passages (slug, title, body, topic, headings, difficulty)
+values ('the-physics-of-moving-sand-dunes', 'The Physics of Moving Sand Dunes', 'A
+A sand dune is a moving landform created by an interaction among loose sediment, wind, and the surface over which grains travel. Not every sandy place develops dunes. The wind must be strong enough to move grains, there must be a supply of transportable sediment, and some change in airflow or surface roughness must encourage deposition. Once a small mound forms, it can alter the wind and trap more sand, allowing the feature to grow. Dunes occur in deserts, on coasts, beside lakes, and even on other planetary bodies, making them useful natural laboratories for studying how granular materials respond to flowing air.
+
+B
+Most sand transport begins only when wind stress exceeds a threshold that depends on grain size, density, moisture, and surface condition. Once moving, many grains travel by saltation, a sequence of short hops above the ground. A landing grain can knock other grains into motion, so transport may continue even if wind speed falls somewhat below the value needed to start movement. Finer particles can remain suspended for much longer distances, while coarser grains may roll or creep along the surface. This mixture of transport modes explains why a dune is not simply pushed forward as a solid heap.
+
+C
+Small ripples and large dunes arise through related but different processes. Ripples can form when impacts from saltating grains sort particles and create repeated low ridges. Dunes, by contrast, depend strongly on the way a growing mound modifies airflow. Wind accelerates up the gentle windward slope and carries sand toward the crest. On many dunes, flow separates on the sheltered side, where sand is deposited on a steeper slip face. When enough grains accumulate, small avalanches move material downslope. Repetition of erosion on one side and deposition on the other causes the entire dune form to migrate.
+
+D
+The rate of migration varies greatly. A small dune supplied with abundant sand can move much faster than a large dune because a similar quantity of transported sediment must shift a smaller volume. Wind strength and direction also matter, as does vegetation or moisture that anchors the surface. Measurements using repeated surveys, aerial photographs, and satellite images can track changes in crest position through time. Migration is important where dunes approach roads, farms, buildings, or archaeological sites. It is equally useful scientifically because movement provides a visible measure of sediment transport integrated over months or years.
+
+E
+Dune shape records the wind regime and sand supply. Crescent-shaped barchan dunes often form where sand is limited and winds blow mainly from one direction. Long linear dunes are associated with more complex wind patterns, while star dunes can develop where winds arrive from several directions and build high central peaks. These categories are useful, but real landscapes contain transitions and combinations. A dune''s present shape may also preserve the influence of earlier winds, so researchers avoid treating morphology as a perfect snapshot of today''s weather. Form is evidence, but it must be interpreted with measurements of modern transport.
+
+F
+Vegetation can transform dune behavior by reducing wind speed near the surface and binding sand with roots. Coastal grasses often trap windblown sediment, helping foredunes grow behind beaches. If plants expand across a mobile dune, migration may slow and the landform can become partly stabilized. Disturbance can reverse the process: grazing, trampling, fire, or drought may expose sand again and reactivate movement. Stabilization is not automatically desirable in every environment, because some specialist species depend on open, shifting sand. Management therefore involves deciding which degree of mobility supports both ecological and human objectives.
+
+G
+Ancient dunes can preserve information long after movement stops. Buried soils, sediment layers, grain properties, and dating methods can reveal episodes when sand was active or stable. On Mars, orbital images of dunes and ripples allow scientists to compare familiar physical processes under a thinner atmosphere and lower gravity. Such comparisons test whether models built on Earth capture the underlying mechanics rather than only local conditions. Dunes are therefore more than scenic piles of sand. Their shapes and motion connect fluid dynamics, sediment transport, ecology, climate history, engineering hazards, and planetary science within the same deceptively simple landform. Field experiments also help test these models at smaller scales.', 'geomorphology', '["The threshold that starts grains moving","How airflow creates migration through erosion and deposition","Why dune speed depends on size and environmental conditions","Dune shape as evidence of wind regime and sand supply","Vegetation as both stabilizer and ecological complication","Ancient and extraterrestrial dunes as scientific archives","Why loose sediment alone does not guarantee a dune","Different ways grains travel near the ground","Why modern dune shape may preserve earlier wind conditions"]'::jsonb, 3)
+on conflict (slug) do update set
+  title = excluded.title, body = excluded.body, topic = excluded.topic,
+  headings = excluded.headings, difficulty = excluded.difficulty;
+
+with p as (select id from public.passages where slug = 'the-physics-of-moving-sand-dunes'),
+     q as (
+       insert into public.questions (passage_id, idx, kind, prompt, options, evidence, explanation)
+       select p.id, 1, 'matching_headings'::public.question_kind, 'Choose the most suitable heading for paragraph B.',
+              null, 'Most sand transport begins only when wind stress exceeds a threshold that depends on grain size, density, moisture, and surface condition.', 'The paragraph explains the threshold for motion and the transport modes that follow.'
+       from p
+       on conflict (passage_id, idx) do update set
+         kind = excluded.kind, prompt = excluded.prompt, options = excluded.options,
+         evidence = excluded.evidence, explanation = excluded.explanation
+       returning id
+     )
+insert into public.question_answers (question_id, answer)
+select q.id, '["The threshold that starts grains moving"]'::jsonb from q
+on conflict (question_id) do update set answer = excluded.answer;
+
+with p as (select id from public.passages where slug = 'the-physics-of-moving-sand-dunes'),
+     q as (
+       insert into public.questions (passage_id, idx, kind, prompt, options, evidence, explanation)
+       select p.id, 2, 'matching_headings'::public.question_kind, 'Choose the most suitable heading for paragraph C.',
+              null, 'Repetition of erosion on one side and deposition on the other causes the entire dune form to migrate.', 'The paragraph describes airflow over a dune and how erosion and deposition shift the landform.'
+       from p
+       on conflict (passage_id, idx) do update set
+         kind = excluded.kind, prompt = excluded.prompt, options = excluded.options,
+         evidence = excluded.evidence, explanation = excluded.explanation
+       returning id
+     )
+insert into public.question_answers (question_id, answer)
+select q.id, '["How airflow creates migration through erosion and deposition"]'::jsonb from q
+on conflict (question_id) do update set answer = excluded.answer;
+
+with p as (select id from public.passages where slug = 'the-physics-of-moving-sand-dunes'),
+     q as (
+       insert into public.questions (passage_id, idx, kind, prompt, options, evidence, explanation)
+       select p.id, 3, 'matching_headings'::public.question_kind, 'Choose the most suitable heading for paragraph D.',
+              null, 'A small dune supplied with abundant sand can move much faster than a large dune because a similar quantity of transported sediment must shift a smaller volume.', 'The paragraph explains why migration rates vary with dune size, wind, moisture and vegetation.'
+       from p
+       on conflict (passage_id, idx) do update set
+         kind = excluded.kind, prompt = excluded.prompt, options = excluded.options,
+         evidence = excluded.evidence, explanation = excluded.explanation
+       returning id
+     )
+insert into public.question_answers (question_id, answer)
+select q.id, '["Why dune speed depends on size and environmental conditions"]'::jsonb from q
+on conflict (question_id) do update set answer = excluded.answer;
+
+with p as (select id from public.passages where slug = 'the-physics-of-moving-sand-dunes'),
+     q as (
+       insert into public.questions (passage_id, idx, kind, prompt, options, evidence, explanation)
+       select p.id, 4, 'matching_headings'::public.question_kind, 'Choose the most suitable heading for paragraph E.',
+              null, 'Dune shape records the wind regime and sand supply.', 'The paragraph links barchan, linear and star dunes to different wind and sediment conditions.'
+       from p
+       on conflict (passage_id, idx) do update set
+         kind = excluded.kind, prompt = excluded.prompt, options = excluded.options,
+         evidence = excluded.evidence, explanation = excluded.explanation
+       returning id
+     )
+insert into public.question_answers (question_id, answer)
+select q.id, '["Dune shape as evidence of wind regime and sand supply"]'::jsonb from q
+on conflict (question_id) do update set answer = excluded.answer;
+
+with p as (select id from public.passages where slug = 'the-physics-of-moving-sand-dunes'),
+     q as (
+       insert into public.questions (passage_id, idx, kind, prompt, options, evidence, explanation)
+       select p.id, 5, 'true_false_not_given'::public.question_kind, 'Sand transport can sometimes continue after wind speed falls below the level needed to initiate movement.',
+              null, 'A landing grain can knock other grains into motion, so transport may continue even if wind speed falls somewhat below the value needed to start movement.', 'The passage explicitly says moving grains can sustain transport below the initial threshold.'
+       from p
+       on conflict (passage_id, idx) do update set
+         kind = excluded.kind, prompt = excluded.prompt, options = excluded.options,
+         evidence = excluded.evidence, explanation = excluded.explanation
+       returning id
+     )
+insert into public.question_answers (question_id, answer)
+select q.id, '["TRUE"]'::jsonb from q
+on conflict (question_id) do update set answer = excluded.answer;
+
+with p as (select id from public.passages where slug = 'the-physics-of-moving-sand-dunes'),
+     q as (
+       insert into public.questions (passage_id, idx, kind, prompt, options, evidence, explanation)
+       select p.id, 6, 'true_false_not_given'::public.question_kind, 'All stabilized dunes are ecologically preferable to mobile dunes.',
+              null, 'Stabilization is not automatically desirable in every environment, because some specialist species depend on open, shifting sand.', 'The passage directly states that stabilization is not always desirable.'
+       from p
+       on conflict (passage_id, idx) do update set
+         kind = excluded.kind, prompt = excluded.prompt, options = excluded.options,
+         evidence = excluded.evidence, explanation = excluded.explanation
+       returning id
+     )
+insert into public.question_answers (question_id, answer)
+select q.id, '["FALSE"]'::jsonb from q
+on conflict (question_id) do update set answer = excluded.answer;
+
+with p as (select id from public.passages where slug = 'the-physics-of-moving-sand-dunes'),
+     q as (
+       insert into public.questions (passage_id, idx, kind, prompt, options, evidence, explanation)
+       select p.id, 7, 'true_false_not_given'::public.question_kind, 'The passage states that barchan dunes migrate exactly twice as fast as star dunes.',
+              null, 'Crescent-shaped barchan dunes often form where sand is limited and winds blow mainly from one direction.', 'The passage describes how barchans form but provides no fixed migration-rate comparison with star dunes.'
+       from p
+       on conflict (passage_id, idx) do update set
+         kind = excluded.kind, prompt = excluded.prompt, options = excluded.options,
+         evidence = excluded.evidence, explanation = excluded.explanation
+       returning id
+     )
+insert into public.question_answers (question_id, answer)
+select q.id, '["NOT GIVEN"]'::jsonb from q
+on conflict (question_id) do update set answer = excluded.answer;
+
+with p as (select id from public.passages where slug = 'the-physics-of-moving-sand-dunes'),
+     q as (
+       insert into public.questions (passage_id, idx, kind, prompt, options, evidence, explanation)
+       select p.id, 8, 'multiple_choice'::public.question_kind, 'What happens on the sheltered side of many dunes?',
+              '["Airflow separates and sand is deposited.","All sand becomes suspended indefinitely.","Roots immediately bind every moving grain.","Wind speeds always increase down the slip face."]'::jsonb, 'On many dunes, flow separates on the sheltered side, where sand is deposited on a steeper slip face.', 'The passage explicitly describes flow separation and deposition on the sheltered side.'
+       from p
+       on conflict (passage_id, idx) do update set
+         kind = excluded.kind, prompt = excluded.prompt, options = excluded.options,
+         evidence = excluded.evidence, explanation = excluded.explanation
+       returning id
+     )
+insert into public.question_answers (question_id, answer)
+select q.id, '["Airflow separates and sand is deposited."]'::jsonb from q
+on conflict (question_id) do update set answer = excluded.answer;
+
+with p as (select id from public.passages where slug = 'the-physics-of-moving-sand-dunes'),
+     q as (
+       insert into public.questions (passage_id, idx, kind, prompt, options, evidence, explanation)
+       select p.id, 9, 'multiple_choice'::public.question_kind, 'Why can a small dune migrate faster than a large one under similar sediment transport?',
+              '["A smaller volume must be shifted.","Small dunes contain no coarse grains.","Large dunes cannot form slip faces.","Small dunes always receive stronger winds."]'::jsonb, 'A small dune supplied with abundant sand can move much faster than a large dune because a similar quantity of transported sediment must shift a smaller volume.', 'The passage gives the smaller volume as the reason.'
+       from p
+       on conflict (passage_id, idx) do update set
+         kind = excluded.kind, prompt = excluded.prompt, options = excluded.options,
+         evidence = excluded.evidence, explanation = excluded.explanation
+       returning id
+     )
+insert into public.question_answers (question_id, answer)
+select q.id, '["A smaller volume must be shifted."]'::jsonb from q
+on conflict (question_id) do update set answer = excluded.answer;
+
+with p as (select id from public.passages where slug = 'the-physics-of-moving-sand-dunes'),
+     q as (
+       insert into public.questions (passage_id, idx, kind, prompt, options, evidence, explanation)
+       select p.id, 10, 'multiple_choice'::public.question_kind, 'Why do researchers avoid reading dune shape as a perfect record of present-day weather?',
+              '["The shape may preserve the influence of earlier winds.","Satellite images cannot detect dune crests.","All dune shapes are produced by vegetation alone.","Modern winds never move established dunes."]'::jsonb, 'A dune''s present shape may also preserve the influence of earlier winds, so researchers avoid treating morphology as a perfect snapshot of today''s weather.', 'The passage says inherited effects from earlier winds can remain visible in present morphology.'
+       from p
+       on conflict (passage_id, idx) do update set
+         kind = excluded.kind, prompt = excluded.prompt, options = excluded.options,
+         evidence = excluded.evidence, explanation = excluded.explanation
+       returning id
+     )
+insert into public.question_answers (question_id, answer)
+select q.id, '["The shape may preserve the influence of earlier winds."]'::jsonb from q
+on conflict (question_id) do update set answer = excluded.answer;
+
+with p as (select id from public.passages where slug = 'the-physics-of-moving-sand-dunes'),
+     q as (
+       insert into public.questions (passage_id, idx, kind, prompt, options, evidence, explanation)
+       select p.id, 11, 'sentence_completion'::public.question_kind, 'Complete the sentence using NO MORE THAN TWO WORDS from the passage: Many grains move in short hops known as ______.',
+              null, 'Once moving, many grains travel by saltation, a sequence of short hops above the ground.', 'The exact technical term in the passage is saltation.'
+       from p
+       on conflict (passage_id, idx) do update set
+         kind = excluded.kind, prompt = excluded.prompt, options = excluded.options,
+         evidence = excluded.evidence, explanation = excluded.explanation
+       returning id
+     )
+insert into public.question_answers (question_id, answer)
+select q.id, '["saltation"]'::jsonb from q
+on conflict (question_id) do update set answer = excluded.answer;
+
+with p as (select id from public.passages where slug = 'the-physics-of-moving-sand-dunes'),
+     q as (
+       insert into public.questions (passage_id, idx, kind, prompt, options, evidence, explanation)
+       select p.id, 12, 'sentence_completion'::public.question_kind, 'Complete the sentence using NO MORE THAN TWO WORDS from the passage: Coastal grasses can help ______ grow behind beaches.',
+              null, 'Coastal grasses often trap windblown sediment, helping foredunes grow behind beaches.', 'The answer is lifted directly from the passage.'
+       from p
+       on conflict (passage_id, idx) do update set
+         kind = excluded.kind, prompt = excluded.prompt, options = excluded.options,
+         evidence = excluded.evidence, explanation = excluded.explanation
+       returning id
+     )
+insert into public.question_answers (question_id, answer)
+select q.id, '["foredunes"]'::jsonb from q
+on conflict (question_id) do update set answer = excluded.answer;
+
+with p as (select id from public.passages where slug = 'the-physics-of-moving-sand-dunes'),
+     q as (
+       insert into public.questions (passage_id, idx, kind, prompt, options, evidence, explanation)
+       select p.id, 13, 'sentence_completion'::public.question_kind, 'Complete the sentence using NO MORE THAN TWO WORDS from the passage: On Mars, dune studies test models under lower gravity and a ______.',
+              null, 'On Mars, orbital images of dunes and ripples allow scientists to compare familiar physical processes under a thinner atmosphere and lower gravity.', 'The exact two-word phrase is "thinner atmosphere".'
+       from p
+       on conflict (passage_id, idx) do update set
+         kind = excluded.kind, prompt = excluded.prompt, options = excluded.options,
+         evidence = excluded.evidence, explanation = excluded.explanation
+       returning id
+     )
+insert into public.question_answers (question_id, answer)
+select q.id, '["thinner atmosphere"]'::jsonb from q
+on conflict (question_id) do update set answer = excluded.answer;
+
+-- The Science of Bird Migration
+insert into public.passages (slug, title, body, topic, headings, difficulty)
+values ('the-science-of-bird-migration', 'The Science of Bird Migration', 'A
+Migration allows birds to exploit resources that vary with season, but long-distance travel requires major physiological preparation. Before departure, many species increase food intake and deposit large reserves of fat, which contains more usable energy per unit of mass than carbohydrates or protein. Some small migratory birds can substantially increase their body mass during this period. Internal organs may also change size as the demands of feeding, flight and fasting shift. These adjustments are not permanent; birds can remodel their bodies again after migration. The ability to store fuel efficiently is especially important for species that must cross deserts, seas or other regions where stopping to feed is difficult or impossible.
+
+B
+Finding the correct route involves several sources of information. Experiments suggest that migratory birds can use the position of the sun, patterns of stars, landmarks, odours and cues associated with Earth''s magnetic field. Different species rely on these signals to different degrees, and an individual may switch between cues when one source becomes unreliable. A cloudy sky, for example, can obscure celestial information without eliminating magnetic information. Navigation is therefore better understood as a flexible system than as dependence on one biological compass. Researchers distinguish between knowing a direction and knowing a geographical position, because following the correct compass bearing does not necessarily tell a bird whether it has been displaced away from its normal route.
+
+C
+Some migration behaviour develops without direct instruction from experienced adults. In several species, young birds making their first journey travel separately from their parents yet still move in a seasonally appropriate direction. Experiments in captivity have shown inherited components of both migratory restlessness and directional preference. This does not mean that experience is unimportant. Older birds may follow more efficient routes, adjust timing according to local conditions or learn the locations of favourable stopping sites. Migration can therefore combine genetic programmes with learning, producing behaviour that is neither completely fixed at birth nor entirely taught by other birds.
+
+D
+Weather strongly affects the cost and safety of migration. Tailwinds can increase ground speed and reduce energy expenditure, whereas strong headwinds may delay departure or force birds to stop. Storms can push migrants far from their usual routes, sometimes carrying individuals across seas or continents. Birds do not simply respond to average seasonal climate; many make departure decisions in relation to immediate atmospheric conditions. This flexibility is particularly important for species undertaking long nonstop flights. A favourable wind at the beginning of a journey can determine whether stored fat lasts until the next suitable place to land and feed.
+
+E
+For many migrants, the journey consists of repeated flights separated by periods of rest and refuelling. Wetlands, forests, coastal mudflats and even small urban green spaces can function as stopover sites. At these locations, birds replenish energy reserves, recover from previous flights and wait for favourable weather. Loss of habitat at a critical stopover can therefore affect populations breeding or wintering thousands of kilometres away. Conservation of migratory species often requires international cooperation because the same bird may depend on habitats in several countries during a single annual cycle. Protecting breeding grounds alone may achieve little if essential sites along the route disappear.
+
+F
+Modern tracking technology has transformed migration research. Traditional metal rings provided valuable information when a marked bird was later captured or found elsewhere, but such recoveries were relatively rare. Lightweight GPS devices, satellite transmitters and miniature light-level recorders can now reveal complete or nearly complete journeys for individual birds. Researchers have discovered unexpected detours, high-altitude flights and previously unknown wintering areas. Devices still have limitations: they add weight, vary in positional accuracy and may require recapturing the bird to recover stored data. Nevertheless, tracking has shifted migration research from inference based largely on departure and arrival points toward direct observation of routes taken between them.', 'animal navigation and migration', '["Preparing the body for a long journey","Several sources of information for navigation","How young birds can migrate without experienced guides","Why weather can transform a migration strategy","Tracking technology changes what researchers can observe","The importance of resting and refuelling sites","How migration routes remain completely unchanged","The use of ocean currents by soaring birds","Why every migratory species travels in large flocks"]'::jsonb, 4)
+on conflict (slug) do update set
+  title = excluded.title, body = excluded.body, topic = excluded.topic,
+  headings = excluded.headings, difficulty = excluded.difficulty;
+
+with p as (select id from public.passages where slug = 'the-science-of-bird-migration'),
+     q as (
+       insert into public.questions (passage_id, idx, kind, prompt, options, evidence, explanation)
+       select p.id, 1, 'matching_headings'::public.question_kind, 'Choose the most suitable heading for paragraph A.',
+              null, 'Before departure, many species increase food intake and deposit large reserves of fat, which contains more usable energy per unit of mass than carbohydrates or protein.', 'Paragraph A describes physiological changes that prepare birds for migration.'
+       from p
+       on conflict (passage_id, idx) do update set
+         kind = excluded.kind, prompt = excluded.prompt, options = excluded.options,
+         evidence = excluded.evidence, explanation = excluded.explanation
+       returning id
+     )
+insert into public.question_answers (question_id, answer)
+select q.id, '["Preparing the body for a long journey"]'::jsonb from q
+on conflict (question_id) do update set answer = excluded.answer;
+
+with p as (select id from public.passages where slug = 'the-science-of-bird-migration'),
+     q as (
+       insert into public.questions (passage_id, idx, kind, prompt, options, evidence, explanation)
+       select p.id, 2, 'matching_headings'::public.question_kind, 'Choose the most suitable heading for paragraph B.',
+              null, 'Experiments suggest that migratory birds can use the position of the sun, patterns of stars, landmarks, odours and cues associated with Earth''s magnetic field.', 'The paragraph describes multiple navigational cues rather than a single compass system.'
+       from p
+       on conflict (passage_id, idx) do update set
+         kind = excluded.kind, prompt = excluded.prompt, options = excluded.options,
+         evidence = excluded.evidence, explanation = excluded.explanation
+       returning id
+     )
+insert into public.question_answers (question_id, answer)
+select q.id, '["Several sources of information for navigation"]'::jsonb from q
+on conflict (question_id) do update set answer = excluded.answer;
+
+with p as (select id from public.passages where slug = 'the-science-of-bird-migration'),
+     q as (
+       insert into public.questions (passage_id, idx, kind, prompt, options, evidence, explanation)
+       select p.id, 3, 'matching_headings'::public.question_kind, 'Choose the most suitable heading for paragraph C.',
+              null, 'In several species, young birds making their first journey travel separately from their parents yet still move in a seasonally appropriate direction.', 'Paragraph C discusses inherited migration behaviour and the later contribution of experience.'
+       from p
+       on conflict (passage_id, idx) do update set
+         kind = excluded.kind, prompt = excluded.prompt, options = excluded.options,
+         evidence = excluded.evidence, explanation = excluded.explanation
+       returning id
+     )
+insert into public.question_answers (question_id, answer)
+select q.id, '["How young birds can migrate without experienced guides"]'::jsonb from q
+on conflict (question_id) do update set answer = excluded.answer;
+
+with p as (select id from public.passages where slug = 'the-science-of-bird-migration'),
+     q as (
+       insert into public.questions (passage_id, idx, kind, prompt, options, evidence, explanation)
+       select p.id, 4, 'matching_headings'::public.question_kind, 'Choose the most suitable heading for paragraph D.',
+              null, 'Weather strongly affects the cost and safety of migration.', 'The paragraph explains the effects of winds, storms and immediate atmospheric conditions on migration.'
+       from p
+       on conflict (passage_id, idx) do update set
+         kind = excluded.kind, prompt = excluded.prompt, options = excluded.options,
+         evidence = excluded.evidence, explanation = excluded.explanation
+       returning id
+     )
+insert into public.question_answers (question_id, answer)
+select q.id, '["Why weather can transform a migration strategy"]'::jsonb from q
+on conflict (question_id) do update set answer = excluded.answer;
+
+with p as (select id from public.passages where slug = 'the-science-of-bird-migration'),
+     q as (
+       insert into public.questions (passage_id, idx, kind, prompt, options, evidence, explanation)
+       select p.id, 5, 'true_false_not_given'::public.question_kind, 'Fat provides more usable energy per unit of mass than carbohydrates or protein.',
+              null, 'Before departure, many species increase food intake and deposit large reserves of fat, which contains more usable energy per unit of mass than carbohydrates or protein.', 'This is directly stated in the passage.'
+       from p
+       on conflict (passage_id, idx) do update set
+         kind = excluded.kind, prompt = excluded.prompt, options = excluded.options,
+         evidence = excluded.evidence, explanation = excluded.explanation
+       returning id
+     )
+insert into public.question_answers (question_id, answer)
+select q.id, '["TRUE"]'::jsonb from q
+on conflict (question_id) do update set answer = excluded.answer;
+
+with p as (select id from public.passages where slug = 'the-science-of-bird-migration'),
+     q as (
+       insert into public.questions (passage_id, idx, kind, prompt, options, evidence, explanation)
+       select p.id, 6, 'true_false_not_given'::public.question_kind, 'Migratory birds rely exclusively on Earth''s magnetic field when the sky is cloudy.',
+              null, 'Navigation is therefore better understood as a flexible system than as dependence on one biological compass.', 'The passage describes a flexible system using several cues, not exclusive dependence on magnetic information.'
+       from p
+       on conflict (passage_id, idx) do update set
+         kind = excluded.kind, prompt = excluded.prompt, options = excluded.options,
+         evidence = excluded.evidence, explanation = excluded.explanation
+       returning id
+     )
+insert into public.question_answers (question_id, answer)
+select q.id, '["FALSE"]'::jsonb from q
+on conflict (question_id) do update set answer = excluded.answer;
+
+with p as (select id from public.passages where slug = 'the-science-of-bird-migration'),
+     q as (
+       insert into public.questions (passage_id, idx, kind, prompt, options, evidence, explanation)
+       select p.id, 7, 'true_false_not_given'::public.question_kind, 'Young birds of all migratory species begin their first journey later in the day than adults.',
+              null, 'In several species, young birds making their first journey travel separately from their parents yet still move in a seasonally appropriate direction.', 'The passage discusses first migrations by young birds but gives no comparison of their daily departure time with that of adults.'
+       from p
+       on conflict (passage_id, idx) do update set
+         kind = excluded.kind, prompt = excluded.prompt, options = excluded.options,
+         evidence = excluded.evidence, explanation = excluded.explanation
+       returning id
+     )
+insert into public.question_answers (question_id, answer)
+select q.id, '["NOT GIVEN"]'::jsonb from q
+on conflict (question_id) do update set answer = excluded.answer;
+
+with p as (select id from public.passages where slug = 'the-science-of-bird-migration'),
+     q as (
+       insert into public.questions (passage_id, idx, kind, prompt, options, evidence, explanation)
+       select p.id, 8, 'multiple_choice'::public.question_kind, 'Why does the passage distinguish direction from geographical position?',
+              '["A correct compass bearing does not necessarily reveal whether a bird has been displaced.","Birds can determine position only by following older individuals.","Magnetic information provides position but never direction.","Landmarks are useful only during the first migration."]'::jsonb, 'Researchers distinguish between knowing a direction and knowing a geographical position, because following the correct compass bearing does not necessarily tell a bird whether it has been displaced away from its normal route.', 'Direction alone does not provide full positional information.'
+       from p
+       on conflict (passage_id, idx) do update set
+         kind = excluded.kind, prompt = excluded.prompt, options = excluded.options,
+         evidence = excluded.evidence, explanation = excluded.explanation
+       returning id
+     )
+insert into public.question_answers (question_id, answer)
+select q.id, '["A correct compass bearing does not necessarily reveal whether a bird has been displaced."]'::jsonb from q
+on conflict (question_id) do update set answer = excluded.answer;
+
+with p as (select id from public.passages where slug = 'the-science-of-bird-migration'),
+     q as (
+       insert into public.questions (passage_id, idx, kind, prompt, options, evidence, explanation)
+       select p.id, 9, 'multiple_choice'::public.question_kind, 'What can favourable winds do for a migrating bird?',
+              '["Reduce the energy needed to reach the next stopping place.","Eliminate the need to store fat before departure.","Prevent storms from moving birds off course.","Allow birds to navigate without sensory information."]'::jsonb, 'Tailwinds can increase ground speed and reduce energy expenditure, whereas strong headwinds may delay departure or force birds to stop.', 'Tailwinds can make travel faster and energetically cheaper.'
+       from p
+       on conflict (passage_id, idx) do update set
+         kind = excluded.kind, prompt = excluded.prompt, options = excluded.options,
+         evidence = excluded.evidence, explanation = excluded.explanation
+       returning id
+     )
+insert into public.question_answers (question_id, answer)
+select q.id, '["Reduce the energy needed to reach the next stopping place."]'::jsonb from q
+on conflict (question_id) do update set answer = excluded.answer;
+
+with p as (select id from public.passages where slug = 'the-science-of-bird-migration'),
+     q as (
+       insert into public.questions (passage_id, idx, kind, prompt, options, evidence, explanation)
+       select p.id, 10, 'multiple_choice'::public.question_kind, 'Why can the loss of one stopover site affect birds far away?',
+              '["Migrants may rely on that site during journeys between distant seasonal habitats.","Stopover sites determine the genetic direction programme of young birds.","Birds use stopover sites only when tracking devices are attached.","The loss of one site permanently alters Earth''s magnetic field."]'::jsonb, 'Loss of habitat at a critical stopover can therefore affect populations breeding or wintering thousands of kilometres away.', 'Migratory populations can depend on a chain of geographically separated habitats.'
+       from p
+       on conflict (passage_id, idx) do update set
+         kind = excluded.kind, prompt = excluded.prompt, options = excluded.options,
+         evidence = excluded.evidence, explanation = excluded.explanation
+       returning id
+     )
+insert into public.question_answers (question_id, answer)
+select q.id, '["Migrants may rely on that site during journeys between distant seasonal habitats."]'::jsonb from q
+on conflict (question_id) do update set answer = excluded.answer;
+
+with p as (select id from public.passages where slug = 'the-science-of-bird-migration'),
+     q as (
+       insert into public.questions (passage_id, idx, kind, prompt, options, evidence, explanation)
+       select p.id, 11, 'sentence_completion'::public.question_kind, 'Complete the sentence using NO MORE THAN TWO WORDS from the passage: Before migration, many birds store large reserves of ______.',
+              null, 'Before departure, many species increase food intake and deposit large reserves of fat, which contains more usable energy per unit of mass than carbohydrates or protein.', 'The answer is taken directly from the passage.'
+       from p
+       on conflict (passage_id, idx) do update set
+         kind = excluded.kind, prompt = excluded.prompt, options = excluded.options,
+         evidence = excluded.evidence, explanation = excluded.explanation
+       returning id
+     )
+insert into public.question_answers (question_id, answer)
+select q.id, '["fat"]'::jsonb from q
+on conflict (question_id) do update set answer = excluded.answer;
+
+with p as (select id from public.passages where slug = 'the-science-of-bird-migration'),
+     q as (
+       insert into public.questions (passage_id, idx, kind, prompt, options, evidence, explanation)
+       select p.id, 12, 'sentence_completion'::public.question_kind, 'Complete the sentence using NO MORE THAN TWO WORDS from the passage: Strong ______ may cause birds to delay departure or stop.',
+              null, 'Tailwinds can increase ground speed and reduce energy expenditure, whereas strong headwinds may delay departure or force birds to stop.', 'The missing word is stated verbatim.'
+       from p
+       on conflict (passage_id, idx) do update set
+         kind = excluded.kind, prompt = excluded.prompt, options = excluded.options,
+         evidence = excluded.evidence, explanation = excluded.explanation
+       returning id
+     )
+insert into public.question_answers (question_id, answer)
+select q.id, '["headwinds"]'::jsonb from q
+on conflict (question_id) do update set answer = excluded.answer;
+
+with p as (select id from public.passages where slug = 'the-science-of-bird-migration'),
+     q as (
+       insert into public.questions (passage_id, idx, kind, prompt, options, evidence, explanation)
+       select p.id, 13, 'sentence_completion'::public.question_kind, 'Complete the sentence using NO MORE THAN THREE WORDS from the passage: Tracking has revealed some previously unknown ______ used by migrating birds.',
+              null, 'Researchers have discovered unexpected detours, high-altitude flights and previously unknown wintering areas.', 'The exact phrase ''wintering areas'' appears in the passage.'
+       from p
+       on conflict (passage_id, idx) do update set
+         kind = excluded.kind, prompt = excluded.prompt, options = excluded.options,
+         evidence = excluded.evidence, explanation = excluded.explanation
+       returning id
+     )
+insert into public.question_answers (question_id, answer)
+select q.id, '["wintering areas"]'::jsonb from q
+on conflict (question_id) do update set answer = excluded.answer;
+
+-- The Science of Roman Concrete
+insert into public.passages (slug, title, body, topic, headings, difficulty)
+values ('the-science-of-roman-concrete', 'The Science of Roman Concrete', 'A
+Ancient Roman builders produced concrete structures that have survived for remarkably long periods, including harbour installations repeatedly exposed to seawater. Their durability has attracted renewed scientific interest because modern concrete can deteriorate through cracking, chemical attack and corrosion of embedded steel. Roman concrete was not a single universal material, and recipes varied according to region and purpose. Nevertheless, many surviving examples were made from lime, water, pieces of rock and volcanic material rich in reactive minerals. Researchers study these structures not because every Roman wall is stronger than modern concrete, but because particular ancient mixtures reveal chemical processes that may suggest ways to improve future construction materials.
+
+B
+One important ingredient was pozzolanic material, named after the area around Pozzuoli near Naples, where volcanic ash was widely exploited. When suitable volcanic ash is mixed with lime and water, chemical reactions produce binding compounds that can harden even in wet conditions. This property made such mixtures especially valuable in hydraulic structures, including harbours, baths and water systems. Roman builders also used locally available volcanic deposits elsewhere in the empire, so the exact mineral composition varied. The effectiveness of a mixture therefore depended partly on geology. Transporting volcanic material over long distances was possible, but builders often adapted their recipes to the resources available near a construction site.
+
+C
+Marine concrete has provided some of the most striking evidence of long-term mineral change. In several Roman harbour structures, seawater gradually entered microscopic spaces in the concrete and reacted with volcanic components. Scientists examining samples have identified minerals that formed after the original construction. Some of these crystals can grow within cracks and pores, making the internal structure more tightly interlocked. The process does not mean that Roman concrete is indestructible or that every crack repairs itself completely. Instead, it shows that certain chemical environments can encourage new mineral growth over long periods. Modern materials researchers are interested in whether similar reactions could be designed deliberately into concrete rather than occurring only by chance.
+
+D
+Another line of research concerns small white fragments of lime that are visible in some Roman concrete. These fragments were once treated mainly as evidence that ancient builders had mixed their materials poorly. More recent microscopic and chemical studies suggest that at least some of the fragments were created by using lime under very hot conditions. When cracks later pass through reactive lime-rich areas, water can dissolve calcium compounds that may then move into the crack and precipitate again. Laboratory experiments with concrete designed to reproduce this feature have shown faster sealing of some cracks than comparable mixtures without the lime fragments. Researchers describe this as a potentially useful self-healing mechanism, although the performance of reconstructed materials must still be tested under realistic conditions.
+
+E
+It would be misleading, however, to conclude that engineers should simply replace modern concrete with a Roman formula. Contemporary structures have requirements that ancient builders did not face, including standardised performance, rapid construction schedules, reinforced designs and tightly controlled safety specifications. Modern Portland cement can gain strength quickly and is produced on an enormous industrial scale. Ancient formulations may harden differently and depend on raw materials whose composition varies from one deposit to another. In addition, a material that survives for centuries in a massive unreinforced harbour wall is not automatically suitable for a slender high-rise column or a heavily loaded bridge. The useful lesson from Roman concrete is therefore likely to involve particular chemical principles rather than literal duplication.
+
+F
+The search for those principles has an environmental dimension. Cement manufacture is responsible for substantial carbon dioxide emissions because producing clinker requires high temperatures and because limestone releases carbon dioxide during processing. Researchers are exploring numerous ways to reduce these emissions, including alternative binders, lower-clinker mixtures, longer-lasting concrete and methods that incorporate industrial by-products. Ancient Roman materials are only one source of ideas within this much larger field. If insights from their mineral chemistry help concrete last longer or repair minor damage, fewer structures may need premature replacement. Yet environmental benefits must be assessed across the entire life cycle of a material, including extraction, transport, construction, maintenance and eventual demolition.', 'archaeological materials science', '["A building material that survived unusual conditions","The role of volcanic ingredients in Roman construction","Evidence that cracks can trigger new mineral growth","Why modern concrete cannot simply copy an ancient recipe","The environmental cost of present-day cement production","What microscopic analysis reveals about lime fragments","The disappearance of Roman engineering knowledge","How sea water can alter ancient harbour concrete","The use of steel reinforcement in imperial monuments"]'::jsonb, 4)
+on conflict (slug) do update set
+  title = excluded.title, body = excluded.body, topic = excluded.topic,
+  headings = excluded.headings, difficulty = excluded.difficulty;
+
+with p as (select id from public.passages where slug = 'the-science-of-roman-concrete'),
+     q as (
+       insert into public.questions (passage_id, idx, kind, prompt, options, evidence, explanation)
+       select p.id, 1, 'matching_headings'::public.question_kind, 'Choose the most suitable heading for paragraph A.',
+              null, 'Ancient Roman builders produced concrete structures that have survived for remarkably long periods, including harbour installations repeatedly exposed to seawater.', 'Paragraph A introduces the exceptional survival of some Roman concrete and explains why scientists study it.'
+       from p
+       on conflict (passage_id, idx) do update set
+         kind = excluded.kind, prompt = excluded.prompt, options = excluded.options,
+         evidence = excluded.evidence, explanation = excluded.explanation
+       returning id
+     )
+insert into public.question_answers (question_id, answer)
+select q.id, '["A building material that survived unusual conditions"]'::jsonb from q
+on conflict (question_id) do update set answer = excluded.answer;
+
+with p as (select id from public.passages where slug = 'the-science-of-roman-concrete'),
+     q as (
+       insert into public.questions (passage_id, idx, kind, prompt, options, evidence, explanation)
+       select p.id, 2, 'matching_headings'::public.question_kind, 'Choose the most suitable heading for paragraph B.',
+              null, 'One important ingredient was pozzolanic material, named after the area around Pozzuoli near Naples, where volcanic ash was widely exploited.', 'The paragraph focuses on volcanic ash and its chemical and practical role in Roman concrete.'
+       from p
+       on conflict (passage_id, idx) do update set
+         kind = excluded.kind, prompt = excluded.prompt, options = excluded.options,
+         evidence = excluded.evidence, explanation = excluded.explanation
+       returning id
+     )
+insert into public.question_answers (question_id, answer)
+select q.id, '["The role of volcanic ingredients in Roman construction"]'::jsonb from q
+on conflict (question_id) do update set answer = excluded.answer;
+
+with p as (select id from public.passages where slug = 'the-science-of-roman-concrete'),
+     q as (
+       insert into public.questions (passage_id, idx, kind, prompt, options, evidence, explanation)
+       select p.id, 3, 'matching_headings'::public.question_kind, 'Choose the most suitable heading for paragraph C.',
+              null, 'In several Roman harbour structures, seawater gradually entered microscopic spaces in the concrete and reacted with volcanic components.', 'Paragraph C describes chemical changes caused by seawater inside Roman harbour concrete.'
+       from p
+       on conflict (passage_id, idx) do update set
+         kind = excluded.kind, prompt = excluded.prompt, options = excluded.options,
+         evidence = excluded.evidence, explanation = excluded.explanation
+       returning id
+     )
+insert into public.question_answers (question_id, answer)
+select q.id, '["How sea water can alter ancient harbour concrete"]'::jsonb from q
+on conflict (question_id) do update set answer = excluded.answer;
+
+with p as (select id from public.passages where slug = 'the-science-of-roman-concrete'),
+     q as (
+       insert into public.questions (passage_id, idx, kind, prompt, options, evidence, explanation)
+       select p.id, 4, 'matching_headings'::public.question_kind, 'Choose the most suitable heading for paragraph D.',
+              null, 'More recent microscopic and chemical studies suggest that at least some of the fragments were created by using lime under very hot conditions.', 'Paragraph D revises an older interpretation of white lime fragments and explains their possible self-healing role.'
+       from p
+       on conflict (passage_id, idx) do update set
+         kind = excluded.kind, prompt = excluded.prompt, options = excluded.options,
+         evidence = excluded.evidence, explanation = excluded.explanation
+       returning id
+     )
+insert into public.question_answers (question_id, answer)
+select q.id, '["What microscopic analysis reveals about lime fragments"]'::jsonb from q
+on conflict (question_id) do update set answer = excluded.answer;
+
+with p as (select id from public.passages where slug = 'the-science-of-roman-concrete'),
+     q as (
+       insert into public.questions (passage_id, idx, kind, prompt, options, evidence, explanation)
+       select p.id, 5, 'true_false_not_given'::public.question_kind, 'All surviving examples of Roman concrete were made from the same mixture.',
+              null, 'Roman concrete was not a single universal material, and recipes varied according to region and purpose.', 'The passage explicitly states that Roman concrete recipes varied.'
+       from p
+       on conflict (passage_id, idx) do update set
+         kind = excluded.kind, prompt = excluded.prompt, options = excluded.options,
+         evidence = excluded.evidence, explanation = excluded.explanation
+       returning id
+     )
+insert into public.question_answers (question_id, answer)
+select q.id, '["FALSE"]'::jsonb from q
+on conflict (question_id) do update set answer = excluded.answer;
+
+with p as (select id from public.passages where slug = 'the-science-of-roman-concrete'),
+     q as (
+       insert into public.questions (passage_id, idx, kind, prompt, options, evidence, explanation)
+       select p.id, 6, 'true_false_not_given'::public.question_kind, 'The mineral composition of Roman concrete could depend on the geology near a building site.',
+              null, 'The effectiveness of a mixture therefore depended partly on geology.', 'The passage links the performance and composition of mixtures to local geological resources.'
+       from p
+       on conflict (passage_id, idx) do update set
+         kind = excluded.kind, prompt = excluded.prompt, options = excluded.options,
+         evidence = excluded.evidence, explanation = excluded.explanation
+       returning id
+     )
+insert into public.question_answers (question_id, answer)
+select q.id, '["TRUE"]'::jsonb from q
+on conflict (question_id) do update set answer = excluded.answer;
+
+with p as (select id from public.passages where slug = 'the-science-of-roman-concrete'),
+     q as (
+       insert into public.questions (passage_id, idx, kind, prompt, options, evidence, explanation)
+       select p.id, 7, 'true_false_not_given'::public.question_kind, 'Roman builders deliberately included lime fragments because they understood that the fragments would repair future cracks.',
+              null, 'More recent microscopic and chemical studies suggest that at least some of the fragments were created by using lime under very hot conditions.', 'The passage explains how the fragments may have formed and how they can contribute to crack sealing, but it does not establish that Roman builders intentionally used them for future self-repair.'
+       from p
+       on conflict (passage_id, idx) do update set
+         kind = excluded.kind, prompt = excluded.prompt, options = excluded.options,
+         evidence = excluded.evidence, explanation = excluded.explanation
+       returning id
+     )
+insert into public.question_answers (question_id, answer)
+select q.id, '["NOT GIVEN"]'::jsonb from q
+on conflict (question_id) do update set answer = excluded.answer;
+
+with p as (select id from public.passages where slug = 'the-science-of-roman-concrete'),
+     q as (
+       insert into public.questions (passage_id, idx, kind, prompt, options, evidence, explanation)
+       select p.id, 8, 'multiple_choice'::public.question_kind, 'Why was pozzolanic material useful in hydraulic structures?',
+              '["It could form binding compounds that hardened in wet conditions.","It prevented all cracks from developing in concrete.","It allowed concrete to be reinforced with steel.","It eliminated the need to use lime."]'::jsonb, 'When suitable volcanic ash is mixed with lime and water, chemical reactions produce binding compounds that can harden even in wet conditions.', 'The ability to harden under wet conditions made volcanic ash particularly useful for water-related construction.'
+       from p
+       on conflict (passage_id, idx) do update set
+         kind = excluded.kind, prompt = excluded.prompt, options = excluded.options,
+         evidence = excluded.evidence, explanation = excluded.explanation
+       returning id
+     )
+insert into public.question_answers (question_id, answer)
+select q.id, '["It could form binding compounds that hardened in wet conditions."]'::jsonb from q
+on conflict (question_id) do update set answer = excluded.answer;
+
+with p as (select id from public.passages where slug = 'the-science-of-roman-concrete'),
+     q as (
+       insert into public.questions (passage_id, idx, kind, prompt, options, evidence, explanation)
+       select p.id, 9, 'multiple_choice'::public.question_kind, 'What do the laboratory experiments discussed in paragraph D suggest?',
+              '["Lime fragments may help some cracks seal more rapidly.","Volcanic ash prevents water from entering concrete.","Ancient concrete always gains strength faster than Portland cement.","White fragments prove that Roman builders mixed concrete carelessly."]'::jsonb, 'Laboratory experiments with concrete designed to reproduce this feature have shown faster sealing of some cracks than comparable mixtures without the lime fragments.', 'The experiments found faster crack sealing in mixtures containing the reproduced lime feature.'
+       from p
+       on conflict (passage_id, idx) do update set
+         kind = excluded.kind, prompt = excluded.prompt, options = excluded.options,
+         evidence = excluded.evidence, explanation = excluded.explanation
+       returning id
+     )
+insert into public.question_answers (question_id, answer)
+select q.id, '["Lime fragments may help some cracks seal more rapidly."]'::jsonb from q
+on conflict (question_id) do update set answer = excluded.answer;
+
+with p as (select id from public.passages where slug = 'the-science-of-roman-concrete'),
+     q as (
+       insert into public.questions (passage_id, idx, kind, prompt, options, evidence, explanation)
+       select p.id, 10, 'multiple_choice'::public.question_kind, 'Why does the author reject simply replacing modern concrete with an ancient formula?',
+              '["Ancient concrete cannot survive contact with seawater.","Modern structures have requirements that differ from ancient ones.","Roman concrete contains no chemically reactive minerals.","Volcanic material cannot be transported over long distances."]'::jsonb, 'Contemporary structures have requirements that ancient builders did not face, including standardised performance, rapid construction schedules, reinforced designs and tightly controlled safety specifications.', 'The passage emphasises differences between ancient and modern engineering requirements.'
+       from p
+       on conflict (passage_id, idx) do update set
+         kind = excluded.kind, prompt = excluded.prompt, options = excluded.options,
+         evidence = excluded.evidence, explanation = excluded.explanation
+       returning id
+     )
+insert into public.question_answers (question_id, answer)
+select q.id, '["Modern structures have requirements that differ from ancient ones."]'::jsonb from q
+on conflict (question_id) do update set answer = excluded.answer;
+
+with p as (select id from public.passages where slug = 'the-science-of-roman-concrete'),
+     q as (
+       insert into public.questions (passage_id, idx, kind, prompt, options, evidence, explanation)
+       select p.id, 11, 'sentence_completion'::public.question_kind, 'Complete the sentence using NO MORE THAN TWO WORDS from the passage: Volcanic ash used in Roman concrete was rich in reactive ______.',
+              null, 'Nevertheless, many surviving examples were made from lime, water, pieces of rock and volcanic material rich in reactive minerals.', 'The answer is copied directly from the passage.'
+       from p
+       on conflict (passage_id, idx) do update set
+         kind = excluded.kind, prompt = excluded.prompt, options = excluded.options,
+         evidence = excluded.evidence, explanation = excluded.explanation
+       returning id
+     )
+insert into public.question_answers (question_id, answer)
+select q.id, '["minerals"]'::jsonb from q
+on conflict (question_id) do update set answer = excluded.answer;
+
+with p as (select id from public.passages where slug = 'the-science-of-roman-concrete'),
+     q as (
+       insert into public.questions (passage_id, idx, kind, prompt, options, evidence, explanation)
+       select p.id, 12, 'sentence_completion'::public.question_kind, 'Complete the sentence using NO MORE THAN TWO WORDS from the passage: Researchers describe the crack-sealing effect associated with lime fragments as a possible ______ mechanism.',
+              null, 'Researchers describe this as a potentially useful self-healing mechanism, although the performance of reconstructed materials must still be tested under realistic conditions.', 'The passage uses the exact term ''self-healing mechanism''.'
+       from p
+       on conflict (passage_id, idx) do update set
+         kind = excluded.kind, prompt = excluded.prompt, options = excluded.options,
+         evidence = excluded.evidence, explanation = excluded.explanation
+       returning id
+     )
+insert into public.question_answers (question_id, answer)
+select q.id, '["self-healing"]'::jsonb from q
+on conflict (question_id) do update set answer = excluded.answer;
+
+with p as (select id from public.passages where slug = 'the-science-of-roman-concrete'),
+     q as (
+       insert into public.questions (passage_id, idx, kind, prompt, options, evidence, explanation)
+       select p.id, 13, 'sentence_completion'::public.question_kind, 'Complete the sentence using NO MORE THAN TWO WORDS from the passage: Producing cement clinker requires high temperatures, while processing ______ releases carbon dioxide.',
+              null, 'Cement manufacture is responsible for substantial carbon dioxide emissions because producing clinker requires high temperatures and because limestone releases carbon dioxide during processing.', 'The missing word appears verbatim in the evidence sentence.'
+       from p
+       on conflict (passage_id, idx) do update set
+         kind = excluded.kind, prompt = excluded.prompt, options = excluded.options,
+         evidence = excluded.evidence, explanation = excluded.explanation
+       returning id
+     )
+insert into public.question_answers (question_id, answer)
+select q.id, '["limestone"]'::jsonb from q
+on conflict (question_id) do update set answer = excluded.answer;
+
+-- Why Some Animals Build Collective Shelters
+insert into public.passages (slug, title, body, topic, headings, difficulty)
+values ('why-some-animals-build-collective-shelters', 'Why Some Animals Build Collective Shelters', 'A
+Some animals build shelters that are far larger or more complex than any one individual could construct alone. Social insects, colonial birds, and certain mammals create nests or burrows that serve many occupants and may persist across generations. These structures arise from repeated actions such as carrying material, digging, depositing soil, repairing damage, or responding to local cues. No single builder necessarily possesses a complete plan of the final structure. Instead, architecture can emerge from interactions among individuals, materials, and the changing conditions created by earlier construction.
+
+B
+Communal shelters can modify temperature in ways that improve survival or reduce energy use. A large nest may warm and cool more slowly than the surrounding air, protecting occupants from rapid temperature swings. Clustering animals also produce metabolic heat, which can raise internal temperatures during cold periods. Ventilation passages may move warm air and moisture through a structure, while insulation from soil, plant fibers, feathers, or other materials slows heat exchange. The benefit depends on climate and season because a structure that retains heat effectively in winter may require additional ventilation or behavioral adjustment during hot weather.
+
+C
+Complex structures do not always require complex instructions. In some social insects, individuals respond to local signals such as the presence of building material, airflow, humidity, or chemical cues left by nestmates. One worker may deposit material where another has already placed it, gradually creating pillars, walls, or covered passages. This kind of decentralized process is often described as self-organization. The colony-level pattern can be highly ordered even though each individual follows relatively simple behavioral rules. Researchers study these systems because they offer examples of how coordinated outcomes can emerge without central supervision.
+
+D
+Sharing a shelter also creates costs. Dense groups can make it easier for parasites and pathogens to spread between individuals. Competition may occur over the safest or warmest locations, and accumulated waste must be removed or isolated. A conspicuous colony can attract predators that learn where many potential prey are concentrated. Construction itself also consumes time and energy that could otherwise be spent feeding or reproducing. Collective sheltering persists when the benefits of protection, environmental control, reproduction, or cooperation outweigh these disadvantages under local ecological conditions.
+
+E
+Building materials vary with what animals can obtain and what the environment demands. Birds may weave grasses, fibers, or twigs, while insects can use soil, chewed plant material, wax, silk, or secretions. Burrowing mammals mainly reshape the ground itself, sometimes adding plant matter to sleeping chambers. Material choice affects strength, insulation, drainage, and resistance to weather. Animals may also change construction as conditions change; repairs after rain, for example, can differ from additions made during a dry period. Architecture is therefore partly constrained by inherited behavior and partly shaped by available resources.
+
+F
+Scientists investigate construction using field observation, laboratory colonies, sensors, imaging, and controlled experiments. Researchers may alter humidity, temperature, airflow, or material availability and record how building behavior changes. Transparent artificial nests can reveal activity that would normally be hidden underground, while three-dimensional scanning can map internal chambers without destroying the structure. Experiments must be interpreted carefully because animals in laboratory settings may experience different colony sizes, predators, soils, or climates from those in nature. Combining controlled tests with field measurements helps distinguish general behavioral rules from responses specific to one setting.
+
+G
+Collective shelters can influence more than their builders. Excavation may mix soil layers, change drainage, and create spaces later used by other organisms. Accumulated organic material can alter nutrient concentrations, while discarded food or waste may support additional species. Large nesting colonies can therefore become small centers of ecological activity. The shelter is both a product of animal behavior and a modification of habitat. Understanding these structures requires researchers to connect individual decisions with physical processes and ecosystem effects rather than treating architecture as an isolated object.', 'behavioral ecology', '["Shelters that emerge from many small actions","The temperature benefits of communal structures","How simple behavioral rules can create complex architecture","The costs of sharing a crowded shelter","Why building material depends on local conditions","Using experiments to understand construction behavior","How collective shelters alter surrounding ecosystems","The balance between individual behavior and colony-level results"]'::jsonb, 3)
+on conflict (slug) do update set
+  title = excluded.title, body = excluded.body, topic = excluded.topic,
+  headings = excluded.headings, difficulty = excluded.difficulty;
+
+with p as (select id from public.passages where slug = 'why-some-animals-build-collective-shelters'),
+     q as (
+       insert into public.questions (passage_id, idx, kind, prompt, options, evidence, explanation)
+       select p.id, 1, 'matching_headings'::public.question_kind, 'Choose the most suitable heading for paragraph B.',
+              null, 'Communal shelters can modify temperature in ways that improve survival or reduce energy use.', 'The paragraph describes thermal buffering, metabolic heat, insulation, and ventilation.'
+       from p
+       on conflict (passage_id, idx) do update set
+         kind = excluded.kind, prompt = excluded.prompt, options = excluded.options,
+         evidence = excluded.evidence, explanation = excluded.explanation
+       returning id
+     )
+insert into public.question_answers (question_id, answer)
+select q.id, '["The temperature benefits of communal structures"]'::jsonb from q
+on conflict (question_id) do update set answer = excluded.answer;
+
+with p as (select id from public.passages where slug = 'why-some-animals-build-collective-shelters'),
+     q as (
+       insert into public.questions (passage_id, idx, kind, prompt, options, evidence, explanation)
+       select p.id, 2, 'matching_headings'::public.question_kind, 'Choose the most suitable heading for paragraph C.',
+              null, 'Complex structures do not always require complex instructions.', 'The paragraph explains decentralized self-organization based on local cues.'
+       from p
+       on conflict (passage_id, idx) do update set
+         kind = excluded.kind, prompt = excluded.prompt, options = excluded.options,
+         evidence = excluded.evidence, explanation = excluded.explanation
+       returning id
+     )
+insert into public.question_answers (question_id, answer)
+select q.id, '["How simple behavioral rules can create complex architecture"]'::jsonb from q
+on conflict (question_id) do update set answer = excluded.answer;
+
+with p as (select id from public.passages where slug = 'why-some-animals-build-collective-shelters'),
+     q as (
+       insert into public.questions (passage_id, idx, kind, prompt, options, evidence, explanation)
+       select p.id, 3, 'matching_headings'::public.question_kind, 'Choose the most suitable heading for paragraph D.',
+              null, 'Sharing a shelter also creates costs.', 'The paragraph discusses disease, competition, predation risk, waste, and construction costs.'
+       from p
+       on conflict (passage_id, idx) do update set
+         kind = excluded.kind, prompt = excluded.prompt, options = excluded.options,
+         evidence = excluded.evidence, explanation = excluded.explanation
+       returning id
+     )
+insert into public.question_answers (question_id, answer)
+select q.id, '["The costs of sharing a crowded shelter"]'::jsonb from q
+on conflict (question_id) do update set answer = excluded.answer;
+
+with p as (select id from public.passages where slug = 'why-some-animals-build-collective-shelters'),
+     q as (
+       insert into public.questions (passage_id, idx, kind, prompt, options, evidence, explanation)
+       select p.id, 4, 'matching_headings'::public.question_kind, 'Choose the most suitable heading for paragraph F.',
+              null, 'Scientists investigate construction using field observation, laboratory colonies, sensors, imaging, and controlled experiments.', 'The paragraph describes experimental and observational methods used to study collective building.'
+       from p
+       on conflict (passage_id, idx) do update set
+         kind = excluded.kind, prompt = excluded.prompt, options = excluded.options,
+         evidence = excluded.evidence, explanation = excluded.explanation
+       returning id
+     )
+insert into public.question_answers (question_id, answer)
+select q.id, '["Using experiments to understand construction behavior"]'::jsonb from q
+on conflict (question_id) do update set answer = excluded.answer;
+
+with p as (select id from public.passages where slug = 'why-some-animals-build-collective-shelters'),
+     q as (
+       insert into public.questions (passage_id, idx, kind, prompt, options, evidence, explanation)
+       select p.id, 5, 'true_false_not_given'::public.question_kind, 'A communal shelter may reduce rapid changes in temperature experienced by its occupants.',
+              null, 'A large nest may warm and cool more slowly than the surrounding air, protecting occupants from rapid temperature swings.', 'The passage directly describes this buffering effect.'
+       from p
+       on conflict (passage_id, idx) do update set
+         kind = excluded.kind, prompt = excluded.prompt, options = excluded.options,
+         evidence = excluded.evidence, explanation = excluded.explanation
+       returning id
+     )
+insert into public.question_answers (question_id, answer)
+select q.id, '["TRUE"]'::jsonb from q
+on conflict (question_id) do update set answer = excluded.answer;
+
+with p as (select id from public.passages where slug = 'why-some-animals-build-collective-shelters'),
+     q as (
+       insert into public.questions (passage_id, idx, kind, prompt, options, evidence, explanation)
+       select p.id, 6, 'true_false_not_given'::public.question_kind, 'Every individual builder must understand the complete final design before construction begins.',
+              null, 'No single builder necessarily possesses a complete plan of the final structure.', 'The passage explicitly contradicts the claim.'
+       from p
+       on conflict (passage_id, idx) do update set
+         kind = excluded.kind, prompt = excluded.prompt, options = excluded.options,
+         evidence = excluded.evidence, explanation = excluded.explanation
+       returning id
+     )
+insert into public.question_answers (question_id, answer)
+select q.id, '["FALSE"]'::jsonb from q
+on conflict (question_id) do update set answer = excluded.answer;
+
+with p as (select id from public.passages where slug = 'why-some-animals-build-collective-shelters'),
+     q as (
+       insert into public.questions (passage_id, idx, kind, prompt, options, evidence, explanation)
+       select p.id, 7, 'true_false_not_given'::public.question_kind, 'The passage states that communal nests always contain more than one thousand animals.',
+              null, 'Some animals build shelters that are far larger or more complex than any one individual could construct alone.', 'The passage discusses shared structures but provides no universal minimum number of occupants.'
+       from p
+       on conflict (passage_id, idx) do update set
+         kind = excluded.kind, prompt = excluded.prompt, options = excluded.options,
+         evidence = excluded.evidence, explanation = excluded.explanation
+       returning id
+     )
+insert into public.question_answers (question_id, answer)
+select q.id, '["NOT GIVEN"]'::jsonb from q
+on conflict (question_id) do update set answer = excluded.answer;
+
+with p as (select id from public.passages where slug = 'why-some-animals-build-collective-shelters'),
+     q as (
+       insert into public.questions (passage_id, idx, kind, prompt, options, evidence, explanation)
+       select p.id, 8, 'multiple_choice'::public.question_kind, 'What is self-organization in the context of collective building?',
+              '["An ordered colony-level pattern emerging from simple local behavior.","A central leader issuing detailed construction instructions.","A structure designed entirely by environmental temperature.","A building method limited to mammals."]'::jsonb, 'The colony-level pattern can be highly ordered even though each individual follows relatively simple behavioral rules.', 'The passage describes organized outcomes emerging from simple individual rules.'
+       from p
+       on conflict (passage_id, idx) do update set
+         kind = excluded.kind, prompt = excluded.prompt, options = excluded.options,
+         evidence = excluded.evidence, explanation = excluded.explanation
+       returning id
+     )
+insert into public.question_answers (question_id, answer)
+select q.id, '["An ordered colony-level pattern emerging from simple local behavior."]'::jsonb from q
+on conflict (question_id) do update set answer = excluded.answer;
+
+with p as (select id from public.passages where slug = 'why-some-animals-build-collective-shelters'),
+     q as (
+       insert into public.questions (passage_id, idx, kind, prompt, options, evidence, explanation)
+       select p.id, 9, 'multiple_choice'::public.question_kind, 'What is one potential disadvantage of communal sheltering?',
+              '["Parasites may spread more easily.","All occupants lose the ability to regulate temperature.","Building materials become physically indestructible.","Predators are unable to locate colonies."]'::jsonb, 'Dense groups can make it easier for parasites and pathogens to spread between individuals.', 'The passage directly identifies increased transmission as a cost.'
+       from p
+       on conflict (passage_id, idx) do update set
+         kind = excluded.kind, prompt = excluded.prompt, options = excluded.options,
+         evidence = excluded.evidence, explanation = excluded.explanation
+       returning id
+     )
+insert into public.question_answers (question_id, answer)
+select q.id, '["Parasites may spread more easily."]'::jsonb from q
+on conflict (question_id) do update set answer = excluded.answer;
+
+with p as (select id from public.passages where slug = 'why-some-animals-build-collective-shelters'),
+     q as (
+       insert into public.questions (passage_id, idx, kind, prompt, options, evidence, explanation)
+       select p.id, 10, 'multiple_choice'::public.question_kind, 'Why do researchers combine field measurements with controlled tests?',
+              '["To separate general behavioral rules from responses unique to one setting.","To ensure animals never experience natural soils.","To replace all direct observation with computer models.","To prove that laboratory colonies always behave identically to wild ones."]'::jsonb, 'Combining controlled tests with field measurements helps distinguish general behavioral rules from responses specific to one setting.', 'The passage explicitly states this purpose.'
+       from p
+       on conflict (passage_id, idx) do update set
+         kind = excluded.kind, prompt = excluded.prompt, options = excluded.options,
+         evidence = excluded.evidence, explanation = excluded.explanation
+       returning id
+     )
+insert into public.question_answers (question_id, answer)
+select q.id, '["To separate general behavioral rules from responses unique to one setting."]'::jsonb from q
+on conflict (question_id) do update set answer = excluded.answer;
+
+with p as (select id from public.passages where slug = 'why-some-animals-build-collective-shelters'),
+     q as (
+       insert into public.questions (passage_id, idx, kind, prompt, options, evidence, explanation)
+       select p.id, 11, 'sentence_completion'::public.question_kind, 'Complete the sentence using NO MORE THAN TWO WORDS from the passage: Clustering animals can produce ______.',
+              null, 'Clustering animals also produce metabolic heat, which can raise internal temperatures during cold periods.', 'The exact phrase is metabolic heat.'
+       from p
+       on conflict (passage_id, idx) do update set
+         kind = excluded.kind, prompt = excluded.prompt, options = excluded.options,
+         evidence = excluded.evidence, explanation = excluded.explanation
+       returning id
+     )
+insert into public.question_answers (question_id, answer)
+select q.id, '["metabolic heat"]'::jsonb from q
+on conflict (question_id) do update set answer = excluded.answer;
+
+with p as (select id from public.passages where slug = 'why-some-animals-build-collective-shelters'),
+     q as (
+       insert into public.questions (passage_id, idx, kind, prompt, options, evidence, explanation)
+       select p.id, 12, 'sentence_completion'::public.question_kind, 'Complete the sentence using NO MORE THAN TWO WORDS from the passage: Decentralized construction is often described as ______.',
+              null, 'This kind of decentralized process is often described as self-organization.', 'The answer is taken verbatim from the passage.'
+       from p
+       on conflict (passage_id, idx) do update set
+         kind = excluded.kind, prompt = excluded.prompt, options = excluded.options,
+         evidence = excluded.evidence, explanation = excluded.explanation
+       returning id
+     )
+insert into public.question_answers (question_id, answer)
+select q.id, '["self-organization"]'::jsonb from q
+on conflict (question_id) do update set answer = excluded.answer;
+
+with p as (select id from public.passages where slug = 'why-some-animals-build-collective-shelters'),
+     q as (
+       insert into public.questions (passage_id, idx, kind, prompt, options, evidence, explanation)
+       select p.id, 13, 'sentence_completion'::public.question_kind, 'Complete the sentence using NO MORE THAN TWO WORDS from the passage: Three-dimensional scanning can map internal ______.',
+              null, 'Transparent artificial nests can reveal activity that would normally be hidden underground, while three-dimensional scanning can map internal chambers without destroying the structure.', 'The required word is chambers.'
+       from p
+       on conflict (passage_id, idx) do update set
+         kind = excluded.kind, prompt = excluded.prompt, options = excluded.options,
+         evidence = excluded.evidence, explanation = excluded.explanation
+       returning id
+     )
+insert into public.question_answers (question_id, answer)
+select q.id, '["chambers"]'::jsonb from q
+on conflict (question_id) do update set answer = excluded.answer;
+
+-- Why Some Rivers Are Being Reconnected
+insert into public.passages (slug, title, body, topic, headings, difficulty)
+values ('why-some-rivers-are-being-reconnected', 'Why Some Rivers Are Being Reconnected', 'A
+Rivers are naturally connected systems in which water, sediment, nutrients and organisms move over long distances. Dams, weirs and culverts interrupt that continuity. Some barriers are essential for hydropower, irrigation, water supply or flood management, while others have become obsolete. From an ecological perspective, even a relatively small structure can matter if it prevents fish and other organisms from reaching feeding, spawning or refuge habitat. Barriers can also alter the downstream transport of gravel, sand and organic material. As a result, river restoration increasingly includes efforts to improve connectivity rather than concentrating only on water quality at individual sites.
+
+B
+Complete removal is not the only way to improve passage. Where a dam must remain, engineers may construct fish ladders, bypass channels or other routes intended to help animals move around the obstacle. Their success varies widely. A passage designed for strong-swimming salmon may be unsuitable for smaller fish or species that remain close to the riverbed. Water velocity, entrance location, turbulence and seasonal flow all influence whether animals actually use the structure. Effective design therefore requires knowledge of the behaviour and swimming ability of the species that restoration is intended to help. In some cases, modifying an existing barrier can provide substantial ecological benefit while retaining its original human function.
+
+C
+When an obsolete dam is removed, one of the most visible changes involves sediment. Reservoirs often trap material that would otherwise travel downstream, sometimes for decades. After removal, some stored sediment may begin moving through the river again. This can rebuild gravel bars and deliver sediment to downstream habitats, but large releases can temporarily increase turbidity or cover organisms living on the riverbed. Engineers may therefore remove sediment beforehand, release it gradually or allow the river to redistribute it naturally, depending on contamination, volume and downstream conditions. Sediment management is often one of the most important practical questions in planning a dam-removal project.
+
+D
+Ecological responses to reconnection are not always immediate or uniformly positive. Migratory fish may regain access to upstream habitat within a short period, while vegetation, channel shape and food webs can take much longer to adjust. Removing a structure also changes local water levels and can expose areas that were previously submerged within a reservoir. Newly exposed sediment may initially support little vegetation and can be vulnerable to erosion. Restoration teams sometimes plant native species to stabilise these surfaces, but natural colonisation may also occur. Short-term disturbance is therefore compatible with long-term ecological recovery, and a river should not necessarily be judged only by its appearance during the first months after a project.
+
+E
+Deciding whether to remove a barrier involves more than biological science. A dam may provide electricity, irrigation, recreation, cultural value or water storage, while its removal may affect bridges, property boundaries and local economies. Conversely, maintaining an ageing structure can require expensive repairs and may create safety liabilities. Restoration planners therefore compare ecological gains with social, economic and engineering consequences. Projects are especially attractive when a barrier has little remaining economic function, has high maintenance costs and blocks access to extensive upstream habitat. The best decision depends on the individual river rather than on a universal rule that all barriers are either beneficial or harmful.
+
+F
+Monitoring after reconnection is essential because predicted outcomes do not always match real ones. Scientists may track fish movement using electronic tags, survey changes in riverbed shape, measure sediment transport and record the development of vegetation. Data collected before a project provide a baseline against which later conditions can be compared. Monitoring can reveal whether fish passages need adjustment, whether unexpected erosion is occurring or whether species are using newly accessible habitat. Long-term observations are particularly valuable because some ecological changes take years to emerge. River reconnection is therefore best understood as an adaptive process in which management can be revised as evidence accumulates.', 'river ecology and restoration', '["How barriers divide a river into ecological fragments","Restoring movement without removing an entire structure","The return of sediment after dam removal","Why removing a barrier can create short-term disturbance","Choosing projects by balancing ecological and social needs","The role of reservoirs in producing drinking water","Monitoring rivers after reconnection","How migratory fish navigate through the open ocean","Why every old dam should immediately be demolished"]'::jsonb, 3)
+on conflict (slug) do update set
+  title = excluded.title, body = excluded.body, topic = excluded.topic,
+  headings = excluded.headings, difficulty = excluded.difficulty;
+
+with p as (select id from public.passages where slug = 'why-some-rivers-are-being-reconnected'),
+     q as (
+       insert into public.questions (passage_id, idx, kind, prompt, options, evidence, explanation)
+       select p.id, 1, 'matching_headings'::public.question_kind, 'Choose the most suitable heading for paragraph A.',
+              null, 'Dams, weirs and culverts interrupt that continuity.', 'Paragraph A explains how barriers disrupt the movement of organisms, sediment and other material through river systems.'
+       from p
+       on conflict (passage_id, idx) do update set
+         kind = excluded.kind, prompt = excluded.prompt, options = excluded.options,
+         evidence = excluded.evidence, explanation = excluded.explanation
+       returning id
+     )
+insert into public.question_answers (question_id, answer)
+select q.id, '["How barriers divide a river into ecological fragments"]'::jsonb from q
+on conflict (question_id) do update set answer = excluded.answer;
+
+with p as (select id from public.passages where slug = 'why-some-rivers-are-being-reconnected'),
+     q as (
+       insert into public.questions (passage_id, idx, kind, prompt, options, evidence, explanation)
+       select p.id, 2, 'matching_headings'::public.question_kind, 'Choose the most suitable heading for paragraph B.',
+              null, 'Complete removal is not the only way to improve passage.', 'Paragraph B discusses fish ladders and bypass channels used when a barrier remains in place.'
+       from p
+       on conflict (passage_id, idx) do update set
+         kind = excluded.kind, prompt = excluded.prompt, options = excluded.options,
+         evidence = excluded.evidence, explanation = excluded.explanation
+       returning id
+     )
+insert into public.question_answers (question_id, answer)
+select q.id, '["Restoring movement without removing an entire structure"]'::jsonb from q
+on conflict (question_id) do update set answer = excluded.answer;
+
+with p as (select id from public.passages where slug = 'why-some-rivers-are-being-reconnected'),
+     q as (
+       insert into public.questions (passage_id, idx, kind, prompt, options, evidence, explanation)
+       select p.id, 3, 'matching_headings'::public.question_kind, 'Choose the most suitable heading for paragraph C.',
+              null, 'After removal, some stored sediment may begin moving through the river again.', 'Paragraph C focuses on the movement and management of sediment released after a dam is removed.'
+       from p
+       on conflict (passage_id, idx) do update set
+         kind = excluded.kind, prompt = excluded.prompt, options = excluded.options,
+         evidence = excluded.evidence, explanation = excluded.explanation
+       returning id
+     )
+insert into public.question_answers (question_id, answer)
+select q.id, '["The return of sediment after dam removal"]'::jsonb from q
+on conflict (question_id) do update set answer = excluded.answer;
+
+with p as (select id from public.passages where slug = 'why-some-rivers-are-being-reconnected'),
+     q as (
+       insert into public.questions (passage_id, idx, kind, prompt, options, evidence, explanation)
+       select p.id, 4, 'matching_headings'::public.question_kind, 'Choose the most suitable heading for paragraph D.',
+              null, 'Short-term disturbance is therefore compatible with long-term ecological recovery, and a river should not necessarily be judged only by its appearance during the first months after a project.', 'The paragraph explains why temporary disruption can accompany longer-term ecological improvement.'
+       from p
+       on conflict (passage_id, idx) do update set
+         kind = excluded.kind, prompt = excluded.prompt, options = excluded.options,
+         evidence = excluded.evidence, explanation = excluded.explanation
+       returning id
+     )
+insert into public.question_answers (question_id, answer)
+select q.id, '["Why removing a barrier can create short-term disturbance"]'::jsonb from q
+on conflict (question_id) do update set answer = excluded.answer;
+
+with p as (select id from public.passages where slug = 'why-some-rivers-are-being-reconnected'),
+     q as (
+       insert into public.questions (passage_id, idx, kind, prompt, options, evidence, explanation)
+       select p.id, 5, 'true_false_not_given'::public.question_kind, 'Small river barriers can prevent organisms from reaching important habitat.',
+              null, 'From an ecological perspective, even a relatively small structure can matter if it prevents fish and other organisms from reaching feeding, spawning or refuge habitat.', 'The statement is directly supported by the passage.'
+       from p
+       on conflict (passage_id, idx) do update set
+         kind = excluded.kind, prompt = excluded.prompt, options = excluded.options,
+         evidence = excluded.evidence, explanation = excluded.explanation
+       returning id
+     )
+insert into public.question_answers (question_id, answer)
+select q.id, '["TRUE"]'::jsonb from q
+on conflict (question_id) do update set answer = excluded.answer;
+
+with p as (select id from public.passages where slug = 'why-some-rivers-are-being-reconnected'),
+     q as (
+       insert into public.questions (passage_id, idx, kind, prompt, options, evidence, explanation)
+       select p.id, 6, 'true_false_not_given'::public.question_kind, 'A fish passage suitable for salmon will necessarily work for smaller species.',
+              null, 'A passage designed for strong-swimming salmon may be unsuitable for smaller fish or species that remain close to the riverbed.', 'The passage explicitly says a design suitable for salmon may not suit smaller fish.'
+       from p
+       on conflict (passage_id, idx) do update set
+         kind = excluded.kind, prompt = excluded.prompt, options = excluded.options,
+         evidence = excluded.evidence, explanation = excluded.explanation
+       returning id
+     )
+insert into public.question_answers (question_id, answer)
+select q.id, '["FALSE"]'::jsonb from q
+on conflict (question_id) do update set answer = excluded.answer;
+
+with p as (select id from public.passages where slug = 'why-some-rivers-are-being-reconnected'),
+     q as (
+       insert into public.questions (passage_id, idx, kind, prompt, options, evidence, explanation)
+       select p.id, 7, 'true_false_not_given'::public.question_kind, 'Fish ladders cost less to build than bypass channels in most countries.',
+              null, 'Where a dam must remain, engineers may construct fish ladders, bypass channels or other routes intended to help animals move around the obstacle.', 'The passage lists fish ladders and bypass channels but does not compare their construction costs.'
+       from p
+       on conflict (passage_id, idx) do update set
+         kind = excluded.kind, prompt = excluded.prompt, options = excluded.options,
+         evidence = excluded.evidence, explanation = excluded.explanation
+       returning id
+     )
+insert into public.question_answers (question_id, answer)
+select q.id, '["NOT GIVEN"]'::jsonb from q
+on conflict (question_id) do update set answer = excluded.answer;
+
+with p as (select id from public.passages where slug = 'why-some-rivers-are-being-reconnected'),
+     q as (
+       insert into public.questions (passage_id, idx, kind, prompt, options, evidence, explanation)
+       select p.id, 8, 'multiple_choice'::public.question_kind, 'What can happen when sediment stored behind a dam is released?',
+              '["It may temporarily make the water more turbid.","It permanently prevents gravel bars from forming.","It stops all downstream erosion.","It immediately restores vegetation on exposed surfaces."]'::jsonb, 'This can rebuild gravel bars and deliver sediment to downstream habitats, but large releases can temporarily increase turbidity or cover organisms living on the riverbed.', 'The passage identifies increased turbidity as one possible short-term effect.'
+       from p
+       on conflict (passage_id, idx) do update set
+         kind = excluded.kind, prompt = excluded.prompt, options = excluded.options,
+         evidence = excluded.evidence, explanation = excluded.explanation
+       returning id
+     )
+insert into public.question_answers (question_id, answer)
+select q.id, '["It may temporarily make the water more turbid."]'::jsonb from q
+on conflict (question_id) do update set answer = excluded.answer;
+
+with p as (select id from public.passages where slug = 'why-some-rivers-are-being-reconnected'),
+     q as (
+       insert into public.questions (passage_id, idx, kind, prompt, options, evidence, explanation)
+       select p.id, 9, 'multiple_choice'::public.question_kind, 'Why may a river look disturbed soon after a dam is removed?',
+              '["Previously submerged areas can become exposed and vulnerable to erosion.","All migratory fish leave the river permanently.","Fish passages immediately become blocked by vegetation.","The river stops transporting sediment downstream."]'::jsonb, 'Removing a structure also changes local water levels and can expose areas that were previously submerged within a reservoir.', 'The newly exposed areas can initially look bare and unstable as the ecosystem adjusts.'
+       from p
+       on conflict (passage_id, idx) do update set
+         kind = excluded.kind, prompt = excluded.prompt, options = excluded.options,
+         evidence = excluded.evidence, explanation = excluded.explanation
+       returning id
+     )
+insert into public.question_answers (question_id, answer)
+select q.id, '["Previously submerged areas can become exposed and vulnerable to erosion."]'::jsonb from q
+on conflict (question_id) do update set answer = excluded.answer;
+
+with p as (select id from public.passages where slug = 'why-some-rivers-are-being-reconnected'),
+     q as (
+       insert into public.questions (passage_id, idx, kind, prompt, options, evidence, explanation)
+       select p.id, 10, 'multiple_choice'::public.question_kind, 'When is barrier removal described as particularly attractive?',
+              '["When a dam has little remaining economic use and blocks extensive habitat.","Whenever a dam produces hydroelectricity for a large city.","When the river contains no migratory species.","Whenever a reservoir has accumulated any sediment."]'::jsonb, 'Projects are especially attractive when a barrier has little remaining economic function, has high maintenance costs and blocks access to extensive upstream habitat.', 'The passage gives this specific combination of factors as making removal especially attractive.'
+       from p
+       on conflict (passage_id, idx) do update set
+         kind = excluded.kind, prompt = excluded.prompt, options = excluded.options,
+         evidence = excluded.evidence, explanation = excluded.explanation
+       returning id
+     )
+insert into public.question_answers (question_id, answer)
+select q.id, '["When a dam has little remaining economic use and blocks extensive habitat."]'::jsonb from q
+on conflict (question_id) do update set answer = excluded.answer;
+
+with p as (select id from public.passages where slug = 'why-some-rivers-are-being-reconnected'),
+     q as (
+       insert into public.questions (passage_id, idx, kind, prompt, options, evidence, explanation)
+       select p.id, 11, 'sentence_completion'::public.question_kind, 'Complete the sentence using NO MORE THAN TWO WORDS from the passage: Rivers transport water, nutrients, organisms and ______ over long distances.',
+              null, 'Rivers are naturally connected systems in which water, sediment, nutrients and organisms move over long distances.', 'The missing noun is copied directly from the passage.'
+       from p
+       on conflict (passage_id, idx) do update set
+         kind = excluded.kind, prompt = excluded.prompt, options = excluded.options,
+         evidence = excluded.evidence, explanation = excluded.explanation
+       returning id
+     )
+insert into public.question_answers (question_id, answer)
+select q.id, '["sediment"]'::jsonb from q
+on conflict (question_id) do update set answer = excluded.answer;
+
+with p as (select id from public.passages where slug = 'why-some-rivers-are-being-reconnected'),
+     q as (
+       insert into public.questions (passage_id, idx, kind, prompt, options, evidence, explanation)
+       select p.id, 12, 'sentence_completion'::public.question_kind, 'Complete the sentence using NO MORE THAN TWO WORDS from the passage: One possible response to newly exposed sediment is to plant ______.',
+              null, 'Restoration teams sometimes plant native species to stabilise these surfaces, but natural colonisation may also occur.', 'The phrase appears verbatim in the passage.'
+       from p
+       on conflict (passage_id, idx) do update set
+         kind = excluded.kind, prompt = excluded.prompt, options = excluded.options,
+         evidence = excluded.evidence, explanation = excluded.explanation
+       returning id
+     )
+insert into public.question_answers (question_id, answer)
+select q.id, '["native species"]'::jsonb from q
+on conflict (question_id) do update set answer = excluded.answer;
+
+with p as (select id from public.passages where slug = 'why-some-rivers-are-being-reconnected'),
+     q as (
+       insert into public.questions (passage_id, idx, kind, prompt, options, evidence, explanation)
+       select p.id, 13, 'sentence_completion'::public.question_kind, 'Complete the sentence using NO MORE THAN TWO WORDS from the passage: Measurements taken before a project provide a ______ for later comparison.',
+              null, 'Data collected before a project provide a baseline against which later conditions can be compared.', 'The answer is the exact term used in the passage.'
+       from p
+       on conflict (passage_id, idx) do update set
+         kind = excluded.kind, prompt = excluded.prompt, options = excluded.options,
+         evidence = excluded.evidence, explanation = excluded.explanation
+       returning id
+     )
+insert into public.question_answers (question_id, answer)
+select q.id, '["baseline"]'::jsonb from q
+on conflict (question_id) do update set answer = excluded.answer;
+
+-- Why Volcanic Ash Threatens Aircraft
+insert into public.passages (slug, title, body, topic, headings, difficulty)
+values ('why-volcanic-ash-threatens-aircraft', 'Why Volcanic Ash Threatens Aircraft', 'A
+Volcanic ash is not the soft residue produced by burning wood. It consists of tiny fragments of rock, mineral crystals, and volcanic glass created when magma is violently broken apart during an eruption. Fine particles can be carried high into the atmosphere and transported hundreds or thousands of kilometres by winds. An ash cloud may spread across busy air routes even when the volcano itself is far from an airport. Because individual particles can be extremely small, pilots may not always see a clear boundary between clean air and contaminated air, especially at night or when meteorological clouds obscure the view.
+
+B
+Jet engines are particularly vulnerable because they draw enormous volumes of air through compressors and combustion chambers. When ash enters an engine, some particles can melt or soften in the high-temperature section. Farther through the engine, the material may cool and stick to internal components, interfering with airflow and reducing engine performance. Ash can also erode compressor blades and contaminate sensors. In a severe encounter, several engines may lose thrust. Engines can sometimes recover after an aircraft leaves the ash cloud, but crews cannot safely assume that recovery will occur, so avoiding significant ash concentrations is the primary strategy.
+
+C
+The hazard is not limited to engines. Fast-moving ash particles can abrade the leading edges of wings and damage lights, antennas, and other exposed surfaces. Windscreens may become scratched or frosted, reducing a pilot''s forward visibility. Ash entering ventilation systems can contaminate the cabin, while deposits can affect moving components. Even after landing, maintenance teams may need to inspect engines, sensors, and air systems before the aircraft returns to service. These effects make volcanic ash both an immediate flight hazard and a potential source of expensive maintenance even when an encounter does not lead to engine failure.
+
+D
+Detecting and forecasting ash clouds requires information from several sources. Weather satellites can identify some volcanic plumes by measuring radiation at different wavelengths, while ground-based radar, cameras, lightning sensors, and observations from aircraft can provide additional evidence. Satellite detection becomes more difficult when ash lies beneath thick meteorological cloud or when the concentration is low. Observatories near volcanoes monitor earthquakes, gas emissions, and deformation to recognize unrest, but the exact size and duration of an eruption cannot always be predicted in advance. Once an eruption begins, scientists must rapidly estimate how much ash is entering the atmosphere and at what altitude.
+
+E
+Specialized volcanic ash advisory centers use observations together with atmospheric dispersion models. These models combine estimates of the eruption with wind fields to predict where ash is likely to travel at different heights. Aviation authorities, airlines, and air-traffic managers can use the resulting advisories when deciding whether to reroute, delay, or cancel flights. The process is more complicated than drawing a single line around an ash cloud because concentration varies within the plume and model predictions change as new observations arrive. Route planning therefore involves both the expected location of ash and uncertainty about how the cloud may evolve.
+
+F
+Uncertainty comes from several sources. Wind forecasts are imperfect, and an eruption can change intensity rapidly. The amount of ash released at different altitudes may be poorly known, especially during bad weather or at remote volcanoes. Particles also fall out of the atmosphere at rates that depend on their size and on processes such as aggregation, in which small particles clump together. Rain can remove ash from the air, while strong winds can later remobilize deposits from the ground. Consequently, a forecast produced soon after an eruption may need repeated revision as measurements improve.
+
+G
+Aviation procedures have been shaped by serious encounters in which aircraft entered ash clouds without recognizing the danger in time. Such events demonstrated that visual avoidance alone was inadequate and encouraged international coordination among volcanologists, meteorologists, regulators, and airlines. Modern practice emphasizes rapid reporting of eruptions, standardized advisories, satellite monitoring, forecasting, and operational planning. The objective is not to predict every particle perfectly. It is to reduce the probability that an aircraft enters a concentration capable of causing significant damage while avoiding unnecessary disruption of airspace that is actually safe.', 'aviation and volcanology', '["What volcanic ash actually consists of","Why jet engines are vulnerable to ash","Damage to windscreens and external surfaces","Tracking clouds that may be invisible to pilots","How volcanic ash advisories support route decisions","Why uncertainty remains after an eruption","Lessons from aircraft encounters with ash clouds","The difficulty of predicting where ash concentrations will be highest"]'::jsonb, 4)
+on conflict (slug) do update set
+  title = excluded.title, body = excluded.body, topic = excluded.topic,
+  headings = excluded.headings, difficulty = excluded.difficulty;
+
+with p as (select id from public.passages where slug = 'why-volcanic-ash-threatens-aircraft'),
+     q as (
+       insert into public.questions (passage_id, idx, kind, prompt, options, evidence, explanation)
+       select p.id, 1, 'matching_headings'::public.question_kind, 'Choose the most suitable heading for paragraph B.',
+              null, 'Jet engines are particularly vulnerable because they draw enormous volumes of air through compressors and combustion chambers.', 'The paragraph describes several ways ash can damage or disrupt jet engines.'
+       from p
+       on conflict (passage_id, idx) do update set
+         kind = excluded.kind, prompt = excluded.prompt, options = excluded.options,
+         evidence = excluded.evidence, explanation = excluded.explanation
+       returning id
+     )
+insert into public.question_answers (question_id, answer)
+select q.id, '["Why jet engines are vulnerable to ash"]'::jsonb from q
+on conflict (question_id) do update set answer = excluded.answer;
+
+with p as (select id from public.passages where slug = 'why-volcanic-ash-threatens-aircraft'),
+     q as (
+       insert into public.questions (passage_id, idx, kind, prompt, options, evidence, explanation)
+       select p.id, 2, 'matching_headings'::public.question_kind, 'Choose the most suitable heading for paragraph C.',
+              null, 'The hazard is not limited to engines.', 'The paragraph focuses on abrasion, windshield damage, cabin contamination, and maintenance outside the engine itself.'
+       from p
+       on conflict (passage_id, idx) do update set
+         kind = excluded.kind, prompt = excluded.prompt, options = excluded.options,
+         evidence = excluded.evidence, explanation = excluded.explanation
+       returning id
+     )
+insert into public.question_answers (question_id, answer)
+select q.id, '["Damage to windscreens and external surfaces"]'::jsonb from q
+on conflict (question_id) do update set answer = excluded.answer;
+
+with p as (select id from public.passages where slug = 'why-volcanic-ash-threatens-aircraft'),
+     q as (
+       insert into public.questions (passage_id, idx, kind, prompt, options, evidence, explanation)
+       select p.id, 3, 'matching_headings'::public.question_kind, 'Choose the most suitable heading for paragraph D.',
+              null, 'Detecting and forecasting ash clouds requires information from several sources.', 'The paragraph describes satellite and ground observations used to detect and characterize ash.'
+       from p
+       on conflict (passage_id, idx) do update set
+         kind = excluded.kind, prompt = excluded.prompt, options = excluded.options,
+         evidence = excluded.evidence, explanation = excluded.explanation
+       returning id
+     )
+insert into public.question_answers (question_id, answer)
+select q.id, '["Tracking clouds that may be invisible to pilots"]'::jsonb from q
+on conflict (question_id) do update set answer = excluded.answer;
+
+with p as (select id from public.passages where slug = 'why-volcanic-ash-threatens-aircraft'),
+     q as (
+       insert into public.questions (passage_id, idx, kind, prompt, options, evidence, explanation)
+       select p.id, 4, 'matching_headings'::public.question_kind, 'Choose the most suitable heading for paragraph F.',
+              null, 'Uncertainty comes from several sources.', 'The paragraph explains uncertainty in winds, eruption intensity, ash release, particle behavior, and weather.'
+       from p
+       on conflict (passage_id, idx) do update set
+         kind = excluded.kind, prompt = excluded.prompt, options = excluded.options,
+         evidence = excluded.evidence, explanation = excluded.explanation
+       returning id
+     )
+insert into public.question_answers (question_id, answer)
+select q.id, '["Why uncertainty remains after an eruption"]'::jsonb from q
+on conflict (question_id) do update set answer = excluded.answer;
+
+with p as (select id from public.passages where slug = 'why-volcanic-ash-threatens-aircraft'),
+     q as (
+       insert into public.questions (passage_id, idx, kind, prompt, options, evidence, explanation)
+       select p.id, 5, 'true_false_not_given'::public.question_kind, 'Volcanic ash can contain fragments of volcanic glass.',
+              null, 'It consists of tiny fragments of rock, mineral crystals, and volcanic glass created when magma is violently broken apart during an eruption.', 'The passage explicitly includes volcanic glass among the components.'
+       from p
+       on conflict (passage_id, idx) do update set
+         kind = excluded.kind, prompt = excluded.prompt, options = excluded.options,
+         evidence = excluded.evidence, explanation = excluded.explanation
+       returning id
+     )
+insert into public.question_answers (question_id, answer)
+select q.id, '["TRUE"]'::jsonb from q
+on conflict (question_id) do update set answer = excluded.answer;
+
+with p as (select id from public.passages where slug = 'why-volcanic-ash-threatens-aircraft'),
+     q as (
+       insert into public.questions (passage_id, idx, kind, prompt, options, evidence, explanation)
+       select p.id, 6, 'true_false_not_given'::public.question_kind, 'Pilots can always identify the edge of an ash cloud visually.',
+              null, 'Because individual particles can be extremely small, pilots may not always see a clear boundary between clean air and contaminated air, especially at night or when meteorological clouds obscure the view.', 'The passage states that the boundary may not be visible.'
+       from p
+       on conflict (passage_id, idx) do update set
+         kind = excluded.kind, prompt = excluded.prompt, options = excluded.options,
+         evidence = excluded.evidence, explanation = excluded.explanation
+       returning id
+     )
+insert into public.question_answers (question_id, answer)
+select q.id, '["FALSE"]'::jsonb from q
+on conflict (question_id) do update set answer = excluded.answer;
+
+with p as (select id from public.passages where slug = 'why-volcanic-ash-threatens-aircraft'),
+     q as (
+       insert into public.questions (passage_id, idx, kind, prompt, options, evidence, explanation)
+       select p.id, 7, 'true_false_not_given'::public.question_kind, 'The passage states that every ash encounter causes permanent engine failure.',
+              null, 'Engines can sometimes recover after an aircraft leaves the ash cloud, but crews cannot safely assume that recovery will occur, so avoiding significant ash concentrations is the primary strategy.', 'The passage says recovery is sometimes possible and does not give a universal statement that every encounter causes permanent failure.'
+       from p
+       on conflict (passage_id, idx) do update set
+         kind = excluded.kind, prompt = excluded.prompt, options = excluded.options,
+         evidence = excluded.evidence, explanation = excluded.explanation
+       returning id
+     )
+insert into public.question_answers (question_id, answer)
+select q.id, '["NOT GIVEN"]'::jsonb from q
+on conflict (question_id) do update set answer = excluded.answer;
+
+with p as (select id from public.passages where slug = 'why-volcanic-ash-threatens-aircraft'),
+     q as (
+       insert into public.questions (passage_id, idx, kind, prompt, options, evidence, explanation)
+       select p.id, 8, 'multiple_choice'::public.question_kind, 'What can happen to ash inside the hot section of a jet engine?',
+              '["Particles can melt or soften.","Particles become harmless water vapor.","Particles increase the strength of compressor blades.","Particles automatically leave through the cabin."]'::jsonb, 'When ash enters an engine, some particles can melt or soften in the high-temperature section.', 'The passage directly states that high temperatures can melt or soften ash particles.'
+       from p
+       on conflict (passage_id, idx) do update set
+         kind = excluded.kind, prompt = excluded.prompt, options = excluded.options,
+         evidence = excluded.evidence, explanation = excluded.explanation
+       returning id
+     )
+insert into public.question_answers (question_id, answer)
+select q.id, '["Particles can melt or soften."]'::jsonb from q
+on conflict (question_id) do update set answer = excluded.answer;
+
+with p as (select id from public.passages where slug = 'why-volcanic-ash-threatens-aircraft'),
+     q as (
+       insert into public.questions (passage_id, idx, kind, prompt, options, evidence, explanation)
+       select p.id, 9, 'multiple_choice'::public.question_kind, 'Why can satellite detection of ash become difficult?',
+              '["Ash may lie beneath thick meteorological cloud.","Satellites cannot observe atmospheric radiation.","Aircraft always disperse the plume before detection.","Volcanic ash exists only at ground level."]'::jsonb, 'Satellite detection becomes more difficult when ash lies beneath thick meteorological cloud or when the concentration is low.', 'The passage identifies cloud cover and low concentration as detection challenges.'
+       from p
+       on conflict (passage_id, idx) do update set
+         kind = excluded.kind, prompt = excluded.prompt, options = excluded.options,
+         evidence = excluded.evidence, explanation = excluded.explanation
+       returning id
+     )
+insert into public.question_answers (question_id, answer)
+select q.id, '["Ash may lie beneath thick meteorological cloud."]'::jsonb from q
+on conflict (question_id) do update set answer = excluded.answer;
+
+with p as (select id from public.passages where slug = 'why-volcanic-ash-threatens-aircraft'),
+     q as (
+       insert into public.questions (passage_id, idx, kind, prompt, options, evidence, explanation)
+       select p.id, 10, 'multiple_choice'::public.question_kind, 'What do dispersion models combine to forecast ash movement?',
+              '["Estimates of the eruption and wind fields.","Passenger numbers and airport lighting.","Engine age and runway length.","Ticket prices and aircraft weight."]'::jsonb, 'These models combine estimates of the eruption with wind fields to predict where ash is likely to travel at different heights.', 'The passage explicitly states the two main model inputs.'
+       from p
+       on conflict (passage_id, idx) do update set
+         kind = excluded.kind, prompt = excluded.prompt, options = excluded.options,
+         evidence = excluded.evidence, explanation = excluded.explanation
+       returning id
+     )
+insert into public.question_answers (question_id, answer)
+select q.id, '["Estimates of the eruption and wind fields."]'::jsonb from q
+on conflict (question_id) do update set answer = excluded.answer;
+
+with p as (select id from public.passages where slug = 'why-volcanic-ash-threatens-aircraft'),
+     q as (
+       insert into public.questions (passage_id, idx, kind, prompt, options, evidence, explanation)
+       select p.id, 11, 'sentence_completion'::public.question_kind, 'Complete the sentence using NO MORE THAN TWO WORDS from the passage: Ash may abrade the leading edges of ______.',
+              null, 'Fast-moving ash particles can abrade the leading edges of wings and damage lights, antennas, and other exposed surfaces.', 'The answer is taken directly from the sentence.'
+       from p
+       on conflict (passage_id, idx) do update set
+         kind = excluded.kind, prompt = excluded.prompt, options = excluded.options,
+         evidence = excluded.evidence, explanation = excluded.explanation
+       returning id
+     )
+insert into public.question_answers (question_id, answer)
+select q.id, '["wings"]'::jsonb from q
+on conflict (question_id) do update set answer = excluded.answer;
+
+with p as (select id from public.passages where slug = 'why-volcanic-ash-threatens-aircraft'),
+     q as (
+       insert into public.questions (passage_id, idx, kind, prompt, options, evidence, explanation)
+       select p.id, 12, 'sentence_completion'::public.question_kind, 'Complete the sentence using NO MORE THAN TWO WORDS from the passage: Advisory centers use observations together with atmospheric ______.',
+              null, 'Specialized volcanic ash advisory centers use observations together with atmospheric dispersion models.', 'The exact phrase is dispersion models.'
+       from p
+       on conflict (passage_id, idx) do update set
+         kind = excluded.kind, prompt = excluded.prompt, options = excluded.options,
+         evidence = excluded.evidence, explanation = excluded.explanation
+       returning id
+     )
+insert into public.question_answers (question_id, answer)
+select q.id, '["dispersion models"]'::jsonb from q
+on conflict (question_id) do update set answer = excluded.answer;
+
+with p as (select id from public.passages where slug = 'why-volcanic-ash-threatens-aircraft'),
+     q as (
+       insert into public.questions (passage_id, idx, kind, prompt, options, evidence, explanation)
+       select p.id, 13, 'sentence_completion'::public.question_kind, 'Complete the sentence using NO MORE THAN TWO WORDS from the passage: Small ash particles may join together through ______.',
+              null, 'Particles also fall out of the atmosphere at rates that depend on their size and on processes such as aggregation, in which small particles clump together.', 'The required word appears verbatim in the passage.'
+       from p
+       on conflict (passage_id, idx) do update set
+         kind = excluded.kind, prompt = excluded.prompt, options = excluded.options,
+         evidence = excluded.evidence, explanation = excluded.explanation
+       returning id
+     )
+insert into public.question_answers (question_id, answer)
+select q.id, '["aggregation"]'::jsonb from q
+on conflict (question_id) do update set answer = excluded.answer;
+
 insert into public.writing_prompts (slug, task, format, prompt_text, chart_data)
 values ('task2-remote-work', 2, 'academic'::public.test_format, 'Some people believe that allowing employees to work from home permanently benefits both companies and workers. Others argue that it weakens teams and harms younger employees in particular.
 
@@ -753,6 +5594,66 @@ values ('task1-academic-co2-emissions', 1, 'academic'::public.test_format, 'The 
 Summarise the information by selecting and reporting the main features, and make comparisons where relevant.
 
 Write at least 150 words.', '{"kind":"line","title":"CO2 emissions per capita, 1990-2020","unit":"tonnes per person","xLabel":"Year","series":[{"name":"United States","points":[[1990,19.3],[2000,20.2],[2010,17.6],[2020,13.7]]},{"name":"United Kingdom","points":[[1990,9.9],[2000,9.2],[2010,7.7],[2020,4.8]]},{"name":"Brazil","points":[[1990,1.4],[2000,1.8],[2010,2.1],[2020,2]]}]}'::jsonb)
+on conflict (slug) do update set
+  task = excluded.task, format = excluded.format, prompt_text = excluded.prompt_text,
+  chart_data = excluded.chart_data;
+
+insert into public.writing_prompts (slug, task, format, prompt_text, chart_data)
+values ('task2-public-transport-funding', 2, 'academic'::public.test_format, 'Some people believe that governments should make public transport free in order to reduce traffic congestion and pollution. Others think passengers should pay fares to help cover the cost of providing these services.
+
+Discuss both these views and give your own opinion
+
+Give reasons for your answer and include any relevant examples from your own knowledge or experience. Write at least 250 words.', null)
+on conflict (slug) do update set
+  task = excluded.task, format = excluded.format, prompt_text = excluded.prompt_text,
+  chart_data = excluded.chart_data;
+
+insert into public.writing_prompts (slug, task, format, prompt_text, chart_data)
+values ('task2-financial-education-schools', 2, 'academic'::public.test_format, 'Schools traditionally focus on academic subjects, but some people believe that students should also be taught practical financial skills such as budgeting, saving and managing debt.
+
+To what extent do you agree or disagree?
+
+Give reasons for your answer and include any relevant examples from your own knowledge or experience. Write at least 250 words.', null)
+on conflict (slug) do update set
+  task = excluded.task, format = excluded.format, prompt_text = excluded.prompt_text,
+  chart_data = excluded.chart_data;
+
+insert into public.writing_prompts (slug, task, format, prompt_text, chart_data)
+values ('task2-online-shopping-local-businesses', 2, 'academic'::public.test_format, 'The growth of online shopping has made it easier for consumers to buy a wide range of products, but it has also created challenges for small local shops and traditional shopping areas.
+
+Do the advantages outweigh the disadvantages?
+
+Give reasons for your answer and include any relevant examples from your own knowledge or experience. Write at least 250 words.', null)
+on conflict (slug) do update set
+  task = excluded.task, format = excluded.format, prompt_text = excluded.prompt_text,
+  chart_data = excluded.chart_data;
+
+insert into public.writing_prompts (slug, task, format, prompt_text, chart_data)
+values ('task2-decline-physical-activity', 2, 'academic'::public.test_format, 'In many societies, people are becoming less physically active in their daily lives despite greater public awareness of the benefits of exercise.
+
+What are the causes, and what measures could be taken?
+
+Give reasons for your answer and include any relevant examples from your own knowledge or experience. Write at least 250 words.', null)
+on conflict (slug) do update set
+  task = excluded.task, format = excluded.format, prompt_text = excluded.prompt_text,
+  chart_data = excluded.chart_data;
+
+insert into public.writing_prompts (slug, task, format, prompt_text, chart_data)
+values ('task2-city-green-spaces', 2, 'academic'::public.test_format, 'Some people believe that rapidly growing cities should use available land mainly for housing and commercial development. Others argue that preserving parks and other green spaces should be a higher priority.
+
+Discuss both these views and give your own opinion
+
+Give reasons for your answer and include any relevant examples from your own knowledge or experience. Write at least 250 words.', null)
+on conflict (slug) do update set
+  task = excluded.task, format = excluded.format, prompt_text = excluded.prompt_text,
+  chart_data = excluded.chart_data;
+
+insert into public.writing_prompts (slug, task, format, prompt_text, chart_data)
+values ('task1-academic-weekly-exercise', 1, 'academic'::public.test_format, 'The bar chart below shows the average number of hours per week spent on physical exercise by people in four age groups in 2005 and 2025.
+
+Summarise the information by selecting and reporting the main features, and make comparisons where relevant.
+
+Write at least 150 words.', '{"kind":"bar","title":"Average weekly exercise by age group, 2005 and 2025","unit":"Hours per week","xLabel":"Age group","series":[{"name":"2005","points":[["18-29",4.8],["30-44",3.6],["45-59",3.1],["60+",2.7]]},{"name":"2025","points":[["18-29",5.4],["30-44",4.2],["45-59",4.5],["60+",4.1]]}]}'::jsonb)
 on conflict (slug) do update set
   task = excluded.task, format = excluded.format, prompt_text = excluded.prompt_text,
   chart_data = excluded.chart_data;

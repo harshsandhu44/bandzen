@@ -1,0 +1,178 @@
+{
+  "slug": "the-science-of-roman-concrete",
+  "title": "The Science of Roman Concrete",
+  "topic": "archaeological materials science",
+  "difficulty": 4,
+  "headings": [
+    "A building material that survived unusual conditions",
+    "The role of volcanic ingredients in Roman construction",
+    "Evidence that cracks can trigger new mineral growth",
+    "Why modern concrete cannot simply copy an ancient recipe",
+    "The environmental cost of present-day cement production",
+    "What microscopic analysis reveals about lime fragments",
+    "The disappearance of Roman engineering knowledge",
+    "How sea water can alter ancient harbour concrete",
+    "The use of steel reinforcement in imperial monuments"
+  ],
+  "body": "A\nAncient Roman builders produced concrete structures that have survived for remarkably long periods, including harbour installations repeatedly exposed to seawater. Their durability has attracted renewed scientific interest because modern concrete can deteriorate through cracking, chemical attack and corrosion of embedded steel. Roman concrete was not a single universal material, and recipes varied according to region and purpose. Nevertheless, many surviving examples were made from lime, water, pieces of rock and volcanic material rich in reactive minerals. Researchers study these structures not because every Roman wall is stronger than modern concrete, but because particular ancient mixtures reveal chemical processes that may suggest ways to improve future construction materials.\n\nB\nOne important ingredient was pozzolanic material, named after the area around Pozzuoli near Naples, where volcanic ash was widely exploited. When suitable volcanic ash is mixed with lime and water, chemical reactions produce binding compounds that can harden even in wet conditions. This property made such mixtures especially valuable in hydraulic structures, including harbours, baths and water systems. Roman builders also used locally available volcanic deposits elsewhere in the empire, so the exact mineral composition varied. The effectiveness of a mixture therefore depended partly on geology. Transporting volcanic material over long distances was possible, but builders often adapted their recipes to the resources available near a construction site.\n\nC\nMarine concrete has provided some of the most striking evidence of long-term mineral change. In several Roman harbour structures, seawater gradually entered microscopic spaces in the concrete and reacted with volcanic components. Scientists examining samples have identified minerals that formed after the original construction. Some of these crystals can grow within cracks and pores, making the internal structure more tightly interlocked. The process does not mean that Roman concrete is indestructible or that every crack repairs itself completely. Instead, it shows that certain chemical environments can encourage new mineral growth over long periods. Modern materials researchers are interested in whether similar reactions could be designed deliberately into concrete rather than occurring only by chance.\n\nD\nAnother line of research concerns small white fragments of lime that are visible in some Roman concrete. These fragments were once treated mainly as evidence that ancient builders had mixed their materials poorly. More recent microscopic and chemical studies suggest that at least some of the fragments were created by using lime under very hot conditions. When cracks later pass through reactive lime-rich areas, water can dissolve calcium compounds that may then move into the crack and precipitate again. Laboratory experiments with concrete designed to reproduce this feature have shown faster sealing of some cracks than comparable mixtures without the lime fragments. Researchers describe this as a potentially useful self-healing mechanism, although the performance of reconstructed materials must still be tested under realistic conditions.\n\nE\nIt would be misleading, however, to conclude that engineers should simply replace modern concrete with a Roman formula. Contemporary structures have requirements that ancient builders did not face, including standardised performance, rapid construction schedules, reinforced designs and tightly controlled safety specifications. Modern Portland cement can gain strength quickly and is produced on an enormous industrial scale. Ancient formulations may harden differently and depend on raw materials whose composition varies from one deposit to another. In addition, a material that survives for centuries in a massive unreinforced harbour wall is not automatically suitable for a slender high-rise column or a heavily loaded bridge. The useful lesson from Roman concrete is therefore likely to involve particular chemical principles rather than literal duplication.\n\nF\nThe search for those principles has an environmental dimension. Cement manufacture is responsible for substantial carbon dioxide emissions because producing clinker requires high temperatures and because limestone releases carbon dioxide during processing. Researchers are exploring numerous ways to reduce these emissions, including alternative binders, lower-clinker mixtures, longer-lasting concrete and methods that incorporate industrial by-products. Ancient Roman materials are only one source of ideas within this much larger field. If insights from their mineral chemistry help concrete last longer or repair minor damage, fewer structures may need premature replacement. Yet environmental benefits must be assessed across the entire life cycle of a material, including extraction, transport, construction, maintenance and eventual demolition.",
+  "questions": [
+    {
+      "idx": 1,
+      "kind": "matching_headings",
+      "prompt": "Choose the most suitable heading for paragraph A.",
+      "options": null,
+      "answer": [
+        "A building material that survived unusual conditions"
+      ],
+      "evidence": "Ancient Roman builders produced concrete structures that have survived for remarkably long periods, including harbour installations repeatedly exposed to seawater.",
+      "explanation": "Paragraph A introduces the exceptional survival of some Roman concrete and explains why scientists study it."
+    },
+    {
+      "idx": 2,
+      "kind": "matching_headings",
+      "prompt": "Choose the most suitable heading for paragraph B.",
+      "options": null,
+      "answer": [
+        "The role of volcanic ingredients in Roman construction"
+      ],
+      "evidence": "One important ingredient was pozzolanic material, named after the area around Pozzuoli near Naples, where volcanic ash was widely exploited.",
+      "explanation": "The paragraph focuses on volcanic ash and its chemical and practical role in Roman concrete."
+    },
+    {
+      "idx": 3,
+      "kind": "matching_headings",
+      "prompt": "Choose the most suitable heading for paragraph C.",
+      "options": null,
+      "answer": [
+        "How sea water can alter ancient harbour concrete"
+      ],
+      "evidence": "In several Roman harbour structures, seawater gradually entered microscopic spaces in the concrete and reacted with volcanic components.",
+      "explanation": "Paragraph C describes chemical changes caused by seawater inside Roman harbour concrete."
+    },
+    {
+      "idx": 4,
+      "kind": "matching_headings",
+      "prompt": "Choose the most suitable heading for paragraph D.",
+      "options": null,
+      "answer": [
+        "What microscopic analysis reveals about lime fragments"
+      ],
+      "evidence": "More recent microscopic and chemical studies suggest that at least some of the fragments were created by using lime under very hot conditions.",
+      "explanation": "Paragraph D revises an older interpretation of white lime fragments and explains their possible self-healing role."
+    },
+    {
+      "idx": 5,
+      "kind": "true_false_not_given",
+      "prompt": "All surviving examples of Roman concrete were made from the same mixture.",
+      "options": null,
+      "answer": [
+        "FALSE"
+      ],
+      "evidence": "Roman concrete was not a single universal material, and recipes varied according to region and purpose.",
+      "explanation": "The passage explicitly states that Roman concrete recipes varied."
+    },
+    {
+      "idx": 6,
+      "kind": "true_false_not_given",
+      "prompt": "The mineral composition of Roman concrete could depend on the geology near a building site.",
+      "options": null,
+      "answer": [
+        "TRUE"
+      ],
+      "evidence": "The effectiveness of a mixture therefore depended partly on geology.",
+      "explanation": "The passage links the performance and composition of mixtures to local geological resources."
+    },
+    {
+      "idx": 7,
+      "kind": "true_false_not_given",
+      "prompt": "Roman builders deliberately included lime fragments because they understood that the fragments would repair future cracks.",
+      "options": null,
+      "answer": [
+        "NOT GIVEN"
+      ],
+      "evidence": "More recent microscopic and chemical studies suggest that at least some of the fragments were created by using lime under very hot conditions.",
+      "explanation": "The passage explains how the fragments may have formed and how they can contribute to crack sealing, but it does not establish that Roman builders intentionally used them for future self-repair."
+    },
+    {
+      "idx": 8,
+      "kind": "multiple_choice",
+      "prompt": "Why was pozzolanic material useful in hydraulic structures?",
+      "options": [
+        "It could form binding compounds that hardened in wet conditions.",
+        "It prevented all cracks from developing in concrete.",
+        "It allowed concrete to be reinforced with steel.",
+        "It eliminated the need to use lime."
+      ],
+      "answer": [
+        "It could form binding compounds that hardened in wet conditions."
+      ],
+      "evidence": "When suitable volcanic ash is mixed with lime and water, chemical reactions produce binding compounds that can harden even in wet conditions.",
+      "explanation": "The ability to harden under wet conditions made volcanic ash particularly useful for water-related construction."
+    },
+    {
+      "idx": 9,
+      "kind": "multiple_choice",
+      "prompt": "What do the laboratory experiments discussed in paragraph D suggest?",
+      "options": [
+        "Lime fragments may help some cracks seal more rapidly.",
+        "Volcanic ash prevents water from entering concrete.",
+        "Ancient concrete always gains strength faster than Portland cement.",
+        "White fragments prove that Roman builders mixed concrete carelessly."
+      ],
+      "answer": [
+        "Lime fragments may help some cracks seal more rapidly."
+      ],
+      "evidence": "Laboratory experiments with concrete designed to reproduce this feature have shown faster sealing of some cracks than comparable mixtures without the lime fragments.",
+      "explanation": "The experiments found faster crack sealing in mixtures containing the reproduced lime feature."
+    },
+    {
+      "idx": 10,
+      "kind": "multiple_choice",
+      "prompt": "Why does the author reject simply replacing modern concrete with an ancient formula?",
+      "options": [
+        "Ancient concrete cannot survive contact with seawater.",
+        "Modern structures have requirements that differ from ancient ones.",
+        "Roman concrete contains no chemically reactive minerals.",
+        "Volcanic material cannot be transported over long distances."
+      ],
+      "answer": [
+        "Modern structures have requirements that differ from ancient ones."
+      ],
+      "evidence": "Contemporary structures have requirements that ancient builders did not face, including standardised performance, rapid construction schedules, reinforced designs and tightly controlled safety specifications.",
+      "explanation": "The passage emphasises differences between ancient and modern engineering requirements."
+    },
+    {
+      "idx": 11,
+      "kind": "sentence_completion",
+      "prompt": "Complete the sentence using NO MORE THAN TWO WORDS from the passage: Volcanic ash used in Roman concrete was rich in reactive ______.",
+      "options": null,
+      "answer": [
+        "minerals"
+      ],
+      "evidence": "Nevertheless, many surviving examples were made from lime, water, pieces of rock and volcanic material rich in reactive minerals.",
+      "explanation": "The answer is copied directly from the passage."
+    },
+    {
+      "idx": 12,
+      "kind": "sentence_completion",
+      "prompt": "Complete the sentence using NO MORE THAN TWO WORDS from the passage: Researchers describe the crack-sealing effect associated with lime fragments as a possible ______ mechanism.",
+      "options": null,
+      "answer": [
+        "self-healing"
+      ],
+      "evidence": "Researchers describe this as a potentially useful self-healing mechanism, although the performance of reconstructed materials must still be tested under realistic conditions.",
+      "explanation": "The passage uses the exact term 'self-healing mechanism'."
+    },
+    {
+      "idx": 13,
+      "kind": "sentence_completion",
+      "prompt": "Complete the sentence using NO MORE THAN TWO WORDS from the passage: Producing cement clinker requires high temperatures, while processing ______ releases carbon dioxide.",
+      "options": null,
+      "answer": [
+        "limestone"
+      ],
+      "evidence": "Cement manufacture is responsible for substantial carbon dioxide emissions because producing clinker requires high temperatures and because limestone releases carbon dioxide during processing.",
+      "explanation": "The missing word appears verbatim in the evidence sentence."
+    }
+  ]
+}

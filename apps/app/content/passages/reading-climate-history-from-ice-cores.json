@@ -1,0 +1,178 @@
+{
+  "slug": "reading-climate-history-from-ice-cores",
+  "title": "Reading Climate History from Ice Cores",
+  "topic": "paleoclimatology",
+  "difficulty": 4,
+  "headings": [
+    "How annual layers and external markers build an age scale",
+    "Using isotopes as an indirect record of temperature",
+    "Why the air in bubbles is younger than the surrounding ice",
+    "How dust, salts and sulfate expand the environmental record",
+    "Engineering difficulties near the bottom of an ice sheet",
+    "Why frozen archives are preserved for future research",
+    "The transformation of buried snow into a multi-purpose archive",
+    "Evidence connecting greenhouse gases with glacial cycles",
+    "Choosing sites where very old ice may remain ordered"
+  ],
+  "body": "A\nAn ice sheet is not simply frozen water piled in one place. Snow that survives summer is buried by later snowfall, compressed into firn, and eventually transformed into dense glacial ice. During this slow compaction, spaces between grains become isolated bubbles. Those bubbles contain small samples of the atmosphere that existed when the pores finally closed. Scientists drill cylinders of ice from Greenland, Antarctica, and high mountain glaciers because the ice preserves several kinds of evidence at once: snowfall chemistry, windblown dust, volcanic products, isotopic ratios, and ancient air. A single core can therefore link environmental changes that would otherwise be studied in separate archives.\n\nB\nDating the ice is easiest near the surface, where seasonal differences in snowfall chemistry or dust can form visible or measurable annual layers. Researchers may count these layers much as dendrochronologists count tree rings, although the task becomes harder with depth as layers thin under pressure. Volcanic ash and sulfate peaks can provide additional markers when an eruption is independently dated elsewhere. In very old ice, scientists often combine several dating methods and use models of ice flow to estimate ages between known points. An ice-core age scale is therefore a reconstruction built from multiple lines of evidence rather than a simple depth-to-year conversion.\n\nC\nOne of the most important temperature clues comes from the isotopic composition of the ice itself. Water molecules containing heavier isotopes of oxygen or hydrogen behave slightly differently during evaporation and condensation. In polar regions, the relative abundance of these isotopes in snowfall changes with temperature and with the route taken by moisture through the atmosphere. Researchers calibrate these relationships using modern observations and physical models. The isotope signal is not a direct thermometer reading, because it can also be influenced by seasonality and moisture source. Even so, carefully interpreted isotope records reveal large shifts between glacial and warmer interglacial conditions.\n\nD\nThe bubbles and the surrounding ice preserve different clocks. Air can continue moving through porous firn for decades or centuries after the snow itself fell, so the trapped gas is usually younger than the ice enclosing it. Once the pores close, however, the bubbles preserve greenhouse gases such as carbon dioxide and methane. Measurements from Antarctic cores show that these gases varied strongly across past glacial cycles. The records demonstrate a close relationship between greenhouse-gas concentrations and large-scale climate changes, while also allowing scientists to investigate the sequence and timing of those changes rather than treating correlation alone as an explanation.\n\nE\nOther impurities broaden the story beyond temperature and gases. Dust concentrations can indicate stronger winds, drier source regions, or changes in exposed land, although the interpretation depends on where the particles came from. Sea salts can reflect marine aerosols and changing atmospheric circulation. Distinct layers rich in sulfate may mark large volcanic eruptions whose aerosols spread over wide areas. Chemical traces from modern industrial pollution can also appear in younger ice. Because many signals are carried by the atmosphere, an event occurring far from the drilling site may leave a detectable layer, turning remote ice sheets into records of processes that crossed continents and oceans.\n\nF\nRecovering the oldest ice creates engineering and interpretive problems. A drill retrieves a cylindrical section of core, but deep drilling may require several kilometres of cable, fluid to balance pressure, and repeated trips down the borehole. Near the bedrock, ice has been squeezed and stretched by centuries of flow. Layers can become extremely thin, folded, or disturbed, making their original order difficult to reconstruct. In some places, melting at the base removes old ice entirely. For this reason, researchers search carefully for locations where snowfall, temperature, bedrock shape, and ice flow may preserve a long and relatively undisturbed sequence.\n\nG\nAfter recovery, the core becomes a carefully managed scientific resource. Sections are logged, packed, transported in frozen conditions, and stored in cold facilities so that future teams can make measurements that may not yet have been invented. Different laboratories may receive slices from the same depth for gas, isotope, dust, or chemical analysis. Replication matters because concentrations can be tiny and contamination can alter results. Modern ice-core projects therefore depend on international collaboration as much as on drilling technology. The real value of a core lies not in a single dramatic graph, but in the ability to compare multiple signals within a shared chronological framework.",
+  "questions": [
+    {
+      "idx": 1,
+      "kind": "matching_headings",
+      "prompt": "Choose the most suitable heading for paragraph B.",
+      "options": null,
+      "answer": [
+        "How annual layers and external markers build an age scale"
+      ],
+      "evidence": "An ice-core age scale is therefore a reconstruction built from multiple lines of evidence rather than a simple depth-to-year conversion.",
+      "explanation": "The paragraph explains how annual layers, volcanic markers and flow models are combined to construct an age scale."
+    },
+    {
+      "idx": 2,
+      "kind": "matching_headings",
+      "prompt": "Choose the most suitable heading for paragraph C.",
+      "options": null,
+      "answer": [
+        "Using isotopes as an indirect record of temperature"
+      ],
+      "evidence": "The isotope signal is not a direct thermometer reading, because it can also be influenced by seasonality and moisture source.",
+      "explanation": "The paragraph explains how isotope ratios provide temperature information while requiring careful interpretation."
+    },
+    {
+      "idx": 3,
+      "kind": "matching_headings",
+      "prompt": "Choose the most suitable heading for paragraph D.",
+      "options": null,
+      "answer": [
+        "Why the air in bubbles is younger than the surrounding ice"
+      ],
+      "evidence": "Air can continue moving through porous firn for decades or centuries after the snow itself fell, so the trapped gas is usually younger than the ice enclosing it.",
+      "explanation": "The paragraph focuses on the age difference between the ice and the air trapped within it."
+    },
+    {
+      "idx": 4,
+      "kind": "matching_headings",
+      "prompt": "Choose the most suitable heading for paragraph E.",
+      "options": null,
+      "answer": [
+        "How dust, salts and sulfate expand the environmental record"
+      ],
+      "evidence": "Other impurities broaden the story beyond temperature and gases.",
+      "explanation": "The paragraph describes several impurities that reveal winds, marine influence, eruptions and pollution."
+    },
+    {
+      "idx": 5,
+      "kind": "true_false_not_given",
+      "prompt": "Near the surface, seasonal chemical differences can help researchers identify individual years.",
+      "options": null,
+      "answer": [
+        "TRUE"
+      ],
+      "evidence": "Dating the ice is easiest near the surface, where seasonal differences in snowfall chemistry or dust can form visible or measurable annual layers.",
+      "explanation": "The passage states that seasonal differences can form annual layers, which can be used for dating."
+    },
+    {
+      "idx": 6,
+      "kind": "true_false_not_given",
+      "prompt": "Ice-core isotope measurements provide a completely direct reading of past air temperature.",
+      "options": null,
+      "answer": [
+        "FALSE"
+      ],
+      "evidence": "The isotope signal is not a direct thermometer reading, because it can also be influenced by seasonality and moisture source.",
+      "explanation": "The passage explicitly says the isotope signal is not a direct thermometer reading."
+    },
+    {
+      "idx": 7,
+      "kind": "true_false_not_given",
+      "prompt": "Every ice-core drilling project uses cylinders of exactly the same diameter.",
+      "options": null,
+      "answer": [
+        "NOT GIVEN"
+      ],
+      "evidence": "A drill retrieves a cylindrical section of core, but deep drilling may require several kilometres of cable, fluid to balance pressure, and repeated trips down the borehole.",
+      "explanation": "The passage says the drill retrieves a cylindrical core but gives no information about whether all projects use the same diameter."
+    },
+    {
+      "idx": 8,
+      "kind": "multiple_choice",
+      "prompt": "Why can volcanic sulfate layers help with ice-core dating?",
+      "options": [
+        "They can be linked to eruptions independently dated elsewhere.",
+        "They reveal the exact speed of ice flow at every depth.",
+        "They show when the pores in firn first opened.",
+        "They identify the laboratory that stored the core."
+      ],
+      "answer": [
+        "They can be linked to eruptions independently dated elsewhere."
+      ],
+      "evidence": "Volcanic ash and sulfate peaks can provide additional markers when an eruption is independently dated elsewhere.",
+      "explanation": "The passage says independently dated eruptions can provide chronological markers in the ice."
+    },
+    {
+      "idx": 9,
+      "kind": "multiple_choice",
+      "prompt": "What is one problem with ice close to bedrock?",
+      "options": [
+        "It contains no chemical impurities.",
+        "Its layers may be folded or disturbed.",
+        "It always melts immediately after drilling.",
+        "It contains only modern air bubbles."
+      ],
+      "answer": [
+        "Its layers may be folded or disturbed."
+      ],
+      "evidence": "Layers can become extremely thin, folded, or disturbed, making their original order difficult to reconstruct.",
+      "explanation": "The passage identifies deformation of deep layers as a problem for reconstructing their sequence."
+    },
+    {
+      "idx": 10,
+      "kind": "multiple_choice",
+      "prompt": "Why are recovered cores kept in cold storage?",
+      "options": [
+        "To increase the concentration of greenhouse gases.",
+        "To allow future teams to use new measurement methods.",
+        "To make annual layers become thicker.",
+        "To prevent volcanic sulfate from entering the ice."
+      ],
+      "answer": [
+        "To allow future teams to use new measurement methods."
+      ],
+      "evidence": "Sections are logged, packed, transported in frozen conditions, and stored in cold facilities so that future teams can make measurements that may not yet have been invented.",
+      "explanation": "The stated reason is to preserve the core for future analytical techniques."
+    },
+    {
+      "idx": 11,
+      "kind": "sentence_completion",
+      "prompt": "Complete the sentence using NO MORE THAN TWO WORDS from the passage: Buried snow is compressed into ______ before becoming dense glacial ice.",
+      "options": null,
+      "answer": [
+        "firn"
+      ],
+      "evidence": "Snow that survives summer is buried by later snowfall, compressed into firn, and eventually transformed into dense glacial ice.",
+      "explanation": "The exact word used in the passage is \"firn\"."
+    },
+    {
+      "idx": 12,
+      "kind": "sentence_completion",
+      "prompt": "Complete the sentence using NO MORE THAN TWO WORDS from the passage: Near the bed, melting can remove ______ entirely.",
+      "options": null,
+      "answer": [
+        "old ice"
+      ],
+      "evidence": "In some places, melting at the base removes old ice entirely.",
+      "explanation": "The words \"old ice\" are taken directly from the passage."
+    },
+    {
+      "idx": 13,
+      "kind": "sentence_completion",
+      "prompt": "Complete the sentence using NO MORE THAN TWO WORDS from the passage: Scientists may compare several signals within a shared ______.",
+      "options": null,
+      "answer": [
+        "chronological framework"
+      ],
+      "evidence": "The real value of a core lies not in a single dramatic graph, but in the ability to compare multiple signals within a shared chronological framework.",
+      "explanation": "The answer is the exact two-word phrase used in the passage."
+    }
+  ]
+}

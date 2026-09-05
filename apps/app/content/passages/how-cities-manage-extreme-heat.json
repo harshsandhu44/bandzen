@@ -1,0 +1,178 @@
+{
+  "slug": "how-cities-manage-extreme-heat",
+  "title": "How Cities Manage Extreme Heat",
+  "topic": "urban climate adaptation",
+  "difficulty": 3,
+  "headings": [
+    "Why cities can remain warmer after sunset",
+    "The cooling value and limitations of urban trees",
+    "Changing the thermal behaviour of roofs and streets",
+    "Why heat risk depends on social conditions",
+    "The challenge of measuring neighbourhood temperatures",
+    "Air conditioning as both protection and a source of heat",
+    "Designing cities around winter rather than summer",
+    "Using public facilities during dangerous heat",
+    "How underground transport systems affect street temperatures"
+  ],
+  "body": "A\nCities often experience higher temperatures than nearby rural areas, a phenomenon known as the urban heat island effect. The difference is produced by several processes rather than a single cause. Dark roofs and paved surfaces absorb substantial amounts of solar energy during the day, while buildings reduce the movement of cooling winds and create surfaces that store heat. Vegetation is also usually less abundant than in surrounding countryside, so less water is available for evaporative cooling. The effect can persist after sunset because concrete, brick and asphalt release heat that they absorbed earlier. As a result, the greatest urban-rural temperature contrast is sometimes observed at night rather than during the hottest part of the afternoon.\n\nB\nPlanting trees is one of the most widely promoted responses to urban heat. Trees cool streets by providing shade and by transferring water from the soil to the atmosphere through transpiration. Their effectiveness, however, depends on species, age, canopy size, local water supply and where they are planted. A narrow strip of young trees may provide little immediate protection to pedestrians, whereas a mature canopy over a pavement can reduce direct solar exposure substantially. Trees can also create management difficulties: roots may damage infrastructure, pollen can affect some residents, and irrigation can be difficult in dry climates. For these reasons, urban forestry programmes increasingly focus not simply on the number of trees planted but on whether those trees survive long enough to provide useful shade.\n\nC\nCities can also modify the materials covering buildings and streets. Conventional dark roofs may reach very high surface temperatures in strong sunlight, while reflective roofs return a larger fraction of incoming solar radiation to the atmosphere. Some cities have therefore introduced programmes encouraging pale or specially coated roofs. Permeable pavements can provide another benefit when moisture stored within or beneath them evaporates, although their performance depends on water availability. Reflective materials are not automatically beneficial in every location because reflected sunlight may increase glare or transfer heat toward nearby pedestrians and buildings. Consequently, engineers increasingly evaluate materials at the scale of streets and neighbourhoods rather than assuming that a cooler individual surface will always produce a cooler environment for people.\n\nD\nTemperature alone does not determine the human consequences of a heatwave. Older people, outdoor workers, individuals living alone and people with certain medical conditions may be especially vulnerable. Housing quality matters as well: a poorly ventilated top-floor apartment can remain dangerously warm long after outdoor temperatures have fallen. Income influences whether households can afford air conditioning, adequate insulation or even the electricity required to operate cooling equipment. Heat exposure is therefore partly a question of social inequality. Two neighbourhoods experiencing the same official temperature may have very different levels of illness if one has shaded streets, well-insulated homes and accessible public services while the other lacks these protections.\n\nE\nUnderstanding these differences requires measurements at a much finer scale than those supplied by a city's main weather station. Researchers increasingly use networks of inexpensive sensors, mobile instruments mounted on bicycles or vehicles, and satellite observations to map temperature variations between neighbourhoods. Yet each method has limitations. A sensor attached to a sunny wall may record conditions that are not representative of the air experienced by pedestrians, while satellites generally measure surface temperature rather than air temperature. Researchers must therefore pay close attention to instrument placement and to what exactly a measurement represents. Maps that appear highly precise can otherwise give a misleading impression of which streets or communities face the greatest danger.\n\nF\nDuring severe heat, cities also rely on emergency measures. Public libraries, community centres and other air-conditioned buildings may be designated as cooling centres where residents can spend the hottest hours of the day. Authorities sometimes extend swimming-pool hours, provide drinking-water stations or contact people known to be particularly vulnerable. Air conditioning remains highly effective at reducing indoor heat exposure, but widespread use can increase electricity demand and release additional heat outdoors through cooling equipment. If electricity systems fail during a heatwave, residents who depend heavily on mechanical cooling can suddenly become more exposed. Long-term heat planning therefore combines emergency services with changes to buildings, vegetation, infrastructure and energy systems rather than depending on a single technological solution.",
+  "questions": [
+    {
+      "idx": 1,
+      "kind": "matching_headings",
+      "prompt": "Choose the most suitable heading for paragraph A.",
+      "options": null,
+      "answer": [
+        "Why cities can remain warmer after sunset"
+      ],
+      "evidence": "The effect can persist after sunset because concrete, brick and asphalt release heat that they absorbed earlier.",
+      "explanation": "Paragraph A explains the mechanisms behind the urban heat island effect, including the release of stored heat after sunset."
+    },
+    {
+      "idx": 2,
+      "kind": "matching_headings",
+      "prompt": "Choose the most suitable heading for paragraph B.",
+      "options": null,
+      "answer": [
+        "The cooling value and limitations of urban trees"
+      ],
+      "evidence": "Their effectiveness, however, depends on species, age, canopy size, local water supply and where they are planted.",
+      "explanation": "Paragraph B discusses both the cooling benefits of trees and practical limitations affecting their performance."
+    },
+    {
+      "idx": 3,
+      "kind": "matching_headings",
+      "prompt": "Choose the most suitable heading for paragraph C.",
+      "options": null,
+      "answer": [
+        "Changing the thermal behaviour of roofs and streets"
+      ],
+      "evidence": "Cities can also modify the materials covering buildings and streets.",
+      "explanation": "Paragraph C focuses on reflective roofs, permeable pavements and other material-based approaches to managing heat."
+    },
+    {
+      "idx": 4,
+      "kind": "matching_headings",
+      "prompt": "Choose the most suitable heading for paragraph D.",
+      "options": null,
+      "answer": [
+        "Why heat risk depends on social conditions"
+      ],
+      "evidence": "Heat exposure is therefore partly a question of social inequality.",
+      "explanation": "The paragraph explains why housing, income, age and access to services affect vulnerability even under similar temperatures."
+    },
+    {
+      "idx": 5,
+      "kind": "true_false_not_given",
+      "prompt": "The greatest difference between urban and rural temperatures always occurs in the afternoon.",
+      "options": null,
+      "answer": [
+        "FALSE"
+      ],
+      "evidence": "As a result, the greatest urban-rural temperature contrast is sometimes observed at night rather than during the hottest part of the afternoon.",
+      "explanation": "The passage explicitly says that the largest difference can occur at night."
+    },
+    {
+      "idx": 6,
+      "kind": "true_false_not_given",
+      "prompt": "Urban tree-planting programmes are increasingly concerned with whether trees remain alive long enough to become useful.",
+      "options": null,
+      "answer": [
+        "TRUE"
+      ],
+      "evidence": "For these reasons, urban forestry programmes increasingly focus not simply on the number of trees planted but on whether those trees survive long enough to provide useful shade.",
+      "explanation": "This statement directly matches the passage."
+    },
+    {
+      "idx": 7,
+      "kind": "true_false_not_given",
+      "prompt": "Most cities require new commercial buildings to install reflective roofs.",
+      "options": null,
+      "answer": [
+        "NOT GIVEN"
+      ],
+      "evidence": "Some cities have therefore introduced programmes encouraging pale or specially coated roofs.",
+      "explanation": "The passage says some cities encourage reflective roofs, but it does not state that most cities require them on new commercial buildings."
+    },
+    {
+      "idx": 8,
+      "kind": "multiple_choice",
+      "prompt": "Why may reflective materials fail to improve conditions for pedestrians?",
+      "options": [
+        "They may direct additional heat or light toward nearby people.",
+        "They can prevent rainfall from entering drainage systems.",
+        "They require mature trees to work effectively.",
+        "They absorb more solar energy than dark materials."
+      ],
+      "answer": [
+        "They may direct additional heat or light toward nearby people."
+      ],
+      "evidence": "Reflective materials are not automatically beneficial in every location because reflected sunlight may increase glare or transfer heat toward nearby pedestrians and buildings.",
+      "explanation": "The passage warns that reflected energy may worsen glare or heat exposure at pedestrian level."
+    },
+    {
+      "idx": 9,
+      "kind": "multiple_choice",
+      "prompt": "What problem can arise when neighbourhood temperatures are mapped using satellites?",
+      "options": [
+        "Satellites cannot observe cities after sunset.",
+        "They usually measure surfaces rather than the air around people.",
+        "They provide data only for wealthy neighbourhoods.",
+        "Their measurements are affected mainly by underground transport."
+      ],
+      "answer": [
+        "They usually measure surfaces rather than the air around people."
+      ],
+      "evidence": "A sensor attached to a sunny wall may record conditions that are not representative of the air experienced by pedestrians, while satellites generally measure surface temperature rather than air temperature.",
+      "explanation": "The key limitation identified is the distinction between surface temperature and the air temperature experienced by people."
+    },
+    {
+      "idx": 10,
+      "kind": "multiple_choice",
+      "prompt": "Why can heavy dependence on air conditioning create additional risk during heatwaves?",
+      "options": [
+        "Cooling centres may refuse residents who own air conditioners.",
+        "Trees stop transpiring near mechanically cooled buildings.",
+        "Power failure can remove a major source of protection.",
+        "Air conditioners make indoor humidity permanently increase."
+      ],
+      "answer": [
+        "Power failure can remove a major source of protection."
+      ],
+      "evidence": "If electricity systems fail during a heatwave, residents who depend heavily on mechanical cooling can suddenly become more exposed.",
+      "explanation": "The passage specifically identifies electricity failure as a vulnerability for residents dependent on air conditioning."
+    },
+    {
+      "idx": 11,
+      "kind": "sentence_completion",
+      "prompt": "Complete the sentence using NO MORE THAN TWO WORDS from the passage: Trees transfer water from soil to the atmosphere through ______.",
+      "options": null,
+      "answer": [
+        "transpiration"
+      ],
+      "evidence": "Trees cool streets by providing shade and by transferring water from the soil to the atmosphere through transpiration.",
+      "explanation": "The missing word is taken directly from the passage."
+    },
+    {
+      "idx": 12,
+      "kind": "sentence_completion",
+      "prompt": "Complete the sentence using NO MORE THAN TWO WORDS from the passage: A poorly ventilated apartment on the ______ may stay dangerously hot after outdoor temperatures fall.",
+      "options": null,
+      "answer": [
+        "top-floor"
+      ],
+      "evidence": "Housing quality matters as well: a poorly ventilated top-floor apartment can remain dangerously warm long after outdoor temperatures have fallen.",
+      "explanation": "The answer is the exact word used in the passage."
+    },
+    {
+      "idx": 13,
+      "kind": "sentence_completion",
+      "prompt": "Complete the sentence using NO MORE THAN TWO WORDS from the passage: Public libraries and community centres may be used as ______ during severe heat.",
+      "options": null,
+      "answer": [
+        "cooling centres"
+      ],
+      "evidence": "Public libraries, community centres and other air-conditioned buildings may be designated as cooling centres where residents can spend the hottest hours of the day.",
+      "explanation": "The phrase appears verbatim in the passage."
+    }
+  ]
+}
