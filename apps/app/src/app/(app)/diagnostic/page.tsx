@@ -26,9 +26,6 @@ export default async function DiagnosticPage() {
   ]);
 
   // The page asks the question the action asks, so the two cannot disagree.
-  // It used to offer a live "Start the diagnostic" to a candidate who had
-  // already spent theirs: the action correctly refused and redirected, and
-  // from their side pressing Start silently landed them on an old result.
   const spent = existing != null && !canStartDiagnostic({ isPro: pro, taken });
 
   if (spent) {
@@ -80,8 +77,13 @@ export default async function DiagnosticPage() {
           Find out where you actually are
         </h1>
         <p className="mt-3 text-sm leading-6 text-muted-foreground">
-          One reading passage, then one Task 2 essay. You get an estimated band
-          for each, your weakest area, and a study plan built from the result.
+          A full exam sitting — Listening, Reading and Writing
+          {pro ? ', then Speaking' : ''}, each section timed and taken in order.
+          You get an estimated band per skill, an overall, your weakest skill,
+          and a study plan built from the result.
+          {pro
+            ? ''
+            : ' Speaking is unlocked on Pro; the sitting closes after Writing.'}
         </p>
       </header>
 

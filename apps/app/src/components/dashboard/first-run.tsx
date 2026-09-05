@@ -7,7 +7,7 @@ import {
   SectionHeader,
 } from '@/components/app/primitives';
 import { firstWrittenLesson } from '@/content/lessons';
-import { DIAGNOSTIC_MINUTES } from '@/lib/timing';
+import { DIAGNOSTIC_DURATION_LABEL } from '@/lib/timing';
 import type { Profile } from '@/lib/db/schema';
 
 /**
@@ -38,7 +38,7 @@ export async function FirstRun({
         headingId="start-here"
         eyebrow="Start here"
         title="Take the diagnostic"
-        meta={`One reading passage, then one Task 2 essay · ${DIAGNOSTIC_MINUTES} min`}
+        meta={`Listening, Reading and Writing, timed like the real exam · ${DIAGNOSTIC_DURATION_LABEL}`}
         action={
           <Button
             size="xl"
