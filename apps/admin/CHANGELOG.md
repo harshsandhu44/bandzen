@@ -1,3 +1,10 @@
+# admin [0.9.0](https://github.com/harshsandhu44/bandzen/compare/admin@0.8.0...admin@0.9.0) (2026-09-05)
+
+
+### Features
+
+* **app:** replace lesson catalogue with a 40-lesson beginner-to-expert curriculum ([#50](https://github.com/harshsandhu44/bandzen/issues/50)) ([bccd53d](https://github.com/harshsandhu44/bandzen/commit/bccd53d2f72860d4f3d86ee8d26fce857d0d54ad))
+
 # admin [0.8.0](https://github.com/harshsandhu44/bandzen/compare/admin@0.7.0...admin@0.8.0) (2026-09-05)
 
 
