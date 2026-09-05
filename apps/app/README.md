@@ -21,9 +21,7 @@ vars, prod schema, error monitoring, a live payment) is done; see #46.
 
 1. Create a Neon project and a Clerk application, then `cp .env.example .env.local`
    and fill in the keys.
-2. In Clerk: **Restrictions → Sign-up mode → Restricted**, then invite people
-   from **Configure → Invitations**. That is the entire beta gate — there is no
-   invite table in this app.
+2. In Clerk: sign-up mode is **Public** — nothing to configure.
 3. In Clerk: add `/sign-in` and `/signup` as the sign-in/sign-up paths.
 4. `pnpm db:migrate` to create the schema.
 5. `pnpm content:generate` → review the JSON in `content/passages/` by hand →
@@ -50,7 +48,7 @@ vars, prod schema, error monitoring, a live payment) is done; see #46.
 
 ## Access model
 
-Clerk's invite list is still the gate on who can sign up. What they get once in
+Sign-up is open in Clerk — anyone can create an account. What they get once in
 is decided by `subscriptions`: **`isPro` is `current_period_end > now()`**, one
 date comparison, and everything falls out of it. A cancellation keeps the period
 already paid for because cancelling does not move the date; a failed renewal

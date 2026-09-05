@@ -17,12 +17,12 @@ export const metadata = {
  * it is already the logo, the favicon and the social image.
  *
  * Then the entry points, phrased as the sentence someone arrives already
- * thinking — "I was just invited", "I got a CMS role" — rather than as two
+ * thinking — "I just signed up", "I got a CMS role" — rather than as two
  * doors labelled by who you are. Most people know what they came to do before
  * they know which audience the site would file them under.
  */
 const ENTRIES: { prompt: string; href: string }[] = [
-  { prompt: 'I was just invited', href: '/candidates/setting-up' },
+  { prompt: 'I just signed up', href: '/candidates/setting-up' },
   { prompt: 'I want a starting band', href: '/candidates/the-diagnostic' },
   {
     prompt: 'I want to understand marking and bands',

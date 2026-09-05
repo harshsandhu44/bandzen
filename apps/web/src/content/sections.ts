@@ -74,7 +74,7 @@ export const hero = {
   headlineAccent: 'anymore.',
   support:
     'Practice all four IELTS modules, take realistic mock tests, and understand exactly what is holding your score back with detailed AI analysis.',
-  note: 'Invitation-only while in beta. No credit card required.',
+  note: 'No credit card required.',
 } as const;
 
 /** Illustrative sample report — the shape of a real Bandzen estimate. */
@@ -396,7 +396,7 @@ export const testimonials = {
 export const pricing = {
   eyebrow: 'Pricing',
   headline: 'Start free. Upgrade when practice turns serious.',
-  note: 'Founding price until 31 October 2026. Invitation-only while in beta. Cancel any time; refund within 7 days.',
+  note: 'Founding price until 31 October 2026. Cancel any time; refund within 7 days.',
   tiers: [
     {
       name: 'Free',
