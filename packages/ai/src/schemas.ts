@@ -275,7 +275,7 @@ export type GeneratedSpeakingTest = z.infer<typeof generatedSpeakingTestSchema>;
 export const MAX_ITEMS = 50;
 
 const FORMATS = ['academic', 'general'] as const;
-const MODULES = ['reading', 'writing'] as const;
+const MODULES = ['reading', 'writing', 'listening', 'speaking'] as const;
 const LESSON_GROUPS = ['foundations', 'question-types', 'advanced'] as const;
 const LESSON_STAGE_IDS = [
   'understand',
@@ -423,6 +423,11 @@ export const lessonBlockSchema = z.discriminatedUnion('kind', [
     answer: z.string(),
     why: z.string(),
   }),
+  z.object({
+    kind: z.literal('video'),
+    url: z.string(),
+    title: z.string().optional(),
+  }),
 ]);
 
 export const lessonSchema = z.object({
@@ -432,7 +437,7 @@ export const lessonSchema = z.object({
   title: z.string(),
   summary: z.string(),
   minutes: z.number().int().min(1),
-  questionKind: z.enum(QUESTION_KINDS).nullish(),
+  questionKind: z.enum(ALL_QUESTION_KINDS).nullish(),
   orderIndex: z.number().int().optional(),
   stages: z
     .array(
