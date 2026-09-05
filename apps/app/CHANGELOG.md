@@ -1,3 +1,11 @@
+# app [0.20.0](https://github.com/harshsandhu44/bandzen/compare/app@0.19.1...app@0.20.0) (2026-09-05)
+
+
+### Features
+
+* **app:** add Sentry monitoring, fix mock-test copy, seed reading content ([#48](https://github.com/harshsandhu44/bandzen/issues/48)) ([7a0540d](https://github.com/harshsandhu44/bandzen/commit/7a0540db1bb3e5ed09acd09190d3886a0378edd4)), closes [#44](https://github.com/harshsandhu44/bandzen/issues/44) [#47](https://github.com/harshsandhu44/bandzen/issues/47)
+* **app:** seed listening/speaking audio with multi-voice synthesis ([#49](https://github.com/harshsandhu44/bandzen/issues/49)) ([f133456](https://github.com/harshsandhu44/bandzen/commit/f1334566908e51b4dbabff92b93992dc2519b394)), closes [#47](https://github.com/harshsandhu44/bandzen/issues/47) [#46](https://github.com/harshsandhu44/bandzen/issues/46)
+
 ## app [0.19.1](https://github.com/harshsandhu44/bandzen/compare/app@0.19.0...app@0.19.1) (2026-09-05)
 
 
