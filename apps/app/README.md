@@ -14,6 +14,9 @@ against the IELTS band descriptors, past the response via `after()`. Speaking
 is Pro-only — grading a test from its audio is the most expensive per-unit AI
 cost in the app.
 
+**v1.0.0** — the launch-readiness checklist (prod content volume, prod env
+vars, prod schema, error monitoring, a live payment) is done; see #46.
+
 ## Setup
 
 1. Create a Neon project and a Clerk application, then `cp .env.example .env.local`
