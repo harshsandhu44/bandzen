@@ -7,7 +7,7 @@ import { LiveWaveform } from '@bandzen/ui/components/live-waveform';
 import { SubmitConfirm } from '@/components/app/submit-confirm';
 import { ExamNavigator } from '@/components/exam/exam-navigator';
 import { MockBlurBanner } from '@/components/exam/mock-blur-banner';
-import { blobToWav } from '@/lib/wav';
+import { startPcmRecording, type PcmRecorder } from '@/lib/pcm-recorder';
 import { saveSpeakingRecording, submitSpeakingAttempt } from '../actions';
 
 type Prompt = {
@@ -70,11 +70,11 @@ export function SpeakingTest({
   const [analyser, setAnalyser] = useState<AnalyserNode | null>(null);
 
   const audioRef = useRef<HTMLAudioElement>(null);
-  const recorderRef = useRef<MediaRecorder | null>(null);
-  const chunksRef = useRef<Blob[]>([]);
+  const recorderRef = useRef<PcmRecorder | null>(null);
+  const streamRef = useRef<MediaStream | null>(null);
+  const recordingPromptRef = useRef<string>('');
   const startedAtRef = useRef(0);
   const deadlineRef = useRef(0);
-  const audioCtxRef = useRef<AudioContext | null>(null);
 
   const prompt = prompts[current]!;
   const cap = MAX_SECONDS[prompt.part] ?? 60;
@@ -111,8 +111,25 @@ export function SpeakingTest({
   );
 
   const stopRecording = useCallback(() => {
-    if (recorderRef.current?.state === 'recording') recorderRef.current.stop();
-  }, []);
+    const recorder = recorderRef.current;
+    if (!recorder) return;
+    recorderRef.current = null;
+
+    const wav = recorder.stop();
+    streamRef.current?.getTracks().forEach((t) => t.stop());
+    streamRef.current = null;
+    setAnalyser(null);
+    setPhase('idle');
+
+    const promptId = recordingPromptRef.current;
+    const duration = Math.round((Date.now() - startedAtRef.current) / 1000);
+    if (wav.size > 44) {
+      void upload(promptId, wav, duration);
+    } else {
+      // A header-only WAV means no samples were captured.
+      setPromptStatus(promptId, 'failed');
+    }
+  }, [upload]);
 
   const beginRecording = useCallback(async () => {
     setMicError(null);
@@ -127,50 +144,26 @@ export function SpeakingTest({
       return;
     }
 
-    // A live input-level meter, off the same stream the recorder uses.
+    let recorder: PcmRecorder;
     try {
-      const ctx = new AudioContext();
-      const analyser = ctx.createAnalyser();
-      analyser.fftSize = 256;
-      ctx.createMediaStreamSource(stream).connect(analyser);
-      audioCtxRef.current = ctx;
-      setAnalyser(analyser);
+      recorder = startPcmRecording(stream);
     } catch {
-      // No Web Audio — the meter just stays flat, recording is unaffected.
+      stream.getTracks().forEach((t) => t.stop());
+      setMicError('Could not start recording. Try again.');
+      setPhase('idle');
+      return;
     }
 
-    const recorder = new MediaRecorder(stream);
     recorderRef.current = recorder;
-    chunksRef.current = [];
-    const thisPrompt = prompt.id;
-
-    recorder.ondataavailable = (e) => {
-      if (e.data.size) chunksRef.current.push(e.data);
-    };
-    recorder.onstop = async () => {
-      stream.getTracks().forEach((t) => t.stop());
-      void audioCtxRef.current?.close();
-      audioCtxRef.current = null;
-      setAnalyser(null);
-      const duration = Math.round((Date.now() - startedAtRef.current) / 1000);
-      const raw = new Blob(chunksRef.current, {
-        type: recorder.mimeType || 'audio/webm',
-      });
-      setPhase('idle');
-      try {
-        const wav = await blobToWav(raw);
-        await upload(thisPrompt, wav, duration);
-      } catch {
-        setPromptStatus(thisPrompt, 'failed');
-      }
-    };
+    streamRef.current = stream;
+    recordingPromptRef.current = prompt.id;
+    setAnalyser(recorder.analyser);
 
     startedAtRef.current = Date.now();
     deadlineRef.current = Date.now() + cap * 1000;
-    recorder.start();
     setPhase('recording');
     setLeft(cap);
-  }, [prompt.id, cap, upload]);
+  }, [prompt.id, cap]);
 
   // One ticker for both countdowns. The deadline lives in a ref, so this effect
   // only ever wires up an interval — the state changes happen in its callback,
@@ -193,6 +186,18 @@ export function SpeakingTest({
     const id = setInterval(tick, 250);
     return () => clearInterval(id);
   }, [phase, beginRecording, stopRecording]);
+
+  // Leaving the page mid-recording: release the mic and the audio graph. The
+  // in-flight answer is dropped rather than saved half-spoken.
+  useEffect(
+    () => () => {
+      recorderRef.current?.stop();
+      recorderRef.current = null;
+      streamRef.current?.getTracks().forEach((t) => t.stop());
+      streamRef.current = null;
+    },
+    [],
+  );
 
   const start = () => {
     if (prompt.prepSeconds > 0) {

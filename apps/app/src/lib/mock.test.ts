@@ -70,6 +70,33 @@ test('all four sections submitted is the end of the sitting', () => {
   );
 });
 
+test('a Free diagnostic drops Speaking: the sitting ends at Writing', () => {
+  const throughWriting = [
+    { module: 'listening', status: 'complete' },
+    { module: 'reading', status: 'complete' },
+    { module: 'writing', status: 'complete' },
+  ] as const;
+  // With Speaking in scope the sitting continues into it...
+  assert.equal(mockPosition(throughWriting), 'speaking');
+  // ...without it, Writing was the last section and the sitting is over.
+  assert.equal(
+    mockPosition(throughWriting, { includeSpeaking: false }),
+    null,
+  );
+  // And an unfinished Writing is still the position either way.
+  assert.equal(
+    mockPosition(
+      [
+        { module: 'listening', status: 'complete' },
+        { module: 'reading', status: 'complete' },
+        { module: 'writing', status: 'in_progress' },
+      ],
+      { includeSpeaking: false },
+    ),
+    'writing',
+  );
+});
+
 test('track index at the very start is the first track, no pause', () => {
   const r = trackIndexAtElapsed(0, [100, 100, 100, 100], 30);
   assert.deepEqual(r, {

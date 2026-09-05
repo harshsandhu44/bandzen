@@ -97,7 +97,7 @@ export async function nextPracticeStep(
       kind: 'diagnostic',
       href: '/diagnostic',
       title: 'Take the diagnostic',
-      reason: 'One passage and one essay — your fastest first estimate',
+      reason: 'A timed four-skill sitting — your fastest first estimate',
     };
   }
 

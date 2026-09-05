@@ -9,6 +9,7 @@ import {
   latestReport,
   listLessonProgress,
   listPassages,
+  listTracks,
   listWritingPrompts,
 } from '@/lib/db/queries';
 import type { Profile } from '@/lib/db/schema';
@@ -59,10 +60,12 @@ export async function loadPlanData(
     speakingBand,
     report,
     kindAccuracy,
+    listeningAccuracy,
     doneToday,
     lessons,
     passages,
     prompts,
+    tracks,
     lessonForKind,
   ] = await Promise.all([
     latestBand(userId, 'reading'),
@@ -71,10 +74,12 @@ export async function loadPlanData(
     latestBand(userId, 'speaking'),
     latestReport(userId),
     accuracyByQuestionKind(userId, 'reading'),
+    accuracyByQuestionKind(userId, 'listening'),
     attemptsSubmittedOn(userId, start, end),
     listLessonProgress(userId),
     listPassages(),
     listWritingPrompts(),
+    listTracks(),
     lessonForKindMap(),
   ]);
 
@@ -83,6 +88,7 @@ export async function loadPlanData(
   const planInput: PlanInput = {
     readingBand,
     writingBand,
+    listeningBand,
     targetBand: profile.targetBand,
     testDate: profile.testDate,
     weaknesses: report?.weaknesses ?? undefined,
@@ -92,6 +98,7 @@ export async function loadPlanData(
     catalogue: {
       passageIds: passages.map((p) => p.id),
       prompts: prompts.map((p) => ({ id: p.id, task: p.task })),
+      trackIds: tracks.map((t) => t.id),
       lessonForKind,
       completedLessonIds,
     },
@@ -126,6 +133,7 @@ export async function loadPlanData(
     speakingBand,
     report,
     kindAccuracy,
+    listeningAccuracy,
     completedLessonIds,
     /** True once anything has actually been measured. */
     measured:

@@ -236,7 +236,13 @@ async function mockStartsInWindow(userId: string, since: Date) {
     .select({ startedAt: mockAttempts.startedAt })
     .from(mockAttempts)
     .where(
-      and(eq(mockAttempts.userId, userId), gt(mockAttempts.startedAt, since)),
+      and(
+        eq(mockAttempts.userId, userId),
+        // Only real mocks count against the weekly cap — a diagnostic is a
+        // `mock_attempts` row too and must not spend the slot.
+        eq(mockAttempts.kind, 'mock'),
+        gt(mockAttempts.startedAt, since),
+      ),
     );
   return rows.map((r) => r.startedAt);
 }
@@ -340,9 +346,11 @@ export async function mockContentExclusions(userId: string) {
   for (const m of mockRows) {
     for (const id of m.readingPassageIds) passageIds.add(id);
     for (const id of m.listeningTrackIds) trackIds.add(id);
-    promptIds.add(m.writingTask1PromptId);
+    // task1 / speakingTest are nullable — a diagnostic sits Task 2 only, and a
+    // backfilled legacy diagnostic has no speaking test.
+    if (m.writingTask1PromptId) promptIds.add(m.writingTask1PromptId);
     promptIds.add(m.writingTask2PromptId);
-    speakingTestIds.add(m.speakingTestId);
+    if (m.speakingTestId) speakingTestIds.add(m.speakingTestId);
   }
 
   return {
@@ -355,9 +363,12 @@ export async function mockContentExclusions(userId: string) {
 
 export async function createMockAttempt(values: {
   userId: string;
+  /** Omit for a full mock; `'diagnostic'` for the trimmed 4-skill sitting. */
+  kind?: 'mock' | 'diagnostic';
   readingPassageIds: string[];
   listeningTrackIds: string[];
-  writingTask1PromptId: string;
+  /** Null for a diagnostic — Task 2 only. */
+  writingTask1PromptId: string | null;
   writingTask2PromptId: string;
   speakingTestId: string;
 }) {
@@ -380,18 +391,32 @@ export async function getMockAttempt(userId: string, mockAttemptId: string) {
   );
 }
 
-/** The most recent sitting still open, for `startMock` to resume instead of starting a second one. */
-export async function latestOpenMock(userId: string) {
+/** The most recent open sitting of one kind, for its start action to resume instead of starting a second. */
+async function latestOpenSitting(userId: string, kind: 'mock' | 'diagnostic') {
   return firstRow(
     await db
       .select()
       .from(mockAttempts)
       .where(
-        and(eq(mockAttempts.userId, userId), isNull(mockAttempts.submittedAt)),
+        and(
+          eq(mockAttempts.userId, userId),
+          eq(mockAttempts.kind, kind),
+          isNull(mockAttempts.submittedAt),
+        ),
       )
       .orderBy(desc(mockAttempts.startedAt))
       .limit(1),
   );
+}
+
+/** The most recent mock still open, for `startMock` to resume instead of starting a second one. */
+export async function latestOpenMock(userId: string) {
+  return latestOpenSitting(userId, 'mock');
+}
+
+/** The most recent diagnostic sitting still open, for `startDiagnostic` to resume. */
+export async function latestOpenDiagnostic(userId: string) {
+  return latestOpenSitting(userId, 'diagnostic');
 }
 
 /** This sitting's child attempt(s) for one module — 0, 1 (every module but Writing) or 2 (Writing). */
@@ -408,6 +433,33 @@ export async function getMockSectionAttempts(
         eq(attempts.userId, userId),
         eq(attempts.mockAttemptId, mockAttemptId),
         eq(attempts.module, module),
+      ),
+    );
+}
+
+/**
+ * Re-anchor a section's clock to now. Called when the candidate re-enters a
+ * section through the interstitial — its copy says "the section's clock
+ * starts" on Continue, so a section abandoned earlier and resumed this way
+ * starts fresh: Listening plays from the first track, Reading and Writing get
+ * their full time back. Only touches `in_progress` rows, so a section already
+ * submitted is never rewound. A plain reload of the engine URL does not route
+ * through here, so an accidental refresh mid-section still resumes in place.
+ */
+export async function restartSectionClock(
+  userId: string,
+  mockAttemptId: string,
+  module: Skill,
+) {
+  await db
+    .update(attempts)
+    .set({ startedAt: new Date() })
+    .where(
+      and(
+        eq(attempts.userId, userId),
+        eq(attempts.mockAttemptId, mockAttemptId),
+        eq(attempts.module, module),
+        eq(attempts.status, 'in_progress'),
       ),
     );
 }
@@ -429,13 +481,19 @@ export async function getMockResult(userId: string, mockAttemptId: string) {
 
   return {
     mock,
+    kind: mock.kind,
     listening: rows.find((r) => r.module === 'listening') ?? null,
     reading: rows.find((r) => r.module === 'reading') ?? null,
+    // A diagnostic sits Task 2 only — `writingTask1PromptId` is null and there
+    // is no task1 row. The single writing row matches `writingTask2PromptId`.
     task1:
-      rows.find(
-        (r) =>
-          r.module === 'writing' && r.promptId === mock.writingTask1PromptId,
-      ) ?? null,
+      (mock.writingTask1PromptId != null
+        ? rows.find(
+            (r) =>
+              r.module === 'writing' &&
+              r.promptId === mock.writingTask1PromptId,
+          )
+        : null) ?? null,
     task2:
       rows.find(
         (r) =>
@@ -491,23 +549,26 @@ export async function markedEssayCount(userId: string): Promise<number> {
 }
 
 /**
- * Diagnostic sittings that actually produced a result.
+ * Diagnostic sittings that actually finished.
  *
- * The reading half is the sitting; writing is its child. Only completed ones
- * count, deliberately: the free diagnostic is the demonstration the whole
- * funnel points at, and a sitting that broke — a grading failure, an abandoned
- * half — must not be the thing that locks someone out of it forever.
+ * A diagnostic is a `mock_attempts` row with `kind = 'diagnostic'`; it counts
+ * once `submittedAt` is stamped — which happens when the last section for that
+ * candidate submits (Speaking for Pro, Writing for Free). A sitting abandoned
+ * part way has a null `submittedAt` and does not count, deliberately: the free
+ * diagnostic is the demonstration the whole funnel points at, and a sitting
+ * that broke must not be the thing that locks someone out of it forever.
+ * Legacy 2-skill diagnostics are backfilled with `submittedAt` set, so they
+ * still count here.
  */
 export async function diagnosticCount(userId: string): Promise<number> {
   const [row] = await db
     .select({ n: count() })
-    .from(attempts)
+    .from(mockAttempts)
     .where(
       and(
-        eq(attempts.userId, userId),
-        eq(attempts.kind, 'diagnostic'),
-        eq(attempts.module, 'reading'),
-        eq(attempts.status, 'complete'),
+        eq(mockAttempts.userId, userId),
+        eq(mockAttempts.kind, 'diagnostic'),
+        isNotNull(mockAttempts.submittedAt),
       ),
     );
   return row?.n ?? 0;
@@ -904,6 +965,7 @@ export async function getMockReadingTest(userId: string, attemptId: string) {
 
   return {
     attempt,
+    kind: mock.kind,
     passages: orderedPassages,
     questions: renumbered,
     headingsByQuestion,
@@ -1173,6 +1235,7 @@ export async function getMockListeningTest(userId: string, attemptId: string) {
 
   return {
     attempt,
+    kind: mock.kind,
     tracks: orderedTracks,
     questions: renumbered,
     matchingOptionsByQuestion,
@@ -1451,12 +1514,13 @@ export async function getWritingTest(userId: string, attemptId: string) {
 }
 
 /**
- * The mock's Writing section: both tasks, keyed by which prompt each
- * attempt row was created for (there is no other way to tell them apart —
- * both rows are `module: 'writing'`, same `mockAttemptId`, same `startedAt`).
+ * The Writing section of a sitting. A mock has both tasks, keyed by which
+ * prompt each attempt row was created for (there is no other way to tell them
+ * apart — both rows are `module: 'writing'`, same `mockAttemptId`, same
+ * `startedAt`). A diagnostic has Task 2 only: one row, `task1` null.
+ *
  * `startedAt` comes off the rows themselves rather than `mockAttempts`,
- * because that's the actual clock anchor `MOCK_SECTION_MINUTES.writing`
- * counts down from.
+ * because that's the actual clock anchor the section timer counts down from.
  */
 export async function getMockWritingTest(
   userId: string,
@@ -1464,6 +1528,11 @@ export async function getMockWritingTest(
 ) {
   const mock = await getMockAttempt(userId, mockAttemptId);
   if (!mock) return null;
+
+  const promptIds = [
+    ...(mock.writingTask1PromptId ? [mock.writingTask1PromptId] : []),
+    mock.writingTask2PromptId,
+  ];
 
   const [rows, promptRows] = await Promise.all([
     getMockSectionAttempts(userId, mockAttemptId, 'writing'),
@@ -1475,29 +1544,37 @@ export async function getMockWritingTest(
         chartData: writingPrompts.chartData,
       })
       .from(writingPrompts)
-      .where(
-        inArray(writingPrompts.id, [
-          mock.writingTask1PromptId,
-          mock.writingTask2PromptId,
-        ]),
-      ),
+      .where(inArray(writingPrompts.id, promptIds)),
   ]);
 
-  const row1 = rows.find((r) => r.promptId === mock.writingTask1PromptId);
   const row2 = rows.find((r) => r.promptId === mock.writingTask2PromptId);
-  const prompt1 = promptRows.find((p) => p.id === mock.writingTask1PromptId);
   const prompt2 = promptRows.find((p) => p.id === mock.writingTask2PromptId);
-  if (!row1 || !row2 || !prompt1 || !prompt2) return null;
+  if (!row2 || !prompt2) return null;
 
   const essayRows = await db
     .select({ attemptId: essays.attemptId, body: essays.body })
     .from(essays)
-    .where(inArray(essays.attemptId, [row1.id, row2.id]));
+    .where(inArray(essays.attemptId, rows.map((r) => r.id)));
   const bodyFor = (attemptId: string) =>
     essayRows.find((e) => e.attemptId === attemptId)?.body ?? '';
 
+  // A diagnostic (Task 2 only): one row, no task1.
+  if (mock.writingTask1PromptId == null) {
+    return {
+      startedAt: row2.startedAt,
+      kind: mock.kind,
+      task1: null,
+      task2: { attemptId: row2.id, ...prompt2, body: bodyFor(row2.id) },
+    };
+  }
+
+  const row1 = rows.find((r) => r.promptId === mock.writingTask1PromptId);
+  const prompt1 = promptRows.find((p) => p.id === mock.writingTask1PromptId);
+  if (!row1 || !prompt1) return null;
+
   return {
     startedAt: row1.startedAt,
+    kind: mock.kind,
     task1: { attemptId: row1.id, ...prompt1, body: bodyFor(row1.id) },
     task2: { attemptId: row2.id, ...prompt2, body: bodyFor(row2.id) },
   };
@@ -1556,56 +1633,55 @@ export async function getReport(userId: string, attemptId: string) {
 // Diagnostic
 // ---------------------------------------------------------------------------
 
-export async function getDiagnostic(userId: string, readingAttemptId: string) {
-  const reading = await getAttempt(userId, readingAttemptId);
-  if (!reading) return null;
+/**
+ * A diagnostic sitting's result: the per-skill section rows (same shape as
+ * `getMockResult`) plus the weakness phrases from the essay's report, which
+ * the "what to do next" plan on the result page reads.
+ *
+ * `sittingId` is a `mock_attempts.id`. It also accepts a legacy reading
+ * attempt id — every backfilled diagnostic set `mockAttemptId` on its two
+ * rows, so an old `/diagnostic/[readingAttemptId]/result` link still resolves.
+ */
+export async function getDiagnosticResult(userId: string, sittingId: string) {
+  let result = await getMockResult(userId, sittingId);
 
-  const [writing] = await db
-    .select()
-    .from(attempts)
-    .where(
-      and(eq(attempts.parentId, readingAttemptId), eq(attempts.userId, userId)),
-    );
+  if (!result) {
+    const attempt = await getAttempt(userId, sittingId);
+    if (!attempt?.mockAttemptId) return null;
+    result = await getMockResult(userId, attempt.mockAttemptId);
+    if (!result) return null;
+  }
+  if (result.kind !== 'diagnostic') return null;
 
-  const report = writing
+  const essay = result.task2;
+  const weaknesses = essay
     ? ((
         await db
           .select({ weaknesses: reports.weaknesses })
           .from(reports)
-          .where(eq(reports.attemptId, writing.id))
-      )[0] ?? null)
-    : null;
+          .where(eq(reports.attemptId, essay.id))
+      )[0]?.weaknesses ?? [])
+    : [];
 
-  return {
-    reading,
-    writing: writing ?? null,
-    weaknesses: report?.weaknesses ?? [],
-  };
+  return { ...result, weaknesses };
 }
 
+/** The most recent diagnostic sitting, whatever its state. `{ id, submittedAt }`. */
 export async function latestDiagnostic(userId: string) {
   return firstRow(
     await db
-      .select({ id: attempts.id, status: attempts.status })
-      .from(attempts)
+      .select({
+        id: mockAttempts.id,
+        submittedAt: mockAttempts.submittedAt,
+      })
+      .from(mockAttempts)
       .where(
         and(
-          eq(attempts.userId, userId),
-          eq(attempts.kind, 'diagnostic'),
-          eq(attempts.module, 'reading'),
+          eq(mockAttempts.userId, userId),
+          eq(mockAttempts.kind, 'diagnostic'),
         ),
       )
-      .orderBy(desc(attempts.startedAt))
-      .limit(1),
-  );
-}
-
-export async function findChildAttempt(userId: string, parentId: string) {
-  return firstRow(
-    await db
-      .select({ id: attempts.id, status: attempts.status })
-      .from(attempts)
-      .where(and(eq(attempts.parentId, parentId), eq(attempts.userId, userId)))
+      .orderBy(desc(mockAttempts.startedAt))
       .limit(1),
   );
 }

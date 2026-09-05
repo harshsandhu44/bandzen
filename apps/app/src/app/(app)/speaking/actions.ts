@@ -12,8 +12,8 @@ import {
   getAttempt,
   isPro,
   saveSpeakingResponse,
-  submitMockAttempt,
 } from '@/lib/db/queries';
+import { finishSittingSection } from '@/lib/mock-guard';
 import { uploadObject } from '@bandzen/storage/r2';
 
 export async function startSpeakingAttempt(formData: FormData) {
@@ -63,11 +63,12 @@ export async function saveSpeakingRecording(
 
   const bytes = Buffer.from(await file.arrayBuffer());
 
-  // The client always sends a WAV (see lib/wav.ts's blobToWav) — checking the
-  // RIFF/WAVE header rejects anything else before it's stored under an
-  // audio/wav content-type or handed to the grader's transcription call.
+  // The client always sends a 16 kHz mono WAV (see lib/pcm-recorder.ts).
+  // Checking the RIFF/WAVE header and that there is a non-empty `data` chunk
+  // rejects anything malformed or silent before it is stored or handed to the
+  // grader — a header-only WAV is exactly the "recording came back empty" bug.
   const isWav =
-    bytes.length >= 12 &&
+    bytes.length > 44 &&
     bytes.toString('ascii', 0, 4) === 'RIFF' &&
     bytes.toString('ascii', 8, 12) === 'WAVE';
   if (!isWav) return { ok: false };
@@ -102,13 +103,12 @@ export async function submitSpeakingAttempt(formData: FormData) {
     after(() => gradeSpeaking(attemptId));
   }
 
-  // Speaking is the mock's last section — this is what closes the sitting:
-  // frees the weekly cap and lets `startMock` resume land at the result page
-  // instead of looping back in. Stamped even though grading itself runs
-  // after the response, same as every other mock section.
-  if (attempt.kind === 'mock' && attempt.mockAttemptId) {
-    await submitMockAttempt(userId, attempt.mockAttemptId);
-    redirect(`/mock/${attempt.mockAttemptId}/result`);
+  // Speaking is the last section of a mock or a Pro diagnostic —
+  // `finishSittingSection` stamps `mock_attempts.submittedAt` (which frees the
+  // weekly cap) and sends the candidate to the result page. Grading itself
+  // still runs after the response, same as every other sitting section.
+  if (attempt.mockAttemptId) {
+    await finishSittingSection(userId, attempt.mockAttemptId);
   }
 
   redirect(`/speaking/${attemptId}/report`);

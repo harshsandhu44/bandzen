@@ -8,7 +8,7 @@ import {
   getWritingTest,
 } from '@/lib/db/queries';
 import { assertMockSection } from '@/lib/mock-guard';
-import { MOCK_SECTION_MINUTES, taskRules } from '@/lib/timing';
+import { sittingSectionMinutes, taskRules } from '@/lib/timing';
 import { MockWritingTest } from './mock-writing-test';
 import { WritingTest } from './writing-test';
 
@@ -23,24 +23,26 @@ export default async function WritingAttemptPage({
   const attempt = await getAttempt(userId, attemptId);
   if (!attempt) notFound();
 
-  if (attempt.kind === 'mock' && attempt.mockAttemptId) {
+  if (attempt.mockAttemptId) {
     const mock = await getMockAttempt(userId, attempt.mockAttemptId);
     if (!mock) notFound();
 
-    // Task 1's attempt is the canonical URL — a bookmark or stale link
-    // pointing at Task 2's own attempt id lands here instead.
     const siblings = await getMockSectionAttempts(
       userId,
       attempt.mockAttemptId,
       'writing',
     );
-    const task1Row = siblings.find(
-      (r) => r.promptId === mock.writingTask1PromptId,
-    );
-    if (!task1Row) notFound();
-    if (task1Row.id !== attemptId) redirect(`/writing/${task1Row.id}`);
 
-    await assertMockSection(userId, task1Row);
+    // The canonical URL: Task 1's row for a mock, the single Task 2 row for a
+    // diagnostic. A stale link pointing at Task 2's own id lands on Task 1.
+    const canonicalRow =
+      mock.writingTask1PromptId != null
+        ? siblings.find((r) => r.promptId === mock.writingTask1PromptId)
+        : siblings[0];
+    if (!canonicalRow) notFound();
+    if (canonicalRow.id !== attemptId) redirect(`/writing/${canonicalRow.id}`);
+
+    await assertMockSection(userId, canonicalRow);
 
     const data = await getMockWritingTest(userId, attempt.mockAttemptId);
     if (!data) notFound();
@@ -48,7 +50,7 @@ export default async function WritingAttemptPage({
     return (
       <MockWritingTest
         startedAt={data.startedAt.toISOString()}
-        minutes={MOCK_SECTION_MINUTES.writing}
+        minutes={sittingSectionMinutes(data.kind, 'writing')}
         task1={data.task1}
         task2={data.task2}
       />

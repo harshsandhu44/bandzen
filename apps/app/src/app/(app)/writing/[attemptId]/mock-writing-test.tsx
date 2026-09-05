@@ -26,30 +26,35 @@ type Task = {
 type Props = {
   startedAt: string;
   minutes: number;
-  task1: Task;
+  /** Null for a diagnostic — Task 2 only, and the tab strip collapses to one. */
+  task1: Task | null;
   task2: Task;
 };
 
-/** Blocks paste/copy/cut — a mock-only exam-condition guardrail. Standalone practice never sets this. */
+/** Blocks paste/copy/cut — a sitting-only exam-condition guardrail. Standalone practice never sets this. */
 function blockClipboard(e: ClipboardEvent<HTMLTextAreaElement>) {
   e.preventDefault();
 }
 
 export function MockWritingTest({ startedAt, minutes, task1, task2 }: Props) {
-  const [active, setActive] = useState<1 | 2>(1);
-  const [body1, setBody1] = useState(task1.body);
+  // The tasks this sitting actually has: [1, 2] for a mock, [2] for a
+  // diagnostic. The canonical submit row is Task 1's when there is one.
+  const numbers = (task1 ? [1, 2] : [2]) as (1 | 2)[];
+  const [active, setActive] = useState<1 | 2>(numbers[0]!);
+  const [body1, setBody1] = useState(task1?.body ?? '');
   const [body2, setBody2] = useState(task2.body);
   const autoFormRef = useRef<HTMLFormElement>(null);
+  const submitAttemptId = task1?.attemptId ?? task2.attemptId;
 
-  // One instance, both tasks — `schedule` is already keyed per string.
   const { status, schedule, retryFailed } = useAutosave(saveEssayDraft, {
     delay: 900,
   });
 
   const words1 = countWords(body1);
   const words2 = countWords(body2);
+  const wordsFor = (n: 1 | 2) => (n === 1 ? words1 : words2);
   const activeTask =
-    active === 1
+    active === 1 && task1
       ? { task: task1, body: body1, words: words1, set: setBody1 }
       : { task: task2, body: body2, words: words2, set: setBody2 };
 
@@ -58,29 +63,26 @@ export function MockWritingTest({ startedAt, minutes, task1, task2 }: Props) {
       <MockBlurBanner />
       <header className="sticky top-0 z-10 shrink-0 flex flex-wrap items-center justify-between gap-4 border-b border-border bg-background px-6 py-3">
         <div className="flex gap-1">
-          {([1, 2] as const).map((n) => {
-            const words = n === 1 ? words1 : words2;
-            return (
-              <button
-                key={n}
-                type="button"
-                onClick={() => setActive(n)}
-                aria-pressed={active === n}
-                className={cn(
-                  'border px-3 py-1.5 text-sm',
-                  active === n
-                    ? 'border-foreground bg-foreground text-background'
-                    : 'border-border text-muted-foreground hover:text-foreground',
-                )}
-              >
-                Task {n}
-                <span className="ml-2 font-metric text-metric-sm tabular-nums">
-                  {words}
-                  <span className="text-current/60"> / {MIN_WORDS[n]}</span>
-                </span>
-              </button>
-            );
-          })}
+          {numbers.map((n) => (
+            <button
+              key={n}
+              type="button"
+              onClick={() => setActive(n)}
+              aria-pressed={active === n}
+              className={cn(
+                'border px-3 py-1.5 text-sm',
+                active === n
+                  ? 'border-foreground bg-foreground text-background'
+                  : 'border-border text-muted-foreground hover:text-foreground',
+              )}
+            >
+              Task {n}
+              <span className="ml-2 font-metric text-metric-sm tabular-nums">
+                {wordsFor(n)}
+                <span className="text-current/60"> / {MIN_WORDS[n]}</span>
+              </span>
+            </button>
+          ))}
         </div>
         <div className="flex items-center gap-4">
           <SaveStatus status={status} onRetry={retryFailed} />
@@ -91,7 +93,7 @@ export function MockWritingTest({ startedAt, minutes, task1, task2 }: Props) {
           />
           <SubmitConfirm
             action={submitMockWriting}
-            attemptId={task1.attemptId}
+            attemptId={submitAttemptId}
             unsaved={status === 'failed'}
             disabled={words1 === 0 && words2 === 0}
             label="Submit"
@@ -100,7 +102,7 @@ export function MockWritingTest({ startedAt, minutes, task1, task2 }: Props) {
       </header>
 
       <form ref={autoFormRef} action={submitMockWriting} className="hidden">
-        <input type="hidden" name="attemptId" value={task1.attemptId} />
+        <input type="hidden" name="attemptId" value={submitAttemptId} />
       </form>
 
       <div className="mx-auto flex w-full max-w-3xl flex-1 flex-col gap-6 p-6">
