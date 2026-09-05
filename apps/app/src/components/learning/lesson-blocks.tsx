@@ -101,5 +101,25 @@ export function LessonBlockView({ block }: { block: LessonBlock }) {
           </details>
         </div>
       );
+
+    case 'video':
+      return (
+        <figure className="max-w-prose space-y-2">
+          <div className="aspect-video w-full border border-border">
+            <iframe
+              src={block.url}
+              title={block.title ?? 'Lesson video'}
+              className="size-full"
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+              allowFullScreen
+            />
+          </div>
+          {block.title ? (
+            <figcaption className="text-xs text-muted-foreground">
+              {block.title}
+            </figcaption>
+          ) : null}
+        </figure>
+      );
   }
 }
