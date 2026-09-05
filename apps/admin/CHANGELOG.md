@@ -1,3 +1,10 @@
+# admin [0.10.0](https://github.com/harshsandhu44/bandzen/compare/admin@0.9.0...admin@0.10.0) (2026-09-05)
+
+
+### Features
+
+* **ui:** shadcn component consolidation and Coach chat rebuild ([#51](https://github.com/harshsandhu44/bandzen/issues/51)) ([391b7ab](https://github.com/harshsandhu44/bandzen/commit/391b7abb83cf3208e265a00309d9843adee53c52))
+
 # admin [0.9.0](https://github.com/harshsandhu44/bandzen/compare/admin@0.8.0...admin@0.9.0) (2026-09-05)
 
 
