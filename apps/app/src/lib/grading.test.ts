@@ -4,6 +4,7 @@ import {
   isAnswerCorrect,
   overallBand,
   readingBand,
+  speakingCoverageCeiling,
   writingSectionBand,
 } from './grading.ts';
 
@@ -82,4 +83,19 @@ test('overall band boundary: exactly .75 rounds up to the next whole band', () =
 
 test('overall band with all four the same is that band', () => {
   assert.equal(overallBand([7, 7, 7, 7]), 7);
+});
+
+test('a completed speaking test has no coverage ceiling', () => {
+  assert.equal(speakingCoverageCeiling(10, 10), 9);
+  assert.equal(speakingCoverageCeiling(9, 10), 9); // 90% is essentially done
+});
+
+test('a barely-attempted speaking test is capped low', () => {
+  assert.equal(speakingCoverageCeiling(1, 10), 3);
+  assert.equal(speakingCoverageCeiling(2, 10), 4.5);
+  assert.equal(speakingCoverageCeiling(5, 10), 6);
+});
+
+test('speakingCoverageCeiling handles a zero-prompt test without dividing by zero', () => {
+  assert.equal(speakingCoverageCeiling(0, 0), 9);
 });

@@ -8,6 +8,7 @@ import {
 } from '@/lib/db/queries';
 import { transcribeAudio } from '@bandzen/ai/speech';
 import { checkAwards } from '@/lib/award-check';
+import { speakingCoverageCeiling } from '@/lib/grading';
 import { openai } from './client';
 import { SPEAKING_GRADER_MODEL } from './models';
 import { SPEAKING_RUBRIC } from './speaking-rubric';
@@ -65,14 +66,17 @@ const PART_LABEL: Record<number, string> = {
 export async function gradeSpeaking(attemptId: string) {
   try {
     const work = await loadSpeakingForGrading(attemptId);
-    if (!work || work.answers.length === 0) {
+    const answered = work?.prompts.filter((p) => p.audioUrl) ?? [];
+    if (!work || answered.length === 0) {
       throw new Error('Test, prompts or recordings missing');
     }
+    const totalPrompts = work.prompts.length;
+    const missing = totalPrompts - answered.length;
 
     // Fetch every recording once. Reused for both Whisper and the grader.
     const clips = await Promise.all(
-      work.answers.map(async (a) => {
-        const res = await fetch(a.audioUrl);
+      answered.map(async (a) => {
+        const res = await fetch(a.audioUrl!);
         if (!res.ok) {
           throw new Error(`Could not fetch a recording (${res.status}).`);
         }
@@ -100,17 +104,34 @@ export async function gradeSpeaking(attemptId: string) {
       | { type: 'text'; text: string }
       | { type: 'input_audio'; input_audio: { data: string; format: 'wav' } }
     > = [];
-    for (const c of clips) {
+    const clipByPrompt = new Map(clips.map((c) => [c.promptId, c]));
+    // Walk every prompt in order — answered ones carry their audio, unanswered
+    // ones are shown as gaps so the grader knows the test was not completed.
+    for (const p of work.prompts) {
       content.push({
         type: 'text',
-        text: `${PART_LABEL[c.part] ?? `Part ${c.part}`} — examiner: ${c.text}`,
+        text: `${PART_LABEL[p.part] ?? `Part ${p.part}`} — examiner: ${p.text}`,
       });
+      const clip = clipByPrompt.get(p.promptId);
+      if (clip) {
+        content.push({
+          type: 'input_audio',
+          input_audio: {
+            data: Buffer.from(clip.bytes).toString('base64'),
+            format: 'wav',
+          },
+        });
+      } else {
+        content.push({
+          type: 'text',
+          text: '[No response recorded for this prompt.]',
+        });
+      }
+    }
+    if (missing > 0) {
       content.push({
-        type: 'input_audio',
-        input_audio: {
-          data: Buffer.from(c.bytes).toString('base64'),
-          format: 'wav',
-        },
+        type: 'text',
+        text: `The candidate answered ${answered.length} of ${totalPrompts} prompts and left ${missing} with no response at all. A Speaking band rewards sustained production across the whole interview; unanswered prompts must pull Fluency and Coherence and the overall band down sharply.`,
       });
     }
 
@@ -136,14 +157,27 @@ export async function gradeSpeaking(attemptId: string) {
       ? parsed.annotations.filter((a) => said.includes(a.quote.toLowerCase()))
       : parsed.annotations;
 
-    const band = toBand(parsed.band);
+    // Deterministic backstop: the model has been told about the gaps, but cap
+    // the estimate at what the answered fraction can actually support so a
+    // half-finished test never comes back as a mid band.
+    const ceiling = speakingCoverageCeiling(answered.length, totalPrompts);
+    const band = Math.min(toBand(parsed.band), ceiling);
 
     const userId = await writeReport(attemptId, {
       band,
-      criteria: parsed.criteria.map((c) => ({ ...c, band: toBand(c.band) })),
+      criteria: parsed.criteria.map((c) => ({
+        ...c,
+        band: Math.min(toBand(c.band), ceiling),
+      })),
       annotations,
       strengths: parsed.strengths,
-      weaknesses: parsed.weaknesses,
+      weaknesses:
+        missing > 0
+          ? [
+              `Only ${answered.length} of ${totalPrompts} questions were answered — record the rest for a full estimate.`,
+              ...parsed.weaknesses,
+            ].slice(0, 3)
+          : parsed.weaknesses,
       model: SPEAKING_GRADER_MODEL,
     });
 

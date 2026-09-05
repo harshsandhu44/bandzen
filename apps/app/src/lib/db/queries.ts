@@ -1418,6 +1418,10 @@ export async function loadSpeakingForGrading(attemptId: string) {
     .where(eq(speakingTests.id, attempt.speakingTestId));
   if (!test) return null;
 
+  // Left join, not inner: every prompt in the test comes back, with a null
+  // `audioUrl` for the ones the candidate never recorded. The grader needs to
+  // see the gaps — a test where nine of ten prompts went unanswered is not a
+  // Band 6 just because the one answer was fluent.
   const rows = await db
     .select({
       promptId: speakingPrompts.id,
@@ -1427,7 +1431,7 @@ export async function loadSpeakingForGrading(attemptId: string) {
       audioUrl: speakingResponses.audioUrl,
     })
     .from(speakingPrompts)
-    .innerJoin(
+    .leftJoin(
       speakingResponses,
       and(
         eq(speakingResponses.promptId, speakingPrompts.id),
@@ -1437,7 +1441,7 @@ export async function loadSpeakingForGrading(attemptId: string) {
     .where(eq(speakingPrompts.testId, attempt.speakingTestId))
     .orderBy(speakingPrompts.idx);
 
-  return { title: test.title, answers: rows };
+  return { title: test.title, prompts: rows };
 }
 
 /** Persist the Whisper transcript of one answer, for the review page. */
