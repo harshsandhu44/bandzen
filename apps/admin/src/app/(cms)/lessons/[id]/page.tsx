@@ -84,6 +84,13 @@ export default async function EditLessonPage({
                 answer: b.answer,
                 why: b.why,
               };
+            case 'video':
+              return {
+                ...base,
+                kind: 'video',
+                url: b.url,
+                title: b.title ?? '',
+              };
           }
         }),
       };

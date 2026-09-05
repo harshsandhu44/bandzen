@@ -8,6 +8,7 @@ export const BLOCK_KINDS = [
   'callout',
   'example',
   'try',
+  'video',
 ] as const;
 
 /** One flat shape covers every block kind; toSave narrows by `kind`. */
@@ -21,6 +22,7 @@ const blockForm = z.object({
   question: z.string(),
   answer: z.string(),
   why: z.string(),
+  url: z.string(),
 });
 export type BlockFormValues = z.infer<typeof blockForm>;
 
@@ -49,6 +51,7 @@ export const blankBlock = (): BlockFormValues => ({
   question: '',
   answer: '',
   why: '',
+  url: '',
 });
 
 const lines = (s: string) =>
@@ -87,6 +90,12 @@ function toBlock(b: BlockFormValues): LessonBlock {
         question: b.question.trim(),
         answer: b.answer.trim(),
         why: b.why.trim(),
+      };
+    case 'video':
+      return {
+        kind: 'video',
+        url: b.url.trim(),
+        ...(b.title.trim() ? { title: b.title.trim() } : {}),
       };
   }
 }
@@ -140,6 +149,11 @@ const lessonBlockSchema = z.discriminatedUnion('kind', [
     question: z.string(),
     answer: z.string(),
     why: z.string(),
+  }),
+  z.object({
+    kind: z.literal('video'),
+    url: z.string(),
+    title: z.string().optional(),
   }),
 ]);
 
