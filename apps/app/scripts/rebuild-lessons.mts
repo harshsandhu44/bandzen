@@ -7,9 +7,10 @@
  * `@bandzen/db/queries` already refuses that while completion records exist
  * ("Unpublish it instead"), which is a deliberate rail, not an accident.
  * Instead: unpublish every currently published lesson (their `lesson_progress`
- * rows stay put and harmless), then insert the new 40 as published. Safe to
- * run twice -- unpublishing an already-draft lesson is a no-op, and slugs are
- * unique so a second run fails fast on the insert instead of duplicating.
+ * rows stay put and harmless), then upsert the new 40 as published, keyed on
+ * the unique slug. Safe to run again to push edited content -- the second
+ * run's unpublish step catches its own previous output too, and the upsert
+ * republishes the same 40 slugs rather than colliding on them.
  */
 import { neon } from '@neondatabase/serverless';
 import { READING_LESSONS } from './lesson-content/reading.ts';
@@ -52,9 +53,21 @@ for (const l of ALL_LESSONS) {
       (${l.slug}, ${l.module}, ${l.group}, ${l.title}, ${l.summary}, ${l.minutes},
        ${l.questionKind ?? null}, ${JSON.stringify(l.stages)}::jsonb, ${l.orderIndex},
        'published', 'rebuild-lessons script')
+    on conflict (slug) do update set
+      module = excluded.module,
+      "group" = excluded.group,
+      title = excluded.title,
+      summary = excluded.summary,
+      minutes = excluded.minutes,
+      question_kind = excluded.question_kind,
+      stages = excluded.stages,
+      order_index = excluded.order_index,
+      status = excluded.status,
+      updated_by = excluded.updated_by,
+      updated_at = now()
   `;
 }
-console.log(`Inserted ${ALL_LESSONS.length} new lesson(s).`);
+console.log(`Upserted ${ALL_LESSONS.length} lesson(s).`);
 
 const counts = await sql`
   select module, "group", status, count(*) from lessons
