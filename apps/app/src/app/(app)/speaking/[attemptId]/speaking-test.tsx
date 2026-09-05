@@ -115,20 +115,35 @@ export function SpeakingTest({
     if (!recorder) return;
     recorderRef.current = null;
 
-    const wav = recorder.stop();
-    streamRef.current?.getTracks().forEach((t) => t.stop());
+    const stream = streamRef.current;
     streamRef.current = null;
     setAnalyser(null);
     setPhase('idle');
 
     const promptId = recordingPromptRef.current;
     const duration = Math.round((Date.now() - startedAtRef.current) / 1000);
-    if (wav.size > 44) {
-      void upload(promptId, wav, duration);
-    } else {
-      // A header-only WAV means no samples were captured.
-      setPromptStatus(promptId, 'failed');
-    }
+
+    void (async () => {
+      let result: { wav: Blob; peak: number };
+      try {
+        result = await recorder.stop();
+      } catch {
+        setPromptStatus(promptId, 'failed');
+        return;
+      } finally {
+        stream?.getTracks().forEach((t) => t.stop());
+      }
+      // Peak near zero, or a header-only WAV, means nothing was captured —
+      // don't store dead audio, tell the candidate to check their mic.
+      if (result.peak < 0.002 || result.wav.size <= 44) {
+        setPromptStatus(promptId, 'failed');
+        setMicError(
+          'We did not pick up any sound. Check your microphone and record again.',
+        );
+        return;
+      }
+      void upload(promptId, result.wav, duration);
+    })();
   }, [upload]);
 
   const beginRecording = useCallback(async () => {
@@ -146,7 +161,7 @@ export function SpeakingTest({
 
     let recorder: PcmRecorder;
     try {
-      recorder = startPcmRecording(stream);
+      recorder = await startPcmRecording(stream);
     } catch {
       stream.getTracks().forEach((t) => t.stop());
       setMicError('Could not start recording. Try again.');
@@ -191,7 +206,7 @@ export function SpeakingTest({
   // in-flight answer is dropped rather than saved half-spoken.
   useEffect(
     () => () => {
-      recorderRef.current?.stop();
+      void recorderRef.current?.stop().catch(() => {});
       recorderRef.current = null;
       streamRef.current?.getTracks().forEach((t) => t.stop());
       streamRef.current = null;
