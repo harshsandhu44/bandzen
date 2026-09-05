@@ -1,3 +1,10 @@
+# web [0.5.0](https://github.com/harshsandhu44/bandzen/compare/web@0.4.0...web@0.5.0) (2026-09-05)
+
+
+### Features
+
+* **app:** add Sentry monitoring, fix mock-test copy, seed reading content ([#48](https://github.com/harshsandhu44/bandzen/issues/48)) ([7a0540d](https://github.com/harshsandhu44/bandzen/commit/7a0540db1bb3e5ed09acd09190d3886a0378edd4)), closes [#44](https://github.com/harshsandhu44/bandzen/issues/44) [#47](https://github.com/harshsandhu44/bandzen/issues/47)
+
 # web [0.4.0](https://github.com/harshsandhu44/bandzen/compare/web@0.3.2...web@0.4.0) (2026-09-04)
 
 
