@@ -403,7 +403,7 @@ export const pricing = {
       price: '₹0',
       period: 'forever',
       features: [
-        { label: 'Unlimited Reading practice', planned: false },
+        { label: '5 Reading and 5 Listening practice tests', planned: false },
         { label: 'One diagnostic assessment', planned: false },
         { label: 'All lessons and study materials', planned: false },
         { label: '2 AI-marked essays a week', planned: false },

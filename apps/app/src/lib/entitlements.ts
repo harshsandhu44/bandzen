@@ -40,14 +40,22 @@ export function daysLeft(until: Date, now: Date = new Date()): number {
 }
 
 /**
- * The metered surfaces are the ones that cost money to serve. Reading is
- * unlimited on Free because `grading.ts` is pure — marking a reading attempt
- * costs nothing, and capping it would throttle the habit that produces a
- * paying candidate in the first place.
+ * What Free is allowed, and how much of it is left.
+ *
+ * Two shapes. The metered surfaces — essays, Coach — cost a model call each
+ * to serve, so they run on a rolling window: a spent slot comes back in a
+ * week, and the reset date is a scheduled reason to return. Reading and
+ * Listening cost nothing to grade (`grading.ts` is pure), so a window would
+ * only be theatre; they run on a lifetime count instead — a fixed number of
+ * tests to try the product on, and then Pro. Speaking never reaches Free at
+ * all.
  */
 export const QUOTA_WINDOW_DAYS = 7;
 export const FREE_ESSAYS_PER_WINDOW = 2;
 export const FREE_COACH_MESSAGES_PER_WINDOW = 10;
+
+/** Reading and Listening practice tests a Free candidate may start, ever. */
+export const FREE_PRACTICE_TESTS_PER_MODULE = 5;
 
 /** A new candidate's reverse trial. */
 export const TRIAL_DAYS = 7;
@@ -128,6 +136,32 @@ export function allowance(input: {
       remaining > 0 || !blocking
         ? null
         : new Date(blocking.getTime() + WINDOW_MS),
+  };
+}
+
+/**
+ * What is left of a lifetime allowance — a plain count, no window.
+ *
+ * The same `Allowance` shape as `allowance()` so the meter and the gate read
+ * it identically, but `resetsAt` is always null: nothing about a lifetime cap
+ * ever frees up. `QuotaMeter` is told not to say "this week" when it renders
+ * one of these.
+ */
+export function lifetimeAllowance(input: {
+  isPro: boolean;
+  used: number;
+  limit: number;
+}): Allowance {
+  if (input.isPro) return UNLIMITED;
+
+  const remaining = Math.max(0, input.limit - input.used);
+  return {
+    allowed: remaining > 0,
+    unlimited: false,
+    used: input.used,
+    limit: input.limit,
+    remaining,
+    resetsAt: null,
   };
 }
 

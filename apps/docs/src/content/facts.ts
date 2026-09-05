@@ -34,6 +34,8 @@ export const FREE = {
   coach: 10,
   /** The window is rolling, not calendar, so the reset can be stated exactly. */
   windowDays: 7,
+  /** Reading, and separately Listening, practice tests — a lifetime count, not a window. */
+  practicePerModule: 5,
   /** Diagnostics, ever. Retaking is Pro. */
   diagnostics: 1,
   /** How far the band trend on Progress goes back. Source: `progress/page.tsx`. */

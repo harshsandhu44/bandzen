@@ -7,6 +7,7 @@ import {
   createAttempt,
   findInProgress,
   getAttempt,
+  practiceAllowance,
   saveAnswer,
   submitListening,
   submitMockListening,
@@ -21,6 +22,11 @@ export async function startListeningAttempt(formData: FormData) {
   // Resume rather than stack up abandoned attempts on the same track.
   const existing = await findInProgress(userId, { trackId });
   if (existing) redirect(`/listening/${existing.id}`);
+
+  // The gate. The list page already blurs the rows past this point, so a Free
+  // candidate only reaches here by posting the form directly — check anyway.
+  const quota = await practiceAllowance(userId, 'listening');
+  if (!quota.allowed) redirect('/upgrade?from=listening_wall');
 
   const attempt = await createAttempt({ userId, module: 'listening', trackId });
   redirect(`/listening/${attempt.id}`);

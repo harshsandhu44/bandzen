@@ -67,6 +67,10 @@ test('free allowances match entitlements.ts', () => {
     entitlements,
     new RegExp(`QUOTA_WINDOW_DAYS = ${FREE.windowDays}\\b`),
   );
+  assert.match(
+    entitlements,
+    new RegExp(`FREE_PRACTICE_TESTS_PER_MODULE = ${FREE.practicePerModule}\\b`),
+  );
   assert.match(entitlements, new RegExp(`TRIAL_DAYS = ${TRIAL_DAYS}\\b`));
 });
 

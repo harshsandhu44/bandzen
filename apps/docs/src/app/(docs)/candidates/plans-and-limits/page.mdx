@@ -10,25 +10,30 @@ export const metadata = {
 
 ## What Free includes
 
-Two things are metered, and only two: **marked essays** and **Coach messages**.
-They are the two things that cost real money every time they run. Speaking
-sits apart from both — it is not metered, it is closed entirely on Free.
+Two things are metered on a rolling window — **marked essays** and **Coach
+messages** — because they cost a model call every time they run. **Reading**
+and **Listening** practice are capped a different way: a fixed number of tests
+to try each module on, then Pro, with no reset. **Speaking** is closed
+entirely on Free.
 
-|                          | Free                                     |
-| ------------------------ | ---------------------------------------- |
-| Marked essays            | {FREE.essays} per {FREE.windowDays} days |
-| Coach messages           | {FREE.coach} per {FREE.windowDays} days  |
-| Diagnostic               | {FREE.diagnostics}, ever                 |
-| Band history on Progress | Last {FREE.trendPoints} attempts         |
-| Reading practice         | Unlimited                                |
-| Listening practice       | Unlimited                                |
-| Lessons                  | Unlimited                                |
-| Guides                   | Unlimited                                |
-| Speaking                 | Not available                            |
+|                          | Free                                          |
+| ------------------------ | --------------------------------------------- |
+| Marked essays            | {FREE.essays} per {FREE.windowDays} days      |
+| Coach messages           | {FREE.coach} per {FREE.windowDays} days       |
+| Reading practice         | {FREE.practicePerModule} tests, ever          |
+| Listening practice       | {FREE.practicePerModule} tests, ever          |
+| Diagnostic               | {FREE.diagnostics}, ever                      |
+| Band history on Progress | Last {FREE.trendPoints} attempts              |
+| Lessons                  | Unlimited                                     |
+| Guides                   | Unlimited                                     |
+| Speaking                 | Not available                                 |
 
-Reading, Listening, lessons and guides are unlimited on purpose. Marking them
-costs nothing to run, and capping the thing that builds the habit would be
-throttling the reason to be here at all.
+The Reading and Listening caps are a lifetime count, not a weekly ration —
+each test you start counts against the {FREE.practicePerModule}, and the
+number does not come back. The catalogue past that point stays visible on the
+practice pages, greyed out, so you can see what Pro opens. Lessons and guides
+stay unlimited: they are the technique you read before you practise, not the
+practice itself.
 
 ## The window is rolling
 
@@ -61,10 +66,11 @@ your test date if you gave one.
 </Callout>
 
 After that: {FREE.essays} essay marks and {FREE.coach} Coach messages a week,
-your band history goes back to the last {FREE.trendPoints} attempts, and
-Speaking closes — starting a new attempt is blocked the same way it is for any
-Free account. Reading practice, Listening practice, and lessons stay
-unlimited.
+your band history goes back to the last {FREE.trendPoints} attempts, Speaking
+closes, and Reading and Listening return to the Free cap of
+{FREE.practicePerModule} tests each — counted across everything you have ever
+started, so if you were already past that on Free before upgrading, those
+modules are closed until you renew. Lessons and guides stay unlimited.
 
 **A failed payment is not an instant cutoff.** Access is decided by the date your
 period runs to, and a failed renewal simply does not extend it — so the retry

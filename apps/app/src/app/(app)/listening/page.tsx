@@ -3,8 +3,10 @@ import { Badge } from '@bandzen/ui/components/badge';
 import { Button } from '@bandzen/ui/components/button';
 import { EmptyState, PageHeader, Panel } from '@/components/app/primitives';
 import { FilterBar } from '@/components/app/filter-bar';
+import { LockedPracticeRow, QuotaMeter } from '@/components/billing/pro';
+import { capture } from '@/lib/analytics';
 import { requireUserId } from '@/lib/auth';
-import { DIFFICULTY_RANGE, listTracks } from '@/lib/db/queries';
+import { DIFFICULTY_RANGE, listTracks, practiceAllowance } from '@/lib/db/queries';
 import { QUESTION_KIND_LABEL } from '@/lib/modules';
 import { startListeningAttempt } from './actions';
 
@@ -40,7 +42,7 @@ export default async function ListeningPage({
   searchParams,
 }: PageProps<'/listening'>) {
   // Auth is checked at the resource, not in middleware — see proxy.ts.
-  await requireUserId();
+  const userId = await requireUserId();
 
   const sp = await searchParams;
   const one = (v: string | string[] | undefined) =>
@@ -60,8 +62,15 @@ export default async function ListeningPage({
 
   const trackId = one(sp.track);
 
-  const tracks = await listTracks({ kind, difficulty, id: trackId });
+  const [tracks, quota] = await Promise.all([
+    listTracks({ kind, difficulty, id: trackId }),
+    practiceAllowance(userId, 'listening'),
+  ]);
   const params = { kind, difficulty };
+
+  if (!quota.unlimited && quota.remaining === 0) {
+    await capture(userId, 'quota_exhausted', { surface: 'listening' });
+  }
 
   return (
     <div className="max-w-3xl space-y-8">
@@ -103,6 +112,14 @@ export default async function ListeningPage({
         </div>
       )}
 
+      <QuotaMeter
+        id="listening-quota"
+        allowance={quota}
+        noun="listening tests"
+        period=""
+        source="listening_wall"
+      />
+
       {!tracks.length ? (
         kind || difficulty ? (
           <EmptyState
@@ -135,11 +152,8 @@ export default async function ListeningPage({
           }
         >
           <ul className="-my-3 divide-y divide-border">
-            {tracks.map((t) => (
-              <li
-                key={t.id}
-                className="flex items-center justify-between gap-4 py-3"
-              >
+            {tracks.map((t, i) => {
+              const inner = (
                 <div className="min-w-0">
                   <h2 className="font-medium">{t.title}</h2>
                   <p className="mt-1 flex items-center gap-2 text-xs text-muted-foreground">
@@ -147,14 +161,31 @@ export default async function ListeningPage({
                     <span className="truncate">{t.topic}</span>
                   </p>
                 </div>
-                <form action={startListeningAttempt}>
-                  <input type="hidden" name="trackId" value={t.id} />
-                  <Button type="submit" variant="outline" size="sm">
-                    Start
-                  </Button>
-                </form>
-              </li>
-            ))}
+              );
+
+              if (!quota.unlimited && i >= quota.remaining) {
+                return (
+                  <LockedPracticeRow key={t.id} source="listening_wall">
+                    {inner}
+                  </LockedPracticeRow>
+                );
+              }
+
+              return (
+                <li
+                  key={t.id}
+                  className="flex items-center justify-between gap-4 py-3"
+                >
+                  {inner}
+                  <form action={startListeningAttempt}>
+                    <input type="hidden" name="trackId" value={t.id} />
+                    <Button type="submit" variant="outline" size="sm">
+                      Start
+                    </Button>
+                  </form>
+                </li>
+              );
+            })}
           </ul>
         </Panel>
       )}

@@ -9,6 +9,7 @@ import {
   findInProgress,
   getAttempt,
   pickTask2Prompt,
+  practiceAllowance,
   saveAnswer,
   submitMockReading,
   submitReading,
@@ -23,6 +24,11 @@ export async function startReadingAttempt(formData: FormData) {
   // Resume rather than stack up abandoned attempts on the same passage.
   const existing = await findInProgress(userId, { passageId });
   if (existing) redirect(`/reading/${existing.id}`);
+
+  // The gate. The list page already blurs the rows past this point, so a Free
+  // candidate only reaches here by posting the form directly — check anyway.
+  const quota = await practiceAllowance(userId, 'reading');
+  if (!quota.allowed) redirect('/upgrade?from=reading_wall');
 
   const attempt = await createAttempt({ userId, module: 'reading', passageId });
   redirect(`/reading/${attempt.id}`);

@@ -88,6 +88,7 @@ export function QuotaMeter({
   noun,
   source,
   timezone,
+  period = 'this week',
   id,
   className,
 }: {
@@ -97,6 +98,11 @@ export function QuotaMeter({
   source: string;
   /** The candidate's zone, so the reset date reads the same on every surface. */
   timezone?: string | null;
+  /**
+   * How the budget is framed. The default suits a rolling window; pass `''`
+   * for a lifetime cap, where "this week" would falsely promise a reset.
+   */
+  period?: string;
   id?: string;
   className?: string;
 }) {
@@ -104,6 +110,7 @@ export function QuotaMeter({
 
   const used = Math.min(allowance.used, allowance.limit);
   const spent = allowance.remaining === 0;
+  const left = `${noun} left ${period}`.trim();
 
   return (
     <div id={id} className={cn('space-y-1.5', className)}>
@@ -113,7 +120,7 @@ export function QuotaMeter({
             {allowance.remaining} of {allowance.limit}
           </span>{' '}
           <span className={spent ? 'text-foreground' : 'text-muted-foreground'}>
-            {noun} left this week
+            {left}
           </span>
         </p>
 
@@ -133,7 +140,7 @@ export function QuotaMeter({
       <Progress
         value={used}
         max={allowance.limit}
-        aria-label={`${noun} used this week`}
+        aria-label={`${noun} used ${period}`.trim()}
         indicatorClassName={spent ? 'bg-chrome' : undefined}
       />
     </div>
@@ -214,5 +221,39 @@ export function ProLocked({
         Upgrade
       </Button>
     </div>
+  );
+}
+
+/**
+ * A catalogue row a Free candidate can see but not start — the ones past their
+ * lifetime practice allowance. The real title and topic stay visible but
+ * blurred, so the list reads as "there is more here" rather than a wall of
+ * placeholders, and the whole row is the checkout link. `ProTag`, not a
+ * padlock: this opens with money, and that is the distinction `status.tsx`'s
+ * `Lock` is reserved for.
+ */
+export function LockedPracticeRow({
+  source,
+  children,
+}: {
+  source: string;
+  children: ReactNode;
+}) {
+  return (
+    <li className="flex items-center justify-between gap-4 py-3">
+      <div
+        className="pointer-events-none min-w-0 select-none blur-[3px]"
+        aria-hidden
+      >
+        {children}
+      </div>
+      <Link
+        href={`/upgrade?from=${source}`}
+        aria-label="Unlock the full practice catalogue with Pro"
+        className="shrink-0"
+      >
+        <ProTag />
+      </Link>
+    </li>
   );
 }
