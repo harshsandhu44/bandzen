@@ -96,7 +96,7 @@ export async function submitSpeakingAttempt(formData: FormData) {
   // instead of looping back in. Stamped even though grading itself runs
   // after the response, same as every other mock section.
   if (attempt.kind === 'mock' && attempt.mockAttemptId) {
-    await submitMockAttempt(attempt.mockAttemptId);
+    await submitMockAttempt(userId, attempt.mockAttemptId);
     redirect(`/mock/${attempt.mockAttemptId}/result`);
   }
 
