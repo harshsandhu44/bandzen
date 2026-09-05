@@ -4,6 +4,7 @@ import { useEffect, useRef, useState, useTransition } from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { Button } from '@bandzen/ui/components/button';
+import { Checkbox } from '@bandzen/ui/components/checkbox';
 import { ConfirmDialog } from '@bandzen/ui/components/confirm-dialog';
 import { Input } from '@bandzen/ui/components/input';
 import { Select } from '@bandzen/ui/components/select';
@@ -189,11 +190,10 @@ export function ContentList({
         <ul className="divide-y divide-border border-y border-border">
           {bulk ? (
             <li className="flex items-center gap-3 py-2">
-              <input
-                type="checkbox"
+              <Checkbox
                 aria-label="Select all"
                 checked={allSelected}
-                onChange={() =>
+                onCheckedChange={() =>
                   setSelected(
                     allSelected ? new Set() : new Set(items.map((i) => i.id)),
                   )
@@ -207,11 +207,10 @@ export function ContentList({
           {items.map((item) => (
             <li key={item.id} className="flex items-center gap-3 py-3">
               {bulk ? (
-                <input
-                  type="checkbox"
+                <Checkbox
                   aria-label={`Select ${item.title}`}
                   checked={selected.has(item.id)}
-                  onChange={() => toggle(item.id)}
+                  onCheckedChange={() => toggle(item.id)}
                 />
               ) : null}
               <div className="min-w-0 flex-1">

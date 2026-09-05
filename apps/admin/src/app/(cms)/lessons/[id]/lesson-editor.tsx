@@ -2,6 +2,7 @@
 
 import { useTransition } from 'react';
 import {
+  Controller,
   useForm,
   useFieldArray,
   useWatch,
@@ -17,6 +18,7 @@ import {
   CardHeader,
   CardTitle,
 } from '@bandzen/ui/components/card';
+import { Checkbox } from '@bandzen/ui/components/checkbox';
 import { Field } from '@bandzen/ui/components/field';
 import { Input } from '@bandzen/ui/components/input';
 import { Select } from '@bandzen/ui/components/select';
@@ -174,9 +176,15 @@ function StageSection({
           {STAGE_TITLE[stageId as keyof typeof STAGE_TITLE]}
         </CardTitle>
         <label className="flex items-center gap-2 text-xs text-muted-foreground">
-          <input
-            type="checkbox"
-            {...register(`stages.${stageIndex}.present`)}
+          <Controller
+            control={control}
+            name={`stages.${stageIndex}.present`}
+            render={({ field }) => (
+              <Checkbox
+                checked={field.value}
+                onCheckedChange={field.onChange}
+              />
+            )}
           />
           Include this stage
         </label>
