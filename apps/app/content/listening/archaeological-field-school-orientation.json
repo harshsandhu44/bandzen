@@ -1,0 +1,271 @@
+{
+  "slug": "archaeological-field-school-orientation",
+  "title": "Orientation for an Archaeological Field School",
+  "topic": "A supervisor briefs students before their first week on an archaeological excavation",
+  "difficulty": 4,
+  "transcript": "Welcome to the first morning of the Hartwell archaeological field school. Before anyone starts digging, we need to cover the site routine, safety procedures and the recording system you'll use throughout the excavation.\nThe site opens to students at seven thirty each morning. Please arrive by seven twenty so you're ready for the daily briefing, which begins beside the equipment shelter at seven twenty-five.\nYour first task every morning is to sign the attendance sheet. After that, collect your gloves and the tools assigned to your excavation area. Do not take tools from another team's box without asking a supervisor.\nWe'll begin with three work areas. Area A contains the remains of a stone wall and will focus on careful excavation around the foundations. Area B includes several shallow pits, where students will concentrate on collecting soil samples. Area C covers part of an old yard and has produced large quantities of pottery fragments.\nFor the first two days, new students will rotate between the areas rather than staying in one place. This gives everyone experience with different excavation methods before permanent teams are assigned on Wednesday.\nWhen you uncover an object, leave it where it is and call your area supervisor. Do not remove it immediately, even if it appears loose. Its exact position must be recorded before anything is moved.\nEach find receives a number written on a small waterproof label. The label goes into the finds bag with the object. Never write directly on an artefact at the excavation site.\nYou'll also complete a context sheet whenever the soil changes noticeably in colour or texture. If you're uncertain whether a change is significant, ask a supervisor before beginning a new sheet.\nWe stop for lunch from twelve fifteen until one. You can eat in the rest shelter or outside the site fence, but food is not permitted inside the excavation areas.\nAt the end of the day, all tools should be cleaned at the washing station. Brushes can be rinsed with water, but metal tools must be dried before they are returned to storage.\nFinally, remember that your field notebook is part of the academic assessment. Make brief notes during the day, then add a fuller summary each evening while the details are still fresh.",
+  "matchingOptions": [
+    "Area A",
+    "Area B",
+    "Area C",
+    "equipment shelter",
+    "washing station",
+    "rest shelter"
+  ],
+  "questions": [
+    {
+      "idx": 1,
+      "kind": "multiple_choice",
+      "prompt": "What time should students arrive at the excavation site?",
+      "options": [
+        "7:15",
+        "7:20",
+        "7:25",
+        "7:30"
+      ],
+      "answer": [
+        "7:20"
+      ],
+      "evidence": "Please arrive by seven twenty so you're ready for the daily briefing, which begins beside the equipment shelter at seven twenty-five.",
+      "explanation": "Students should arrive at seven twenty, five minutes before the briefing."
+    },
+    {
+      "idx": 2,
+      "kind": "sentence_completion",
+      "prompt": "Complete the sentence. Write TWO WORDS. Students must first sign the ________ each morning.",
+      "options": null,
+      "answer": [
+        "attendance sheet"
+      ],
+      "evidence": "Your first task every morning is to sign the attendance sheet.",
+      "explanation": "Signing the attendance sheet is the first daily task."
+    },
+    {
+      "idx": 3,
+      "kind": "matching",
+      "prompt": "Which excavation area contains the remains of a stone wall?",
+      "options": null,
+      "answer": [
+        "Area A"
+      ],
+      "evidence": "Area A contains the remains of a stone wall and will focus on careful excavation around the foundations.",
+      "explanation": "The stone wall and its foundations are located in Area A."
+    },
+    {
+      "idx": 4,
+      "kind": "matching",
+      "prompt": "Which excavation area will focus on collecting soil samples?",
+      "options": null,
+      "answer": [
+        "Area B"
+      ],
+      "evidence": "Area B includes several shallow pits, where students will concentrate on collecting soil samples.",
+      "explanation": "Soil sampling is the main task described for Area B."
+    },
+    {
+      "idx": 5,
+      "kind": "matching",
+      "prompt": "Which excavation area has produced many pottery fragments?",
+      "options": null,
+      "answer": [
+        "Area C"
+      ],
+      "evidence": "Area C covers part of an old yard and has produced large quantities of pottery fragments.",
+      "explanation": "The large quantity of pottery fragments comes from Area C."
+    },
+    {
+      "idx": 6,
+      "kind": "multiple_choice",
+      "prompt": "When will permanent excavation teams be assigned?",
+      "options": [
+        "Monday",
+        "Tuesday",
+        "Wednesday",
+        "Friday"
+      ],
+      "answer": [
+        "Wednesday"
+      ],
+      "evidence": "This gives everyone experience with different excavation methods before permanent teams are assigned on Wednesday.",
+      "explanation": "Students rotate initially, with permanent teams assigned on Wednesday."
+    },
+    {
+      "idx": 7,
+      "kind": "sentence_completion",
+      "prompt": "Complete the sentence. Write ONE WORD. Before an uncovered object is moved, its exact ________ must be recorded.",
+      "options": null,
+      "answer": [
+        "position"
+      ],
+      "evidence": "Its exact position must be recorded before anything is moved.",
+      "explanation": "The object's position must be documented before removal."
+    },
+    {
+      "idx": 8,
+      "kind": "multiple_choice",
+      "prompt": "Where is the identifying number for a find written?",
+      "options": [
+        "on the artefact itself",
+        "on a waterproof label",
+        "on the outside of the tool box",
+        "on the context sheet only"
+      ],
+      "answer": [
+        "on a waterproof label"
+      ],
+      "evidence": "Each find receives a number written on a small waterproof label.",
+      "explanation": "Find numbers are written on waterproof labels rather than directly on artefacts."
+    },
+    {
+      "idx": 9,
+      "kind": "sentence_completion",
+      "prompt": "Complete the sentence. Write TWO WORDS. Students complete a ________ when the soil changes noticeably.",
+      "options": null,
+      "answer": [
+        "context sheet"
+      ],
+      "evidence": "You'll also complete a context sheet whenever the soil changes noticeably in colour or texture.",
+      "explanation": "A significant soil change requires a new context sheet."
+    },
+    {
+      "idx": 10,
+      "kind": "multiple_choice",
+      "prompt": "What must students do with metal tools before returning them to storage?",
+      "options": [
+        "label them",
+        "photograph them",
+        "dry them",
+        "oil them"
+      ],
+      "answer": [
+        "dry them"
+      ],
+      "evidence": "Brushes can be rinsed with water, but metal tools must be dried before they are returned to storage.",
+      "explanation": "Metal tools need to be dried before storage."
+    }
+  ],
+  "audioUrl": "https://pub-fbae5ca09eba4fd0820da2b390dd7ca0.r2.dev/listening/archaeological-field-school-orientation.mp3",
+  "peaks": [
+    1,
+    0.6763956899621549,
+    0.3949749951864939,
+    0.8459391170250149,
+    0.8423977150412334,
+    0.6159781209281306,
+    0.5821473913788271,
+    0.7313865224220718,
+    0.7386133297550842,
+    0.40602679279076526,
+    0.6664601006246719,
+    0.6914179620661427,
+    0.38276739684165373,
+    0.664761030734271,
+    0.645857568982757,
+    0.6549882948865635,
+    0.6092614676793435,
+    0.6722528731178398,
+    0.49769566974317947,
+    0.6096412924175156,
+    0.8202025475334722,
+    0.7474436329790624,
+    0.5832510299468103,
+    0.6698527998619055,
+    0.6881972161972387,
+    0.48947563151183754,
+    0.6857308127441587,
+    0.7313785992843568,
+    0.6670711404761858,
+    0.29082605076996,
+    0.8792359514393274,
+    0.5714778095327948,
+    0.834545306695429,
+    0.759103373546403,
+    0.7653227391114196,
+    0.49483534857010636,
+    0.4331928012343959,
+    0.1316768293784166,
+    0.8165464673375951,
+    0.5374084342564504,
+    0.5771076818825708,
+    0.6193824636623783,
+    0.41456193231992067,
+    0.13113233131125826,
+    0.7705293304621742,
+    0.6767882544766778,
+    0.5376383922394241,
+    0.4716836370235066,
+    0.3478563532604571,
+    0.5557057821626841,
+    0.8152396613138634,
+    0.6260889776683802,
+    0.7486865806448371,
+    0.7113909427617794,
+    0.40053922363660777,
+    0.676752180746058,
+    0.5397116359340679,
+    0.451716152159335,
+    0.71543191048116,
+    0.4817510558384839,
+    0.7357664812825049,
+    0.790154191327817,
+    0.7015045177373176,
+    0.6154463752544272,
+    0.43770201149977833,
+    0.8389530004000669,
+    0.7327708545183638,
+    0.5790068920640544,
+    0.6607320100703267,
+    0.6482497089518474,
+    0.666288141535109,
+    0.35541681322905705,
+    0.7361937620959516,
+    0.7825505056791394,
+    0.607317033795757,
+    0.625287397117204,
+    0.7656743611329824,
+    0.3641620013993178,
+    0.6968436194155609,
+    0.7195689358365099,
+    0.46055477376832815,
+    0.7093572524108647,
+    0.6248068330198759,
+    0.5566088600491973,
+    0.6265745599131965,
+    0.4380713122258967,
+    0.3417450336409762,
+    0.610317048937177,
+    0.5475463846788275,
+    0.46882692154764194,
+    0.4465414923253375,
+    0.33377956055030583,
+    0.6009494922214832,
+    0.5845044007564032,
+    0.4121327267441141,
+    0.8043479136500307,
+    0.6036167840328374,
+    0.34485571306746693,
+    0.6432210935089759,
+    0.6123701805023961,
+    0.3808385049765411,
+    0.5430679400219364,
+    0.6047594939064177,
+    0.6868966260591249,
+    0.3653108793336855,
+    0.7651960742742542,
+    0.5989555844996838,
+    0.9357411382750246,
+    0.5311295977924158,
+    0.4882485296963197,
+    0.625448211568598,
+    0.9777232203303196,
+    0.5812279357900128,
+    0.5193660869369406,
+    0.5068407595435153,
+    0.5702160229521502,
+    0.6958745390318856,
+    0.590778560782556,
+    0.4846455369512746,
+    0.24850619301396062
+  ],
+  "durationSeconds": 139.1804081632653
+}

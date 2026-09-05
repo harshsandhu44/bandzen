@@ -1,0 +1,85 @@
+{
+  "slug": "a-busy-day-you-handled-well",
+  "title": "Speaking — a busy day you handled well",
+  "topic": "Managing time and responsibilities",
+  "difficulty": 3,
+  "prompts": [
+    {
+      "idx": 1,
+      "part": 1,
+      "text": "What part of your daily routine is usually the busiest?",
+      "cueCardPoints": null,
+      "prepSeconds": 0,
+      "audioUrl": "https://pub-fbae5ca09eba4fd0820da2b390dd7ca0.r2.dev/speaking/a-busy-day-you-handled-well-1.mp3"
+    },
+    {
+      "idx": 2,
+      "part": 1,
+      "text": "How do you usually organize the things you need to do each day?",
+      "cueCardPoints": null,
+      "prepSeconds": 0,
+      "audioUrl": "https://pub-fbae5ca09eba4fd0820da2b390dd7ca0.r2.dev/speaking/a-busy-day-you-handled-well-2.mp3"
+    },
+    {
+      "idx": 3,
+      "part": 1,
+      "text": "What do you like to do when you have a completely free day?",
+      "cueCardPoints": null,
+      "prepSeconds": 0,
+      "audioUrl": "https://pub-fbae5ca09eba4fd0820da2b390dd7ca0.r2.dev/speaking/a-busy-day-you-handled-well-3.mp3"
+    },
+    {
+      "idx": 4,
+      "part": 2,
+      "text": "Describe a particularly busy day that you managed well. You should say:",
+      "cueCardPoints": [
+        "when the day was",
+        "what you had to do",
+        "how you organized your time",
+        "and explain how you felt at the end of the day."
+      ],
+      "prepSeconds": 60,
+      "audioUrl": "https://pub-fbae5ca09eba4fd0820da2b390dd7ca0.r2.dev/speaking/a-busy-day-you-handled-well-4.mp3"
+    },
+    {
+      "idx": 5,
+      "part": 3,
+      "text": "Why do many people feel that their lives are becoming busier?",
+      "cueCardPoints": null,
+      "prepSeconds": 0,
+      "audioUrl": "https://pub-fbae5ca09eba4fd0820da2b390dd7ca0.r2.dev/speaking/a-busy-day-you-handled-well-5.mp3"
+    },
+    {
+      "idx": 6,
+      "part": 3,
+      "text": "What are the main consequences of having too many responsibilities?",
+      "cueCardPoints": null,
+      "prepSeconds": 0,
+      "audioUrl": "https://pub-fbae5ca09eba4fd0820da2b390dd7ca0.r2.dev/speaking/a-busy-day-you-handled-well-6.mp3"
+    },
+    {
+      "idx": 7,
+      "part": 3,
+      "text": "How should employers help workers manage heavy workloads?",
+      "cueCardPoints": null,
+      "prepSeconds": 0,
+      "audioUrl": "https://pub-fbae5ca09eba4fd0820da2b390dd7ca0.r2.dev/speaking/a-busy-day-you-handled-well-7.mp3"
+    },
+    {
+      "idx": 8,
+      "part": 3,
+      "text": "In what ways has technology made time management easier or more difficult?",
+      "cueCardPoints": null,
+      "prepSeconds": 0,
+      "audioUrl": "https://pub-fbae5ca09eba4fd0820da2b390dd7ca0.r2.dev/speaking/a-busy-day-you-handled-well-8.mp3"
+    },
+    {
+      "idx": 9,
+      "part": 3,
+      "text": "How do you think attitudes toward work-life balance will change in the future?",
+      "cueCardPoints": null,
+      "prepSeconds": 0,
+      "audioUrl": "https://pub-fbae5ca09eba4fd0820da2b390dd7ca0.r2.dev/speaking/a-busy-day-you-handled-well-9.mp3"
+    }
+  ]
+}

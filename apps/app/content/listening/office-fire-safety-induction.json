@@ -1,0 +1,271 @@
+{
+  "slug": "office-fire-safety-induction",
+  "title": "Office Fire Safety Induction",
+  "topic": "A safety officer explains emergency procedures to new office employees",
+  "difficulty": 2,
+  "transcript": "Welcome to the building safety induction. Today I'll focus mainly on fire procedures, because these apply to everyone regardless of which department you work in.\nThe fire alarm is tested every Tuesday at eleven o'clock. During the test, the alarm sounds for about ten seconds and you do not need to leave the building. At any other time, treat the alarm as a real emergency.\nIf the alarm sounds, stop what you're doing and leave by the nearest safe exit. Do not wait to collect coats, bags or laptops. The lifts must never be used during an evacuation.\nThere are three emergency staircases. The main staircase beside reception is usually the quickest for staff on the first floor. Staff on the second and third floors may find the east staircase closer, while the rear staircase is mainly used by people working near the loading area.\nOnce outside, go directly to the assembly point in Meadow Car Park. Do not gather on the pavement in front of the building because emergency vehicles need clear access.\nEach department has a fire marshal wearing a yellow vest. Fire marshals check work areas as they leave, but they are not expected to delay their own evacuation to search locked rooms.\nIf you notice smoke or a small fire, activate the nearest alarm point before doing anything else. Fire extinguishers are available, but employees should only use one if they have received practical training and have a clear escape route behind them.\nVisitors are also your responsibility. If you're hosting a visitor when the alarm sounds, take them with you and report their presence to your department's fire marshal at the assembly point.\nAnyone who may need assistance using stairs should complete a personal emergency evacuation plan with Human Resources. This should be arranged before an emergency occurs, not after an alarm has sounded.\nAfter evacuation, do not re-enter the building until the senior fire marshal or the emergency services say it is safe. Even if the alarm stops, remain at the assembly point until official permission is given.",
+  "matchingOptions": [
+    "main staircase",
+    "east staircase",
+    "rear staircase",
+    "Meadow Car Park",
+    "reception",
+    "loading area"
+  ],
+  "questions": [
+    {
+      "idx": 1,
+      "kind": "multiple_choice",
+      "prompt": "When is the regular fire alarm test?",
+      "options": [
+        "Monday at 10:00",
+        "Tuesday at 11:00",
+        "Wednesday at 11:00",
+        "Friday at 10:00"
+      ],
+      "answer": [
+        "Tuesday at 11:00"
+      ],
+      "evidence": "The fire alarm is tested every Tuesday at eleven o'clock.",
+      "explanation": "The scheduled alarm test is every Tuesday at eleven."
+    },
+    {
+      "idx": 2,
+      "kind": "sentence_completion",
+      "prompt": "Complete the sentence. Write ONE WORD. Employees must not use the ________ during an evacuation.",
+      "options": null,
+      "answer": [
+        "lifts"
+      ],
+      "evidence": "The lifts must never be used during an evacuation.",
+      "explanation": "Lifts are prohibited during fire evacuations."
+    },
+    {
+      "idx": 3,
+      "kind": "matching",
+      "prompt": "Which staircase is usually quickest for employees on the first floor?",
+      "options": null,
+      "answer": [
+        "main staircase"
+      ],
+      "evidence": "The main staircase beside reception is usually the quickest for staff on the first floor.",
+      "explanation": "First-floor staff are directed toward the main staircase."
+    },
+    {
+      "idx": 4,
+      "kind": "matching",
+      "prompt": "Which staircase may be closer for staff on upper floors?",
+      "options": null,
+      "answer": [
+        "east staircase"
+      ],
+      "evidence": "Staff on the second and third floors may find the east staircase closer, while the rear staircase is mainly used by people working near the loading area.",
+      "explanation": "The east staircase may be the nearest for second- and third-floor staff."
+    },
+    {
+      "idx": 5,
+      "kind": "matching",
+      "prompt": "Where is the evacuation assembly point?",
+      "options": null,
+      "answer": [
+        "Meadow Car Park"
+      ],
+      "evidence": "Once outside, go directly to the assembly point in Meadow Car Park.",
+      "explanation": "Meadow Car Park is the designated assembly area."
+    },
+    {
+      "idx": 6,
+      "kind": "sentence_completion",
+      "prompt": "Complete the sentence. Write TWO WORDS. Department fire marshals wear a ________.",
+      "options": null,
+      "answer": [
+        "yellow vest"
+      ],
+      "evidence": "Each department has a fire marshal wearing a yellow vest.",
+      "explanation": "The yellow vest identifies the department fire marshal."
+    },
+    {
+      "idx": 7,
+      "kind": "multiple_choice",
+      "prompt": "What should an employee do first after noticing smoke or a small fire?",
+      "options": [
+        "Use an extinguisher",
+        "Call a colleague",
+        "Activate the nearest alarm point",
+        "Open a window"
+      ],
+      "answer": [
+        "Activate the nearest alarm point"
+      ],
+      "evidence": "If you notice smoke or a small fire, activate the nearest alarm point before doing anything else.",
+      "explanation": "Raising the alarm is the first required action."
+    },
+    {
+      "idx": 8,
+      "kind": "multiple_choice",
+      "prompt": "When may an employee use a fire extinguisher?",
+      "options": [
+        "Whenever the fire is small",
+        "Only after practical training and with a safe escape route",
+        "Only when a fire marshal is present",
+        "Only in the loading area"
+      ],
+      "answer": [
+        "Only after practical training and with a safe escape route"
+      ],
+      "evidence": "Fire extinguishers are available, but employees should only use one if they have received practical training and have a clear escape route behind them.",
+      "explanation": "Training and a safe way out are both required."
+    },
+    {
+      "idx": 9,
+      "kind": "sentence_completion",
+      "prompt": "Complete the sentence. Write TWO WORDS. Employees who may need help on stairs should complete a personal emergency evacuation plan with ________.",
+      "options": null,
+      "answer": [
+        "Human Resources"
+      ],
+      "evidence": "Anyone who may need assistance using stairs should complete a personal emergency evacuation plan with Human Resources.",
+      "explanation": "Human Resources arranges personal emergency evacuation plans."
+    },
+    {
+      "idx": 10,
+      "kind": "multiple_choice",
+      "prompt": "When may employees return to the building?",
+      "options": [
+        "When the alarm stops",
+        "When their manager returns",
+        "When official permission is given",
+        "After ten minutes"
+      ],
+      "answer": [
+        "When official permission is given"
+      ],
+      "evidence": "Even if the alarm stops, remain at the assembly point until official permission is given.",
+      "explanation": "The end of the alarm does not itself mean the building is safe to re-enter."
+    }
+  ],
+  "audioUrl": "https://pub-fbae5ca09eba4fd0820da2b390dd7ca0.r2.dev/listening/office-fire-safety-induction.mp3",
+  "peaks": [
+    0.9068543671232221,
+    0.5811846730381971,
+    0.48758794532923205,
+    0.7315983790858586,
+    0.37710845695684975,
+    0.5172623405664845,
+    0.5825893710893625,
+    0.48282127754634796,
+    0.24474091197046732,
+    0.7804307494418988,
+    0.4839810361854626,
+    0.45200216491500705,
+    0.47389219519522646,
+    0.5255347168648563,
+    0.9607761273053227,
+    0.43473268915306656,
+    1,
+    0.32574806309924237,
+    0.6696515442142496,
+    0.3405816898947609,
+    0.7199126947165395,
+    0.5737502850333535,
+    0.8280493913295491,
+    0.4928437881904978,
+    0.8298664583801325,
+    0.7535334777759132,
+    0.2634719429288983,
+    0.7669786698335543,
+    0.40412217817719953,
+    0.5801011551618553,
+    0.6720564738558888,
+    0.7681953078011109,
+    0.5441287463628306,
+    0.2035504801000137,
+    0.9400043206163108,
+    0.4755397930208095,
+    0.8354280100224498,
+    0.488453268765187,
+    0.6140886182055598,
+    0.4484311665555265,
+    0.3037784062326404,
+    0.577696487550506,
+    0.6643389124790084,
+    0.5759896712962885,
+    0.4067579142822696,
+    0.5898067893208524,
+    0.5438352966263177,
+    0.6549612422828888,
+    0.49341293910322537,
+    0.28942811894127163,
+    0.5772605454339286,
+    0.6981330306883289,
+    0.5430254229986904,
+    0.4506934391048099,
+    0.664356572659798,
+    0.660098704240091,
+    0.5008115935242605,
+    0.5210338609626257,
+    0.5266486118440054,
+    0.2760827617148387,
+    0.5462264953781033,
+    0.5562561578848926,
+    0.5306280231252165,
+    0.5383195362268739,
+    0.6116133778385494,
+    0.40628087358196446,
+    0.555375181404238,
+    0.5521958812856415,
+    0.6425556023564627,
+    0.3695094338513631,
+    0.2586875022775133,
+    0.6528273541869606,
+    0.508194162544148,
+    0.5260650272571562,
+    0.7566372763107014,
+    0.6066984711442583,
+    0.2436162451080989,
+    0.705354121643414,
+    0.37557637353657625,
+    0.6879243597107926,
+    0.7124148793221143,
+    0.4601051685928869,
+    0.4413911609581649,
+    0.4321536939565449,
+    0.18980616331059924,
+    0.7706364798237042,
+    0.6291009803832324,
+    0.41955528266282566,
+    0.8755495817148968,
+    0.8660400382707862,
+    0.6814199328877327,
+    0.7022021740096385,
+    0.5946432399104572,
+    0.49679925886995785,
+    0.36389656820992766,
+    0.7568221879224861,
+    0.9194259911653779,
+    0.5499847046186825,
+    0.5640032361555387,
+    0.7060904297294961,
+    0.5331327094826553,
+    0.5259992363235123,
+    0.3641114948399663,
+    0.6964997355955539,
+    0.6594022821414771,
+    0.5941653826720142,
+    0.5778375951131414,
+    0.14683442737752828,
+    0.6659866865866391,
+    0.7606999342697128,
+    0.6326619221532347,
+    0.7054220071702134,
+    0.6466867752412477,
+    0.6101151877757011,
+    0.3241816929191465,
+    0.3901546928514107,
+    0.7124245836364685,
+    0.7157637504810195,
+    0.39425330052676305,
+    0.4029571291858407
+  ],
+  "durationSeconds": 128.4063492063492
+}

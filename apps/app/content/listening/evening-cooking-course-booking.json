@@ -1,0 +1,275 @@
+{
+  "slug": "evening-cooking-course-booking",
+  "title": "Booking an Evening Cooking Course",
+  "topic": "Two people discuss available classes at a local cookery school",
+  "difficulty": 2,
+  "transcript": "Priya:\nHello, I'm calling about the evening cooking courses advertised on your website. I'm trying to choose one for my brother and me.\nEthan:\nSure. We have three beginner courses starting next month: Italian Basics, Street Food at Home and Vegetarian Weeknights.\nPriya:\nWe're both beginners, but my brother doesn't eat meat, so I suppose Italian Basics might be difficult.\nEthan:\nNot necessarily, but two of the four sessions include meat dishes. Vegetarian Weeknights would probably suit you better because every recipe is meat-free.\nPriya:\nWhat day does that course run?\nEthan:\nVegetarian Weeknights is on Wednesdays from six thirty to eight thirty. It starts on the ninth of October and runs for four weeks.\nPriya:\nWednesday works. What does it cost?\nEthan:\nThe full course is ninety-six pounds per person. That includes all ingredients, but students need to bring their own containers if they want to take food home.\nPriya:\nDo we need any special equipment?\nEthan:\nNo. Knives, pans and aprons are provided. We do recommend closed shoes, though, because you're working around hot liquids.\nPriya:\nHow large are the classes?\nEthan:\nWe normally allow twelve people, but the Wednesday class already has eight bookings, so there are four places left.\nPriya:\nCould you tell me what dishes we'll make?\nEthan:\nIn the first week, it's a chickpea curry with flatbread. Week two is mushroom dumplings. The third session covers vegetable noodles, and the final week is a lentil pie.\nPriya:\nMy brother would love the dumplings. Is the class held at your main building?\nEthan:\nNo, the evening courses are in the teaching kitchen at Brook Street Community Centre. The entrance is at the back of the building beside the small car park.\nPriya:\nCan we park there?\nEthan:\nOnly instructors can use that car park. Students normally use the public car park behind the cinema, which is about a five-minute walk away.\nPriya:\nHow do I reserve two places?\nEthan:\nI can hold them for twenty-four hours. To confirm the booking, you'll need to pay a twenty-pound deposit for each person through our website.\nPriya:\nAnd the rest is paid when the course begins?\nEthan:\nThe remaining balance is due seven days before the first class.",
+  "speakers": {
+    "Priya": "female",
+    "Ethan": "male"
+  },
+  "matchingOptions": [
+    "chickpea curry",
+    "mushroom dumplings",
+    "vegetable noodles",
+    "lentil pie",
+    "flatbread",
+    "Italian pasta"
+  ],
+  "questions": [
+    {
+      "idx": 1,
+      "kind": "multiple_choice",
+      "prompt": "Which course does Ethan recommend for Priya and her brother?",
+      "options": [
+        "Italian Basics",
+        "Street Food at Home",
+        "Vegetarian Weeknights",
+        "Advanced Baking"
+      ],
+      "answer": [
+        "Vegetarian Weeknights"
+      ],
+      "evidence": "Vegetarian Weeknights would probably suit you better because every recipe is meat-free.",
+      "explanation": "Ethan recommends Vegetarian Weeknights because Priya's brother does not eat meat."
+    },
+    {
+      "idx": 2,
+      "kind": "sentence_completion",
+      "prompt": "Complete the sentence. Write ONE WORD. The recommended course takes place on ________.",
+      "options": null,
+      "answer": [
+        "Wednesdays"
+      ],
+      "evidence": "Vegetarian Weeknights is on Wednesdays from six thirty to eight thirty.",
+      "explanation": "The course runs on Wednesday evenings."
+    },
+    {
+      "idx": 3,
+      "kind": "multiple_choice",
+      "prompt": "What is included in the course price?",
+      "options": [
+        "food containers",
+        "all ingredients",
+        "parking charges",
+        "a recipe book"
+      ],
+      "answer": [
+        "all ingredients"
+      ],
+      "evidence": "That includes all ingredients, but students need to bring their own containers if they want to take food home.",
+      "explanation": "Ingredients are included, whereas students supply their own takeaway containers."
+    },
+    {
+      "idx": 4,
+      "kind": "sentence_completion",
+      "prompt": "Complete the sentence. Write TWO WORDS. Students are advised to wear ________.",
+      "options": null,
+      "answer": [
+        "closed shoes"
+      ],
+      "evidence": "We do recommend closed shoes, though, because you're working around hot liquids.",
+      "explanation": "Closed shoes are recommended for safety."
+    },
+    {
+      "idx": 5,
+      "kind": "multiple_choice",
+      "prompt": "How many places remain in the Wednesday class?",
+      "options": [
+        "two",
+        "four",
+        "eight",
+        "twelve"
+      ],
+      "answer": [
+        "four"
+      ],
+      "evidence": "We normally allow twelve people, but the Wednesday class already has eight bookings, so there are four places left.",
+      "explanation": "Eight of twelve places have already been booked, leaving four."
+    },
+    {
+      "idx": 6,
+      "kind": "matching",
+      "prompt": "Which dish will students make in the first week?",
+      "options": null,
+      "answer": [
+        "chickpea curry"
+      ],
+      "evidence": "In the first week, it's a chickpea curry with flatbread.",
+      "explanation": "The first week's main dish is chickpea curry."
+    },
+    {
+      "idx": 7,
+      "kind": "matching",
+      "prompt": "Which dish will students make in the second week?",
+      "options": null,
+      "answer": [
+        "mushroom dumplings"
+      ],
+      "evidence": "Week two is mushroom dumplings.",
+      "explanation": "Mushroom dumplings are scheduled for the second class."
+    },
+    {
+      "idx": 8,
+      "kind": "matching",
+      "prompt": "Which dish will students make in the final week?",
+      "options": null,
+      "answer": [
+        "lentil pie"
+      ],
+      "evidence": "The third session covers vegetable noodles, and the final week is a lentil pie.",
+      "explanation": "The lentil pie is the dish planned for the fourth and final session."
+    },
+    {
+      "idx": 9,
+      "kind": "sentence_completion",
+      "prompt": "Complete the sentence. Write TWO WORDS. The course is held at Brook Street ________.",
+      "options": null,
+      "answer": [
+        "Community Centre"
+      ],
+      "evidence": "No, the evening courses are in the teaching kitchen at Brook Street Community Centre.",
+      "explanation": "The teaching kitchen is located at Brook Street Community Centre."
+    },
+    {
+      "idx": 10,
+      "kind": "multiple_choice",
+      "prompt": "How much deposit is required for each person?",
+      "options": [
+        "ten pounds",
+        "twenty pounds",
+        "forty pounds",
+        "ninety-six pounds"
+      ],
+      "answer": [
+        "twenty pounds"
+      ],
+      "evidence": "To confirm the booking, you'll need to pay a twenty-pound deposit for each person through our website.",
+      "explanation": "Each participant must pay a twenty-pound deposit."
+    }
+  ],
+  "audioUrl": "https://pub-fbae5ca09eba4fd0820da2b390dd7ca0.r2.dev/listening/evening-cooking-course-booking.mp3",
+  "peaks": [
+    0.44307882400445375,
+    0.5503548262392597,
+    0.4142489712495609,
+    0.424485285364605,
+    0.28275461530910695,
+    0.4691837515396616,
+    0.45774316848549296,
+    0.7182409589156611,
+    0.6839214778471838,
+    0.6998557192493345,
+    0.4653210793921394,
+    0.5513932184050045,
+    0.4141944032413624,
+    0.6124636951819128,
+    0.6372029595386102,
+    0.32284654740909624,
+    0.50278102636613,
+    0.5231935154639712,
+    0.30358609047066454,
+    0.39302093900897833,
+    0.4230538543805676,
+    0.2317343453508113,
+    0.685268535398639,
+    0.6713660715113846,
+    0.582164508614078,
+    0.4958815020952526,
+    0.4835187198804189,
+    0.4554176955040803,
+    0.5492632977363257,
+    0.7505245890595797,
+    0.5325772480038052,
+    0.4494815378773385,
+    0.4106844610406731,
+    0.7014270778526326,
+    0.6137575267681148,
+    0.45059432381392334,
+    0.4046895723476526,
+    0.5055614885316326,
+    0.4714485935288513,
+    0.5019439648424858,
+    0.43620779565879453,
+    0.3281040352589169,
+    0.29504325701212225,
+    0.7302037009913541,
+    0.6673742931257572,
+    0.5360890931170292,
+    0.5117682054011727,
+    0.7310151103499367,
+    0.5078762142390153,
+    0.6946895145011243,
+    0.5223746794046537,
+    0.4030041506965658,
+    0.5930728582468129,
+    0.4612255306845561,
+    0.6808639286921977,
+    0.5545620608856885,
+    0.43704780643612345,
+    0.6230315664674246,
+    0.5257931118931883,
+    0.7160162226326091,
+    0.42406990530321814,
+    0.4242495555452464,
+    1,
+    0.6680950654045256,
+    0.4799558607613337,
+    0.6311942203037518,
+    0.39200571977195914,
+    0.7093371415122525,
+    0.4128974757780931,
+    0.5759539450738679,
+    0.36079882163871213,
+    0.8184610080195871,
+    0.5240148846383267,
+    0.7503968480603725,
+    0.45410860332477554,
+    0.6936400177193222,
+    0.5833921953291631,
+    0.7160300344664009,
+    0.673999061211857,
+    0.6145537272871415,
+    0.5955391001521996,
+    0.6720296435240911,
+    0.5258104451204155,
+    0.5211092895550115,
+    0.239344184939082,
+    0.4530420479907834,
+    0.408656349978283,
+    0.6090733345527142,
+    0.5338277668101065,
+    0.413571732189518,
+    0.5882355206822533,
+    0.3484225685641488,
+    0.6467044370579155,
+    0.45620191087693274,
+    0.5096973983654106,
+    0.47667815293829685,
+    0.7469923302011166,
+    0.7469364114537002,
+    0.39437721396616066,
+    0.5695261423412408,
+    0.6482075126162051,
+    0.5956572234011859,
+    0.5955755728299985,
+    0.7743293940406087,
+    0.6394726503025214,
+    0.48935840781408135,
+    0.7777044859767882,
+    0.8668319229687833,
+    0.6046913062021736,
+    0.5970224079559294,
+    0.6942812795547704,
+    0.6453125349576693,
+    0.7051557293916161,
+    0.552460513619935,
+    0.4925882426709305,
+    0.41863455273743666,
+    0.6898849091818782,
+    0.6507818939562738,
+    0.45045674757232257,
+    0.39915653471251544
+  ],
+  "durationSeconds": 132.70204081632653
+}

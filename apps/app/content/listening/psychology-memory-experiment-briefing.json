@@ -1,0 +1,269 @@
+{
+  "slug": "psychology-memory-experiment-briefing",
+  "title": "Briefing for a Memory Experiment",
+  "topic": "A psychology researcher explains the procedure for a student memory experiment",
+  "difficulty": 4,
+  "transcript": "Thank you for taking part in today's memory study. Before we begin, I'll explain the procedure so that everyone completes the experiment under the same conditions.\nThe study has three stages and should take about forty-five minutes in total. Please switch off your phone rather than putting it on silent, because even a vibration can distract you during the memory tasks.\nIn the first stage, you will see a series of twenty-four everyday objects on the computer screen. Each image appears for three seconds. You do not need to write anything down while the images are being shown.\nImmediately afterwards, you will have two minutes to type the names of as many objects as you can remember. Spelling is not important as long as the word is clearly recognisable.\nThe second stage uses short word lists. You will hear twelve words through headphones, followed by a thirty-second distraction task involving simple arithmetic. After the arithmetic task, you will write down the words you remember.\nPlease do not try to create a story linking the words together. We are interested in spontaneous recall rather than deliberate memory strategies.\nThere will then be a five-minute break. You may leave your seat and get water, but please remain inside the laboratory and do not discuss the experiment with other participants.\nThe final stage is a recognition test. You will see forty words on the screen. Half appeared in the earlier listening task and half are new. For each word, select either seen before or new.\nSome participants worry that poor performance will affect their course grade. It will not. Your individual score is anonymous and is not shared with teaching staff.\nAt the end, you will complete a short questionnaire about sleep, caffeine and how difficult you found each task. Please answer honestly rather than trying to guess what result the researchers expect.\nWhen everyone has finished, I will explain the purpose of the experiment in more detail. Until then, please avoid discussing the tasks with students who are scheduled to participate later this week.",
+  "matchingOptions": null,
+  "questions": [
+    {
+      "idx": 1,
+      "kind": "multiple_choice",
+      "prompt": "Approximately how long will the whole experiment take?",
+      "options": [
+        "thirty minutes",
+        "forty-five minutes",
+        "one hour",
+        "ninety minutes"
+      ],
+      "answer": [
+        "forty-five minutes"
+      ],
+      "evidence": "The study has three stages and should take about forty-five minutes in total.",
+      "explanation": "The researcher estimates the complete study will take about forty-five minutes."
+    },
+    {
+      "idx": 2,
+      "kind": "sentence_completion",
+      "prompt": "Complete the sentence. Write ONE WORD. Participants should switch off their ________ before the experiment begins.",
+      "options": null,
+      "answer": [
+        "phone"
+      ],
+      "evidence": "Please switch off your phone rather than putting it on silent, because even a vibration can distract you during the memory tasks.",
+      "explanation": "Phones must be switched off to reduce distraction."
+    },
+    {
+      "idx": 3,
+      "kind": "multiple_choice",
+      "prompt": "How many object images are shown during the first stage?",
+      "options": [
+        "twelve",
+        "twenty",
+        "twenty-four",
+        "forty"
+      ],
+      "answer": [
+        "twenty-four"
+      ],
+      "evidence": "In the first stage, you will see a series of twenty-four everyday objects on the computer screen.",
+      "explanation": "The first memory task uses twenty-four object images."
+    },
+    {
+      "idx": 4,
+      "kind": "sentence_completion",
+      "prompt": "Complete the sentence. Write ONE WORD AND/OR A NUMBER. Each object image remains on screen for ________ seconds.",
+      "options": null,
+      "answer": [
+        "three"
+      ],
+      "evidence": "Each image appears for three seconds.",
+      "explanation": "Every object is displayed for three seconds."
+    },
+    {
+      "idx": 5,
+      "kind": "multiple_choice",
+      "prompt": "What happens immediately after the object images are shown?",
+      "options": [
+        "Participants complete arithmetic problems",
+        "Participants type the object names they remember",
+        "Participants listen to a word list",
+        "Participants take a five-minute break"
+      ],
+      "answer": [
+        "Participants type the object names they remember"
+      ],
+      "evidence": "Immediately afterwards, you will have two minutes to type the names of as many objects as you can remember.",
+      "explanation": "The first recall test follows immediately after the images."
+    },
+    {
+      "idx": 6,
+      "kind": "sentence_completion",
+      "prompt": "Complete the sentence. Write ONE WORD. During the second stage, participants hear the words through ________.",
+      "options": null,
+      "answer": [
+        "headphones"
+      ],
+      "evidence": "You will hear twelve words through headphones, followed by a thirty-second distraction task involving simple arithmetic.",
+      "explanation": "The word list is delivered through headphones."
+    },
+    {
+      "idx": 7,
+      "kind": "multiple_choice",
+      "prompt": "What is the purpose of the arithmetic task?",
+      "options": [
+        "To test mathematical ability",
+        "To distract participants before recall",
+        "To determine the final score",
+        "To teach a memory strategy"
+      ],
+      "answer": [
+        "To distract participants before recall"
+      ],
+      "evidence": "You will hear twelve words through headphones, followed by a thirty-second distraction task involving simple arithmetic.",
+      "explanation": "The arithmetic is explicitly described as a distraction task before recall."
+    },
+    {
+      "idx": 8,
+      "kind": "sentence_completion",
+      "prompt": "Complete the sentence. Write ONE WORD AND/OR A NUMBER. The break lasts ________ minutes.",
+      "options": null,
+      "answer": [
+        "five"
+      ],
+      "evidence": "There will then be a five-minute break.",
+      "explanation": "Participants receive a five-minute break."
+    },
+    {
+      "idx": 9,
+      "kind": "multiple_choice",
+      "prompt": "What proportion of the words in the final recognition test are new?",
+      "options": [
+        "one quarter",
+        "one third",
+        "one half",
+        "three quarters"
+      ],
+      "answer": [
+        "one half"
+      ],
+      "evidence": "Half appeared in the earlier listening task and half are new.",
+      "explanation": "Twenty of the forty recognition-test words are new."
+    },
+    {
+      "idx": 10,
+      "kind": "sentence_completion",
+      "prompt": "Complete the sentence. Write TWO WORDS. Individual scores are not shared with ________.",
+      "options": null,
+      "answer": [
+        "teaching staff"
+      ],
+      "evidence": "Your individual score is anonymous and is not shared with teaching staff.",
+      "explanation": "The researcher reassures participants that teaching staff will not receive individual results."
+    }
+  ],
+  "audioUrl": "https://pub-fbae5ca09eba4fd0820da2b390dd7ca0.r2.dev/listening/psychology-memory-experiment-briefing.mp3",
+  "peaks": [
+    0.7520370292631879,
+    0.6021295141825489,
+    0.10589424342659827,
+    0.6537124820611253,
+    0.5865049304963901,
+    0.5782324959737304,
+    0.4789384295225992,
+    0.607823358249363,
+    0.34940722876256114,
+    0.5455734081050906,
+    0.5305215606535177,
+    0.5074996909094696,
+    0.4945995821208167,
+    0.05477827655146988,
+    0.5847903696295914,
+    0.5680650847916026,
+    0.3388405017452999,
+    0.6920092677815824,
+    0.4840698697658614,
+    0.4948229173290332,
+    0.17692053741858293,
+    0.7186783456901676,
+    0.5840082377201405,
+    0.4826159476734191,
+    0.5195443362631352,
+    0.3151398247877428,
+    0.3748858926808339,
+    0.47818349715131936,
+    0.3222026632115647,
+    0.8228300196668547,
+    0.7144070913042148,
+    0.5450659741135216,
+    0.24354161893357051,
+    1,
+    0.6167834650236809,
+    0.46529195025969156,
+    0.6119741901612674,
+    0.39829075315212653,
+    0.23904700563439957,
+    0.553373258737744,
+    0.5504914381937291,
+    0.555390222064362,
+    0.5126973977605706,
+    0.32798912868563274,
+    0.5499446376789509,
+    0.3923411348663584,
+    0.5355638940196313,
+    0.5216563197463094,
+    0.3627939879998186,
+    0.6539970391352351,
+    0.42918628677331927,
+    0.5262292676105028,
+    0.4308873963679443,
+    0.4194840345847686,
+    0.47018000039444025,
+    0.7829837258822727,
+    0.6934000878555542,
+    0.05236483658690387,
+    0.6619247033529444,
+    0.6301618467315688,
+    0.44442379187513453,
+    0.6198036611773156,
+    0.7239986979491211,
+    0.5931164684909388,
+    0.7176700665578761,
+    0.23854396921619764,
+    0.9113481179896257,
+    0.49017643988594056,
+    0.9580500658497432,
+    0.5557791283064333,
+    0.7428129814799981,
+    0.4792967533158881,
+    0.6477727702956182,
+    0.4191806896725041,
+    0.2760102932154231,
+    0.5109890190929843,
+    0.569312813846265,
+    0.3724214236057319,
+    0.840766885650652,
+    0.5007684226924921,
+    0.5089022267909603,
+    0.7763341620551895,
+    0.39768109872227586,
+    0.5411552381747965,
+    0.4556758080357392,
+    0.6606006612641756,
+    0.7007442814660239,
+    0.38454157741434997,
+    0.6680849935839632,
+    0.6258888249797944,
+    0.43464306536916697,
+    0.1748994202451792,
+    0.2882042221972699,
+    0.8005007541679316,
+    0.6510661320505298,
+    0.59416617939891,
+    0.28613919057540926,
+    0.4433022524270007,
+    0.8647763679181631,
+    0.5322902726019424,
+    0.49381435777385946,
+    0.6619821129110169,
+    0.6900487359752698,
+    0.4717091963725312,
+    0.4945411445374377,
+    0.8090727129481351,
+    0.8118123436126808,
+    0.6639353864748478,
+    0.34408781329490046,
+    0.757272701874592,
+    0.7365973362781602,
+    0.6147917657786894,
+    0.6852569812945118,
+    0.26068712785035236,
+    0.7009195364118502,
+    0.5901933051091572,
+    0.4780061452982586,
+    0.5526980700652182,
+    0.39999076174732145,
+    0.29734610116116444
+  ],
+  "durationSeconds": 123.90167800453514
+}

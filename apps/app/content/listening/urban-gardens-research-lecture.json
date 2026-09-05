@@ -1,0 +1,269 @@
+{
+  "slug": "urban-gardens-research-lecture",
+  "title": "Researching Urban Community Gardens",
+  "topic": "A lecturer introduces a research project on community gardens in cities",
+  "difficulty": 4,
+  "transcript": "Today I'd like to introduce the research project you'll be working on for the next four weeks. The project looks at how community gardens affect life in densely populated neighbourhoods. We're interested not only in food production, but also in social contact, biodiversity and residents' attitudes toward public space.\nYou'll work in teams of four. Each team will study one garden and compare information from three different sources: observations, short interviews and council records. You should not rely on questionnaires for this project because previous classes found that the response rate was too low.\nYour first visit should focus on observation. Spend at least forty minutes at the site and record how people use different areas of the garden. For example, note whether people are gardening alone, talking in groups, supervising children or simply passing through.\nDuring the second visit, you'll conduct short interviews. Aim for six participants per team. Keep each interview under ten minutes, because we want spontaneous responses rather than detailed life histories.\nAsk participants what originally brought them to the garden and whether their reasons for visiting have changed over time. Do not ask for their full names. You only need to record their age group and how often they visit.\nThe council records provide background information. They may include the year the garden opened, the original funding source and changes in the size of the site. Some councils also record complaints from nearby residents, though this information is not available for every garden.\nFor the biodiversity section, you are not expected to identify every species. Instead, record the number of flowering plant types you can distinguish and note any birds or insects observed during a twenty-minute period.\nBe consistent about the time of day. If your first biodiversity observation takes place in the morning, your second should also be in the morning. Comparing a morning visit with an evening visit would introduce an unnecessary variable.\nYour final presentation should last eight minutes, followed by two minutes for questions. Include one map of the garden, two photographs and one graph. The graph should present a comparison, rather than simply showing a list of totals.\nPlease upload your presentation slides by six o'clock on the Monday before presentation week. That gives me enough time to check that every file opens correctly before the sessions begin.",
+  "matchingOptions": null,
+  "questions": [
+    {
+      "idx": 1,
+      "kind": "multiple_choice",
+      "prompt": "How long will students work on the research project?",
+      "options": [
+        "two weeks",
+        "three weeks",
+        "four weeks",
+        "six weeks"
+      ],
+      "answer": [
+        "four weeks"
+      ],
+      "evidence": "Today I'd like to introduce the research project you'll be working on for the next four weeks.",
+      "explanation": "The lecturer states that the project runs for four weeks."
+    },
+    {
+      "idx": 2,
+      "kind": "sentence_completion",
+      "prompt": "Complete the sentence. Write ONE WORD AND/OR A NUMBER. Students will work in teams of ________.",
+      "options": null,
+      "answer": [
+        "four"
+      ],
+      "evidence": "You'll work in teams of four.",
+      "explanation": "Each team consists of four students."
+    },
+    {
+      "idx": 3,
+      "kind": "multiple_choice",
+      "prompt": "Why are questionnaires not being used?",
+      "options": [
+        "They cost too much to print",
+        "The questions are difficult to design",
+        "The response rate was too low",
+        "Council permission is required"
+      ],
+      "answer": [
+        "The response rate was too low"
+      ],
+      "evidence": "You should not rely on questionnaires for this project because previous classes found that the response rate was too low.",
+      "explanation": "Previous students received too few questionnaire responses."
+    },
+    {
+      "idx": 4,
+      "kind": "sentence_completion",
+      "prompt": "Complete the sentence. Write ONE WORD AND/OR A NUMBER. Students should spend at least ________ minutes observing the garden during their first visit.",
+      "options": null,
+      "answer": [
+        "forty"
+      ],
+      "evidence": "Spend at least forty minutes at the site and record how people use different areas of the garden.",
+      "explanation": "The minimum observation period is forty minutes."
+    },
+    {
+      "idx": 5,
+      "kind": "multiple_choice",
+      "prompt": "How many interview participants should each team aim for?",
+      "options": [
+        "four",
+        "six",
+        "eight",
+        "ten"
+      ],
+      "answer": [
+        "six"
+      ],
+      "evidence": "Aim for six participants per team.",
+      "explanation": "The lecturer sets a target of six interview participants for each team."
+    },
+    {
+      "idx": 6,
+      "kind": "sentence_completion",
+      "prompt": "Complete the sentence. Write TWO WORDS. Instead of participants' full names, students should record their ________.",
+      "options": null,
+      "answer": [
+        "age group"
+      ],
+      "evidence": "You only need to record their age group and how often they visit.",
+      "explanation": "Age group is one of the limited pieces of personal information students should record."
+    },
+    {
+      "idx": 7,
+      "kind": "multiple_choice",
+      "prompt": "Which information may be missing from some council records?",
+      "options": [
+        "the opening year",
+        "the original funding source",
+        "complaints from nearby residents",
+        "changes in the size of the site"
+      ],
+      "answer": [
+        "complaints from nearby residents"
+      ],
+      "evidence": "Some councils also record complaints from nearby residents, though this information is not available for every garden.",
+      "explanation": "Complaints data is specifically described as unavailable for some gardens."
+    },
+    {
+      "idx": 8,
+      "kind": "sentence_completion",
+      "prompt": "Complete the sentence. Write ONE WORD. During biodiversity observations, students should note birds and ________.",
+      "options": null,
+      "answer": [
+        "insects"
+      ],
+      "evidence": "Instead, record the number of flowering plant types you can distinguish and note any birds or insects observed during a twenty-minute period.",
+      "explanation": "The lecturer asks students to record observations of birds and insects."
+    },
+    {
+      "idx": 9,
+      "kind": "multiple_choice",
+      "prompt": "Why should biodiversity observations be carried out at a consistent time of day?",
+      "options": [
+        "The garden may close in the evening",
+        "It reduces an unnecessary variable",
+        "Birds are only active in the morning",
+        "The council requires morning visits"
+      ],
+      "answer": [
+        "It reduces an unnecessary variable"
+      ],
+      "evidence": "Comparing a morning visit with an evening visit would introduce an unnecessary variable.",
+      "explanation": "Keeping the time consistent prevents time of day from affecting the comparison."
+    },
+    {
+      "idx": 10,
+      "kind": "sentence_completion",
+      "prompt": "Complete the sentence. Write ONE WORD AND/OR A NUMBER. The final presentation should last ________ minutes before questions.",
+      "options": null,
+      "answer": [
+        "eight"
+      ],
+      "evidence": "Your final presentation should last eight minutes, followed by two minutes for questions.",
+      "explanation": "Students have eight minutes for the presentation itself."
+    }
+  ],
+  "audioUrl": "https://pub-fbae5ca09eba4fd0820da2b390dd7ca0.r2.dev/listening/urban-gardens-research-lecture.mp3",
+  "peaks": [
+    1,
+    0.6428176141860653,
+    0.6909862704007601,
+    0.3434380688578569,
+    0.5501403140264276,
+    0.7533964549008489,
+    0.483701872041233,
+    0.4057945694848932,
+    0.539176150653999,
+    0.7447044620226574,
+    0.5359773778911291,
+    0.588555385496452,
+    0.6659665510763972,
+    0.5988304095072584,
+    0.3193965968486523,
+    0.7069026265686394,
+    0.49522160592471803,
+    0.6415473482122928,
+    0.7998528143295125,
+    0.6298126941746653,
+    0.4304450356166793,
+    0.6047050452666475,
+    0.7235188020090524,
+    0.3301337860560182,
+    0.6528864016918003,
+    0.4315933461080108,
+    0.5141677489022801,
+    0.582594488385703,
+    0.29873378470801454,
+    0.610039730201797,
+    0.4863470798650715,
+    0.4851270415275826,
+    0.5705851443117101,
+    0.5577361435520922,
+    0.5395275431271377,
+    0.2612272293435382,
+    0.6373580686532021,
+    0.8331482749240864,
+    0.7258560277117576,
+    0.6896708609525918,
+    0.6833094580770194,
+    0.4273299957399048,
+    0.5815819662652458,
+    0.697938704824509,
+    0.47743087245021515,
+    0.528720535111427,
+    0.3545663423223313,
+    0.20113778124968107,
+    0.7679545626439587,
+    0.6940234557980516,
+    0.6491789022040865,
+    0.7310751119969243,
+    0.4096388991928364,
+    0.5148638465493085,
+    0.7137796260364047,
+    0.6477877648855445,
+    0.6423636350620744,
+    0.3954227070969574,
+    0.5619077171974989,
+    0.4119100691649092,
+    0.7852468786933803,
+    0.47600827679574925,
+    0.449938956742291,
+    0.4618433106722798,
+    0.517555617986767,
+    0.2709775272145758,
+    0.8342004228471404,
+    0.5979636253621752,
+    0.8205874645001844,
+    0.6138039191729389,
+    0.42584969587588956,
+    0.6015139752709582,
+    0.5481959616957393,
+    0.6214977315645731,
+    0.6898925564474734,
+    0.5475981511302349,
+    0.23267983376749385,
+    0.6505695717117654,
+    0.5955283167580084,
+    0.6005416650302388,
+    0.3373937312839782,
+    0.6198068639228562,
+    0.6893368916935266,
+    0.5620269944465465,
+    0.6080911151498635,
+    0.674048138162411,
+    0.5197448254791044,
+    0.3907707668901614,
+    0.4700352120819087,
+    0.46297402062284804,
+    0.4979050498680072,
+    0.6278693746265231,
+    0.5391503771535507,
+    0.6133961863003106,
+    0.4714649556097933,
+    0.40220915773977134,
+    0.780027810338785,
+    0.5140066008309536,
+    0.7179025736231344,
+    0.24092676137039198,
+    0.6970408361888615,
+    0.5514107499569163,
+    0.5457103507090112,
+    0.39664831164541914,
+    0.793926063034695,
+    0.3869602192068138,
+    0.48329647502678563,
+    0.4511752009251614,
+    0.5582181372101916,
+    0.7323969923372867,
+    0.5654956036760835,
+    0.387345361560713,
+    0.6577680828739698,
+    0.4856305937665239,
+    0.7007348372773277,
+    0.35380917439106757,
+    0.7107006813989252,
+    0.5278735280454231,
+    0.5169306804508426,
+    0.40372285598389307
+  ],
+  "durationSeconds": 151.16190476190476
+}

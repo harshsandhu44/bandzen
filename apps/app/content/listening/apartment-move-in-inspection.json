@@ -1,0 +1,275 @@
+{
+  "slug": "apartment-move-in-inspection",
+  "title": "An Apartment Move-In Inspection",
+  "topic": "A tenant and property manager inspect a rented apartment before move-in",
+  "difficulty": 2,
+  "transcript": "Sofia:\nThanks for meeting me. I thought it would be useful to go through the inspection form before I bring my furniture tomorrow.\nMarcus:\nDefinitely. We'll start in the kitchen and work clockwise around the apartment. Anything we record today won't be treated as damage caused by you later.\nSofia:\nI noticed a small crack in one of the kitchen tiles, just beside the fridge.\nMarcus:\nI've already written that down. The crack is cosmetic, so we won't replace the tile immediately, but it's now on the record.\nSofia:\nThe oven seems fine, but I couldn't get the light inside it to come on.\nMarcus:\nThat's because the bulb has gone. I'll ask maintenance to replace the oven bulb before Friday.\nSofia:\nThanks. What about this tap? It drips for a few seconds after I turn it off.\nMarcus:\nI'll add the kitchen tap to the repair list. A plumber is already coming to the building on Thursday afternoon.\nSofia:\nIn the living room, there are two marks on the wall behind where the sofa will go.\nMarcus:\nI can see them. They're light enough that repainting isn't necessary, but I'll photograph both marks for the inspection record.\nSofia:\nThe balcony door was quite stiff when I tried it yesterday.\nMarcus:\nIt's safe, but the lower hinge needs adjusting. Maintenance can do that at the same time as the oven bulb.\nSofia:\nShould we check the bedroom next?\nMarcus:\nYes. The carpet was professionally cleaned on Monday, so these darker patches are just areas that haven't dried completely yet.\nSofia:\nI was worried they were stains.\nMarcus:\nNo, they should disappear by tomorrow. The wardrobe door, however, does have a loose handle, and I'll arrange for that to be tightened.\nSofia:\nThe bathroom looks fine to me apart from the shower pressure. It seems a little weak.\nMarcus:\nThat's normal for this floor in the morning, but it improves after about ten. We checked the system last month and there isn't a fault.\nSofia:\nRight. How do I report a problem after I move in?\nMarcus:\nFor routine repairs, use the tenant portal. If it's something urgent, like a serious water leak, call the emergency number on the notice beside the front door.\nSofia:\nAnd when do I receive the final inspection form?\nMarcus:\nI'll email a copy to you this evening. You have forty-eight hours to tell us if you notice anything we've missed.",
+  "speakers": {
+    "Sofia": "female",
+    "Marcus": "male"
+  },
+  "matchingOptions": [
+    "kitchen",
+    "living room",
+    "balcony",
+    "bedroom",
+    "bathroom",
+    "entrance hall"
+  ],
+  "questions": [
+    {
+      "idx": 1,
+      "kind": "multiple_choice",
+      "prompt": "Why are Sofia and Marcus recording problems before she moves in?",
+      "options": [
+        "To decide the monthly rent",
+        "To identify damage that already exists",
+        "To arrange new furniture",
+        "To calculate cleaning costs"
+      ],
+      "answer": [
+        "To identify damage that already exists"
+      ],
+      "evidence": "Anything we record today won't be treated as damage caused by you later.",
+      "explanation": "The inspection protects Sofia from being blamed for pre-existing damage."
+    },
+    {
+      "idx": 2,
+      "kind": "matching",
+      "prompt": "In which area is there a cracked tile?",
+      "options": null,
+      "answer": [
+        "kitchen"
+      ],
+      "evidence": "I noticed a small crack in one of the kitchen tiles, just beside the fridge.",
+      "explanation": "Sofia identifies a cracked tile in the kitchen."
+    },
+    {
+      "idx": 3,
+      "kind": "sentence_completion",
+      "prompt": "Complete the sentence. Write TWO WORDS. Maintenance will replace the ________ before Friday.",
+      "options": null,
+      "answer": [
+        "oven bulb"
+      ],
+      "evidence": "I'll ask maintenance to replace the oven bulb before Friday.",
+      "explanation": "The failed oven light is due to the bulb, which will be replaced."
+    },
+    {
+      "idx": 4,
+      "kind": "multiple_choice",
+      "prompt": "When is the plumber expected at the building?",
+      "options": [
+        "Wednesday morning",
+        "Thursday morning",
+        "Thursday afternoon",
+        "Friday afternoon"
+      ],
+      "answer": [
+        "Thursday afternoon"
+      ],
+      "evidence": "A plumber is already coming to the building on Thursday afternoon.",
+      "explanation": "Marcus says the plumber is scheduled for Thursday afternoon."
+    },
+    {
+      "idx": 5,
+      "kind": "matching",
+      "prompt": "In which area will two existing marks be photographed?",
+      "options": null,
+      "answer": [
+        "living room"
+      ],
+      "evidence": "They're light enough that repainting isn't necessary, but I'll photograph both marks for the inspection record.",
+      "explanation": "The marks Sofia identifies are on the living-room wall."
+    },
+    {
+      "idx": 6,
+      "kind": "matching",
+      "prompt": "In which area does a hinge need adjusting?",
+      "options": null,
+      "answer": [
+        "balcony"
+      ],
+      "evidence": "It's safe, but the lower hinge needs adjusting.",
+      "explanation": "Marcus is discussing the stiff balcony door when he mentions the lower hinge."
+    },
+    {
+      "idx": 7,
+      "kind": "sentence_completion",
+      "prompt": "Complete the sentence. Write ONE WORD. The bedroom ________ was professionally cleaned on Monday.",
+      "options": null,
+      "answer": [
+        "carpet"
+      ],
+      "evidence": "The carpet was professionally cleaned on Monday, so these darker patches are just areas that haven't dried completely yet.",
+      "explanation": "The bedroom carpet had recently been professionally cleaned."
+    },
+    {
+      "idx": 8,
+      "kind": "multiple_choice",
+      "prompt": "What does Marcus say about the weak shower pressure?",
+      "options": [
+        "A plumber will repair it",
+        "It is caused by a blocked shower head",
+        "It is normal on that floor in the morning",
+        "It began after a recent inspection"
+      ],
+      "answer": [
+        "It is normal on that floor in the morning"
+      ],
+      "evidence": "That's normal for this floor in the morning, but it improves after about ten.",
+      "explanation": "Marcus says the lower morning pressure is normal and not a fault."
+    },
+    {
+      "idx": 9,
+      "kind": "sentence_completion",
+      "prompt": "Complete the sentence. Write TWO WORDS. Routine repairs should be reported through the ________.",
+      "options": null,
+      "answer": [
+        "tenant portal"
+      ],
+      "evidence": "For routine repairs, use the tenant portal.",
+      "explanation": "The tenant portal is the required channel for non-urgent repair requests."
+    },
+    {
+      "idx": 10,
+      "kind": "multiple_choice",
+      "prompt": "How long does Sofia have to report anything missing from the inspection form?",
+      "options": [
+        "twenty-four hours",
+        "forty-eight hours",
+        "three days",
+        "one week"
+      ],
+      "answer": [
+        "forty-eight hours"
+      ],
+      "evidence": "You have forty-eight hours to tell us if you notice anything we've missed.",
+      "explanation": "Marcus gives Sofia forty-eight hours to report additional issues."
+    }
+  ],
+  "audioUrl": "https://pub-fbae5ca09eba4fd0820da2b390dd7ca0.r2.dev/listening/apartment-move-in-inspection.mp3",
+  "peaks": [
+    0.6108188725846331,
+    0.4526151655254111,
+    0.4169441097259935,
+    0.4334906712867929,
+    0.4900774675970948,
+    0.41926338440126737,
+    0.8419763395737014,
+    0.7295637554316449,
+    0.5473085420354292,
+    0.6820140655344584,
+    0.45749689090016193,
+    0.6015449042008186,
+    0.7276925941328019,
+    0.5093941144554442,
+    0.5823758153996796,
+    0.48477544117396726,
+    0.46918102559621766,
+    0.3582993560470832,
+    0.3052389203504923,
+    0.33737729564667734,
+    0.7370623461832737,
+    0.39622323235820966,
+    0.6181334880231397,
+    0.6113840922147974,
+    0.5764212984932803,
+    0.5817858300077231,
+    0.5506631997210032,
+    0.5463641455559206,
+    0.38523069179119823,
+    0.47359081786742446,
+    0.5741614616870593,
+    1,
+    0.6128965598801542,
+    0.6386898783273848,
+    0.710160249648559,
+    0.5799652684457499,
+    0.36042452505697375,
+    0.558714596785195,
+    0.2633085906981788,
+    0.4272228401409968,
+    0.4164549561786287,
+    0.9095504202542289,
+    0.7091063537201728,
+    0.4582600171100758,
+    0.7493958287282231,
+    0.5192255424808663,
+    0.5555648197688391,
+    0.4933351256920385,
+    0.5166419678684163,
+    0.4412632590985289,
+    0.4265991867600774,
+    0.45138651645540884,
+    0.775026274676172,
+    0.5609552093841714,
+    0.6233862857469823,
+    0.7144585981843046,
+    0.4727890063168942,
+    0.4395466687052434,
+    0.49833748474442396,
+    0.3909730130097412,
+    0.35592580854117495,
+    0.5363375340754121,
+    0.7620786247660029,
+    0.45043333278091036,
+    0.5335636762379026,
+    0.5063908129594382,
+    0.6014033733847524,
+    0.48126589474824377,
+    0.5293276649917718,
+    0.3586426483935839,
+    0.6560593543263269,
+    0.5193140296259726,
+    0.5067404726700729,
+    0.5464399081924118,
+    0.5235621227746583,
+    0.5140147460531149,
+    0.5585903051342717,
+    0.5997750382981052,
+    0.6492587030204539,
+    0.7126906521506748,
+    0.8184200282653941,
+    0.9881282487033122,
+    0.9181437735152089,
+    0.533024261584712,
+    0.9159230792243038,
+    0.4908634847438742,
+    0.4649813722289891,
+    0.5248305134184077,
+    0.38087329984964935,
+    0.4061339559686141,
+    0.6057197248722561,
+    0.8148216918320383,
+    0.6602163956553467,
+    0.8235267054254636,
+    0.5629011023502419,
+    0.6248944067005661,
+    0.6163157642893303,
+    0.8939211706804348,
+    0.3354374021309689,
+    0.586812935814146,
+    0.45353944494937676,
+    0.9443644504206276,
+    0.8818001477866757,
+    0.8497823357454861,
+    0.6543195141623395,
+    0.7750950444870257,
+    0.9748090095377536,
+    0.9044769465020505,
+    0.842887369128974,
+    0.7681342556059305,
+    0.7018154095047097,
+    0.5880452303441824,
+    0.5422174854822623,
+    0.6205730353683706,
+    0.7073514085884975,
+    0.4153281195898049,
+    0.8672323704556807,
+    0.6430921403691294,
+    0.6007099761160132,
+    0.45116574264838905
+  ],
+  "durationSeconds": 130.18848072562358
+}

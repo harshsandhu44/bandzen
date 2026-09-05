@@ -1,0 +1,275 @@
+{
+  "slug": "student-conference-poster-preparation",
+  "title": "Preparing a Poster for a Student Conference",
+  "topic": "Two postgraduate students discuss how to prepare their research poster for a conference",
+  "difficulty": 3,
+  "transcript": "Naomi:\nHave you looked at the poster guidelines for next month's research conference?\nRavi:\nYes. I thought we could use the same poster size as last year, but they've changed it. This time it has to be A1 in portrait format.\nNaomi:\nGood thing you checked. I was still working from the old template. What sections do we definitely need?\nRavi:\nThe organisers specify a title, background, methods, results and conclusion. References are optional because space is limited.\nNaomi:\nWe should probably keep the background short, then. Our draft has nearly four hundred words before the results even start.\nRavi:\nDefinitely too much. I'd aim for about one hundred and fifty words for the background.\nNaomi:\nWhat about the methods section?\nRavi:\nI think a diagram would work better than a paragraph. We can show the three stages of the experiment visually.\nNaomi:\nGood idea. I'll create the diagram. Could you simplify the results table?\nRavi:\nSure. I'll remove the less important variables and keep the two measures that directly relate to our research question.\nNaomi:\nShould we include all six graphs from the dissertation chapter?\nRavi:\nNo. The guidelines suggest no more than three figures, and honestly two would probably be enough for our data.\nNaomi:\nWhich ones would you choose?\nRavi:\nThe response-time graph is essential, and I'd include the accuracy chart as well. The participant-age graph doesn't really support the main argument.\nNaomi:\nAgreed. We also need to think about font size. I don't want people standing five centimetres from the poster just to read it.\nRavi:\nThe minimum body text size is twenty-four point. Headings should be at least thirty-two.\nNaomi:\nWhat about printing? The department printer can't handle A1 paper.\nRavi:\nWe have to send the final PDF to Campus Print Services. They need it by four o'clock on the Monday before the conference.\nNaomi:\nThat's earlier than I expected. How much does printing cost?\nRavi:\nTwelve pounds for standard paper or eighteen pounds for the heavier matte finish.\nNaomi:\nLet's use the matte finish. It will survive the train journey better.\nRavi:\nFine. We should also practise the explanation because the judging panel only gives each presenter three minutes before asking questions.",
+  "speakers": {
+    "Naomi": "female",
+    "Ravi": "male"
+  },
+  "matchingOptions": [
+    "Naomi",
+    "Ravi",
+    "conference organisers",
+    "Campus Print Services",
+    "judging panel",
+    "department printer"
+  ],
+  "questions": [
+    {
+      "idx": 1,
+      "kind": "multiple_choice",
+      "prompt": "What has changed compared with last year's poster requirements?",
+      "options": [
+        "The poster must now be landscape",
+        "The required size and format have changed",
+        "References are now compulsory",
+        "Posters must be printed by students"
+      ],
+      "answer": [
+        "The required size and format have changed"
+      ],
+      "evidence": "I thought we could use the same poster size as last year, but they've changed it. This time it has to be A1 in portrait format.",
+      "explanation": "The poster is now required to be A1 and portrait."
+    },
+    {
+      "idx": 2,
+      "kind": "sentence_completion",
+      "prompt": "Complete the sentence. Write ONE WORD AND/OR A NUMBER. The poster must be size ________.",
+      "options": null,
+      "answer": [
+        "A1"
+      ],
+      "evidence": "This time it has to be A1 in portrait format.",
+      "explanation": "A1 is the specified poster size."
+    },
+    {
+      "idx": 3,
+      "kind": "multiple_choice",
+      "prompt": "Which section is optional?",
+      "options": [
+        "background",
+        "methods",
+        "conclusion",
+        "references"
+      ],
+      "answer": [
+        "references"
+      ],
+      "evidence": "References are optional because space is limited.",
+      "explanation": "The organisers do not require references."
+    },
+    {
+      "idx": 4,
+      "kind": "sentence_completion",
+      "prompt": "Complete the sentence. Write ONE WORD AND/OR A NUMBER. Ravi suggests about ________ words for the background.",
+      "options": null,
+      "answer": [
+        "one hundred and fifty"
+      ],
+      "evidence": "I'd aim for about one hundred and fifty words for the background.",
+      "explanation": "Ravi proposes shortening the background to about one hundred and fifty words."
+    },
+    {
+      "idx": 5,
+      "kind": "matching",
+      "prompt": "Who will create the methods diagram?",
+      "options": null,
+      "answer": [
+        "Naomi"
+      ],
+      "evidence": "Good idea. I'll create the diagram.",
+      "explanation": "Naomi takes responsibility for the methods diagram."
+    },
+    {
+      "idx": 6,
+      "kind": "matching",
+      "prompt": "Who will simplify the results table?",
+      "options": null,
+      "answer": [
+        "Ravi"
+      ],
+      "evidence": "Sure. I'll remove the less important variables and keep the two measures that directly relate to our research question.",
+      "explanation": "Ravi agrees to reduce the table to the most relevant measures."
+    },
+    {
+      "idx": 7,
+      "kind": "multiple_choice",
+      "prompt": "Which figure does Ravi think should NOT be included?",
+      "options": [
+        "the response-time graph",
+        "the accuracy chart",
+        "the participant-age graph",
+        "the methods diagram"
+      ],
+      "answer": [
+        "the participant-age graph"
+      ],
+      "evidence": "The participant-age graph doesn't really support the main argument.",
+      "explanation": "Ravi considers the participant-age graph irrelevant to the main argument."
+    },
+    {
+      "idx": 8,
+      "kind": "sentence_completion",
+      "prompt": "Complete the sentence. Write ONE WORD AND/OR A NUMBER. Body text must be at least ________ point.",
+      "options": null,
+      "answer": [
+        "twenty-four"
+      ],
+      "evidence": "The minimum body text size is twenty-four point.",
+      "explanation": "Twenty-four point is the minimum size for body text."
+    },
+    {
+      "idx": 9,
+      "kind": "matching",
+      "prompt": "Who must receive the final PDF for printing?",
+      "options": null,
+      "answer": [
+        "Campus Print Services"
+      ],
+      "evidence": "We have to send the final PDF to Campus Print Services.",
+      "explanation": "Campus Print Services handles the A1 printing."
+    },
+    {
+      "idx": 10,
+      "kind": "multiple_choice",
+      "prompt": "How long does each presenter have before questions begin?",
+      "options": [
+        "two minutes",
+        "three minutes",
+        "five minutes",
+        "ten minutes"
+      ],
+      "answer": [
+        "three minutes"
+      ],
+      "evidence": "We should also practise the explanation because the judging panel only gives each presenter three minutes before asking questions.",
+      "explanation": "Each presenter has three minutes to explain the poster."
+    }
+  ],
+  "audioUrl": "https://pub-fbae5ca09eba4fd0820da2b390dd7ca0.r2.dev/listening/student-conference-poster-preparation.mp3",
+  "peaks": [
+    0.45621822260122347,
+    0.45931845327779697,
+    0.3995281927133909,
+    0.7325756073904802,
+    0.7592855476754811,
+    0.5718560565743699,
+    0.6193139870640703,
+    0.6506844016601323,
+    0.5432589072965402,
+    0.7194974470997204,
+    0.6636031542477245,
+    0.39821764377339736,
+    0.24036524345330043,
+    0.47817054258721897,
+    0.29990291099830535,
+    0.29017981865828524,
+    0.422676248219029,
+    0.7141490421553314,
+    0.6771017404569821,
+    0.6495021375090633,
+    0.6984432396193202,
+    0.566654547363493,
+    0.37954632442502656,
+    0.70672635814241,
+    0.4231850704067495,
+    0.36338602358833105,
+    0.4747192377783432,
+    0.37690454599687884,
+    0.39652809442421777,
+    0.38955059677012716,
+    0.3709889000194369,
+    0.2849626725671411,
+    0.5620382798659034,
+    0.4304646691187064,
+    0.6247084815753747,
+    0.44303487562205945,
+    0.4187008833827708,
+    0.4523545891730169,
+    0.47428171020957155,
+    0.9135052117519256,
+    0.8151286283116433,
+    0.39636148450623543,
+    0.6150236449825129,
+    0.7320489202936685,
+    0.8059938152307959,
+    0.3759214655311798,
+    0.38903441250377213,
+    0.39400370251483513,
+    0.2804819720250126,
+    0.38878471494380773,
+    0.7624532695373811,
+    1,
+    0.8436290832489068,
+    0.5174763567416861,
+    0.6880536136842001,
+    0.6741374504882114,
+    0.36950463002423595,
+    0.6110139829642893,
+    0.4512477262087978,
+    0.32306518669875084,
+    0.4812431623444394,
+    0.6272452234897457,
+    0.6184163174800238,
+    0.5016344147521246,
+    0.4781911648204885,
+    0.5390565379897475,
+    0.4697800425728224,
+    0.5704115685160448,
+    0.7142757617505529,
+    0.7421240917528926,
+    0.5002733461431715,
+    0.544143307972516,
+    0.5276355183340065,
+    0.5052453905011411,
+    0.6927028068907495,
+    0.5887949710142559,
+    0.666051509465529,
+    0.4725681275437966,
+    0.39934900608127105,
+    0.4741343068298787,
+    0.21432738033002582,
+    0.45597290355524506,
+    0.4118934491173214,
+    0.3473003242308914,
+    0.6407877477327244,
+    0.8340525261978708,
+    0.48745792040463337,
+    0.4737026200433806,
+    0.5990914801075545,
+    0.45657121291058056,
+    0.3026619906954785,
+    0.4193003691752254,
+    0.36844783962010974,
+    0.5550119407318531,
+    0.6720908748192042,
+    0.5577419655121093,
+    0.32260430614402197,
+    0.647112814321505,
+    0.6394326514768796,
+    0.42568656076452716,
+    0.548864687039569,
+    0.27569163305132777,
+    0.4520883742538949,
+    0.6234799226538374,
+    0.6474734091152572,
+    0.722215753623128,
+    0.5206496696746576,
+    0.6284240379081187,
+    0.4041497088677685,
+    0.3533143097948569,
+    0.369916520476576,
+    0.4109971141706526,
+    0.3862224948010615,
+    0.5317822150821944,
+    0.4976707586706947,
+    0.5137168023132865,
+    0.5265964216390393,
+    0.4485777028543986,
+    0.6067796838561957,
+    0.37161617456408896
+  ],
+  "durationSeconds": 132.0257596371882
+}

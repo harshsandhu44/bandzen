@@ -1,0 +1,266 @@
+{
+  "slug": "city-museum-volunteer-briefing",
+  "title": "Briefing for New Museum Volunteers",
+  "topic": "A coordinator explains duties and procedures to new museum volunteers",
+  "difficulty": 3,
+  "transcript": "Welcome to your first volunteer briefing at the City History Museum. Before we discuss your individual roles, I'll explain how a normal shift works. Morning volunteers should arrive at eight forty-five, which gives you fifteen minutes to store your belongings and collect your badge before the museum opens at nine.\nPlease leave coats and large bags in the lockers behind the staff room. Small personal items can stay with you, but phones should remain on silent while you're working.\nMost of you will begin in one of three areas. Volunteers assigned to the entrance hall greet visitors and help them find the ticket desk. Those working in the family gallery prepare activity sheets and replace pencils throughout the day. Volunteers in the archive room assist staff by placing returned reference materials on the sorting trolley.\nIf you're working in the entrance hall, remember that you don't sell tickets yourself. Direct visitors to the ticket desk on your left. You may, however, hand out museum maps and explain where the main exhibitions are located.\nThe family gallery gets especially busy between eleven and two. Activity sheets are stored in the blue cupboard beside the window. Please don't photocopy extra sheets without checking with the gallery supervisor because some activities change from week to week.\nIn the archive room, returned books and folders should go on the sorting trolley rather than directly back onto the shelves. Archive staff need to check each item before it is reshelved.\nEveryone gets a thirty-minute lunch break. Morning volunteers normally take lunch between twelve and one, although the coordinator may adjust the schedule on busy days.\nIf a visitor asks about a lost item, don't take it to the staff room. All lost property must be handed to security at the main entrance. Security keeps a written record of every item received.\nIn an emergency, the assembly point is the fountain in Kings Square, directly opposite the museum. Do not gather in the museum courtyard, even if that seems more convenient.\nFinally, please sign out at the volunteer desk at the end of your shift. This is important because the attendance record is used when we prepare references for volunteers who later apply for jobs or university courses.",
+  "matchingOptions": [
+    "entrance hall",
+    "family gallery",
+    "archive room",
+    "ticket desk",
+    "staff room",
+    "security desk"
+  ],
+  "questions": [
+    {
+      "idx": 1,
+      "kind": "multiple_choice",
+      "prompt": "What time should morning volunteers arrive?",
+      "options": [
+        "8:30",
+        "8:45",
+        "9:00",
+        "9:15"
+      ],
+      "answer": [
+        "8:45"
+      ],
+      "evidence": "Morning volunteers should arrive at eight forty-five, which gives you fifteen minutes to store your belongings and collect your badge before the museum opens at nine.",
+      "explanation": "Volunteers are asked to arrive fifteen minutes before the museum opens."
+    },
+    {
+      "idx": 2,
+      "kind": "sentence_completion",
+      "prompt": "Complete the sentence. Write ONE WORD. Volunteers collect their ________ before the museum opens.",
+      "options": null,
+      "answer": [
+        "badge"
+      ],
+      "evidence": "Morning volunteers should arrive at eight forty-five, which gives you fifteen minutes to store your belongings and collect your badge before the museum opens at nine.",
+      "explanation": "The briefing specifically mentions collecting a badge before opening time."
+    },
+    {
+      "idx": 3,
+      "kind": "matching",
+      "prompt": "Which area is responsible for greeting visitors?",
+      "options": null,
+      "answer": [
+        "entrance hall"
+      ],
+      "evidence": "Volunteers assigned to the entrance hall greet visitors and help them find the ticket desk.",
+      "explanation": "Greeting arriving visitors is a duty of volunteers in the entrance hall."
+    },
+    {
+      "idx": 4,
+      "kind": "matching",
+      "prompt": "Which area involves preparing activity sheets?",
+      "options": null,
+      "answer": [
+        "family gallery"
+      ],
+      "evidence": "Those working in the family gallery prepare activity sheets and replace pencils throughout the day.",
+      "explanation": "The family gallery volunteers prepare activity sheets for visitors."
+    },
+    {
+      "idx": 5,
+      "kind": "matching",
+      "prompt": "Which area involves handling returned reference materials?",
+      "options": null,
+      "answer": [
+        "archive room"
+      ],
+      "evidence": "Volunteers in the archive room assist staff by placing returned reference materials on the sorting trolley.",
+      "explanation": "Returned reference materials are handled by volunteers assigned to the archive room."
+    },
+    {
+      "idx": 6,
+      "kind": "sentence_completion",
+      "prompt": "Complete the sentence. Write TWO WORDS. Activity sheets are kept in the ________.",
+      "options": null,
+      "answer": [
+        "blue cupboard"
+      ],
+      "evidence": "Activity sheets are stored in the blue cupboard beside the window.",
+      "explanation": "The narrator identifies the blue cupboard as the storage location."
+    },
+    {
+      "idx": 7,
+      "kind": "multiple_choice",
+      "prompt": "Why should archive volunteers not return materials directly to shelves?",
+      "options": [
+        "Visitors may still need them",
+        "Staff must check them first",
+        "The shelves are being reorganised",
+        "Volunteers are not allowed near the shelves"
+      ],
+      "answer": [
+        "Staff must check them first"
+      ],
+      "evidence": "Archive staff need to check each item before it is reshelved.",
+      "explanation": "Every returned archive item must first be checked by archive staff."
+    },
+    {
+      "idx": 8,
+      "kind": "sentence_completion",
+      "prompt": "Complete the sentence. Write ONE WORD AND/OR A NUMBER. Each volunteer receives a ________-minute lunch break.",
+      "options": null,
+      "answer": [
+        "thirty"
+      ],
+      "evidence": "Everyone gets a thirty-minute lunch break.",
+      "explanation": "The specified lunch break lasts thirty minutes."
+    },
+    {
+      "idx": 9,
+      "kind": "multiple_choice",
+      "prompt": "Where should lost property be taken?",
+      "options": [
+        "the staff room",
+        "the volunteer desk",
+        "security at the main entrance",
+        "the museum office"
+      ],
+      "answer": [
+        "security at the main entrance"
+      ],
+      "evidence": "All lost property must be handed to security at the main entrance.",
+      "explanation": "Lost items are handled by security at the main entrance."
+    },
+    {
+      "idx": 10,
+      "kind": "sentence_completion",
+      "prompt": "Complete the sentence. Write TWO WORDS. During an emergency, volunteers should assemble at the fountain in ________.",
+      "options": null,
+      "answer": [
+        "Kings Square"
+      ],
+      "evidence": "In an emergency, the assembly point is the fountain in Kings Square, directly opposite the museum.",
+      "explanation": "The designated assembly location is the fountain in Kings Square."
+    }
+  ],
+  "audioUrl": "https://pub-fbae5ca09eba4fd0820da2b390dd7ca0.r2.dev/listening/city-museum-volunteer-briefing.mp3",
+  "peaks": [
+    1,
+    0.7688861800728594,
+    0.4699977620502449,
+    0.2320089161705304,
+    0.8231556142835491,
+    0.5995987299384273,
+    0.709101030967586,
+    0.19493615983719895,
+    0.7964894005163846,
+    0.5452205874863801,
+    0.49029812009293333,
+    0.5325061577408974,
+    0.7060433682730701,
+    0.4498640538197592,
+    0.8136667649354064,
+    0.2716316498463559,
+    0.5013397261067332,
+    0.5818500654643485,
+    0.5494661678640114,
+    0.20657544291493854,
+    0.6498539092627585,
+    0.45030022294509386,
+    0.5116020707800226,
+    0.6332494884264372,
+    0.26753116940635857,
+    0.7095326572797239,
+    0.6248019455363757,
+    0.3476692101179569,
+    0.6874150046584605,
+    0.6039005860066747,
+    0.5657141581659293,
+    0.4780992010244645,
+    0.5580548278274066,
+    0.7316334618687861,
+    0.41379237507317584,
+    0.6054946511394165,
+    0.4928310851154803,
+    0.2984596746730617,
+    0.8258156362973584,
+    0.4492201559015949,
+    0.47993784009290547,
+    0.6050874752534089,
+    0.49855378496328734,
+    0.22386198478700647,
+    0.8201603463476169,
+    0.6088610518552244,
+    0.7779312367686257,
+    0.28447932442825963,
+    0.7245689041798415,
+    0.4457254836540444,
+    0.381610293856584,
+    0.9105065451581607,
+    0.7236245786671329,
+    0.6167555995938024,
+    0.7555083582667569,
+    0.35305875899495937,
+    0.8428346383430467,
+    0.5529876632668679,
+    0.6406134536607212,
+    0.44293215741268216,
+    0.610192660883435,
+    0.5419446166645412,
+    0.29486648391955245,
+    0.6564245511748655,
+    0.41646063825788776,
+    0.5933626728304536,
+    0.4914251006640966,
+    0.5353396090460406,
+    0.5033844381216787,
+    0.6835490466665226,
+    0.7180993327869659,
+    0.5969876413304325,
+    0.6902978913189481,
+    0.4827017863829813,
+    0.8241637119071512,
+    0.3669553294665213,
+    0.5486520274530263,
+    0.6020139280804725,
+    0.460604677892802,
+    0.2166262411674982,
+    0.790162413101255,
+    0.2557380716364675,
+    0.8812166962443045,
+    0.6927827737140678,
+    0.5395231680054354,
+    0.7718437614109973,
+    0.5480281771906602,
+    0.44700802978340426,
+    0.5168852022593895,
+    0.6964731189778581,
+    0.6365470227763652,
+    0.3595047513202264,
+    0.681361164216164,
+    0.698626956583908,
+    0.5383364789383623,
+    0.37489988752288117,
+    0.6650627514910062,
+    0.5184832729338194,
+    0.27541217419118275,
+    0.9051666552766133,
+    0.7991736211832566,
+    0.6612949861750734,
+    0.5963443340433934,
+    0.5292601141281817,
+    0.44168279448991243,
+    0.9866132416812307,
+    0.5935268832025675,
+    0.6785285656362242,
+    0.23755204568351548,
+    0.5930617825698538,
+    0.7161121296527606,
+    0.5646647089031678,
+    0.23917163687049134,
+    0.7211880367680263,
+    0.6186136252439466,
+    0.5861875957436323,
+    0.5954376796526271,
+    0.5683593196215451,
+    0.6040821156800258,
+    0.28824393089829115
+  ],
+  "durationSeconds": 135.74385487528346
+}

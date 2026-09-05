@@ -1,0 +1,85 @@
+{
+  "slug": "an-object-you-have-kept-for-years",
+  "title": "Speaking — an object you have kept for years",
+  "topic": "Personal possessions and their emotional value",
+  "difficulty": 3,
+  "prompts": [
+    {
+      "idx": 1,
+      "part": 1,
+      "text": "What kinds of things do you usually keep in your room?",
+      "cueCardPoints": null,
+      "prepSeconds": 0,
+      "audioUrl": "https://pub-fbae5ca09eba4fd0820da2b390dd7ca0.r2.dev/speaking/an-object-you-have-kept-for-years-1.mp3"
+    },
+    {
+      "idx": 2,
+      "part": 1,
+      "text": "Do you prefer to keep your belongings well organized?",
+      "cueCardPoints": null,
+      "prepSeconds": 0,
+      "audioUrl": "https://pub-fbae5ca09eba4fd0820da2b390dd7ca0.r2.dev/speaking/an-object-you-have-kept-for-years-2.mp3"
+    },
+    {
+      "idx": 3,
+      "part": 1,
+      "text": "Are there any things you find difficult to throw away?",
+      "cueCardPoints": null,
+      "prepSeconds": 0,
+      "audioUrl": "https://pub-fbae5ca09eba4fd0820da2b390dd7ca0.r2.dev/speaking/an-object-you-have-kept-for-years-3.mp3"
+    },
+    {
+      "idx": 4,
+      "part": 2,
+      "text": "Describe an object that you have kept for a long time. You should say:",
+      "cueCardPoints": [
+        "what the object is",
+        "when and how you got it",
+        "where you usually keep it",
+        "and explain why you have kept it for so long."
+      ],
+      "prepSeconds": 60,
+      "audioUrl": "https://pub-fbae5ca09eba4fd0820da2b390dd7ca0.r2.dev/speaking/an-object-you-have-kept-for-years-4.mp3"
+    },
+    {
+      "idx": 5,
+      "part": 3,
+      "text": "Why do people become emotionally attached to ordinary objects?",
+      "cueCardPoints": null,
+      "prepSeconds": 0,
+      "audioUrl": "https://pub-fbae5ca09eba4fd0820da2b390dd7ca0.r2.dev/speaking/an-object-you-have-kept-for-years-5.mp3"
+    },
+    {
+      "idx": 6,
+      "part": 3,
+      "text": "How have people's attitudes toward keeping possessions changed as consumer culture has grown?",
+      "cueCardPoints": null,
+      "prepSeconds": 0,
+      "audioUrl": "https://pub-fbae5ca09eba4fd0820da2b390dd7ca0.r2.dev/speaking/an-object-you-have-kept-for-years-6.mp3"
+    },
+    {
+      "idx": 7,
+      "part": 3,
+      "text": "What factors make an object valuable even when it is worth very little money?",
+      "cueCardPoints": null,
+      "prepSeconds": 0,
+      "audioUrl": "https://pub-fbae5ca09eba4fd0820da2b390dd7ca0.r2.dev/speaking/an-object-you-have-kept-for-years-7.mp3"
+    },
+    {
+      "idx": 8,
+      "part": 3,
+      "text": "How does passing possessions from one generation to another benefit families?",
+      "cueCardPoints": null,
+      "prepSeconds": 0,
+      "audioUrl": "https://pub-fbae5ca09eba4fd0820da2b390dd7ca0.r2.dev/speaking/an-object-you-have-kept-for-years-8.mp3"
+    },
+    {
+      "idx": 9,
+      "part": 3,
+      "text": "What effect might digital photographs and records have on the kinds of physical objects people preserve in the future?",
+      "cueCardPoints": null,
+      "prepSeconds": 0,
+      "audioUrl": "https://pub-fbae5ca09eba4fd0820da2b390dd7ca0.r2.dev/speaking/an-object-you-have-kept-for-years-9.mp3"
+    }
+  ]
+}

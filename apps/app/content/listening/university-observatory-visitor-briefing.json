@@ -1,0 +1,271 @@
+{
+  "slug": "university-observatory-visitor-briefing",
+  "title": "Visitor Briefing for a University Observatory",
+  "topic": "An astronomy guide explains procedures and activities for an evening observatory visit",
+  "difficulty": 3,
+  "transcript": "Welcome to tonight's public observing session at Westmoor University Observatory. Before we begin, I'll explain the schedule and a few rules that help us protect both the equipment and everyone's night vision.\nThe main building opens to visitors at seven fifteen. The introductory talk begins at seven thirty in Lecture Room Two, so please be seated before then. The talk lasts about twenty minutes and explains what objects should be visible tonight.\nAfter the introduction, visitors will be divided into three groups. Group One starts at the large reflecting telescope, Group Two begins in the rooftop observing area, and Group Three visits the astronomy exhibition on the ground floor.\nEach group spends approximately twenty-five minutes at a station before moving to the next one. A member of staff will tell you when it is time to rotate.\nAt the large telescope, please do not touch the instrument or attempt to move it yourself. The telescope is computer-controlled, and even a small manual adjustment can disturb its alignment.\nThe rooftop area contains several smaller telescopes that visitors may look through with guidance from student volunteers. Please keep bags close to the wall so that nobody trips over them in the dark.\nWhite lights are not permitted in observing areas because they affect night vision. If you need a torch, use one with a red light. Staff can provide red covers for phone torches if necessary.\nPhotography is allowed outside, but flash must be switched off. Inside the telescope dome, photography is not permitted because space around the equipment is limited.\nCloud sometimes prevents direct observing. If the sky becomes completely overcast, the session will continue indoors with a live demonstration using archived telescope images and astronomical software.\nHot drinks are available from the small café beside reception until nine thirty. Food and drinks must not be taken onto the roof or into the telescope dome.\nThe session finishes at ten. When leaving, use the main entrance rather than the side gate, because the side gate is locked automatically after nine o'clock.",
+  "matchingOptions": [
+    "large reflecting telescope",
+    "rooftop observing area",
+    "astronomy exhibition",
+    "Lecture Room Two",
+    "small café",
+    "main entrance"
+  ],
+  "questions": [
+    {
+      "idx": 1,
+      "kind": "sentence_completion",
+      "prompt": "Complete the sentence. Write ONE WORD AND/OR A NUMBER. The introductory talk begins at ________.",
+      "options": null,
+      "answer": [
+        "seven thirty"
+      ],
+      "evidence": "The introductory talk begins at seven thirty in Lecture Room Two, so please be seated before then.",
+      "explanation": "The talk begins at seven thirty."
+    },
+    {
+      "idx": 2,
+      "kind": "multiple_choice",
+      "prompt": "How long does the introductory talk last?",
+      "options": [
+        "fifteen minutes",
+        "twenty minutes",
+        "twenty-five minutes",
+        "thirty minutes"
+      ],
+      "answer": [
+        "twenty minutes"
+      ],
+      "evidence": "The talk lasts about twenty minutes and explains what objects should be visible tonight.",
+      "explanation": "The introduction lasts approximately twenty minutes."
+    },
+    {
+      "idx": 3,
+      "kind": "matching",
+      "prompt": "Where does Group One begin?",
+      "options": null,
+      "answer": [
+        "large reflecting telescope"
+      ],
+      "evidence": "Group One starts at the large reflecting telescope, Group Two begins in the rooftop observing area, and Group Three visits the astronomy exhibition on the ground floor.",
+      "explanation": "Group One starts with the main reflecting telescope."
+    },
+    {
+      "idx": 4,
+      "kind": "matching",
+      "prompt": "Where does Group Two begin?",
+      "options": null,
+      "answer": [
+        "rooftop observing area"
+      ],
+      "evidence": "Group One starts at the large reflecting telescope, Group Two begins in the rooftop observing area, and Group Three visits the astronomy exhibition on the ground floor.",
+      "explanation": "Group Two's first station is the rooftop area."
+    },
+    {
+      "idx": 5,
+      "kind": "matching",
+      "prompt": "Where does Group Three begin?",
+      "options": null,
+      "answer": [
+        "astronomy exhibition"
+      ],
+      "evidence": "Group One starts at the large reflecting telescope, Group Two begins in the rooftop observing area, and Group Three visits the astronomy exhibition on the ground floor.",
+      "explanation": "Group Three begins with the ground-floor exhibition."
+    },
+    {
+      "idx": 6,
+      "kind": "multiple_choice",
+      "prompt": "Why must visitors not move the large telescope themselves?",
+      "options": [
+        "It may become too warm",
+        "It is reserved for researchers",
+        "Its alignment could be disturbed",
+        "The controls are located on the roof"
+      ],
+      "answer": [
+        "Its alignment could be disturbed"
+      ],
+      "evidence": "The telescope is computer-controlled, and even a small manual adjustment can disturb its alignment.",
+      "explanation": "Manual movement could interfere with the telescope's alignment."
+    },
+    {
+      "idx": 7,
+      "kind": "sentence_completion",
+      "prompt": "Complete the sentence. Write ONE WORD. Visitors should use a ________ light if they need a torch.",
+      "options": null,
+      "answer": [
+        "red"
+      ],
+      "evidence": "If you need a torch, use one with a red light.",
+      "explanation": "Red light helps preserve night vision."
+    },
+    {
+      "idx": 8,
+      "kind": "multiple_choice",
+      "prompt": "Where is photography NOT permitted?",
+      "options": [
+        "outside the observatory",
+        "in the telescope dome",
+        "beside reception",
+        "in the exhibition"
+      ],
+      "answer": [
+        "in the telescope dome"
+      ],
+      "evidence": "Inside the telescope dome, photography is not permitted because space around the equipment is limited.",
+      "explanation": "Photography is prohibited inside the dome."
+    },
+    {
+      "idx": 9,
+      "kind": "sentence_completion",
+      "prompt": "Complete the sentence. Write ONE WORD. If the sky is completely overcast, the session will continue ________.",
+      "options": null,
+      "answer": [
+        "indoors"
+      ],
+      "evidence": "If the sky becomes completely overcast, the session will continue indoors with a live demonstration using archived telescope images and astronomical software.",
+      "explanation": "Bad weather changes the session to an indoor activity."
+    },
+    {
+      "idx": 10,
+      "kind": "multiple_choice",
+      "prompt": "Why must visitors leave through the main entrance?",
+      "options": [
+        "The café blocks the other exit",
+        "The side gate is locked after nine",
+        "The roof closes before the building",
+        "Staff collect tickets there"
+      ],
+      "answer": [
+        "The side gate is locked after nine"
+      ],
+      "evidence": "When leaving, use the main entrance rather than the side gate, because the side gate is locked automatically after nine o'clock.",
+      "explanation": "The side gate is unavailable by the time the session ends."
+    }
+  ],
+  "audioUrl": "https://pub-fbae5ca09eba4fd0820da2b390dd7ca0.r2.dev/listening/university-observatory-visitor-briefing.mp3",
+  "peaks": [
+    1,
+    0.713917842007594,
+    0.7199316555956662,
+    0.3660755363049665,
+    0.7961545530065195,
+    0.7700484975547899,
+    0.6918604479874519,
+    0.4846024929504054,
+    0.5915098792533444,
+    0.5760056064411427,
+    0.7511395204790823,
+    0.8288765203355578,
+    0.6136633604226863,
+    0.4815633347276761,
+    0.7422470509709375,
+    0.7494940666952763,
+    0.7060672854244215,
+    0.5347352485824299,
+    0.3817416347613087,
+    0.6986470708328508,
+    0.6103208789619184,
+    0.6158197396844122,
+    0.47979936921876404,
+    0.139820233078928,
+    0.7581948372383494,
+    0.736871266021023,
+    0.6646174779584014,
+    0.18701359120189093,
+    0.8082320428114916,
+    0.5920194288502268,
+    0.3068384094821572,
+    0.833505434686415,
+    0.6840150149629327,
+    0.7052830545873232,
+    0.591714990173858,
+    0.564499903541319,
+    0.33720743194386904,
+    0.5173090998203964,
+    0.6233631301127973,
+    0.5645406121329049,
+    0.42967521335160125,
+    0.7794993259591445,
+    0.7291921352187842,
+    0.621541557768962,
+    0.7146004025538244,
+    0.2614204940641893,
+    0.6114924837332706,
+    0.5270702974778464,
+    0.58697565347876,
+    0.7278334928438722,
+    0.28485760346077604,
+    0.5831481675660042,
+    0.5480551720578284,
+    0.8545612481742124,
+    0.6019661556344151,
+    0.4836542553896834,
+    0.3888478178843732,
+    0.6628690925798519,
+    0.6316945929064214,
+    0.48345943438339767,
+    0.6859338734872193,
+    0.4544964680164643,
+    0.4960648267863441,
+    0.4061044570012524,
+    0.5182292780771983,
+    0.66531541197339,
+    0.48103124927621177,
+    0.23415828514185724,
+    0.8262070318569985,
+    0.7371089800363236,
+    0.5029313018782016,
+    0.3870117174013284,
+    0.6648354796638326,
+    0.6604707215536609,
+    0.36557633381136784,
+    0.6247335223715621,
+    0.5912634872580389,
+    0.514228388572696,
+    0.30482855282162713,
+    0.5819438719724396,
+    0.5804920929718659,
+    0.4272362512805079,
+    0.3560209566469322,
+    0.6099398246287614,
+    0.556903890836462,
+    0.5482585782458745,
+    0.6701437255838952,
+    0.5686160791791703,
+    0.39333900411594225,
+    0.4592381024795871,
+    0.6648670698604825,
+    0.4401941069452258,
+    0.5084164132811072,
+    0.5813344587089656,
+    0.3849477121558595,
+    0.6967306505047532,
+    0.7238791171789504,
+    0.5989384502925346,
+    0.6012319644746789,
+    0.4980667491539695,
+    0.5510568004889135,
+    0.20108825577529707,
+    0.7518050908565336,
+    0.7002562627519752,
+    0.4837015971018503,
+    0.5757509081158487,
+    0.19336032844525614,
+    0.7344707379968968,
+    0.6468511178547864,
+    0.6281036740805624,
+    0.4078878381008763,
+    0.5629218117512322,
+    0.5217714056036922,
+    0.9020962210774439,
+    0.9385402243371463,
+    0.5503240125381503,
+    0.546484008920033,
+    0.5605036438259123,
+    0.5056160265173565,
+    0.3047907112651681
+  ],
+  "durationSeconds": 132.12154195011337
+}

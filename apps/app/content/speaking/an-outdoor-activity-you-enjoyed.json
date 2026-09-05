@@ -1,0 +1,93 @@
+{
+  "slug": "an-outdoor-activity-you-enjoyed",
+  "title": "Speaking — an outdoor activity you enjoyed",
+  "topic": "Outdoor recreation and access to nature",
+  "difficulty": 3,
+  "prompts": [
+    {
+      "idx": 1,
+      "part": 1,
+      "text": "How much time do you usually spend outdoors?",
+      "cueCardPoints": null,
+      "prepSeconds": 0,
+      "audioUrl": "https://pub-fbae5ca09eba4fd0820da2b390dd7ca0.r2.dev/speaking/an-outdoor-activity-you-enjoyed-1.mp3"
+    },
+    {
+      "idx": 2,
+      "part": 1,
+      "text": "What outdoor activities are popular where you live?",
+      "cueCardPoints": null,
+      "prepSeconds": 0,
+      "audioUrl": "https://pub-fbae5ca09eba4fd0820da2b390dd7ca0.r2.dev/speaking/an-outdoor-activity-you-enjoyed-2.mp3"
+    },
+    {
+      "idx": 3,
+      "part": 1,
+      "text": "What kind of weather do you prefer when you are outside?",
+      "cueCardPoints": null,
+      "prepSeconds": 0,
+      "audioUrl": "https://pub-fbae5ca09eba4fd0820da2b390dd7ca0.r2.dev/speaking/an-outdoor-activity-you-enjoyed-3.mp3"
+    },
+    {
+      "idx": 4,
+      "part": 1,
+      "text": "Did you spend much time outdoors when you were younger?",
+      "cueCardPoints": null,
+      "prepSeconds": 0,
+      "audioUrl": "https://pub-fbae5ca09eba4fd0820da2b390dd7ca0.r2.dev/speaking/an-outdoor-activity-you-enjoyed-4.mp3"
+    },
+    {
+      "idx": 5,
+      "part": 2,
+      "text": "Describe an outdoor activity that you enjoyed doing. You should say:",
+      "cueCardPoints": [
+        "what the activity was",
+        "where and when you did it",
+        "who you did it with",
+        "and explain what made the experience enjoyable."
+      ],
+      "prepSeconds": 60,
+      "audioUrl": "https://pub-fbae5ca09eba4fd0820da2b390dd7ca0.r2.dev/speaking/an-outdoor-activity-you-enjoyed-5.mp3"
+    },
+    {
+      "idx": 6,
+      "part": 3,
+      "text": "Why do some people prefer outdoor recreation while others prefer indoor activities?",
+      "cueCardPoints": null,
+      "prepSeconds": 0,
+      "audioUrl": "https://pub-fbae5ca09eba4fd0820da2b390dd7ca0.r2.dev/speaking/an-outdoor-activity-you-enjoyed-6.mp3"
+    },
+    {
+      "idx": 7,
+      "part": 3,
+      "text": "What benefits can cities gain from providing more parks and outdoor recreational spaces?",
+      "cueCardPoints": null,
+      "prepSeconds": 0,
+      "audioUrl": "https://pub-fbae5ca09eba4fd0820da2b390dd7ca0.r2.dev/speaking/an-outdoor-activity-you-enjoyed-7.mp3"
+    },
+    {
+      "idx": 8,
+      "part": 3,
+      "text": "What prevents people living in large cities from spending more time in nature?",
+      "cueCardPoints": null,
+      "prepSeconds": 0,
+      "audioUrl": "https://pub-fbae5ca09eba4fd0820da2b390dd7ca0.r2.dev/speaking/an-outdoor-activity-you-enjoyed-8.mp3"
+    },
+    {
+      "idx": 9,
+      "part": 3,
+      "text": "How should governments balance the protection of natural areas with public access to them?",
+      "cueCardPoints": null,
+      "prepSeconds": 0,
+      "audioUrl": "https://pub-fbae5ca09eba4fd0820da2b390dd7ca0.r2.dev/speaking/an-outdoor-activity-you-enjoyed-9.mp3"
+    },
+    {
+      "idx": 10,
+      "part": 3,
+      "text": "How might outdoor leisure activities change as cities become larger and more densely populated?",
+      "cueCardPoints": null,
+      "prepSeconds": 0,
+      "audioUrl": "https://pub-fbae5ca09eba4fd0820da2b390dd7ca0.r2.dev/speaking/an-outdoor-activity-you-enjoyed-10.mp3"
+    }
+  ]
+}

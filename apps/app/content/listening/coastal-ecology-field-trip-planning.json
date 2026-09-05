@@ -1,0 +1,275 @@
+{
+  "slug": "coastal-ecology-field-trip-planning",
+  "title": "Planning a Coastal Ecology Field Trip",
+  "topic": "Two university students discuss arrangements for an ecology field trip",
+  "difficulty": 3,
+  "transcript": "Amira:\nHave you seen the final instructions for Thursday's coastal ecology trip?\nJonah:\nYes. The coach leaves the biology building at seven fifteen, not seven thirty like it said on the first timetable.\nAmira:\nThat's early. We're going to Bracken Bay first, aren't we?\nJonah:\nActually, the order has changed. We're starting at North Point because the tide will be lowest there in the morning.\nAmira:\nRight. What are we doing at North Point?\nJonah:\nOur group is measuring the distribution of seaweed species along the rocky shore. We need to record the species found in each quadrat.\nAmira:\nDo we bring quadrats from the lab?\nJonah:\nNo, Dr Patel is bringing all the sampling equipment. We only need our notebooks, waterproof clothing and lunch.\nAmira:\nI was going to bring my tablet for taking notes.\nJonah:\nYou can, but the instructions recommend a pencil and paper because electronic devices can get wet. I'm taking a small waterproof notebook.\nAmira:\nFair point. What happens after North Point?\nJonah:\nAt eleven thirty we move to Bracken Bay. That's where we'll collect water samples near the stream outlet.\nAmira:\nAre we analysing the samples there?\nJonah:\nOnly part of the analysis. We'll measure temperature and salinity on site, but the nutrient tests will be done back in the laboratory on Friday.\nAmira:\nAnd lunch is at Bracken Bay?\nJonah:\nYes, from twelve thirty to one. There's a café nearby, but the lecturer warned us not to depend on it because it sometimes closes during quiet weeks.\nAmira:\nSo definitely bring food. What's the final stop?\nJonah:\nThe sand dunes at East Marsh. We'll compare vegetation in areas with heavy visitor traffic and areas protected by fencing.\nAmira:\nIs that the section where we take photographs?\nJonah:\nYes. Each pair needs six photographs showing different levels of vegetation cover.\nAmira:\nWhat time are we supposed to get back?\nJonah:\nThe coach is scheduled to leave East Marsh at four forty-five, so we should reach campus around six, depending on traffic.\nAmira:\nDo we have to submit anything immediately?\nJonah:\nJust the field data sheet. Dr Patel wants that uploaded by ten o'clock on Friday morning. The full report isn't due until the following Wednesday.",
+  "speakers": {
+    "Amira": "female",
+    "Jonah": "male"
+  },
+  "matchingOptions": [
+    "North Point",
+    "Bracken Bay",
+    "East Marsh",
+    "biology building",
+    "laboratory",
+    "campus"
+  ],
+  "questions": [
+    {
+      "idx": 1,
+      "kind": "multiple_choice",
+      "prompt": "What time will the coach leave?",
+      "options": [
+        "7:00",
+        "7:15",
+        "7:30",
+        "7:45"
+      ],
+      "answer": [
+        "7:15"
+      ],
+      "evidence": "The coach leaves the biology building at seven fifteen, not seven thirty like it said on the first timetable.",
+      "explanation": "Jonah explains that the departure time was changed to seven fifteen."
+    },
+    {
+      "idx": 2,
+      "kind": "matching",
+      "prompt": "At which location will students study the distribution of seaweed?",
+      "options": null,
+      "answer": [
+        "North Point"
+      ],
+      "evidence": "Our group is measuring the distribution of seaweed species along the rocky shore.",
+      "explanation": "This activity is described immediately after Jonah confirms that the first stop is North Point."
+    },
+    {
+      "idx": 3,
+      "kind": "sentence_completion",
+      "prompt": "Complete the sentence. Write TWO WORDS. Dr Patel will provide all the ________.",
+      "options": null,
+      "answer": [
+        "sampling equipment"
+      ],
+      "evidence": "No, Dr Patel is bringing all the sampling equipment.",
+      "explanation": "Students do not need to bring the quadrats because the sampling equipment is being provided."
+    },
+    {
+      "idx": 4,
+      "kind": "multiple_choice",
+      "prompt": "Why are students advised to use pencil and paper?",
+      "options": [
+        "Tablets are too heavy",
+        "Electronic devices can get wet",
+        "Pencils are required for the report",
+        "There is no internet connection"
+      ],
+      "answer": [
+        "Electronic devices can get wet"
+      ],
+      "evidence": "You can, but the instructions recommend a pencil and paper because electronic devices can get wet.",
+      "explanation": "The risk of water damage is the reason given for preferring pencil and paper."
+    },
+    {
+      "idx": 5,
+      "kind": "matching",
+      "prompt": "At which location will students collect water samples?",
+      "options": null,
+      "answer": [
+        "Bracken Bay"
+      ],
+      "evidence": "That's where we'll collect water samples near the stream outlet.",
+      "explanation": "Jonah says the water sampling will take place at Bracken Bay."
+    },
+    {
+      "idx": 6,
+      "kind": "sentence_completion",
+      "prompt": "Complete the sentence. Write ONE WORD. Students will measure temperature and ________ on site.",
+      "options": null,
+      "answer": [
+        "salinity"
+      ],
+      "evidence": "We'll measure temperature and salinity on site, but the nutrient tests will be done back in the laboratory on Friday.",
+      "explanation": "The two measurements performed on site are temperature and salinity."
+    },
+    {
+      "idx": 7,
+      "kind": "multiple_choice",
+      "prompt": "Why should students bring their own lunch?",
+      "options": [
+        "Food is not allowed to be purchased during the trip",
+        "The café is too far from the field site",
+        "The nearby café may be closed",
+        "The café only serves drinks"
+      ],
+      "answer": [
+        "The nearby café may be closed"
+      ],
+      "evidence": "There's a café nearby, but the lecturer warned us not to depend on it because it sometimes closes during quiet weeks.",
+      "explanation": "Students are warned that the café is not reliably open."
+    },
+    {
+      "idx": 8,
+      "kind": "matching",
+      "prompt": "At which location will students compare vegetation in areas with different levels of visitor traffic?",
+      "options": null,
+      "answer": [
+        "East Marsh"
+      ],
+      "evidence": "We'll compare vegetation in areas with heavy visitor traffic and areas protected by fencing.",
+      "explanation": "This comparison is the activity planned for the sand dunes at East Marsh."
+    },
+    {
+      "idx": 9,
+      "kind": "sentence_completion",
+      "prompt": "Complete the sentence. Write ONE WORD AND/OR A NUMBER. Each pair must take ________ photographs.",
+      "options": null,
+      "answer": [
+        "six"
+      ],
+      "evidence": "Each pair needs six photographs showing different levels of vegetation cover.",
+      "explanation": "Jonah specifies six photographs per pair."
+    },
+    {
+      "idx": 10,
+      "kind": "multiple_choice",
+      "prompt": "What must be uploaded by ten o'clock on Friday morning?",
+      "options": [
+        "the full report",
+        "the field data sheet",
+        "the photographs",
+        "the nutrient test results"
+      ],
+      "answer": [
+        "the field data sheet"
+      ],
+      "evidence": "Dr Patel wants that uploaded by ten o'clock on Friday morning.",
+      "explanation": "The preceding statement identifies the item as the field data sheet, while the full report is due later."
+    }
+  ],
+  "audioUrl": "https://pub-fbae5ca09eba4fd0820da2b390dd7ca0.r2.dev/listening/coastal-ecology-field-trip-planning.mp3",
+  "peaks": [
+    0.5894591371308207,
+    0.4277612283944413,
+    0.3863131759666515,
+    0.45702785936493456,
+    0.4537298614067153,
+    0.675293751062612,
+    0.5059872618340286,
+    0.4516738991625815,
+    0.7553066858670787,
+    0.5372490086178563,
+    0.45158297149560084,
+    0.3642365214212941,
+    0.5927952974862211,
+    0.3453577663314638,
+    0.4531024899490136,
+    0.62009553047167,
+    0.6331159683406518,
+    0.4577955822965909,
+    0.544337377219171,
+    0.5542752703416527,
+    0.25084563168887203,
+    0.5346405861121925,
+    0.4037112374534588,
+    0.6127001044710143,
+    0.39977370464335366,
+    0.43548887041934237,
+    0.5188790890765392,
+    0.4775828676043863,
+    0.4789235684204946,
+    0.5980772613240857,
+    0.5115730227360235,
+    0.5746005981754003,
+    0.7523472674162458,
+    0.7783349004843028,
+    0.7396239468769038,
+    0.6503738615177918,
+    0.7720261237742704,
+    0.7142690174512348,
+    0.47381471048049423,
+    0.4469746031825061,
+    0.40915669905163743,
+    0.4598268768337054,
+    0.6007230319670682,
+    0.48435789249319416,
+    0.5043399924063331,
+    0.5376919867885354,
+    0.34934438641439236,
+    0.6761706231395227,
+    0.7892754376667684,
+    0.3644099133167386,
+    0.35755883767108176,
+    0.4252546760332395,
+    1,
+    0.8991739615668233,
+    0.46694751201684587,
+    0.6866352657142735,
+    0.653062265488612,
+    0.5865467997349614,
+    0.5533667303485461,
+    0.649926602621421,
+    0.5598890207688376,
+    0.5507757782095418,
+    0.4814189934582072,
+    0.4261660290817062,
+    0.4672504750754936,
+    0.4403351303822909,
+    0.4960590957196383,
+    0.6318531792584716,
+    0.48861208870229833,
+    0.35648829437478213,
+    0.4705254011074769,
+    0.5112452121946374,
+    0.8243045258126375,
+    0.39610083125265033,
+    0.5314171879868824,
+    0.4985492287450986,
+    0.6844705804782056,
+    0.553647263663665,
+    0.4551636215606421,
+    0.4702259169572607,
+    0.6303220472461014,
+    0.3729683962185498,
+    0.4585552980360897,
+    0.1726755750820349,
+    0.39832390432414644,
+    0.571095842865813,
+    0.5304699727571764,
+    0.7471140222166295,
+    0.602208407058902,
+    0.6487991565776762,
+    0.5773623251668738,
+    0.6237559897034324,
+    0.44108670748987017,
+    0.4314812758358007,
+    0.36582921740087315,
+    0.5016395318304073,
+    0.5401649054596833,
+    0.46089024805400064,
+    0.5099376086913582,
+    0.35884276277506827,
+    0.42638640419321217,
+    0.3267190617392306,
+    0.5860929572373761,
+    0.6259244849499712,
+    0.5935778563272885,
+    0.45812468676245094,
+    0.5440864040897131,
+    0.5052473218626696,
+    0.48118249144940883,
+    0.42911405322073903,
+    0.4996757069472995,
+    0.5388634225505103,
+    0.7041997913833401,
+    0.4824578256180576,
+    0.6713765154923297,
+    0.6201322333930359,
+    0.5338592206025226,
+    0.6685049798361871,
+    0.6408851123231118,
+    0.4150035955983163
+  ],
+  "durationSeconds": 126.14820861678004
+}
