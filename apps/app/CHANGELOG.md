@@ -1,3 +1,16 @@
+# app [1.0.0](https://github.com/harshsandhu44/bandzen/compare/app@0.21.0...app@1.0.0) (2026-09-05)
+
+
+### chore
+
+* **app:** mark v1 launch readiness complete ([384d2c9](https://github.com/harshsandhu44/bandzen/commit/384d2c9fde5e02ef7108432098032f2a2d731202)), closes [#46](https://github.com/harshsandhu44/bandzen/issues/46) [#46](https://github.com/harshsandhu44/bandzen/issues/46)
+
+
+### BREAKING CHANGES
+
+* **app:** first stable release. The app is now considered
+production-ready for real student sign-ups rather than internal/beta
+
 # app [0.21.0](https://github.com/harshsandhu44/bandzen/compare/app@0.20.0...app@0.21.0) (2026-09-05)
 
 
