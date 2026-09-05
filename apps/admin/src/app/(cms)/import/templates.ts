@@ -687,8 +687,10 @@ exactly. Return JSON only.
 - promptText uses "\\n\\n" between paragraphs, and ends with the standard
   instruction line and the word minimum, exactly as the example does.
 - The slug names the task and the topic, lower case and hyphenated.
-- chartData is stored but nothing renders it yet, so the shape below is a
-  suggestion rather than a contract. Omit it entirely when there is no figure.`;
+- chartData renders as a line or bar chart on the attempt screen: kind is
+  "line" or "bar", series is one or more { name, points }, and each point is
+  [x, y] (x may be a year or a category label, y is always numeric). Omit
+  chartData entirely when there is no figure.`;
 
 export const WRITING_PROMPT_TEMPLATES = build<WritingPrompt>(
   WRITING_PROMPT_BASE,

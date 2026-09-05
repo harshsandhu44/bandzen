@@ -89,16 +89,26 @@ export function peaksFromSamples(
 
 /**
  * Downsamples an MP3 to a fixed-length amplitude array (0-1) for the
- * listening runner's waveform display. Pure WASM decode — no ffmpeg, which
- * Vercel doesn't ship (the same reason Speaking encodes WAV client-side).
+ * listening runner's waveform display, and reads its duration off the same
+ * decode — the mock test's Listening section sums these to know how long its
+ * 4 tracks run without a candidate-visible clock. Pure WASM decode — no
+ * ffmpeg, which Vercel doesn't ship (the same reason Speaking encodes WAV
+ * client-side).
  */
-export async function computePeaks(mp3: Buffer): Promise<number[]> {
+export async function computePeaks(
+  mp3: Buffer,
+): Promise<{ peaks: number[]; durationSeconds: number }> {
   const decoder = new MPEGDecoder();
   await decoder.ready;
   try {
-    const { channelData } = decoder.decode(new Uint8Array(mp3));
+    const { channelData, samplesDecoded, sampleRate } = decoder.decode(
+      new Uint8Array(mp3),
+    );
     const samples = channelData[0];
-    return samples?.length ? peaksFromSamples(samples) : [];
+    return {
+      peaks: samples?.length ? peaksFromSamples(samples) : [],
+      durationSeconds: sampleRate ? samplesDecoded / sampleRate : 0,
+    };
   } finally {
     decoder.free();
   }

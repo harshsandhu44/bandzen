@@ -59,7 +59,7 @@ export async function POST(
   try {
     if (hasTranscript && !hasAudio) {
       const mp3 = await synthesizeSpeech(track.transcript!);
-      const [audioUrl, peaks] = await Promise.all([
+      const [audioUrl, { peaks, durationSeconds }] = await Promise.all([
         uploadObject({
           key: `listening/${crypto.randomUUID()}.mp3`,
           body: mp3,
@@ -69,7 +69,7 @@ export async function POST(
       ]);
       await updateTrack(
         id,
-        { audioUrl, peaks, generationStartedAt: null },
+        { audioUrl, peaks, durationSeconds, generationStartedAt: null },
         userId,
       );
       return NextResponse.json({ status: 'done', generated: 'audio' });

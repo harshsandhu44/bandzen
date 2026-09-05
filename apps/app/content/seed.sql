@@ -657,31 +657,104 @@ insert into public.question_answers (question_id, answer)
 select q.id, '["Reaching international agreement on a prime meridian"]'::jsonb from q
 on conflict (question_id) do update set answer = excluded.answer;
 
-insert into public.writing_prompts (slug, task, prompt_text)
-values ('task2-remote-work', 2, 'Some people believe that allowing employees to work from home permanently benefits both companies and workers. Others argue that it weakens teams and harms younger employees in particular.
+insert into public.writing_prompts (slug, task, format, prompt_text, chart_data)
+values ('task2-remote-work', 2, 'academic'::public.test_format, 'Some people believe that allowing employees to work from home permanently benefits both companies and workers. Others argue that it weakens teams and harms younger employees in particular.
 
 Discuss both these views and give your own opinion.
 
-Give reasons for your answer and include any relevant examples from your own knowledge or experience. Write at least 250 words.')
+Give reasons for your answer and include any relevant examples from your own knowledge or experience. Write at least 250 words.', null)
 on conflict (slug) do update set
-  task = excluded.task, prompt_text = excluded.prompt_text;
+  task = excluded.task, format = excluded.format, prompt_text = excluded.prompt_text,
+  chart_data = excluded.chart_data;
 
-insert into public.writing_prompts (slug, task, prompt_text)
-values ('task2-museums-free', 2, 'In some countries, entry to national museums and galleries is free of charge. In others, visitors are expected to pay.
+insert into public.writing_prompts (slug, task, format, prompt_text, chart_data)
+values ('task2-museums-free', 2, 'academic'::public.test_format, 'In some countries, entry to national museums and galleries is free of charge. In others, visitors are expected to pay.
 
 Do the advantages of free entry outweigh the disadvantages?
 
-Give reasons for your answer and include any relevant examples from your own knowledge or experience. Write at least 250 words.')
+Give reasons for your answer and include any relevant examples from your own knowledge or experience. Write at least 250 words.', null)
 on conflict (slug) do update set
-  task = excluded.task, prompt_text = excluded.prompt_text;
+  task = excluded.task, format = excluded.format, prompt_text = excluded.prompt_text,
+  chart_data = excluded.chart_data;
 
-insert into public.writing_prompts (slug, task, prompt_text)
-values ('task2-university-subjects', 2, 'Some people think universities should only offer subjects that are useful in the future job market, such as those related to science and technology. Others believe that subjects like history, philosophy and literature remain essential.
+insert into public.writing_prompts (slug, task, format, prompt_text, chart_data)
+values ('task2-university-subjects', 2, 'academic'::public.test_format, 'Some people think universities should only offer subjects that are useful in the future job market, such as those related to science and technology. Others believe that subjects like history, philosophy and literature remain essential.
 
 Discuss both views and give your own opinion.
 
-Give reasons for your answer and include any relevant examples from your own knowledge or experience. Write at least 250 words.')
+Give reasons for your answer and include any relevant examples from your own knowledge or experience. Write at least 250 words.', null)
 on conflict (slug) do update set
-  task = excluded.task, prompt_text = excluded.prompt_text;
+  task = excluded.task, format = excluded.format, prompt_text = excluded.prompt_text,
+  chart_data = excluded.chart_data;
+
+insert into public.writing_prompts (slug, task, format, prompt_text, chart_data)
+values ('task1-academic-smartphone-ownership', 1, 'academic'::public.test_format, 'The line graph below shows the percentage of adults who owned a smartphone in three countries between 2008 and 2023.
+
+Summarise the information by selecting and reporting the main features, and make comparisons where relevant.
+
+Write at least 150 words.', '{"kind":"line","title":"Adults owning a smartphone, 2008-2023","unit":"% of adults","xLabel":"Year","series":[{"name":"South Korea","points":[[2008,2],[2011,24],[2014,74],[2017,89],[2020,93],[2023,95]]},{"name":"United States","points":[[2008,1],[2011,18],[2014,58],[2017,77],[2020,85],[2023,90]]},{"name":"Nigeria","points":[[2008,0],[2011,3],[2014,9],[2017,21],[2020,32],[2023,45]]}]}'::jsonb)
+on conflict (slug) do update set
+  task = excluded.task, format = excluded.format, prompt_text = excluded.prompt_text,
+  chart_data = excluded.chart_data;
+
+insert into public.writing_prompts (slug, task, format, prompt_text, chart_data)
+values ('task1-academic-household-spending', 1, 'academic'::public.test_format, 'The bar chart below shows the average monthly household spending on four categories in two countries in 2022.
+
+Summarise the information by selecting and reporting the main features, and make comparisons where relevant.
+
+Write at least 150 words.', '{"kind":"bar","title":"Average monthly household spending, 2022","unit":"USD","xLabel":"Category","series":[{"name":"Country A","points":[["Housing",1200],["Food",500],["Transport",300],["Leisure",250]]},{"name":"Country B","points":[["Housing",650],["Food",420],["Transport",180],["Leisure",150]]}]}'::jsonb)
+on conflict (slug) do update set
+  task = excluded.task, format = excluded.format, prompt_text = excluded.prompt_text,
+  chart_data = excluded.chart_data;
+
+insert into public.writing_prompts (slug, task, format, prompt_text, chart_data)
+values ('task1-academic-renewable-energy', 1, 'academic'::public.test_format, 'The graph below shows the share of electricity generated from renewable sources in three countries between 1995 and 2020.
+
+Summarise the information by selecting and reporting the main features, and make comparisons where relevant.
+
+Write at least 150 words.', '{"kind":"line","title":"Electricity from renewable sources, 1995-2020","unit":"% of total generation","xLabel":"Year","series":[{"name":"Denmark","points":[[1995,6],[2000,16],[2005,24],[2010,33],[2015,52],[2020,67]]},{"name":"Germany","points":[[1995,4],[2000,7],[2005,11],[2010,17],[2015,30],[2020,45]]},{"name":"Poland","points":[[1995,2],[2000,2],[2005,3],[2010,7],[2015,13],[2020,17]]}]}'::jsonb)
+on conflict (slug) do update set
+  task = excluded.task, format = excluded.format, prompt_text = excluded.prompt_text,
+  chart_data = excluded.chart_data;
+
+insert into public.writing_prompts (slug, task, format, prompt_text, chart_data)
+values ('task1-academic-commute-mode', 1, 'academic'::public.test_format, 'The bar chart below shows how workers travelled to their workplace in one city in 2000 and 2020.
+
+Summarise the information by selecting and reporting the main features, and make comparisons where relevant.
+
+Write at least 150 words.', '{"kind":"bar","title":"Method of travel to work, 2000 vs 2020","unit":"% of workers","xLabel":"Mode","series":[{"name":"2000","points":[["Car",58],["Public transport",24],["Cycling",6],["Walking",12]]},{"name":"2020","points":[["Car",41],["Public transport",31],["Cycling",18],["Walking",10]]}]}'::jsonb)
+on conflict (slug) do update set
+  task = excluded.task, format = excluded.format, prompt_text = excluded.prompt_text,
+  chart_data = excluded.chart_data;
+
+insert into public.writing_prompts (slug, task, format, prompt_text, chart_data)
+values ('task1-academic-international-students', 1, 'academic'::public.test_format, 'The line graph below shows the number of students from three countries who enrolled in universities abroad between 2005 and 2020.
+
+Summarise the information by selecting and reporting the main features, and make comparisons where relevant.
+
+Write at least 150 words.', '{"kind":"line","title":"Students enrolled in universities abroad, 2005-2020","unit":"thousands","xLabel":"Year","series":[{"name":"China","points":[[2005,118],[2010,265],[2015,460],[2020,590]]},{"name":"India","points":[[2005,60],[2010,145],[2015,220],[2020,310]]},{"name":"South Korea","points":[[2005,75],[2010,105],[2015,100],[2020,85]]}]}'::jsonb)
+on conflict (slug) do update set
+  task = excluded.task, format = excluded.format, prompt_text = excluded.prompt_text,
+  chart_data = excluded.chart_data;
+
+insert into public.writing_prompts (slug, task, format, prompt_text, chart_data)
+values ('task1-academic-working-hours', 1, 'academic'::public.test_format, 'The bar chart below shows the average number of hours worked per week in four industries in two countries in 2021.
+
+Summarise the information by selecting and reporting the main features, and make comparisons where relevant.
+
+Write at least 150 words.', '{"kind":"bar","title":"Average weekly working hours by industry, 2021","unit":"hours","xLabel":"Industry","series":[{"name":"Country A","points":[["Agriculture",46],["Manufacturing",42],["Retail",38],["Finance",40]]},{"name":"Country B","points":[["Agriculture",39],["Manufacturing",37],["Retail",33],["Finance",36]]}]}'::jsonb)
+on conflict (slug) do update set
+  task = excluded.task, format = excluded.format, prompt_text = excluded.prompt_text,
+  chart_data = excluded.chart_data;
+
+insert into public.writing_prompts (slug, task, format, prompt_text, chart_data)
+values ('task1-academic-co2-emissions', 1, 'academic'::public.test_format, 'The graph below shows carbon dioxide emissions per person in three countries between 1990 and 2020.
+
+Summarise the information by selecting and reporting the main features, and make comparisons where relevant.
+
+Write at least 150 words.', '{"kind":"line","title":"CO2 emissions per capita, 1990-2020","unit":"tonnes per person","xLabel":"Year","series":[{"name":"United States","points":[[1990,19.3],[2000,20.2],[2010,17.6],[2020,13.7]]},{"name":"United Kingdom","points":[[1990,9.9],[2000,9.2],[2010,7.7],[2020,4.8]]},{"name":"Brazil","points":[[1990,1.4],[2000,1.8],[2010,2.1],[2020,2]]}]}'::jsonb)
+on conflict (slug) do update set
+  task = excluded.task, format = excluded.format, prompt_text = excluded.prompt_text,
+  chart_data = excluded.chart_data;
 
 commit;
