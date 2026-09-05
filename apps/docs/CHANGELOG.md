@@ -1,3 +1,10 @@
+# docs [0.4.0](https://github.com/harshsandhu44/bandzen/compare/docs@0.3.0...docs@0.4.0) (2026-09-05)
+
+
+### Features
+
+* **billing:** close subscription-conversion gaps ([#53](https://github.com/harshsandhu44/bandzen/issues/53)) ([460d310](https://github.com/harshsandhu44/bandzen/commit/460d3107bbcc107227dc9a84c80947020bbcd336))
+
 # docs [0.3.0](https://github.com/harshsandhu44/bandzen/compare/docs@0.2.0...docs@0.3.0) (2026-09-04)
 
 
