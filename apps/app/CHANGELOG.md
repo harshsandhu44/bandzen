@@ -1,3 +1,10 @@
+# app [0.19.0](https://github.com/harshsandhu44/bandzen/compare/app@0.18.0...app@0.19.0) (2026-09-05)
+
+
+### Features
+
+* **app:** add the full four-skill mock test ([#44](https://github.com/harshsandhu44/bandzen/issues/44)) ([1f770ee](https://github.com/harshsandhu44/bandzen/commit/1f770ee4869788cd501381e57142a7a13a743710))
+
 # app [0.18.0](https://github.com/harshsandhu44/bandzen/compare/app@0.17.0...app@0.18.0) (2026-09-04)
 
 
