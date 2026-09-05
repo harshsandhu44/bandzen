@@ -14,6 +14,7 @@ import {
   getMockSectionAttempts,
   saveEssay,
 } from '@/lib/db/queries';
+import { finishSittingSection } from '@/lib/mock-guard';
 
 export async function startWritingAttempt(formData: FormData) {
   const promptId = String(formData.get('promptId') ?? '');
@@ -73,19 +74,16 @@ export async function submitEssay(formData: FormData) {
     after(() => gradeEssay(attemptId));
   }
 
-  if (attempt.kind === 'diagnostic' && attempt.parentId) {
-    redirect(`/diagnostic/${attempt.parentId}/result`);
-  }
-
   redirect(`/writing/${attemptId}/report`);
 }
 
 /**
- * Submit the mock's Writing section: both tasks, claimed and graded
- * together. `formData`'s `attemptId` is Task 1's — the canonical URL the
- * candidate is on — and this looks up its sibling under the same
- * `mockAttemptId` rather than trusting a second hidden field for it. Same
- * claim-then-grade-after shape as `submitEssay`, just twice.
+ * Submit the Writing section of a sitting: every writing row under the
+ * sitting, claimed and graded together. A mock has two (Task 1 + Task 2); a
+ * diagnostic has one (Task 2). `formData`'s `attemptId` is the canonical row
+ * the candidate is on; the siblings are looked up by `mockAttemptId` rather
+ * than trusting a second hidden field. Same claim-then-grade-after shape as
+ * `submitEssay`.
  */
 export async function submitMockWriting(formData: FormData) {
   const attemptId = String(formData.get('attemptId') ?? '');
@@ -107,7 +105,9 @@ export async function submitMockWriting(formData: FormData) {
     }
   }
 
-  redirect(`/mock/${attempt.mockAttemptId}/next?section=speaking`);
+  // On to Speaking (mock, Pro diagnostic) or the result page (Free diagnostic
+  // — Writing is its last section).
+  await finishSittingSection(userId, attempt.mockAttemptId);
 }
 
 /**

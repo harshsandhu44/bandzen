@@ -8,6 +8,7 @@ import {
   getMockAttempt,
   getMockSectionAttempts,
   getMockSiblings,
+  isPro,
   latestOpenMock,
   mockAllowance,
   mockContentExclusions,
@@ -91,12 +92,12 @@ export async function startMock() {
  * land the candidate on the actual current section, not wherever the URL
  * claimed.
  *
- * Reading and Listening create one row with no content pointer of their own
- * (`passageId`/`trackId` stay null); their engines resolve the 3 passages or
- * 4 tracks through `mockAttemptId` instead. Writing creates two rows, one per
- * task, because grading is strictly per-attempt. Idempotent either way: a
- * reload of the interstitial finds the row(s) already there and redirects
- * into them rather than creating duplicates.
+ * Shared by `/mock` and `/diagnostic`. Section rows carry the sitting's own
+ * `kind`. Reading and Listening create one row with no content pointer of
+ * their own (`passageId`/`trackId` stay null); their engines resolve the
+ * passages / tracks through `mockAttemptId`. Writing creates two rows for a
+ * mock (one per task) and one for a diagnostic (Task 2 only). Idempotent: a
+ * reload finds the row(s) already there and redirects into them.
  */
 export async function enterMockSection(formData: FormData) {
   const mockAttemptId = String(formData.get('mockAttemptId') ?? '');
@@ -105,12 +106,24 @@ export async function enterMockSection(formData: FormData) {
   const userId = await requireUserId();
   const mock = await getMockAttempt(userId, mockAttemptId);
   if (!mock) notFound();
-  if (mock.submittedAt) redirect(`/mock/${mockAttemptId}/result`);
+  if (mock.submittedAt) {
+    redirect(mockSectionUrl(mockAttemptId, null, mock.kind));
+  }
 
-  const siblings = await getMockSiblings(userId, mockAttemptId);
-  const position = mockPosition(siblings);
-  if (!position) redirect(`/mock/${mockAttemptId}/result`);
+  const [siblings, includeSpeaking] = await Promise.all([
+    getMockSiblings(userId, mockAttemptId),
+    mock.kind === 'mock' ? Promise.resolve(true) : isPro(userId),
+  ]);
+  const position = mockPosition(siblings, { includeSpeaking });
+  if (!position) redirect(mockSectionUrl(mockAttemptId, null, mock.kind));
 
+  // Speaking on a diagnostic requires Pro. Unreachable via the sequencer for a
+  // Free candidate (position stops at writing), but guard the direct path too.
+  if (position === 'speaking' && !includeSpeaking) {
+    redirect('/upgrade?from=diagnostic_speaking_wall');
+  }
+
+  const sectionKind = mock.kind;
   const existing = await getMockSectionAttempts(
     userId,
     mockAttemptId,
@@ -118,25 +131,39 @@ export async function enterMockSection(formData: FormData) {
   );
 
   if (position === 'writing') {
-    const task1 =
-      existing.find((r) => r.promptId === mock.writingTask1PromptId) ??
+    // A mock has Task 1 + Task 2; a diagnostic has Task 2 only.
+    if (mock.writingTask1PromptId != null) {
+      const task1 =
+        existing.find((r) => r.promptId === mock.writingTask1PromptId) ??
+        (await createAttempt({
+          userId,
+          module: 'writing',
+          kind: sectionKind,
+          promptId: mock.writingTask1PromptId,
+          mockAttemptId,
+        }));
+      if (!existing.some((r) => r.promptId === mock.writingTask2PromptId)) {
+        await createAttempt({
+          userId,
+          module: 'writing',
+          kind: sectionKind,
+          promptId: mock.writingTask2PromptId,
+          mockAttemptId,
+        });
+      }
+      redirect(`/writing/${task1.id}`);
+    }
+
+    const row =
+      existing[0] ??
       (await createAttempt({
         userId,
         module: 'writing',
-        kind: 'mock',
-        promptId: mock.writingTask1PromptId,
-        mockAttemptId,
-      }));
-    if (!existing.some((r) => r.promptId === mock.writingTask2PromptId)) {
-      await createAttempt({
-        userId,
-        module: 'writing',
-        kind: 'mock',
+        kind: sectionKind,
         promptId: mock.writingTask2PromptId,
         mockAttemptId,
-      });
-    }
-    redirect(`/writing/${task1.id}`);
+      }));
+    redirect(`/writing/${row.id}`);
   }
 
   if (existing[0]) redirect(`/${position}/${existing[0].id}`);
@@ -144,9 +171,11 @@ export async function enterMockSection(formData: FormData) {
   const attempt = await createAttempt({
     userId,
     module: position,
-    kind: 'mock',
+    kind: sectionKind,
     mockAttemptId,
-    ...(position === 'speaking' ? { speakingTestId: mock.speakingTestId } : {}),
+    ...(position === 'speaking' && mock.speakingTestId
+      ? { speakingTestId: mock.speakingTestId }
+      : {}),
   });
   redirect(`/${position}/${attempt.id}`);
 }

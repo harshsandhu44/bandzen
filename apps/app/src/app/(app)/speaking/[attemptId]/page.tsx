@@ -16,7 +16,7 @@ export default async function SpeakingAttemptPage({
   const attempt = await getAttempt(userId, attemptId);
   if (!attempt) notFound();
 
-  if (attempt.kind === 'mock') {
+  if (attempt.mockAttemptId) {
     await assertMockSection(userId, attempt);
   } else if (attempt.status !== 'in_progress') {
     redirect(`/speaking/${attemptId}/report`);
@@ -31,7 +31,7 @@ export default async function SpeakingAttemptPage({
       title={data.test.title}
       prompts={data.prompts}
       saved={data.saved}
-      mock={attempt.kind === 'mock'}
+      mock={attempt.mockAttemptId != null}
     />
   );
 }

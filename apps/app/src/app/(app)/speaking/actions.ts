@@ -12,8 +12,8 @@ import {
   getAttempt,
   isPro,
   saveSpeakingResponse,
-  submitMockAttempt,
 } from '@/lib/db/queries';
+import { finishSittingSection } from '@/lib/mock-guard';
 import { uploadObject } from '@bandzen/storage/r2';
 
 export async function startSpeakingAttempt(formData: FormData) {
@@ -102,13 +102,12 @@ export async function submitSpeakingAttempt(formData: FormData) {
     after(() => gradeSpeaking(attemptId));
   }
 
-  // Speaking is the mock's last section — this is what closes the sitting:
-  // frees the weekly cap and lets `startMock` resume land at the result page
-  // instead of looping back in. Stamped even though grading itself runs
-  // after the response, same as every other mock section.
-  if (attempt.kind === 'mock' && attempt.mockAttemptId) {
-    await submitMockAttempt(userId, attempt.mockAttemptId);
-    redirect(`/mock/${attempt.mockAttemptId}/result`);
+  // Speaking is the last section of a mock or a Pro diagnostic —
+  // `finishSittingSection` stamps `mock_attempts.submittedAt` (which frees the
+  // weekly cap) and sends the candidate to the result page. Grading itself
+  // still runs after the response, same as every other sitting section.
+  if (attempt.mockAttemptId) {
+    await finishSittingSection(userId, attempt.mockAttemptId);
   }
 
   redirect(`/speaking/${attemptId}/report`);

@@ -27,15 +27,16 @@ export const taskRules = (task: number) =>
 export const SEEDED_QUESTIONS_PER_PASSAGE = 13;
 
 /**
- * How long the diagnostic takes: one reading passage, then one Task 2 essay.
- * Derived from the same rules the engines enforce, so the number a candidate
- * is promised is the number the timers actually give them.
+ * The diagnostic's Reading and Writing clocks. Literal, like
+ * `MOCK_SECTION_MINUTES` and for the same reason — real IELTS gives a fixed
+ * allowance regardless of question count. Reading is 40 (two passages, not the
+ * mock's three); Writing is 40 (`taskRules(2).minutes` — a Task-2-only
+ * section, never the mock's 60 which pays for two tasks).
  */
-export const DIAGNOSTIC_MINUTES =
-  minutesFor(SEEDED_QUESTIONS_PER_PASSAGE) + taskRules(2).minutes;
+export const DIAGNOSTIC_SECTION_MINUTES = { reading: 40, writing: 40 } as const;
 
-/** The diagnostic's length, for prose. */
-export const DIAGNOSTIC_DURATION_LABEL = `${DIAGNOSTIC_MINUTES} min`;
+/** The diagnostic's length, for prose. Listening's real length depends on the 2 tracks picked. */
+export const DIAGNOSTIC_DURATION_LABEL = 'About 1 hr 15 min';
 
 /** A single reading section's allowance, for prose. */
 export const READING_SECTION_DURATION_LABEL = `${minutesFor(
@@ -54,6 +55,15 @@ export const WRITING_TASK2_DURATION_LABEL = `${taskRules(2).minutes} min`;
  * would give 59, not 60 -- close enough to be a worse bug than an unused import.
  */
 export const MOCK_SECTION_MINUTES = { reading: 60, writing: 60 } as const;
+
+/** A sitting section's clock, by which kind of sitting it belongs to. */
+export const sittingSectionMinutes = (
+  kind: 'mock' | 'diagnostic',
+  section: 'reading' | 'writing',
+) =>
+  (kind === 'diagnostic' ? DIAGNOSTIC_SECTION_MINUTES : MOCK_SECTION_MINUTES)[
+    section
+  ];
 
 /** Silent pause between mock Listening tracks, while the next section's questions can be read ahead. */
 export const LISTENING_TRACK_PAUSE_SECONDS = 30;
