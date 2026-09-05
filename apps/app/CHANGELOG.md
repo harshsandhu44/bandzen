@@ -1,3 +1,10 @@
+## app [0.19.1](https://github.com/harshsandhu44/bandzen/compare/app@0.19.0...app@0.19.1) (2026-09-05)
+
+
+### Bug Fixes
+
+* **app:** scope mock-attempt writes, validate speaking uploads, drop dead dynamic exports ([#45](https://github.com/harshsandhu44/bandzen/issues/45)) ([1d26fbf](https://github.com/harshsandhu44/bandzen/commit/1d26fbfd27b3df5ef20a1035d856a35529bc088c))
+
 # app [0.19.0](https://github.com/harshsandhu44/bandzen/compare/app@0.18.0...app@0.19.0) (2026-09-05)
 
 
