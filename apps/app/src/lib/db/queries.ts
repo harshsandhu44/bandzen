@@ -397,12 +397,16 @@ export async function getMockResult(userId: string, mockAttemptId: string) {
 }
 
 /** Speaking is the last section — this is what closes the sitting and frees the weekly cap. */
-export async function submitMockAttempt(mockAttemptId: string) {
+export async function submitMockAttempt(userId: string, mockAttemptId: string) {
   await db
     .update(mockAttempts)
     .set({ submittedAt: new Date() })
     .where(
-      and(eq(mockAttempts.id, mockAttemptId), isNull(mockAttempts.submittedAt)),
+      and(
+        eq(mockAttempts.id, mockAttemptId),
+        eq(mockAttempts.userId, userId),
+        isNull(mockAttempts.submittedAt),
+      ),
     );
 }
 

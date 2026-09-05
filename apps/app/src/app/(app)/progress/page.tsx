@@ -45,8 +45,6 @@ import {
 import { meanBand } from '@/lib/plan-data';
 import type { Skill } from '@/lib/db/schema';
 
-export const dynamic = 'force-dynamic';
-
 export const metadata = { title: 'Progress' };
 
 const DATE = new Intl.DateTimeFormat('en-GB', {

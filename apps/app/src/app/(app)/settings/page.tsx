@@ -25,8 +25,6 @@ import { CancelPlan } from './cancel-plan';
 import { saveSettings } from './actions';
 import pkg from '../../../../package.json';
 
-export const dynamic = 'force-dynamic';
-
 export const metadata = { title: 'Settings' };
 
 const DATE = new Intl.DateTimeFormat('en-GB', {

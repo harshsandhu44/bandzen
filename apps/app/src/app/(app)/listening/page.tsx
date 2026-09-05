@@ -8,16 +8,6 @@ import { DIFFICULTY_RANGE, listTracks } from '@/lib/db/queries';
 import { QUESTION_KIND_LABEL } from '@/lib/modules';
 import { startListeningAttempt } from './actions';
 
-/**
- * Content is shared and immutable, but it lives in the database and there is
- * no database at build time — so render on demand rather than prerender.
- *
- * ponytail: this is a handful of rows per request. If the track list grows
- * enough to matter, wrap the query in a cache rather than making the page
- * static, since the seed can change without a redeploy.
- */
-export const dynamic = 'force-dynamic';
-
 export const metadata = { title: 'Listening practice' };
 
 /** The question kinds that actually appear on a listening track — T/F/NG and

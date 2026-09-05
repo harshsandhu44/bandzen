@@ -8,9 +8,6 @@ import { requireUserId } from '@/lib/auth';
 import { DIFFICULTY_RANGE, isPro, listSpeakingTests } from '@/lib/db/queries';
 import { startSpeakingAttempt } from './actions';
 
-/** See listening/page.tsx — content is rows, and there is no DB at build time. */
-export const dynamic = 'force-dynamic';
-
 export const metadata = { title: 'Speaking practice' };
 
 const DIFFICULTY_OPTIONS = [
