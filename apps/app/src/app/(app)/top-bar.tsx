@@ -88,11 +88,14 @@ export function TopBar({
   email,
   testDays,
   essaysLeft,
+  trialDaysLeft,
 }: {
   email: string | null;
   testDays: number | null;
   /** Marks left this week, or null when unlimited. */
   essaysLeft: number | null;
+  /** Days left on the reverse trial, or null outside of one. */
+  trialDaysLeft: number | null;
 }) {
   const pathname = usePathname();
   const router = useRouter();
@@ -155,6 +158,19 @@ export function TopBar({
               {testDays === 0 ? 'Today' : `${testDays}d`}
             </span>
           </span>
+        ) : null}
+
+        {trialDaysLeft != null ? (
+          <Link
+            href="/upgrade?from=topbar"
+            className="font-mono text-[0.625rem] tracking-[0.14em] whitespace-nowrap text-chrome uppercase underline-offset-4 hover:text-foreground hover:underline"
+          >
+            <span className="hidden sm:inline">
+              Trial · {trialDaysLeft} {trialDaysLeft === 1 ? 'day' : 'days'}{' '}
+              left
+            </span>
+            <span className="sm:hidden">Trial · {trialDaysLeft}d</span>
+          </Link>
         ) : null}
 
         {essaysLeft != null ? (

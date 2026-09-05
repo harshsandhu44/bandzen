@@ -17,6 +17,7 @@ import { meanBand } from '@/lib/plan-data';
 import {
   FREE_COACH_MESSAGES_PER_WINDOW,
   FREE_ESSAYS_PER_WINDOW,
+  FREE_PRACTICE_TESTS_PER_MODULE,
   PLANS,
   formatInr,
   isFoundingActive,
@@ -39,6 +40,7 @@ const DATE = new Intl.DateTimeFormat('en-GB', {
 /** What Pro removes the ceiling on, in the order a candidate feels them. */
 const INCLUDED = [
   'Unlimited essay marking, against all four IELTS criteria',
+  'Unlimited Reading and Listening practice',
   'Speaking tests, graded from your audio on all four criteria',
   'Full four-skill mock tests, one a week',
   'Unlimited Bandzen Coach',
@@ -87,7 +89,7 @@ export default async function UpgradePage(props: PageProps<'/upgrade'>) {
         description={
           paying
             ? 'Everything is unlimited. Manage or cancel your plan from Settings.'
-            : `Free covers ${FREE_ESSAYS_PER_WINDOW} marked essays and ${FREE_COACH_MESSAGES_PER_WINDOW} Coach messages a week. Pro removes the ceiling on both.`
+            : `Free covers ${FREE_ESSAYS_PER_WINDOW} marked essays and ${FREE_COACH_MESSAGES_PER_WINDOW} Coach messages a week, and ${FREE_PRACTICE_TESTS_PER_MODULE} Reading and ${FREE_PRACTICE_TESTS_PER_MODULE} Listening tests in total. Pro removes every one of those ceilings.`
         }
       />
 

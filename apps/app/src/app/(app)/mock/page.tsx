@@ -2,6 +2,7 @@ import { ArrowRight } from 'lucide-react';
 import { Button } from '@bandzen/ui/components/button';
 import { Eyebrow, PageHeader, Panel } from '@/components/app/primitives';
 import { ProTag, QuotaMeter } from '@/components/billing/pro';
+import { capture } from '@/lib/analytics';
 import { requireUserId } from '@/lib/auth';
 import {
   getProfile,
@@ -28,6 +29,12 @@ export default async function MockPage() {
     latestOpenMock(userId),
     getProfile(userId),
   ]);
+
+  if (!pro) {
+    await capture(userId, 'pro_feature_locked', { surface: 'mock' });
+  } else if (!open && !cap.allowed) {
+    await capture(userId, 'quota_exhausted', { surface: 'mock' });
+  }
 
   return (
     <div className="max-w-4xl space-y-6">

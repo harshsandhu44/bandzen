@@ -7,9 +7,11 @@ import {
   allowance,
   canStartDiagnostic,
   canStartMock,
+  daysLeft,
   formatInr,
   grantEndsAt,
   isFoundingActive,
+  lifetimeAllowance,
   perMonth,
   planByKey,
   savingsPercent,
@@ -137,6 +139,32 @@ test('a Pro mock start that has aged out of the window frees up again', () => {
 
 test('a grant expires the given number of days out', () => {
   assert.deepEqual(grantEndsAt(7, NOW), new Date(NOW.getTime() + 7 * DAY));
+});
+
+test('a lifetime allowance counts down to a hard zero with no reset', () => {
+  const two = lifetimeAllowance({ isPro: false, used: 3, limit: 5 });
+  assert.equal(two.allowed, true);
+  assert.equal(two.remaining, 2);
+  assert.equal(two.resetsAt, null);
+
+  const spent = lifetimeAllowance({ isPro: false, used: 5, limit: 5 });
+  assert.equal(spent.allowed, false);
+  assert.equal(spent.remaining, 0);
+
+  const over = lifetimeAllowance({ isPro: false, used: 9, limit: 5 });
+  assert.equal(over.allowed, false);
+  assert.equal(over.remaining, 0);
+
+  assert.equal(
+    lifetimeAllowance({ isPro: true, used: 9, limit: 5 }).unlimited,
+    true,
+  );
+});
+
+test('days left rounds a partial day up and never goes below zero', () => {
+  assert.equal(daysLeft(new Date(NOW.getTime() + 7 * DAY), NOW), 7);
+  assert.equal(daysLeft(new Date(NOW.getTime() + 6 * DAY + 1000), NOW), 7);
+  assert.equal(daysLeft(new Date(NOW.getTime() - DAY), NOW), 0);
 });
 
 test('the founding window is closed when no date is set', () => {

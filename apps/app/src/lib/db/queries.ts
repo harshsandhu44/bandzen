@@ -18,9 +18,11 @@ import {
 import {
   FREE_COACH_MESSAGES_PER_WINDOW,
   FREE_ESSAYS_PER_WINDOW,
+  FREE_PRACTICE_TESTS_PER_MODULE,
   allowance,
   canStartMock,
   isProAt,
+  lifetimeAllowance,
   windowStart,
 } from '@/lib/entitlements';
 import { isAnswerCorrect, readingBand } from '@/lib/grading';
@@ -246,6 +248,53 @@ export async function mockAllowance(userId: string) {
     mockStartsInWindow(userId, windowStart()),
   ]);
   return canStartMock({ isPro: isProAt(until), startsInWindow: starts });
+}
+
+/**
+ * How many Reading or Listening practice tests this candidate has started,
+ * ever. Lifetime, so no window — the Free cap is a fixed number of tries, not
+ * a weekly ration.
+ *
+ * Started, not submitted, and `failed` excluded, for the same reasons as
+ * `essayStartsInWindow`. Diagnostic and mock attempts are a different `kind`
+ * and never count.
+ */
+async function practiceAttemptsUsed(
+  userId: string,
+  module: 'reading' | 'listening',
+): Promise<number> {
+  const [row] = await db
+    .select({ n: count() })
+    .from(attempts)
+    .where(
+      and(
+        eq(attempts.userId, userId),
+        eq(attempts.module, module),
+        eq(attempts.kind, 'practice'),
+        ne(attempts.status, 'failed'),
+      ),
+    );
+  return row?.n ?? 0;
+}
+
+/**
+ * What is left of a Free candidate's Reading or Listening practice tests. One
+ * function for the list page's meter and the `start*Attempt` gate both, as
+ * with `essayAllowance`.
+ */
+export async function practiceAllowance(
+  userId: string,
+  module: 'reading' | 'listening',
+) {
+  const [until, used] = await Promise.all([
+    proUntil(userId),
+    practiceAttemptsUsed(userId, module),
+  ]);
+  return lifetimeAllowance({
+    isPro: isProAt(until),
+    used,
+    limit: FREE_PRACTICE_TESTS_PER_MODULE,
+  });
 }
 
 /**

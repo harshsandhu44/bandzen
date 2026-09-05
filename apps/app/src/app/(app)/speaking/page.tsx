@@ -4,6 +4,7 @@ import { Button } from '@bandzen/ui/components/button';
 import { EmptyState, PageHeader, Panel } from '@/components/app/primitives';
 import { FilterBar } from '@/components/app/filter-bar';
 import { ProLocked } from '@/components/billing/pro';
+import { capture } from '@/lib/analytics';
 import { requireUserId } from '@/lib/auth';
 import { DIFFICULTY_RANGE, isPro, listSpeakingTests } from '@/lib/db/queries';
 import { startSpeakingAttempt } from './actions';
@@ -24,6 +25,10 @@ export default async function SpeakingPage({
 }: PageProps<'/speaking'>) {
   const userId = await requireUserId();
   const pro = await isPro(userId);
+
+  if (!pro) {
+    await capture(userId, 'pro_feature_locked', { surface: 'speaking' });
+  }
 
   const sp = await searchParams;
   const one = (v: string | string[] | undefined) =>

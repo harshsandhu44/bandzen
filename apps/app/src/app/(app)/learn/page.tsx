@@ -3,7 +3,9 @@ import { ArrowRight } from 'lucide-react';
 import { Button } from '@bandzen/ui/components/button';
 import { Progress } from '@bandzen/ui/components/progress';
 import { PageHeader, Panel } from '@/components/app/primitives';
+import { UpgradePrompt } from '@/components/billing/pro';
 import { requireUserId } from '@/lib/auth';
+import { isPro } from '@/lib/db/queries';
 import { learnOverview, nextLearnStep } from '@/lib/learn';
 import { MODULE_LABEL } from '@/lib/modules';
 
@@ -18,9 +20,10 @@ export const metadata = { title: 'Learn' };
  */
 export default async function LearnPage() {
   const userId = await requireUserId();
-  const [overview, next] = await Promise.all([
+  const [overview, next, pro] = await Promise.all([
     learnOverview(userId),
     nextLearnStep(userId),
+    isPro(userId),
   ]);
 
   const anyWritten = overview.some((m) => m.total > 0);
@@ -141,6 +144,14 @@ export default async function LearnPage() {
           aria-hidden
         />
       </Link>
+
+      {!pro ? (
+        <UpgradePrompt
+          eyebrow="Bandzen Pro"
+          title="Unlimited marking, Coach, and mock tests"
+          source="learn_page"
+        />
+      ) : null}
     </div>
   );
 }

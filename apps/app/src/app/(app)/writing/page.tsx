@@ -10,6 +10,7 @@ import {
   listWritingPrompts,
 } from '@/lib/db/queries';
 import { QuotaMeter } from '@/components/billing/pro';
+import { capture } from '@/lib/analytics';
 import { startWritingAttempt } from './actions';
 import { taskRules } from '@/lib/timing';
 
@@ -48,6 +49,10 @@ export default async function WritingPage({
   ]);
 
   const examType = profile?.examType ?? 'academic';
+
+  if (!quota.unlimited && quota.remaining === 0) {
+    await capture(userId, 'quota_exhausted', { surface: 'writing' });
+  }
 
   return (
     <div className="max-w-3xl space-y-8">

@@ -3,8 +3,10 @@ import { Badge } from '@bandzen/ui/components/badge';
 import { Button } from '@bandzen/ui/components/button';
 import { EmptyState, PageHeader, Panel } from '@/components/app/primitives';
 import { FilterBar } from '@/components/app/filter-bar';
+import { LockedPracticeRow, QuotaMeter } from '@/components/billing/pro';
+import { capture } from '@/lib/analytics';
 import { requireUserId } from '@/lib/auth';
-import { DIFFICULTY_RANGE, listPassages } from '@/lib/db/queries';
+import { DIFFICULTY_RANGE, listPassages, practiceAllowance } from '@/lib/db/queries';
 import { QUESTION_KIND_LABEL } from '@/lib/modules';
 import { startReadingAttempt } from './actions';
 
@@ -32,7 +34,7 @@ export default async function ReadingPage({
   searchParams,
 }: PageProps<'/reading'>) {
   // Auth is checked at the resource, not in middleware — see proxy.ts.
-  await requireUserId();
+  const userId = await requireUserId();
 
   const sp = await searchParams;
   const one = (v: string | string[] | undefined) =>
@@ -53,8 +55,15 @@ export default async function ReadingPage({
   // an attempt, because creating a row from a plain link would be wrong.
   const passageId = one(sp.passage);
 
-  const passages = await listPassages({ kind, difficulty, id: passageId });
+  const [passages, quota] = await Promise.all([
+    listPassages({ kind, difficulty, id: passageId }),
+    practiceAllowance(userId, 'reading'),
+  ]);
   const params = { kind, difficulty };
+
+  if (!quota.unlimited && quota.remaining === 0) {
+    await capture(userId, 'quota_exhausted', { surface: 'reading' });
+  }
 
   return (
     <div className="max-w-3xl space-y-8">
@@ -96,6 +105,14 @@ export default async function ReadingPage({
         </div>
       )}
 
+      <QuotaMeter
+        id="reading-quota"
+        allowance={quota}
+        noun="reading tests"
+        period=""
+        source="reading_wall"
+      />
+
       {!passages.length ? (
         kind || difficulty ? (
           <EmptyState
@@ -128,11 +145,8 @@ export default async function ReadingPage({
           }
         >
           <ul className="-my-3 divide-y divide-border">
-            {passages.map((p) => (
-              <li
-                key={p.id}
-                className="flex items-center justify-between gap-4 py-3"
-              >
+            {passages.map((p, i) => {
+              const inner = (
                 <div className="min-w-0">
                   <h2 className="font-medium">{p.title}</h2>
                   <p className="mt-1 flex items-center gap-2 text-xs text-muted-foreground">
@@ -140,14 +154,31 @@ export default async function ReadingPage({
                     <span className="truncate">{p.topic}</span>
                   </p>
                 </div>
-                <form action={startReadingAttempt}>
-                  <input type="hidden" name="passageId" value={p.id} />
-                  <Button type="submit" variant="outline" size="sm">
-                    Start
-                  </Button>
-                </form>
-              </li>
-            ))}
+              );
+
+              if (!quota.unlimited && i >= quota.remaining) {
+                return (
+                  <LockedPracticeRow key={p.id} source="reading_wall">
+                    {inner}
+                  </LockedPracticeRow>
+                );
+              }
+
+              return (
+                <li
+                  key={p.id}
+                  className="flex items-center justify-between gap-4 py-3"
+                >
+                  {inner}
+                  <form action={startReadingAttempt}>
+                    <input type="hidden" name="passageId" value={p.id} />
+                    <Button type="submit" variant="outline" size="sm">
+                      Start
+                    </Button>
+                  </form>
+                </li>
+              );
+            })}
           </ul>
         </Panel>
       )}
