@@ -74,7 +74,7 @@ export const hero = {
   headlineAccent: 'anymore.',
   support:
     'Practice all four IELTS modules, take realistic mock tests, and understand exactly what is holding your score back with detailed AI analysis.',
-  note: 'Invitation-only while in beta. No credit card required.',
+  note: 'No credit card required.',
 } as const;
 
 /** Illustrative sample report — the shape of a real Bandzen estimate. */
@@ -396,7 +396,7 @@ export const testimonials = {
 export const pricing = {
   eyebrow: 'Pricing',
   headline: 'Start free. Upgrade when practice turns serious.',
-  note: 'Founding price until 31 October 2026. Invitation-only while in beta. Cancel any time; refund within 7 days.',
+  note: 'Founding price until 31 October 2026. Cancel any time; refund within 7 days.',
   tiers: [
     {
       name: 'Free',
@@ -467,7 +467,7 @@ export const faq = {
     },
     {
       q: 'Can I take complete mock tests?',
-      a: 'Not yet as a single four-skill mock. What exists today is timed practice in every module — Reading, Writing, Listening, and Speaking — each under realistic conditions with autosave and connection recovery, followed by a complete analysis and review mode. A combined mock that runs all four back to back is on the roadmap.',
+      a: 'Yes. A full four-skill mock runs Listening, Reading, Writing and Speaking back to back in one sitting, real IELTS order, with one overall band at the end. It is a Pro feature, capped at one a week.',
     },
   ],
 } as const;
