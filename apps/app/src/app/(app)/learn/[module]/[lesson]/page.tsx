@@ -41,10 +41,8 @@ export default async function LessonPage({
   const next = siblings[siblings.findIndex((l) => l.id === lesson.id) + 1];
 
   const practiceHref = lesson.questionKind
-    ? `/reading?kind=${lesson.questionKind}`
-    : lesson.module === 'writing'
-      ? '/writing'
-      : '/reading';
+    ? `/${lesson.module}?kind=${lesson.questionKind}`
+    : `/${lesson.module}`;
 
   return (
     <div className="max-w-5xl space-y-6">

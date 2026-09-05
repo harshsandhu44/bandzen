@@ -40,6 +40,7 @@ const KIND_HINT: Record<string, string> = {
   callout: 'A highlighted note or warning.',
   example: 'A worked example the reader studies.',
   try: 'A question the reader answers before revealing.',
+  video: 'An embedded video (e.g. a YouTube embed link).',
 };
 
 function BlockRow({
@@ -125,6 +126,20 @@ function BlockRow({
             <Textarea {...register(`${p}.why`)} />
           </Field>
         </>
+      )}
+      {kind === 'video' && (
+        <div className="flex flex-wrap gap-3">
+          <Field
+            label="Video URL"
+            hint="An embeddable link, e.g. a YouTube embed URL."
+            className="min-w-64 flex-1"
+          >
+            <Input {...register(`${p}.url`)} />
+          </Field>
+          <Field label="Title" hint="Optional" className="min-w-48 flex-1">
+            <Input {...register(`${p}.title`)} />
+          </Field>
+        </div>
       )}
     </fieldset>
   );

@@ -822,25 +822,28 @@ type Lesson = z.infer<typeof lessonSchema>;
 const LESSON_BASE = `Write IELTS lessons as a JSON array matching the example below exactly.
 Return JSON only.
 
-- module is "reading" or "writing". group is "foundations", "question-types" or
-  "advanced".
+- module is "reading", "writing", "listening" or "speaking". group is
+  "foundations", "question-types" or "advanced".
 - questionKind is the question type the lesson teaches, or null: one of
   true_false_not_given, yes_no_not_given, multiple_choice, matching_headings,
-  sentence_completion.
+  sentence_completion, matching.
 - orderIndex is optional and sets the position within its module and group.
 - minutes is how long the lesson takes to work through, honestly estimated.
 - stages[].id is one of: understand, see, try, practice, check, improve — in
   that order, and you may omit any stage that has nothing to say.
-- A block is one of six kinds, each with its own fields:
+- A block is one of seven kinds, each with its own fields:
     { "kind": "prose", "body": "…" }
     { "kind": "steps", "items": ["…"] }
     { "kind": "checklist", "items": ["…"] }
     { "kind": "callout", "tone": "note" | "warning", "title": "…", "body": "…" }
     { "kind": "example", "source": "…", "question": "…", "answer": "…", "why": "…" }
     { "kind": "try", "source": "…" (optional), "question": "…", "answer": "…", "why": "…" }
+    { "kind": "video", "url": "…", "title": "…" (optional) }
   "example" shows the reasoning worked through; "try" is a question the reader
   answers in their head before revealing. Both need a "why" that explains the
-  reasoning, not just the answer.
+  reasoning, not just the answer. "video" is optional and rare — only include
+  one where an embeddable URL (e.g. a YouTube embed link) is actually known;
+  never invent a URL.
 - Write to a candidate who is nervous and short of time. No filler, no
   encouragement that carries no information.`;
 

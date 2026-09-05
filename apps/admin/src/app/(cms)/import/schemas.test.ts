@@ -166,12 +166,13 @@ test('a lesson with stages and every block kind parses', () => {
               why: 'w',
             },
             { kind: 'try', question: 'q', answer: 'a', why: 'w' },
+            { kind: 'video', url: 'https://youtube.com/embed/x' },
           ],
         },
       ],
     }),
   );
-  assert.equal(parsed[0].stages?.[0].blocks.length, 6);
+  assert.equal(parsed[0].stages?.[0].blocks.length, 7);
 });
 
 test('an unwritten lesson -- no stages at all -- is legal', () => {
@@ -197,7 +198,7 @@ test('an unknown block kind is rejected', () => {
       title: 'Bad',
       summary: 's',
       minutes: 5,
-      stages: [{ id: 'understand', blocks: [{ kind: 'video', url: 'x' }] }],
+      stages: [{ id: 'understand', blocks: [{ kind: 'poster', url: 'x' }] }],
     }),
   );
 });

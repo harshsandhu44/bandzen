@@ -275,7 +275,12 @@ export type GeneratedSpeakingTest = z.infer<typeof generatedSpeakingTestSchema>;
 export const MAX_ITEMS = 50;
 
 const FORMATS = ['academic', 'general'] as const;
+/** Resources: unchanged from before this PR. Listening and speaking have no
+ * practice engine for a resource to link to, so claiming one of those two
+ * modules would be a promise the app cannot keep. See templates.test.ts. */
 const MODULES = ['reading', 'writing'] as const;
+/** Lessons: reading, writing, listening, speaking all have lessons now. */
+const LESSON_MODULES = ['reading', 'writing', 'listening', 'speaking'] as const;
 const LESSON_GROUPS = ['foundations', 'question-types', 'advanced'] as const;
 const LESSON_STAGE_IDS = [
   'understand',
@@ -423,16 +428,21 @@ export const lessonBlockSchema = z.discriminatedUnion('kind', [
     answer: z.string(),
     why: z.string(),
   }),
+  z.object({
+    kind: z.literal('video'),
+    url: z.string().regex(/^https:\/\//, 'Must be an https:// URL'),
+    title: z.string().optional(),
+  }),
 ]);
 
 export const lessonSchema = z.object({
   slug,
-  module: z.enum(MODULES),
+  module: z.enum(LESSON_MODULES),
   group: z.enum(LESSON_GROUPS),
   title: z.string(),
   summary: z.string(),
   minutes: z.number().int().min(1),
-  questionKind: z.enum(QUESTION_KINDS).nullish(),
+  questionKind: z.enum(ALL_QUESTION_KINDS).nullish(),
   orderIndex: z.number().int().optional(),
   stages: z
     .array(
@@ -500,5 +510,3 @@ export function findSlugClashes(slugs: string[], existing: Set<string>) {
   }
   return [...clashes];
 }
-
-void ALL_QUESTION_KINDS;
