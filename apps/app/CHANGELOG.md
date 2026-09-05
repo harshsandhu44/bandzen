@@ -1,3 +1,10 @@
+# app [1.1.0](https://github.com/harshsandhu44/bandzen/compare/app@1.0.0...app@1.1.0) (2026-09-05)
+
+
+### Features
+
+* **ui:** shadcn component consolidation and Coach chat rebuild ([#51](https://github.com/harshsandhu44/bandzen/issues/51)) ([391b7ab](https://github.com/harshsandhu44/bandzen/commit/391b7abb83cf3208e265a00309d9843adee53c52))
+
 # app [1.0.0](https://github.com/harshsandhu44/bandzen/compare/app@0.21.0...app@1.0.0) (2026-09-05)
 
 
