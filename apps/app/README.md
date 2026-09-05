@@ -22,7 +22,10 @@ vars, prod schema, error monitoring, a live payment) is done; see #46.
 1. Create a Neon project and a Clerk application, then `cp .env.example .env.local`
    and fill in the keys.
 2. In Clerk: sign-up mode is **Public** — nothing to configure.
-3. In Clerk: add `/sign-in` and `/signup` as the sign-in/sign-up paths.
+3. In Clerk: enable Google under **User & Authentication → Social Connections**
+   (custom credentials for production — see Clerk's Google guide), then add
+   `/sign-in` and `/signup` as the sign-in/sign-up paths. `<SignIn/>`/`<SignUp/>`
+   render whatever's enabled here; no app code changes with it.
 4. `pnpm db:migrate` to create the schema.
 5. `pnpm content:generate` → review the JSON in `content/passages/` by hand →
    `pnpm content:sql` → `pnpm db:seed`.
