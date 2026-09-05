@@ -642,6 +642,12 @@ export type LessonBlock =
       question: string;
       answer: string;
       why: string;
+    }
+  | {
+      /** An embeddable video URL (e.g. a YouTube/Vimeo embed link). */
+      kind: 'video';
+      url: string;
+      title?: string;
     };
 
 /** The six stages every lesson moves through, in order. */
