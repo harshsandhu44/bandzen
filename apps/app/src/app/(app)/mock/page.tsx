@@ -12,7 +12,6 @@ import {
 import { MOCK_DURATION_LABEL } from '@/lib/timing';
 import { startMock } from './actions';
 
-export const dynamic = 'force-dynamic';
 export const metadata = { title: 'Mock test' };
 
 /**

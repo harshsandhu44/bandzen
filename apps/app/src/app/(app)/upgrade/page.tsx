@@ -29,8 +29,6 @@ import {
 import { foundingEndsAt } from '@/lib/razorpay';
 import { CheckoutButton } from './checkout-button';
 
-export const dynamic = 'force-dynamic';
-
 export const metadata = { title: 'Bandzen Pro' };
 
 const DATE = new Intl.DateTimeFormat('en-GB', {

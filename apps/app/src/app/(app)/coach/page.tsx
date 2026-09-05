@@ -4,8 +4,6 @@ import { COACH_PROMPTS } from '@/lib/ai/coach';
 import { requireUserId } from '@/lib/auth';
 import { coachAllowance, getProfile } from '@/lib/db/queries';
 
-export const dynamic = 'force-dynamic';
-
 export const metadata = { title: 'Bandzen Coach' };
 
 export default async function CoachPage() {
