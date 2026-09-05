@@ -30,9 +30,15 @@ export default async function DiagnosticResultPage({
 
   const bands = sittingBands(data);
 
-  // The Speaking row: a real band once it exists, a Pro lock for a Free
-  // candidate, or a "take it now" prompt once they upgrade.
-  const speakingSlot = data.speaking ? undefined : pro ? (
+  // The Speaking row. Only meaningful once the rest of the sitting has closed
+  // (a Free sitting ends at Writing; a Pro sitting that reached Speaking has a
+  // `data.speaking` row). Until then, let SittingResult show the default
+  // "Not reached yet" line.
+  const sittingClosed = data.mock.submittedAt != null;
+
+  // A real band once the row exists, a Pro lock for a Free candidate, or a
+  // "take it now" prompt once they upgrade.
+  const speakingSlot = data.speaking || !sittingClosed ? undefined : pro ? (
     <div className="flex flex-wrap items-center justify-between gap-4 border border-border px-5 py-4">
       <div className="space-y-1">
         <p className="font-title text-sm">Speaking assessment</p>
