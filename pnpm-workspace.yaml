@@ -3,6 +3,7 @@ packages:
   - packages/*
 
 allowBuilds:
+  '@sentry/cli': false
   esbuild: true
   sharp: false
   unrs-resolver: false
