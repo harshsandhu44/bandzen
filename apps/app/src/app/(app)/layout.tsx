@@ -13,9 +13,10 @@ import {
 import { Wordmark } from '@bandzen/ui/components/wordmark';
 import { Toaster } from '@bandzen/ui/components/sonner';
 import { requireUserId } from '@/lib/auth';
-import { essayAllowance, getProfile, proUntil } from '@/lib/db/queries';
+import { essayAllowance, getProfile, getSubscription } from '@/lib/db/queries';
 import {
   PLANS,
+  daysLeft,
   formatInr,
   isFoundingActive,
   isProAt,
@@ -55,9 +56,9 @@ const FOUNDING_DATE = new Intl.DateTimeFormat('en-GB', {
  */
 export default async function AppLayout({ children }: LayoutProps<'/'>) {
   const userId = await requireUserId();
-  const [profile, until, quota, user, cookieStore] = await Promise.all([
+  const [profile, subscription, quota, user, cookieStore] = await Promise.all([
     getProfile(userId),
-    proUntil(userId),
+    getSubscription(userId),
     essayAllowance(userId),
     currentUser(),
     cookies(),
@@ -67,9 +68,17 @@ export default async function AppLayout({ children }: LayoutProps<'/'>) {
     : null;
   const testDays = days != null && days >= 0 ? days : null;
 
+  const until = subscription?.currentPeriodEnd ?? null;
   const pro = isProAt(until);
   const foundingEnds = foundingEndsAt();
   const founding = isFoundingActive(foundingEnds);
+
+  // Trial and paid Pro are the same `isProAt()` boolean everywhere else on
+  // purpose — entitlement doesn't care how the date got there. Only the shell
+  // needs to tell them apart, so a trialing candidate sees a countdown instead
+  // of the upsell going silent for a week and then cutting off with no warning.
+  const trialDaysLeft =
+    pro && subscription?.planId === 'trial' && until ? daysLeft(until) : null;
 
   // Read the sidebar's own cookie server-side so the first paint matches what
   // the candidate left it as, rather than flashing open then collapsing.
@@ -87,7 +96,20 @@ export default async function AppLayout({ children }: LayoutProps<'/'>) {
         </SidebarContent>
 
         <SidebarFooter className="p-4">
-          {pro ? null : (
+          {trialDaysLeft != null ? (
+            <Link
+              href="/upgrade?from=sidebar"
+              className="block border border-chrome/40 px-3 py-2.5 transition-colors hover:border-chrome"
+            >
+              <p className="font-mono text-[0.625rem] tracking-[0.16em] text-chrome uppercase">
+                Trial · {trialDaysLeft} {trialDaysLeft === 1 ? 'day' : 'days'}{' '}
+                left
+              </p>
+              <p className="mt-1 text-xs text-muted-foreground text-pretty">
+                Keep unlimited marking and Coach after it ends.
+              </p>
+            </Link>
+          ) : pro ? null : (
             <Link
               href="/upgrade?from=sidebar"
               className="block border border-chrome/40 px-3 py-2.5 transition-colors hover:border-chrome"
@@ -112,6 +134,7 @@ export default async function AppLayout({ children }: LayoutProps<'/'>) {
           email={user?.primaryEmailAddress?.emailAddress ?? null}
           testDays={testDays}
           essaysLeft={quota.unlimited ? null : quota.remaining}
+          trialDaysLeft={trialDaysLeft}
         />
 
         {/* `p-6 sm:p-10` is load-bearing: the exam screens cancel exactly these

@@ -3,6 +3,7 @@ import { Breadcrumb } from '@/components/app/breadcrumb';
 import { PageHeader, Panel } from '@/components/app/primitives';
 import { FilterBar } from '@/components/app/filter-bar';
 import { LearnNav } from '@/components/learning/learn-nav';
+import { UpgradePrompt } from '@/components/billing/pro';
 import {
   CATEGORY_TITLE,
   listResources,
@@ -10,6 +11,7 @@ import {
   type ResourceCategory,
 } from '@/content/resources';
 import { requireUserId } from '@/lib/auth';
+import { isPro } from '@/lib/db/queries';
 import { cn } from '@bandzen/ui/lib/utils';
 
 export const metadata = { title: 'Guides' };
@@ -22,7 +24,8 @@ const OPTIONS = [
 export default async function ResourcesPage({
   searchParams,
 }: PageProps<'/resources'>) {
-  await requireUserId();
+  const userId = await requireUserId();
+  const pro = await isPro(userId);
 
   const sp = await searchParams;
   const raw = Array.isArray(sp.category) ? sp.category[0] : sp.category;
@@ -121,6 +124,14 @@ export default async function ResourcesPage({
           </ul>
         </Panel>
       ))}
+
+      {!pro ? (
+        <UpgradePrompt
+          eyebrow="Bandzen Pro"
+          title="Unlimited marking, Coach, and mock tests"
+          source="resources_page"
+        />
+      ) : null}
     </div>
   );
 }

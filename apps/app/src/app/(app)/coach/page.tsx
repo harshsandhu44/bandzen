@@ -1,6 +1,7 @@
 import { PageHeader } from '@/components/app/primitives';
 import { CoachChat } from '@/components/coach/coach-chat';
 import { COACH_PROMPTS } from '@/lib/ai/coach';
+import { capture } from '@/lib/analytics';
 import { requireUserId } from '@/lib/auth';
 import { coachAllowance, getProfile } from '@/lib/db/queries';
 
@@ -15,6 +16,10 @@ export default async function CoachPage() {
     coachAllowance(userId),
     getProfile(userId),
   ]);
+
+  if (!quota.unlimited && quota.remaining === 0) {
+    await capture(userId, 'quota_exhausted', { surface: 'coach' });
+  }
 
   return (
     <div className="flex max-w-3xl flex-col gap-6">

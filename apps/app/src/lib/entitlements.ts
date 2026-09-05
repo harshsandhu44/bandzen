@@ -31,6 +31,15 @@ export function isProAt(
 }
 
 /**
+ * Whole days left until `until`, floored at zero and rounded up so the last
+ * partial day still counts as one. For the trial countdown in the shell — the
+ * `new Date()` default keeps the impurity out of the component that calls it.
+ */
+export function daysLeft(until: Date, now: Date = new Date()): number {
+  return Math.max(0, Math.ceil((until.getTime() - now.getTime()) / DAY_MS));
+}
+
+/**
  * The metered surfaces are the ones that cost money to serve. Reading is
  * unlimited on Free because `grading.ts` is pure — marking a reading attempt
  * costs nothing, and capping it would throttle the habit that produces a
@@ -40,9 +49,8 @@ export const QUOTA_WINDOW_DAYS = 7;
 export const FREE_ESSAYS_PER_WINDOW = 2;
 export const FREE_COACH_MESSAGES_PER_WINDOW = 10;
 
-/** A new candidate's reverse trial, and the founding cohort's thank-you. */
+/** A new candidate's reverse trial. */
 export const TRIAL_DAYS = 7;
-export const FOUNDING_GRANT_DAYS = 90;
 
 const WINDOW_MS = QUOTA_WINDOW_DAYS * DAY_MS;
 

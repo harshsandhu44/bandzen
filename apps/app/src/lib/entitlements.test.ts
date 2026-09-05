@@ -7,6 +7,7 @@ import {
   allowance,
   canStartDiagnostic,
   canStartMock,
+  daysLeft,
   formatInr,
   grantEndsAt,
   isFoundingActive,
@@ -137,6 +138,12 @@ test('a Pro mock start that has aged out of the window frees up again', () => {
 
 test('a grant expires the given number of days out', () => {
   assert.deepEqual(grantEndsAt(7, NOW), new Date(NOW.getTime() + 7 * DAY));
+});
+
+test('days left rounds a partial day up and never goes below zero', () => {
+  assert.equal(daysLeft(new Date(NOW.getTime() + 7 * DAY), NOW), 7);
+  assert.equal(daysLeft(new Date(NOW.getTime() + 6 * DAY + 1000), NOW), 7);
+  assert.equal(daysLeft(new Date(NOW.getTime() - DAY), NOW), 0);
 });
 
 test('the founding window is closed when no date is set', () => {

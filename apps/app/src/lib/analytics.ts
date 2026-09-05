@@ -15,6 +15,7 @@ import 'server-only';
 
 export type AnalyticsEvent =
   | 'quota_exhausted'
+  | 'pro_feature_locked'
   | 'upgrade_viewed'
   | 'checkout_started'
   | 'subscription_activated'
