@@ -9,6 +9,7 @@ import {
   getAttempt,
   saveAnswer,
   submitListening,
+  submitMockListening,
 } from '@/lib/db/queries';
 
 export async function startListeningAttempt(formData: FormData) {
@@ -51,10 +52,21 @@ export async function submitListeningAttempt(formData: FormData) {
   if (!attemptId) throw new Error('Missing attempt');
 
   const userId = await requireUserId();
-  const graded = await submitListening(userId, attemptId);
+
+  const before = await getAttempt(userId, attemptId);
+  if (!before) throw new Error('Attempt not found');
+
+  const graded =
+    before.kind === 'mock'
+      ? await submitMockListening(userId, attemptId)
+      : await submitListening(userId, attemptId);
   if (!graded) throw new Error('Attempt not found');
 
   await checkAwards(userId);
+
+  if (graded.kind === 'mock' && graded.mockAttemptId) {
+    redirect(`/mock/${graded.mockAttemptId}/next?section=reading`);
+  }
 
   redirect(`/listening/${attemptId}/review`);
 }
