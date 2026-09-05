@@ -6,7 +6,7 @@ import {
   getReadingTest,
 } from '@/lib/db/queries';
 import { assertMockSection } from '@/lib/mock-guard';
-import { MOCK_SECTION_MINUTES, minutesFor } from '@/lib/timing';
+import { minutesFor, sittingSectionMinutes } from '@/lib/timing';
 import { MockReadingTest } from './mock-reading-test';
 import { ReadingTest } from './reading-test';
 
@@ -22,7 +22,7 @@ export default async function ReadingAttemptPage({
   const attempt = await getAttempt(userId, attemptId);
   if (!attempt) notFound();
 
-  if (attempt.kind === 'mock') {
+  if (attempt.mockAttemptId) {
     await assertMockSection(userId, attempt);
 
     const data = await getMockReadingTest(userId, attemptId);
@@ -32,7 +32,7 @@ export default async function ReadingAttemptPage({
       <MockReadingTest
         attemptId={attempt.id}
         startedAt={attempt.startedAt.toISOString()}
-        minutes={MOCK_SECTION_MINUTES.reading}
+        minutes={sittingSectionMinutes(data.kind, 'reading')}
         passages={data.passages}
         questions={data.questions}
         headingsByQuestion={Object.fromEntries(data.headingsByQuestion)}

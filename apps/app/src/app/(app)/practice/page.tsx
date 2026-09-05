@@ -121,17 +121,17 @@ export default async function PracticePage() {
           <div className="border-b border-border px-5 py-4">
             <h3 className="font-title text-title">Diagnostic</h3>
             <p className="mt-1 max-w-prose text-sm text-muted-foreground text-pretty">
-              One reading passage and one Task 2 essay, back to back. The
-              fastest way to get a first estimate in both skills and a plan
-              built around it.
+              A full exam sitting — Listening, Reading and Writing (and Speaking
+              on Pro), each section timed and in order. The fastest way to a
+              first estimate in every skill and a plan built around it.
             </p>
           </div>
 
           <dl className="grid grid-cols-2 divide-x divide-y divide-border border-b border-border sm:grid-cols-4 sm:divide-y-0">
             {[
-              ['Sections', 'Reading · Writing'],
+              ['Sections', 'Listening · Reading · Writing'],
               ['Duration', DIAGNOSTIC_DURATION_LABEL],
-              ['Difficulty', 'Easier than exam'],
+              ['Difficulty', 'Exam pace'],
               ['Status', diagnostic ? 'Attempted' : 'Not attempted'],
             ].map(([label, value]) => (
               <div key={label} className="px-5 py-3">

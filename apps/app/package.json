@@ -27,7 +27,8 @@
     "db:grant-founding": "node --env-file=.env.local scripts/grant-founding.mts",
     "db:backfill-content": "node --env-file=.env.local scripts/backfill-content.mts",
     "db:backfill-lesson-progress": "node --env-file=.env.local scripts/backfill-lesson-progress.mts",
-    "db:backfill-awards": "node --env-file=.env.local scripts/backfill-awards.mts"
+    "db:backfill-awards": "node --env-file=.env.local scripts/backfill-awards.mts",
+    "db:backfill-diagnostics": "node --env-file=.env.local scripts/backfill-diagnostics.mts"
   },
   "dependencies": {
     "@bandzen/ai": "workspace:*",

@@ -1,18 +1,59 @@
 /**
- * Turn a `MediaRecorder` blob into a 16 kHz mono 16-bit PCM WAV.
+ * Turn microphone PCM into a 16 kHz mono 16-bit PCM WAV.
  *
- * Why: the multimodal grader (`grade-speaking.ts`) accepts `wav` and `mp3`
- * only, and `MediaRecorder` produces webm/opus in Chrome and mp4 in Safari.
- * Encoding to WAV in the browser gives one stored format that both Whisper and
- * the grader take, with no server-side transcoder. 16 kHz mono is what speech
- * models downsample to anyway, and keeps it to ~2 MB per minute.
+ * Why WAV: the multimodal grader (`grade-speaking.ts`) accepts `wav` and `mp3`
+ * only, and there is no server-side transcoder. 16 kHz mono is what speech
+ * models downsample to anyway and keeps it to ~2 MB per minute.
  *
- * `encodeWav` is pure and tested; `blobToWav` is the browser glue around it
- * (`AudioContext` to decode whatever was recorded, `OfflineAudioContext` to
- * resample) and is not.
+ * Why raw PCM and not `MediaRecorder` + `decodeAudioData`: `MediaRecorder`
+ * writes a streaming WebM/MP4 container with no duration in its header, and
+ * `decodeAudioData` on those is unreliable across browsers — it can return a
+ * truncated or empty buffer without throwing, which is how a recording ends up
+ * silent or zero-length. Capturing float samples straight off the mic and
+ * encoding them here removes both fragile steps. See `pcm-recorder.ts`.
+ *
+ * Everything in this file is pure and tested; the browser capture glue lives
+ * in `pcm-recorder.ts`.
  */
 
-const TARGET_RATE = 16_000;
+export const TARGET_RATE = 16_000;
+
+/** Concatenate the per-callback capture buffers into one contiguous track. */
+export function mergeChunks(chunks: readonly Float32Array[]): Float32Array {
+  let total = 0;
+  for (const c of chunks) total += c.length;
+  const out = new Float32Array(total);
+  let offset = 0;
+  for (const c of chunks) {
+    out.set(c, offset);
+    offset += c.length;
+  }
+  return out;
+}
+
+/**
+ * Linear-interpolation resample. Speech into a 16 kHz mono file: the source is
+ * typically 44.1 or 48 kHz, so this is always downsampling, where linear
+ * interpolation is inaudible and a polyphase filter would be over-engineering.
+ */
+export function resampleLinear(
+  samples: Float32Array,
+  fromRate: number,
+  toRate: number,
+): Float32Array {
+  if (fromRate === toRate || samples.length === 0) return samples;
+  const ratio = fromRate / toRate;
+  const outLength = Math.max(1, Math.round(samples.length / ratio));
+  const out = new Float32Array(outLength);
+  for (let i = 0; i < outLength; i += 1) {
+    const pos = i * ratio;
+    const lo = Math.floor(pos);
+    const hi = Math.min(lo + 1, samples.length - 1);
+    const frac = pos - lo;
+    out[i] = samples[lo]! * (1 - frac) + samples[hi]! * frac;
+  }
+  return out;
+}
 
 /** Float samples in [-1, 1] → a WAV file. One channel, 16-bit PCM. */
 export function encodeWav(
@@ -54,29 +95,12 @@ export function encodeWav(
   return buffer;
 }
 
-/** Recorded blob (any codec the browser gave us) → 16 kHz mono WAV blob. */
-export async function blobToWav(blob: Blob): Promise<Blob> {
-  const AudioCtx =
-    window.AudioContext ??
-    (window as unknown as { webkitAudioContext: typeof AudioContext })
-      .webkitAudioContext;
-
-  const decodeCtx = new AudioCtx();
-  try {
-    const decoded = await decodeCtx.decodeAudioData(await blob.arrayBuffer());
-
-    const frames = Math.ceil(decoded.duration * TARGET_RATE);
-    const offline = new OfflineAudioContext(1, frames, TARGET_RATE);
-    const source = offline.createBufferSource();
-    source.buffer = decoded;
-    source.connect(offline.destination);
-    source.start();
-    const rendered = await offline.startRendering();
-
-    return new Blob([encodeWav(rendered.getChannelData(0), TARGET_RATE)], {
-      type: 'audio/wav',
-    });
-  } finally {
-    void decodeCtx.close();
-  }
+/** Captured mono PCM chunks at `sampleRate` → a 16 kHz mono WAV blob. */
+export function pcmChunksToWav(
+  chunks: readonly Float32Array[],
+  sampleRate: number,
+): Blob {
+  const merged = mergeChunks(chunks);
+  const resampled = resampleLinear(merged, sampleRate, TARGET_RATE);
+  return new Blob([encodeWav(resampled, TARGET_RATE)], { type: 'audio/wav' });
 }

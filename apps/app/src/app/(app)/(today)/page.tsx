@@ -109,8 +109,10 @@ export default async function DashboardPage() {
   const insight = buildInsight({
     readingBand: data.readingBand,
     writingBand: data.writingBand,
+    listeningBand: data.listeningBand,
     criteria: report?.criteria ?? null,
     kindAccuracy,
+    listeningAccuracy: data.listeningAccuracy,
   });
 
   return (

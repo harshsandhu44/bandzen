@@ -13,6 +13,7 @@ import type { Skill } from '@/lib/db/schema';
 export type PlanTarget =
   | { kind: 'reading'; passageId: string }
   | { kind: 'writing'; promptId: string }
+  | { kind: 'listening'; trackId: string }
   | { kind: 'lesson'; lessonId: string };
 
 export type PlanTask = {
@@ -37,6 +38,7 @@ export type PlanCatalogue = {
    * schedule an exercise nothing in the library can satisfy.
    */
   prompts?: readonly { id: string; task: number }[];
+  trackIds?: readonly string[];
   /** Lesson slug that teaches a question kind, from src/content/lessons.ts. */
   lessonForKind?: Readonly<Record<string, string>>;
   completedLessonIds?: readonly string[];
@@ -45,6 +47,8 @@ export type PlanCatalogue = {
 export type PlanInput = {
   readingBand: number | null;
   writingBand: number | null;
+  /** Null until the diagnostic (or a listening practice attempt) measures it. */
+  listeningBand?: number | null;
   targetBand: number | null;
   /** ISO date. Null means no exam booked; the plan then runs a fortnight. */
   testDate: string | null;
@@ -62,6 +66,13 @@ const READING_DRILLS = [
   { label: 'Matching headings drill', minutes: 25 },
   { label: 'Sentence completion under timing', minutes: 20 },
   { label: 'Full passage, timed', minutes: 40 },
+];
+
+const LISTENING_DRILLS = [
+  { label: 'One section, note completion under timing', minutes: 15 },
+  { label: 'Matching and multiple choice, one section', minutes: 15 },
+  { label: 'Full track, played once', minutes: 30 },
+  { label: 'Section 3 and 4 back to back', minutes: 20 },
 ];
 
 const WRITING_DRILLS = [
@@ -88,16 +99,33 @@ function daysUntil(from: Date, to: string): number {
   return Math.max(0, Math.round((target - start) / DAY_MS));
 }
 
+/** The skills the plan schedules — Speaking is Pro-only and never drilled here. */
+const PLANNABLE: readonly Skill[] = ['listening', 'reading', 'writing'];
+
+function bandOf(input: PlanInput, skill: Skill): number | null {
+  if (skill === 'reading') return input.readingBand;
+  if (skill === 'writing') return input.writingBand;
+  if (skill === 'listening') return input.listeningBand ?? null;
+  return null;
+}
+
+/** Plannable skills that have actually been measured. */
+function measuredSkills(input: PlanInput): Skill[] {
+  return PLANNABLE.filter((s) => bandOf(input, s) != null);
+}
+
 /**
- * How many of every three days go to the weaker skill. Two when there is a
- * real gap, otherwise an even split — a 0.5 band difference is inside the
- * noise of an estimate and does not justify skewing a fortnight of study.
+ * The one skill holding the band back: the weakest measured skill, but only
+ * when it is a real band clear of the next-worst — a 0.5 difference is inside
+ * the noise of an estimate and does not justify skewing a fortnight of study.
+ * Null when nothing is measured, only one skill is, or the field is even.
  */
-function weakerShare(reading: number | null, writing: number | null) {
-  if (reading == null || writing == null) return null;
-  const gap = reading - writing;
-  if (Math.abs(gap) < 1) return null;
-  return gap > 0 ? ('writing' as const) : ('reading' as const);
+export function weakestSkill(input: PlanInput): Skill | null {
+  const scored = measuredSkills(input)
+    .map((skill) => ({ skill, band: bandOf(input, skill)! }))
+    .sort((a, b) => a.band - b.band);
+  if (scored.length < 2) return null;
+  return scored[1]!.band - scored[0]!.band >= 1 ? scored[0]!.skill : null;
 }
 
 /**
@@ -138,7 +166,14 @@ export function buildPlan(input: PlanInput): PlanTask[] {
 
   if (horizon <= 0) return [];
 
-  const weaker = weakerShare(input.readingBand, input.writingBand);
+  const weakest = weakestSkill(input);
+  const measured = measuredSkills(input);
+  // The skills the rotation cycles, in a stable order. Falls back to the
+  // original reading/writing pair when nothing has been measured yet.
+  const rotation: Skill[] = measured.length
+    ? measured
+    : ['reading', 'writing'];
+  const others = weakest ? rotation.filter((s) => s !== weakest) : [];
   const tasks: PlanTask[] = [];
 
   // A drill may only be scheduled if a prompt exists for the task it names.
@@ -154,34 +189,24 @@ export function buildPlan(input: PlanInput): PlanTask[] {
 
   let readingCursor = 0;
   let writingCursor = 0;
+  let listeningCursor = 0;
+  let otherCursor = 0;
 
   // Spent on the first reading day only; after that the drills take over.
   let pendingLesson = lessonFirst(input);
 
   for (let day = 1; day <= horizon; day += 1) {
-    // With a clear gap the weaker skill takes two days in three; otherwise
-    // the two alternate.
-    const slot = day % 3;
-    const skill: Skill =
-      weaker === null
-        ? day % 2 === 1
-          ? 'reading'
-          : 'writing'
-        : slot === 0
-          ? weaker === 'writing'
-            ? 'reading'
-            : 'writing'
-          : weaker;
-
-    // Kept separate from the reading drill because only this one carries a
-    // task, and the target below has to match it. `??` short-circuits, so the
-    // reading cursor is still only spent on a reading day.
-    const writingDrill =
-      skill === 'writing'
-        ? writingDrills[writingCursor++ % writingDrills.length]!
-        : null;
-    const drill =
-      writingDrill ?? READING_DRILLS[readingCursor++ % READING_DRILLS.length]!;
+    // With a clear gap the weakest skill takes two days in three, the third
+    // cycling through the rest; otherwise an even rotation.
+    let skill: Skill;
+    if (weakest && others.length) {
+      skill =
+        day % 3 === 0 ? others[otherCursor++ % others.length]! : weakest;
+    } else if (weakest) {
+      skill = weakest;
+    } else {
+      skill = rotation[(day - 1) % rotation.length]!;
+    }
 
     // Day 1 is today, not tomorrow. A plan whose first task lands tomorrow
     // leaves the dashboard with nothing to put under "Today".
@@ -192,7 +217,6 @@ export function buildPlan(input: PlanInput): PlanTask[] {
     if (skill === 'reading' && pendingLesson) {
       const lesson = pendingLesson;
       pendingLesson = null;
-      readingCursor -= 1; // The drill was not spent; keep the rotation intact.
       tasks.push({
         day,
         date: iso(date),
@@ -204,17 +228,25 @@ export function buildPlan(input: PlanInput): PlanTask[] {
       continue;
     }
 
-    // Both cursors were post-incremented above, so -1 is this task's slot.
+    let drill: { label: string; minutes: number };
     let target: PlanTarget | null = null;
-    if (skill === 'reading') {
-      const passageId = pick(input.catalogue?.passageIds, readingCursor - 1);
-      if (passageId) target = { kind: 'reading', passageId };
-    } else {
+
+    if (skill === 'writing') {
+      const wd = writingDrills[writingCursor++ % writingDrills.length]!;
+      drill = wd;
       // Rotate within the drill's own task, so the prompt that opens is the
       // kind of exercise the label just promised.
-      const forTask = prompts?.filter((p) => p.task === writingDrill!.task);
+      const forTask = prompts?.filter((p) => p.task === wd.task);
       const prompt = pick(forTask, writingCursor - 1);
       if (prompt) target = { kind: 'writing', promptId: prompt.id };
+    } else if (skill === 'listening') {
+      drill = LISTENING_DRILLS[listeningCursor++ % LISTENING_DRILLS.length]!;
+      const trackId = pick(input.catalogue?.trackIds, listeningCursor - 1);
+      if (trackId) target = { kind: 'listening', trackId };
+    } else {
+      drill = READING_DRILLS[readingCursor++ % READING_DRILLS.length]!;
+      const passageId = pick(input.catalogue?.passageIds, readingCursor - 1);
+      if (passageId) target = { kind: 'reading', passageId };
     }
 
     tasks.push({
@@ -236,19 +268,27 @@ export function buildPlan(input: PlanInput): PlanTask[] {
 }
 
 /** The single line the dashboard leads with. */
+const SKILL_LABEL: Record<Skill, string> = {
+  reading: 'Reading',
+  writing: 'Writing',
+  listening: 'Listening',
+  speaking: 'Speaking',
+};
+
 export function nextAction(input: PlanInput): string {
-  if (input.readingBand == null && input.writingBand == null) {
+  const measured = measuredSkills(input);
+  if (!measured.length) {
     return 'Take the diagnostic to get your first estimate.';
   }
-  const weaker = weakerShare(input.readingBand, input.writingBand);
-  if (weaker)
-    return `${weaker === 'reading' ? 'Reading' : 'Writing'} is holding your band back.`;
+  const weakest = weakestSkill(input);
+  if (weakest)
+    return `${SKILL_LABEL[weakest]} is holding your band back.`;
   if (input.targetBand != null) {
-    const best = Math.max(input.readingBand ?? 0, input.writingBand ?? 0);
+    const best = Math.max(...measured.map((s) => bandOf(input, s)!));
     if (best >= input.targetBand)
       return 'You are at your target band in practice. Keep it warm.';
   }
-  return 'Both skills are close. Keep the rotation even.';
+  return 'Your skills are close. Keep the rotation even.';
 }
 
 // ---------------------------------------------------------------------------
@@ -345,6 +385,8 @@ export function targetHref(task: PlanTask): string | null {
       return `/reading?passage=${task.target.passageId}`;
     case 'writing':
       return `/writing?prompt=${task.target.promptId}`;
+    case 'listening':
+      return `/listening?track=${task.target.trackId}`;
     case 'lesson':
       // Lesson routes are module-scoped, and the task's skill is that module.
       return `/learn/${task.skill}/${task.target.lessonId}`;

@@ -12,6 +12,7 @@ import {
   submitListening,
   submitMockListening,
 } from '@/lib/db/queries';
+import { finishSittingSection } from '@/lib/mock-guard';
 
 export async function startListeningAttempt(formData: FormData) {
   const trackId = String(formData.get('trackId') ?? '');
@@ -62,16 +63,15 @@ export async function submitListeningAttempt(formData: FormData) {
   const before = await getAttempt(userId, attemptId);
   if (!before) throw new Error('Attempt not found');
 
-  const graded =
-    before.kind === 'mock'
-      ? await submitMockListening(userId, attemptId)
-      : await submitListening(userId, attemptId);
+  const graded = before.mockAttemptId
+    ? await submitMockListening(userId, attemptId)
+    : await submitListening(userId, attemptId);
   if (!graded) throw new Error('Attempt not found');
 
   await checkAwards(userId);
 
-  if (graded.kind === 'mock' && graded.mockAttemptId) {
-    redirect(`/mock/${graded.mockAttemptId}/next?section=reading`);
+  if (graded.mockAttemptId) {
+    await finishSittingSection(userId, graded.mockAttemptId);
   }
 
   redirect(`/listening/${attemptId}/review`);

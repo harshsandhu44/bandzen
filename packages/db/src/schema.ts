@@ -54,6 +54,14 @@ export const attemptStatus = pgEnum('attempt_status', [
   'failed',
 ]);
 
+/**
+ * What a `mock_attempts` row actually is. The full `/mock` is one; the
+ * four-skill diagnostic is the other — same sequential-sitting engine, told
+ * apart by this column. `'mock'` is the default so every existing row and
+ * every `createMockAttempt` caller that predates the diagnostic stays a mock.
+ */
+export const sittingKind = pgEnum('sitting_kind', ['mock', 'diagnostic']);
+
 /** Whether a content row is visible to students. Set by the CMS. */
 export const contentStatus = pgEnum('content_status', ['draft', 'published']);
 
@@ -444,32 +452,40 @@ export const speakingPrompts = pgTable(
 );
 
 /**
- * One full four-skill mock sitting. Holds the content picked at start time —
- * 3 passages, 4 tracks, both writing prompts, one speaking test — so the
- * random selection and the weekly cap are decided up front, even though the
- * five `attempts` rows underneath (Listening, Reading, Task 1, Task 2,
- * Speaking) are created lazily, one per section, as the candidate reaches it.
+ * One sequential exam sitting. Two shapes, told apart by `kind`:
  *
- * `submittedAt` is stamped when Speaking (the last section) submits. Until
- * then the sitting is resumable; a null here is what `startMock` checks to
- * find an in-progress sitting instead of starting a second one.
+ * - `'mock'` — the full four-skill mock: 3 passages, 4 tracks, both writing
+ *   prompts, one speaking test.
+ * - `'diagnostic'` — the trimmed measure: 2 passages, 2 tracks, Task 2 only
+ *   (`writingTask1PromptId` null), one speaking test that a Free candidate
+ *   never reaches. On Free the sitting closes after Writing.
+ *
+ * Either way the content is picked and locked in here at start time, and the
+ * section `attempts` rows underneath are created lazily, one per section, as
+ * the candidate reaches it.
+ *
+ * `submittedAt` is stamped when the last section for this sitting submits
+ * (Speaking for a mock or Pro diagnostic; Writing for a Free diagnostic).
+ * Until then the sitting is resumable; a null here is what the start action
+ * checks to resume an in-progress sitting instead of starting a second one.
  */
 export const mockAttempts = pgTable(
   'mock_attempts',
   {
     id: uuid('id').primaryKey().defaultRandom(),
     userId: text('user_id').notNull(),
+    kind: sittingKind('kind').notNull().default('mock'),
     readingPassageIds: jsonb('reading_passage_ids').$type<string[]>().notNull(),
     listeningTrackIds: jsonb('listening_track_ids').$type<string[]>().notNull(),
-    writingTask1PromptId: uuid('writing_task1_prompt_id')
-      .notNull()
-      .references(() => writingPrompts.id),
+    /** Null for a diagnostic — it sits Task 2 only. */
+    writingTask1PromptId: uuid('writing_task1_prompt_id').references(
+      () => writingPrompts.id,
+    ),
     writingTask2PromptId: uuid('writing_task2_prompt_id')
       .notNull()
       .references(() => writingPrompts.id),
-    speakingTestId: uuid('speaking_test_id')
-      .notNull()
-      .references(() => speakingTests.id),
+    /** Null only on legacy diagnostics backfilled from the old 2-skill chain. */
+    speakingTestId: uuid('speaking_test_id').references(() => speakingTests.id),
     startedAt: timestamp('started_at', { withTimezone: true })
       .notNull()
       .defaultNow(),

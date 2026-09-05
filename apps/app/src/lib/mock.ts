@@ -12,6 +12,9 @@
 
 import type { Skill } from './db/schema';
 
+/** Which kind of sitting a `mock_attempts` row is. Mirrors the `sitting_kind` enum. */
+export type SittingKind = 'mock' | 'diagnostic';
+
 /** Real IELTS order. Listening first, Speaking last. */
 export const MOCK_ORDER: readonly Skill[] = [
   'listening',
@@ -21,6 +24,10 @@ export const MOCK_ORDER: readonly Skill[] = [
 ];
 
 export type MockChild = { module: Skill; status: string };
+
+/** A diagnostic sits 2 passages / 2 tracks — half a mock. Mock counts live in `mock/actions.ts`. */
+export const DIAGNOSTIC_PASSAGES = 2;
+export const DIAGNOSTIC_TRACKS = 2;
 
 /**
  * Which section the sitting is on, from whatever child attempt rows exist so
@@ -33,9 +40,21 @@ export type MockChild = { module: Skill; status: string };
  * `enterMockSection`) — the reason the whole sitting isn't five rows
  * inserted up front is that every section's `Timer` anchors on its own
  * `attempts.startedAt`.
+ *
+ * `includeSpeaking: false` drops Speaking from the sequence entirely — a Free
+ * diagnostic ends at Writing, so once Writing is terminal this returns `null`
+ * and the sitting is over. No speaking row is ever created for it.
  */
-export function mockPosition(children: readonly MockChild[]): Skill | null {
-  for (const skill of MOCK_ORDER) {
+export function mockPosition(
+  children: readonly MockChild[],
+  opts?: { includeSpeaking?: boolean },
+): Skill | null {
+  const order =
+    opts?.includeSpeaking === false
+      ? MOCK_ORDER.filter((s) => s !== 'speaking')
+      : MOCK_ORDER;
+
+  for (const skill of order) {
     const rows = children.filter((c) => c.module === skill);
     if (rows.length === 0) return skill;
     if (rows.some((r) => r.status === 'in_progress')) return skill;
@@ -85,9 +104,19 @@ export function listeningSectionSeconds(
   return tracks + Math.max(0, trackDurations.length - 1) * pauseSeconds;
 }
 
-/** `/mock/[id]/next?section=...` or `/mock/[id]/result` — wherever `position` says the sitting actually is. */
-export function mockSectionUrl(mockAttemptId: string, position: Skill | null) {
+/**
+ * `<prefix>/[id]/next?section=...` or `<prefix>/[id]/result` — wherever
+ * `position` says the sitting actually is. The prefix is `/diagnostic` for a
+ * diagnostic sitting and `/mock` for a mock; the engine URLs the interstitial
+ * hands off to (`/reading/[id]` etc.) are shared and unaffected.
+ */
+export function mockSectionUrl(
+  mockAttemptId: string,
+  position: Skill | null,
+  kind: SittingKind = 'mock',
+) {
+  const prefix = kind === 'diagnostic' ? '/diagnostic' : '/mock';
   return position
-    ? `/mock/${mockAttemptId}/next?section=${position}`
-    : `/mock/${mockAttemptId}/result`;
+    ? `${prefix}/${mockAttemptId}/next?section=${position}`
+    : `${prefix}/${mockAttemptId}/result`;
 }

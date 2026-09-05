@@ -1,22 +1,40 @@
 'use server';
 
-import { redirect } from 'next/navigation';
+import { notFound, redirect } from 'next/navigation';
 import { requireUserId } from '@/lib/auth';
 import {
   createAttempt,
+  createMockAttempt,
   diagnosticCount,
-  findChildAttempt,
+  getMockAttempt,
+  getMockSectionAttempts,
+  getMockSiblings,
   isPro,
   latestDiagnostic,
-  pickEasiestPassage,
+  latestOpenDiagnostic,
+  mockContentExclusions,
+  pickRandomPassages,
+  pickRandomPrompt,
+  pickRandomSpeakingTest,
+  pickRandomTracks,
   upsertProfile,
 } from '@/lib/db/queries';
 import { canStartDiagnostic } from '@/lib/entitlements';
+import {
+  DIAGNOSTIC_PASSAGES,
+  DIAGNOSTIC_TRACKS,
+  mockPosition,
+  mockSectionUrl,
+} from '@/lib/mock';
 
 /**
- * Start the diagnostic: record the target and exam date the study plan needs,
- * then hand over to the reading engine. No new test surface is created — the
- * diagnostic is a composition of the two engines that already exist.
+ * Start (or resume) the diagnostic — a trimmed four-skill sitting on the same
+ * engine as `/mock`: a `mock_attempts` row with `kind = 'diagnostic'`, its
+ * section `attempts` created lazily as the candidate reaches each one.
+ *
+ * Two passages, two tracks, one Task 2 essay, and — for Pro — a full speaking
+ * interview. On Free the sitting closes after Writing and Speaking is a locked
+ * card on the result. Resuming is always free.
  */
 export async function startDiagnostic(formData: FormData) {
   const targetBand = Number(String(formData.get('targetBand') ?? ''));
@@ -32,40 +50,88 @@ export async function startDiagnostic(formData: FormData) {
   const userId = await requireUserId();
   await upsertProfile(userId, { targetBand, testDate: rawDate || null });
 
-  const [existing, pro] = await Promise.all([
-    latestDiagnostic(userId),
+  const [open, pro] = await Promise.all([
+    latestOpenDiagnostic(userId),
     isPro(userId),
   ]);
 
-  if (existing) {
-    // Resuming, in either half. The writing branch is new: reading could be
-    // finished while the essay is still open, and sending someone to a result
-    // page they cannot complete is how an unfinished diagnostic became a dead
-    // end.
-    if (existing.status === 'in_progress') redirect(`/reading/${existing.id}`);
-    const child = await findChildAttempt(userId, existing.id);
-    if (child?.status === 'in_progress') redirect(`/writing/${child.id}`);
-
-    // Counted on sittings that produced a result, so a diagnostic that broke
-    // half way is not what locks a candidate out of the one free measurement
-    // the whole funnel points at.
-    const taken = await diagnosticCount(userId);
-    if (!canStartDiagnostic({ isPro: pro, taken })) {
-      redirect(`/diagnostic/${existing.id}/result`);
-    }
+  if (open) {
+    const siblings = await getMockSiblings(userId, open.id);
+    redirect(
+      mockSectionUrl(
+        open.id,
+        mockPosition(siblings, { includeSpeaking: pro }),
+        'diagnostic',
+      ),
+    );
   }
 
-  // Easiest passage available: the diagnostic should measure, not exhaust.
-  // Its length is stated from the engines' own rules -- see lib/timing.ts.
-  const passage = await pickEasiestPassage();
-  if (!passage) throw new Error('No passages seeded — see apps/app/README.md');
+  // The gate — unchanged rule: first diagnostic free, retakes are Pro. A spent
+  // diagnostic lands the candidate back on their last result.
+  const taken = await diagnosticCount(userId);
+  if (!canStartDiagnostic({ isPro: pro, taken })) {
+    const latest = await latestDiagnostic(userId);
+    if (latest) redirect(`/diagnostic/${latest.id}/result`);
+    redirect('/upgrade?from=diagnostic_wall');
+  }
+
+  const exclusions = await mockContentExclusions(userId);
+  const [passages, tracks, task2, speakingTest] = await Promise.all([
+    pickRandomPassages(DIAGNOSTIC_PASSAGES, exclusions.passageIds),
+    pickRandomTracks(DIAGNOSTIC_TRACKS, exclusions.trackIds),
+    pickRandomPrompt(2, exclusions.promptIds),
+    pickRandomSpeakingTest(exclusions.speakingTestIds),
+  ]);
+
+  if (passages.length < DIAGNOSTIC_PASSAGES)
+    throw new Error('Not enough passages seeded for a diagnostic');
+  if (tracks.length < DIAGNOSTIC_TRACKS)
+    throw new Error('Not enough listening tracks seeded for a diagnostic');
+  if (!task2) throw new Error('No Task 2 prompt seeded — see apps/app/README.md');
+  if (!speakingTest)
+    throw new Error('No speaking test seeded — see apps/app/README.md');
+
+  const sitting = await createMockAttempt({
+    userId,
+    kind: 'diagnostic',
+    readingPassageIds: passages.map((p) => p.id),
+    listeningTrackIds: tracks.map((t) => t.id),
+    writingTask1PromptId: null,
+    writingTask2PromptId: task2.id,
+    speakingTestId: speakingTest.id,
+  });
+
+  redirect(`/diagnostic/${sitting.id}/next?section=listening`);
+}
+
+/**
+ * Add Speaking to a diagnostic that closed at Writing on Free, once the
+ * candidate is Pro. Appends a speaking section to the same sitting — no full
+ * retake — and its report/result redirect goes back to the diagnostic.
+ */
+export async function addDiagnosticSpeaking(formData: FormData) {
+  const sittingId = String(formData.get('sittingId') ?? '');
+  if (!sittingId) throw new Error('Missing sitting');
+
+  const userId = await requireUserId();
+  if (!(await isPro(userId))) {
+    redirect('/upgrade?from=diagnostic_speaking_wall');
+  }
+
+  const sitting = await getMockAttempt(userId, sittingId);
+  if (!sitting || sitting.kind !== 'diagnostic' || !sitting.speakingTestId) {
+    notFound();
+  }
+
+  const existing = await getMockSectionAttempts(userId, sittingId, 'speaking');
+  if (existing[0]) redirect(`/speaking/${existing[0].id}`);
 
   const attempt = await createAttempt({
     userId,
-    module: 'reading',
+    module: 'speaking',
     kind: 'diagnostic',
-    passageId: passage.id,
+    mockAttemptId: sittingId,
+    speakingTestId: sitting.speakingTestId,
   });
-
-  redirect(`/reading/${attempt.id}`);
+  redirect(`/speaking/${attempt.id}`);
 }

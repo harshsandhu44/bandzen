@@ -21,7 +21,7 @@ export default async function ListeningAttemptPage({
   const attempt = await getAttempt(userId, attemptId);
   if (!attempt) notFound();
 
-  if (attempt.kind === 'mock') {
+  if (attempt.mockAttemptId) {
     await assertMockSection(userId, attempt);
 
     const data = await getMockListeningTest(userId, attemptId);

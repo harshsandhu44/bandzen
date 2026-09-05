@@ -101,6 +101,34 @@ test('nextAction names the weaker skill', () => {
   assert.match(line, /^Writing/);
 });
 
+test('nextAction names Listening when it is the weakest measured skill', () => {
+  const line = nextAction({
+    readingBand: 7.5,
+    writingBand: 7,
+    listeningBand: 5.5,
+    targetBand: 8,
+    testDate: null,
+  });
+  assert.match(line, /^Listening/);
+});
+
+test('a measured Listening band puts listening drills in the rotation', () => {
+  const plan = buildPlan({
+    readingBand: 7,
+    writingBand: 7,
+    listeningBand: 5.5,
+    targetBand: 8,
+    testDate: null,
+    today: TODAY,
+    catalogue: { trackIds: ['t1', 't2'] },
+  });
+  const listening = plan.filter((t) => t.skill === 'listening');
+  // Weakest by more than a band -> two days in three.
+  assert.equal(listening.length, 10);
+  assert.deepEqual(listening[0]?.target, { kind: 'listening', trackId: 't1' });
+  assert.deepEqual(listening[1]?.target, { kind: 'listening', trackId: 't2' });
+});
+
 const CATALOGUE = {
   passageIds: ['p1', 'p2'],
   // Task 2 only, which is what is actually seeded today.
