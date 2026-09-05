@@ -61,9 +61,20 @@ export async function saveSpeakingRecording(
     return { ok: false };
   }
 
+  const bytes = Buffer.from(await file.arrayBuffer());
+
+  // The client always sends a WAV (see lib/wav.ts's blobToWav) — checking the
+  // RIFF/WAVE header rejects anything else before it's stored under an
+  // audio/wav content-type or handed to the grader's transcription call.
+  const isWav =
+    bytes.length >= 12 &&
+    bytes.toString('ascii', 0, 4) === 'RIFF' &&
+    bytes.toString('ascii', 8, 12) === 'WAVE';
+  if (!isWav) return { ok: false };
+
   const audioUrl = await uploadObject({
     key: `speaking/${crypto.randomUUID()}.wav`,
-    body: Buffer.from(await file.arrayBuffer()),
+    body: bytes,
     contentType: 'audio/wav',
   });
 
