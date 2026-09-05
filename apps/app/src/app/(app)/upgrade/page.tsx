@@ -1,6 +1,6 @@
 import Link from 'next/link';
 import { currentUser } from '@clerk/nextjs/server';
-import { Check, Clock, Lock } from 'lucide-react';
+import { Check, Clock } from 'lucide-react';
 import { Badge } from '@bandzen/ui/components/badge';
 import { Button } from '@bandzen/ui/components/button';
 import { cn } from '@bandzen/ui/lib/utils';
@@ -40,17 +40,11 @@ const DATE = new Intl.DateTimeFormat('en-GB', {
 const INCLUDED = [
   'Unlimited essay marking, against all four IELTS criteria',
   'Speaking tests, graded from your audio on all four criteria',
+  'Full four-skill mock tests, one a week',
   'Unlimited Bandzen Coach',
   'Retake the diagnostic whenever you want to re-measure',
   'Your full band history, not just the last five attempts',
 ];
-
-/**
- * Named, not hidden, and never described as though they work. Anyone paying
- * partly for these can take the seven-day refund — which is the only thing
- * that makes listing them honest.
- */
-const PLANNED = ['Full four-skill mock tests'];
 
 export default async function UpgradePage(props: PageProps<'/upgrade'>) {
   const userId = await requireUserId();
@@ -239,24 +233,7 @@ export default async function UpgradePage(props: PageProps<'/upgrade'>) {
               {item}
             </li>
           ))}
-          {PLANNED.map((item) => (
-            <li
-              key={item}
-              className="flex items-start gap-3 py-3 text-sm text-muted-foreground"
-            >
-              <Lock className="mt-0.5 size-4 shrink-0" aria-hidden />
-              <span className="flex items-center gap-2">
-                {item}
-                <Badge variant="secondary">Planned</Badge>
-              </span>
-            </li>
-          ))}
         </ul>
-        <p className="text-xs text-muted-foreground text-pretty">
-          The planned item does not work yet — there is no combined timer or
-          band behind it. It is listed because it is what we are building next,
-          not because you would be buying it today.
-        </p>
       </section>
 
       <section className="border border-dashed border-border px-5 py-4">

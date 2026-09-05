@@ -467,7 +467,7 @@ export const faq = {
     },
     {
       q: 'Can I take complete mock tests?',
-      a: 'Not yet as a single four-skill mock. What exists today is timed practice in every module — Reading, Writing, Listening, and Speaking — each under realistic conditions with autosave and connection recovery, followed by a complete analysis and review mode. A combined mock that runs all four back to back is on the roadmap.',
+      a: 'Yes. A full four-skill mock runs Listening, Reading, Writing and Speaking back to back in one sitting, real IELTS order, with one overall band at the end. It is a Pro feature, capped at one a week.',
     },
   ],
 } as const;
