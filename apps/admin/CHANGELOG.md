@@ -1,3 +1,10 @@
+# admin [0.8.0](https://github.com/harshsandhu44/bandzen/compare/admin@0.7.0...admin@0.8.0) (2026-09-05)
+
+
+### Features
+
+* **app:** add the full four-skill mock test ([#44](https://github.com/harshsandhu44/bandzen/issues/44)) ([1f770ee](https://github.com/harshsandhu44/bandzen/commit/1f770ee4869788cd501381e57142a7a13a743710))
+
 # admin [0.7.0](https://github.com/harshsandhu44/bandzen/compare/admin@0.6.0...admin@0.7.0) (2026-09-04)
 
 
