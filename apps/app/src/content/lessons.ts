@@ -41,14 +41,26 @@ export async function firstWrittenLesson(): Promise<Lesson | null> {
   return row ? toLesson(row) : null;
 }
 
-/** Written lessons only — the ones a plan may legitimately send someone to. */
+/**
+ * Written reading lessons only, keyed by question kind — the ones a plan may
+ * legitimately send someone to. Scoped to reading because its only caller
+ * (`plan-data.ts`) only ever tracks weak *reading* kinds; listening now has
+ * lessons for some of the same kind names (e.g. multiple_choice), and an
+ * unscoped map would let a listening slug silently shadow the reading one.
+ */
 export async function lessonForKindMap(): Promise<
   Readonly<Record<string, string>>
 > {
   const rows = await listLessons({ status: 'published' });
   return Object.fromEntries(
     rows
-      .filter((r) => r.questionKind && r.stages && r.stages.length > 0)
+      .filter(
+        (r) =>
+          r.module === 'reading' &&
+          r.questionKind &&
+          r.stages &&
+          r.stages.length > 0,
+      )
       .map((r) => [r.questionKind!, r.slug]),
   );
 }
