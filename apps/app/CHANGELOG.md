@@ -1,3 +1,10 @@
+# app [1.3.0](https://github.com/harshsandhu44/bandzen/compare/app@1.2.0...app@1.3.0) (2026-09-05)
+
+
+### Features
+
+* **app:** four-skill diagnostic exam sitting ([#54](https://github.com/harshsandhu44/bandzen/issues/54)) ([c8c628d](https://github.com/harshsandhu44/bandzen/commit/c8c628d90b33034612f243160b5877dbda03c48b))
+
 # app [1.2.0](https://github.com/harshsandhu44/bandzen/compare/app@1.1.0...app@1.2.0) (2026-09-05)
 
 
