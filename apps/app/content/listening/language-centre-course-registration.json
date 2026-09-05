@@ -1,0 +1,270 @@
+{
+  "slug": "language-centre-course-registration",
+  "title": "Registering for an Evening Language Course",
+  "topic": "A learner asks about joining an evening Spanish course at a local language centre",
+  "difficulty": 2,
+  "transcript": "Elena:\nGood afternoon, Riverside Language Centre. How can I help?\nMartin:\nHi. I'm interested in joining one of your evening Spanish courses, but I'm not sure which level would suit me.\nElena:\nHave you studied Spanish before?\nMartin:\nA little. I did one year at school, but that was about eight years ago, so I've forgotten quite a lot.\nElena:\nIn that case, I'd recommend taking our online placement test before you enrol. It takes about twenty minutes and doesn't cost anything.\nMartin:\nCan I do it tonight?\nElena:\nYes. Once you finish, the system will recommend a level automatically. If you're still unsure, you can book a short speaking assessment with a tutor.\nMartin:\nWhat evening classes are available at the moment?\nElena:\nBeginner Spanish runs on Mondays, Elementary Spanish on Tuesdays, and Pre-intermediate Spanish on Thursdays. All three start at six forty-five and finish at eight fifteen.\nMartin:\nTuesday would probably be easiest for me. When does the next course begin?\nElena:\nThe Tuesday course starts on the fourteenth of October and runs for ten weeks.\nMartin:\nDo classes continue during the school holiday at the end of October?\nElena:\nNo. There's a one-week break, so the course finishes a week later than you might expect.\nMartin:\nHow much is the course?\nElena:\nIt's one hundred and fifty pounds. The course book isn't included, but students can buy it from reception for twenty-two pounds or order it elsewhere.\nMartin:\nDo I need the book before the first class?\nElena:\nNot necessarily. The tutor provides photocopied material for the first lesson, but you'll need the book from week two onward.\nMartin:\nHow many students are usually in a class?\nElena:\nWe cap evening classes at fourteen. The Tuesday group currently has nine students registered.\nMartin:\nThat's a good size. How do I enrol after taking the placement test?\nElena:\nYou can enrol through the website. You'll need to pay a fifty-pound deposit, and the remaining balance must be paid before the second class.\nMartin:\nAnd if I decide the level is wrong after the first lesson?\nElena:\nYou can move to another level during the first week, provided there's space in the other class.",
+  "speakers": {
+    "Elena": "female",
+    "Martin": "male"
+  },
+  "matchingOptions": [
+    "Monday",
+    "Tuesday",
+    "Thursday",
+    "Friday",
+    "Saturday",
+    "Wednesday"
+  ],
+  "questions": [
+    {
+      "idx": 1,
+      "kind": "multiple_choice",
+      "prompt": "Why does Elena recommend the placement test?",
+      "options": [
+        "Martin has never studied Spanish",
+        "Martin studied Spanish a long time ago",
+        "The test is required for every course",
+        "The beginner class is already full"
+      ],
+      "answer": [
+        "Martin studied Spanish a long time ago"
+      ],
+      "evidence": "A little. I did one year at school, but that was about eight years ago, so I've forgotten quite a lot.",
+      "explanation": "Martin has some previous experience, but it was several years ago, making a placement test useful."
+    },
+    {
+      "idx": 2,
+      "kind": "sentence_completion",
+      "prompt": "Complete the sentence. Write ONE WORD AND/OR A NUMBER. The online placement test takes about ________ minutes.",
+      "options": null,
+      "answer": [
+        "twenty"
+      ],
+      "evidence": "In that case, I'd recommend taking our online placement test before you enrol. It takes about twenty minutes and doesn't cost anything.",
+      "explanation": "Elena says the test takes approximately twenty minutes."
+    },
+    {
+      "idx": 3,
+      "kind": "matching",
+      "prompt": "On which day does Beginner Spanish run?",
+      "options": null,
+      "answer": [
+        "Monday"
+      ],
+      "evidence": "Beginner Spanish runs on Mondays, Elementary Spanish on Tuesdays, and Pre-intermediate Spanish on Thursdays.",
+      "explanation": "The beginner class is scheduled for Monday evenings."
+    },
+    {
+      "idx": 4,
+      "kind": "matching",
+      "prompt": "On which day does Elementary Spanish run?",
+      "options": null,
+      "answer": [
+        "Tuesday"
+      ],
+      "evidence": "Beginner Spanish runs on Mondays, Elementary Spanish on Tuesdays, and Pre-intermediate Spanish on Thursdays.",
+      "explanation": "The elementary course takes place on Tuesdays."
+    },
+    {
+      "idx": 5,
+      "kind": "matching",
+      "prompt": "On which day does Pre-intermediate Spanish run?",
+      "options": null,
+      "answer": [
+        "Thursday"
+      ],
+      "evidence": "Beginner Spanish runs on Mondays, Elementary Spanish on Tuesdays, and Pre-intermediate Spanish on Thursdays.",
+      "explanation": "The pre-intermediate course is held on Thursdays."
+    },
+    {
+      "idx": 6,
+      "kind": "sentence_completion",
+      "prompt": "Complete the sentence. Write ONE WORD AND/OR A NUMBER. The Tuesday course lasts ________ weeks.",
+      "options": null,
+      "answer": [
+        "ten"
+      ],
+      "evidence": "The Tuesday course starts on the fourteenth of October and runs for ten weeks.",
+      "explanation": "The course duration is ten weeks."
+    },
+    {
+      "idx": 7,
+      "kind": "multiple_choice",
+      "prompt": "Why does the course finish later than ten consecutive weeks would suggest?",
+      "options": [
+        "One class is cancelled for teacher training",
+        "There is a one-week holiday break",
+        "The final class is moved to a weekend",
+        "Two lessons are taught online"
+      ],
+      "answer": [
+        "There is a one-week holiday break"
+      ],
+      "evidence": "No. There's a one-week break, so the course finishes a week later than you might expect.",
+      "explanation": "A one-week break interrupts the normal weekly schedule."
+    },
+    {
+      "idx": 8,
+      "kind": "sentence_completion",
+      "prompt": "Complete the sentence. Write TWO WORDS. Students can buy the course book from ________.",
+      "options": null,
+      "answer": [
+        "reception"
+      ],
+      "evidence": "The course book isn't included, but students can buy it from reception for twenty-two pounds or order it elsewhere.",
+      "explanation": "The book is available for purchase at reception."
+    },
+    {
+      "idx": 9,
+      "kind": "multiple_choice",
+      "prompt": "How many students are currently registered for the Tuesday class?",
+      "options": [
+        "five",
+        "nine",
+        "fourteen",
+        "twenty-two"
+      ],
+      "answer": [
+        "nine"
+      ],
+      "evidence": "We cap evening classes at fourteen. The Tuesday group currently has nine students registered.",
+      "explanation": "Nine students are currently enrolled in the Tuesday group."
+    },
+    {
+      "idx": 10,
+      "kind": "sentence_completion",
+      "prompt": "Complete the sentence. Write ONE WORD AND/OR A NUMBER. A deposit of ________ pounds is required when enrolling.",
+      "options": null,
+      "answer": [
+        "fifty"
+      ],
+      "evidence": "You'll need to pay a fifty-pound deposit, and the remaining balance must be paid before the second class.",
+      "explanation": "The enrolment deposit is fifty pounds."
+    }
+  ],
+  "audioUrl": "https://pub-fbae5ca09eba4fd0820da2b390dd7ca0.r2.dev/listening/language-centre-course-registration.mp3",
+  "peaks": [
+    0.6458326733371879,
+    0.6642201358309439,
+    0.32422035123088633,
+    0.0002556073724960551,
+    0.4156015634448455,
+    0.6272242658760073,
+    0.663503641118858,
+    0.8071260939310293,
+    0.6778130126545551,
+    0.4327863524809801,
+    0.7651670286326909,
+    0.7467926214177384,
+    0.4784049406312445,
+    0.6154076368993934,
+    0.7566796664304892,
+    0.8706597757994359,
+    0.7275117240881718,
+    0.6940216607320403,
+    0.5566097184156219,
+    0.8675290851292913,
+    0.5354783743098998,
+    0.521222101860663,
+    0.5473775223152079,
+    0.5055666048903024,
+    0.4034605783193316,
+    0.3961888095587587,
+    0.4112988743921943,
+    0.4691628603800005,
+    0.49583044242732327,
+    0.5980559062209364,
+    0.5662022512738595,
+    0.5621124765787129,
+    0.49532526186033,
+    0.5121538373569349,
+    0.5332903321413331,
+    0.32911442561052784,
+    0.5336152340073094,
+    0.4608296760002281,
+    0.44189553025793726,
+    0.36160928748406596,
+    1,
+    0.7241408390323801,
+    0.5057384911569008,
+    0.660549288507124,
+    0.5068891634831992,
+    0.570068025567644,
+    0.44887471518626004,
+    0.5456270592052365,
+    0.5032401546539106,
+    0.4150737045038893,
+    0.4812160718123688,
+    0.49709274248167334,
+    0.47470879093642615,
+    0.3975566696949522,
+    0.9661344432482563,
+    0.6290424049779797,
+    0.3129298157861835,
+    0.771820243768127,
+    0.5140862346099928,
+    0.7111698542800328,
+    0.5014158514146876,
+    0.4678182575098669,
+    0.37598484292706985,
+    0.7917639679285007,
+    0.7828997207108606,
+    0.7664416531040403,
+    0.7336716314713696,
+    0.45115136208746615,
+    0.7415363324802519,
+    0.473363370798503,
+    0.5457915395498548,
+    0.6027574485353918,
+    0.8554834588077684,
+    0.8203457786308888,
+    0.627455802922336,
+    0.4097844604945868,
+    0.6035221402124112,
+    0.5274007418349282,
+    0.5204818883801193,
+    0.416809483054568,
+    0.5608085690257747,
+    0.9465733823997358,
+    0.9065919754306184,
+    0.5343058012588955,
+    0.4285513368377584,
+    0.5167512654703625,
+    0.4593891614350758,
+    0.4289845627982158,
+    0.5151057873307421,
+    0.481724193663553,
+    0.3696525879443837,
+    0.8165297313621122,
+    0.7895092033707096,
+    0.42330458117390013,
+    0.4658823253176971,
+    0.3225326276336925,
+    0.6277122788751908,
+    0.5214712612205505,
+    0.3431634021958348,
+    0.898842886542602,
+    0.7931818218988523,
+    0.6988661702651662,
+    0.43046815333858635,
+    0.7426839381995641,
+    0.4865162503184732,
+    0.5642470277357086,
+    0.5139094339117132,
+    0.4882520949280151,
+    0.5082132103425189,
+    0.44688682853223266,
+    0.4399287388288684,
+    0.7413722049512971,
+    0.84364182919649,
+    0.48073177047598276,
+    0.722931650539014,
+    0.6760779523661863,
+    0.39215148222709156,
+    0.5162563922289444,
+    0.4731014689271722,
+    0.34307124927363836
+  ],
+  "durationSeconds": 123.10639455782312
+}

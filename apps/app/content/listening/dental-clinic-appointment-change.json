@@ -1,0 +1,273 @@
+{
+  "slug": "dental-clinic-appointment-change",
+  "title": "Changing a Dental Appointment",
+  "topic": "A patient calls a dental clinic to rearrange an appointment and discuss treatment arrangements",
+  "difficulty": 2,
+  "transcript": "Lena:\nGood morning, Parkside Dental Clinic. How can I help?\nOwen:\nHi, I have an appointment next Tuesday afternoon, but I've just been given a work meeting at the same time. I was hoping to move it.\nLena:\nNo problem. Can I have your surname, please?\nOwen:\nIt's Mercer. The appointment is for a routine check-up with Dr Shah at three forty-five.\nLena:\nI've found it. We can move you to Wednesday at eleven twenty, or Friday at two fifteen.\nOwen:\nWednesday would be difficult because I'm usually out of the office in the morning. Friday at two fifteen should work.\nLena:\nI'll book Friday, then. I can see from your notes that you also mentioned sensitivity in one of your back teeth when you made the original appointment.\nOwen:\nThat's right. It hurts when I drink something cold, but only for a few seconds.\nLena:\nI'll add that to the appointment notes. Dr Shah may want to take an X-ray, so allow about forty minutes rather than the usual twenty-five.\nOwen:\nThat's fine. Is there anything I need to do before I come?\nLena:\nJust avoid eating for about an hour before the appointment if possible. You can still drink water.\nOwen:\nWill I have to pay for the X-ray separately?\nLena:\nA standard check-up is thirty-eight pounds. If an X-ray is needed, that's an additional twelve pounds.\nOwen:\nRight. I think my insurance covers some dental costs. Do you submit claims directly?\nLena:\nWe don't submit them for patients, but we can give you a detailed receipt showing the treatment code and the amount paid.\nOwen:\nThat should be enough. I also changed my mobile number recently. Can I update that now?\nLena:\nCertainly. I have a number ending in four six two on your account.\nOwen:\nThat's the old one. The new number ends in eight one nine.\nLena:\nI've updated it. We'll send a reminder text twenty-four hours before the appointment.\nOwen:\nPerfect. And if I need to cancel, how much notice do you require?\nLena:\nWe ask for at least twenty-four hours. Late cancellations may be charged fifteen pounds unless there's an emergency.",
+  "speakers": {
+    "Lena": "female",
+    "Owen": "male"
+  },
+  "matchingOptions": null,
+  "questions": [
+    {
+      "idx": 1,
+      "kind": "multiple_choice",
+      "prompt": "Why does Owen want to change his original appointment?",
+      "options": [
+        "He has a work meeting",
+        "He is travelling that day",
+        "The clinic changed the dentist",
+        "He has another medical appointment"
+      ],
+      "answer": [
+        "He has a work meeting"
+      ],
+      "evidence": "Hi, I have an appointment next Tuesday afternoon, but I've just been given a work meeting at the same time. I was hoping to move it.",
+      "explanation": "Owen says a work meeting now conflicts with the original appointment."
+    },
+    {
+      "idx": 2,
+      "kind": "sentence_completion",
+      "prompt": "Complete the sentence. Write TWO WORDS. Owen's original appointment was for a ________.",
+      "options": null,
+      "answer": [
+        "routine check-up"
+      ],
+      "evidence": "It's Mercer. The appointment is for a routine check-up with Dr Shah at three forty-five.",
+      "explanation": "Owen describes the appointment as a routine check-up."
+    },
+    {
+      "idx": 3,
+      "kind": "multiple_choice",
+      "prompt": "Which new appointment does Owen choose?",
+      "options": [
+        "Wednesday at 11:20",
+        "Wednesday at 2:15",
+        "Friday at 11:20",
+        "Friday at 2:15"
+      ],
+      "answer": [
+        "Friday at 2:15"
+      ],
+      "evidence": "Friday at two fifteen should work.",
+      "explanation": "Owen selects the Friday afternoon option."
+    },
+    {
+      "idx": 4,
+      "kind": "sentence_completion",
+      "prompt": "Complete the sentence. Write ONE WORD. Owen experiences tooth sensitivity when he drinks something ________.",
+      "options": null,
+      "answer": [
+        "cold"
+      ],
+      "evidence": "It hurts when I drink something cold, but only for a few seconds.",
+      "explanation": "Cold drinks trigger the sensitivity."
+    },
+    {
+      "idx": 5,
+      "kind": "multiple_choice",
+      "prompt": "How long should Owen allow for the appointment?",
+      "options": [
+        "twenty minutes",
+        "twenty-five minutes",
+        "forty minutes",
+        "forty-five minutes"
+      ],
+      "answer": [
+        "forty minutes"
+      ],
+      "evidence": "Dr Shah may want to take an X-ray, so allow about forty minutes rather than the usual twenty-five.",
+      "explanation": "A possible X-ray means the appointment may take about forty minutes."
+    },
+    {
+      "idx": 6,
+      "kind": "sentence_completion",
+      "prompt": "Complete the sentence. Write ONE WORD. Owen may still drink ________ before the appointment.",
+      "options": null,
+      "answer": [
+        "water"
+      ],
+      "evidence": "You can still drink water.",
+      "explanation": "Water is allowed even though eating should be avoided beforehand."
+    },
+    {
+      "idx": 7,
+      "kind": "multiple_choice",
+      "prompt": "How much does an X-ray cost in addition to the check-up?",
+      "options": [
+        "ten pounds",
+        "twelve pounds",
+        "fifteen pounds",
+        "thirty-eight pounds"
+      ],
+      "answer": [
+        "twelve pounds"
+      ],
+      "evidence": "If an X-ray is needed, that's an additional twelve pounds.",
+      "explanation": "The X-ray costs twelve pounds on top of the check-up fee."
+    },
+    {
+      "idx": 8,
+      "kind": "sentence_completion",
+      "prompt": "Complete the sentence. Write TWO WORDS. For an insurance claim, the clinic can provide a ________.",
+      "options": null,
+      "answer": [
+        "detailed receipt"
+      ],
+      "evidence": "We don't submit them for patients, but we can give you a detailed receipt showing the treatment code and the amount paid.",
+      "explanation": "The clinic provides a detailed receipt rather than submitting the insurance claim itself."
+    },
+    {
+      "idx": 9,
+      "kind": "multiple_choice",
+      "prompt": "When will the clinic send Owen a reminder text?",
+      "options": [
+        "twelve hours before",
+        "twenty-four hours before",
+        "two days before",
+        "one week before"
+      ],
+      "answer": [
+        "twenty-four hours before"
+      ],
+      "evidence": "We'll send a reminder text twenty-four hours before the appointment.",
+      "explanation": "The reminder is sent one day before the appointment."
+    },
+    {
+      "idx": 10,
+      "kind": "sentence_completion",
+      "prompt": "Complete the sentence. Write ONE WORD AND/OR A NUMBER. A late cancellation may result in a charge of ________ pounds.",
+      "options": null,
+      "answer": [
+        "fifteen"
+      ],
+      "evidence": "Late cancellations may be charged fifteen pounds unless there's an emergency.",
+      "explanation": "The clinic may charge fifteen pounds for a late cancellation."
+    }
+  ],
+  "audioUrl": "https://pub-fbae5ca09eba4fd0820da2b390dd7ca0.r2.dev/listening/dental-clinic-appointment-change.mp3",
+  "peaks": [
+    0.5762623233936258,
+    0.37511603991247133,
+    0.3529776502906867,
+    0.9359680783089372,
+    0.9066515824892555,
+    0.5366180280608447,
+    0.5721180601592709,
+    0.6653813901632483,
+    0.5498431902474125,
+    0.37135886904664617,
+    0.5252288434552668,
+    0.4965032074835705,
+    0.6161571107673983,
+    0.43474721766209407,
+    0.4385750790278001,
+    0.6400837938539841,
+    0.7401483480180115,
+    0.642930825923012,
+    0.565877669164973,
+    0.6642968983348718,
+    0.5318732371089288,
+    0.5047547712409592,
+    0.6350301554903836,
+    0.4361252974965045,
+    0.3083173064070314,
+    0.4781293631270526,
+    0.3210685166948521,
+    0.650458293759981,
+    0.5567153639301957,
+    0.5581402408665229,
+    0.5950766131082852,
+    0.28782331155951774,
+    0.6762756986931566,
+    0.48431548371609545,
+    0.5307459746399127,
+    0.41224574833008415,
+    0.44056441325574675,
+    0.4683911267167544,
+    0.43488031040455954,
+    0.48506078750363957,
+    0.40179288443096783,
+    0.39886588404731904,
+    0.6259094718503084,
+    0.9256754062413987,
+    0.6045083919636502,
+    0.657743006050079,
+    0.5281714324691027,
+    0.571923775284961,
+    0.4717885763558547,
+    0.46196694410600847,
+    0.4608964423625536,
+    0.39324529051069096,
+    0.39160034993301823,
+    0.44686223402273595,
+    0.4226797479913369,
+    0.40699935594572534,
+    0.5261242307189428,
+    0.45898490518554474,
+    0.7252541132027971,
+    0.5814192778142465,
+    0.49156459272725606,
+    0.5293927620151255,
+    0.4129408588406898,
+    0.4025223745036891,
+    0.31010475334909776,
+    0.4211782842591728,
+    0.8631158002810119,
+    0.8353603616424755,
+    0.5881490016224774,
+    0.49424843270373076,
+    0.48462509592900627,
+    0.30888318311882157,
+    0.4232453972118675,
+    0.3710471737861014,
+    0.4849151357106979,
+    0.39013410740238336,
+    0.49030806275665423,
+    0.5097767200675407,
+    0.6020246669575475,
+    0.36205709814108666,
+    0.4858346935860924,
+    0.5287263284615386,
+    0.6338440157681056,
+    0.40899233829867654,
+    0.5601416845063432,
+    0.38059958401053084,
+    0.4297564856846592,
+    0.3884380678455601,
+    0.319403065451951,
+    0.6268050359135331,
+    0.7315028099558631,
+    0.6783526353844809,
+    0.5503480519387938,
+    0.6300610512362557,
+    0.4886277912157612,
+    0.5763724156979986,
+    0.5695803038182873,
+    0.38063525587237723,
+    0.27085696255886255,
+    0.6267441455750167,
+    0.6370411249048038,
+    0.538512742557552,
+    0.5362891251091613,
+    0.4946941393165614,
+    0.36876714526410087,
+    0.39620633556239054,
+    0.4313943653716931,
+    0.3296448463734107,
+    1,
+    0.8700624941776002,
+    0.5999429443882586,
+    0.7490491944381376,
+    0.47667692529427663,
+    0.5237583290605142,
+    0.32358734657370647,
+    0.4472615739171445,
+    0.4262961651868478,
+    0.4045977170330917,
+    0.4671148585316589,
+    0.39471314424217285
+  ],
+  "durationSeconds": 114.43664399092971
+}

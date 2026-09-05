@@ -1,0 +1,85 @@
+{
+  "slug": "a-helpful-conversation-you-remember",
+  "title": "Speaking — a helpful conversation you remember",
+  "topic": "Advice, communication and exchanging ideas",
+  "difficulty": 3,
+  "prompts": [
+    {
+      "idx": 1,
+      "part": 1,
+      "text": "Who do you usually talk to when you need advice?",
+      "cueCardPoints": null,
+      "prepSeconds": 0,
+      "audioUrl": "https://pub-fbae5ca09eba4fd0820da2b390dd7ca0.r2.dev/speaking/a-helpful-conversation-you-remember-1.mp3"
+    },
+    {
+      "idx": 2,
+      "part": 1,
+      "text": "Do you prefer having long conversations or short ones?",
+      "cueCardPoints": null,
+      "prepSeconds": 0,
+      "audioUrl": "https://pub-fbae5ca09eba4fd0820da2b390dd7ca0.r2.dev/speaking/a-helpful-conversation-you-remember-2.mp3"
+    },
+    {
+      "idx": 3,
+      "part": 1,
+      "text": "What topics do you most enjoy discussing with your friends?",
+      "cueCardPoints": null,
+      "prepSeconds": 0,
+      "audioUrl": "https://pub-fbae5ca09eba4fd0820da2b390dd7ca0.r2.dev/speaking/a-helpful-conversation-you-remember-3.mp3"
+    },
+    {
+      "idx": 4,
+      "part": 2,
+      "text": "Describe a conversation that was particularly helpful to you. You should say:",
+      "cueCardPoints": [
+        "who you had the conversation with",
+        "when and where it happened",
+        "what you talked about",
+        "and explain why the conversation was helpful."
+      ],
+      "prepSeconds": 60,
+      "audioUrl": "https://pub-fbae5ca09eba4fd0820da2b390dd7ca0.r2.dev/speaking/a-helpful-conversation-you-remember-4.mp3"
+    },
+    {
+      "idx": 5,
+      "part": 3,
+      "text": "What makes someone good at giving advice?",
+      "cueCardPoints": null,
+      "prepSeconds": 0,
+      "audioUrl": "https://pub-fbae5ca09eba4fd0820da2b390dd7ca0.r2.dev/speaking/a-helpful-conversation-you-remember-5.mp3"
+    },
+    {
+      "idx": 6,
+      "part": 3,
+      "text": "Why are people sometimes unwilling to follow advice even when it is sensible?",
+      "cueCardPoints": null,
+      "prepSeconds": 0,
+      "audioUrl": "https://pub-fbae5ca09eba4fd0820da2b390dd7ca0.r2.dev/speaking/a-helpful-conversation-you-remember-6.mp3"
+    },
+    {
+      "idx": 7,
+      "part": 3,
+      "text": "How has online communication changed the way people discuss personal problems?",
+      "cueCardPoints": null,
+      "prepSeconds": 0,
+      "audioUrl": "https://pub-fbae5ca09eba4fd0820da2b390dd7ca0.r2.dev/speaking/a-helpful-conversation-you-remember-7.mp3"
+    },
+    {
+      "idx": 8,
+      "part": 3,
+      "text": "What differences are there between getting advice from friends and getting advice from professionals?",
+      "cueCardPoints": null,
+      "prepSeconds": 0,
+      "audioUrl": "https://pub-fbae5ca09eba4fd0820da2b390dd7ca0.r2.dev/speaking/a-helpful-conversation-you-remember-8.mp3"
+    },
+    {
+      "idx": 9,
+      "part": 3,
+      "text": "How important will face-to-face conversation remain as artificial intelligence and digital communication become more common?",
+      "cueCardPoints": null,
+      "prepSeconds": 0,
+      "audioUrl": "https://pub-fbae5ca09eba4fd0820da2b390dd7ca0.r2.dev/speaking/a-helpful-conversation-you-remember-9.mp3"
+    }
+  ]
+}

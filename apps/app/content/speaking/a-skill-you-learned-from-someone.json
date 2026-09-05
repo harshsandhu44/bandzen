@@ -1,0 +1,85 @@
+{
+  "slug": "a-skill-you-learned-from-someone",
+  "title": "Speaking — a skill you learned from someone",
+  "topic": "Learning useful skills from other people",
+  "difficulty": 3,
+  "prompts": [
+    {
+      "idx": 1,
+      "part": 1,
+      "text": "What kind of things do you enjoy learning in your free time?",
+      "cueCardPoints": null,
+      "prepSeconds": 0,
+      "audioUrl": "https://pub-fbae5ca09eba4fd0820da2b390dd7ca0.r2.dev/speaking/a-skill-you-learned-from-someone-1.mp3"
+    },
+    {
+      "idx": 2,
+      "part": 1,
+      "text": "How do you usually learn a new skill?",
+      "cueCardPoints": null,
+      "prepSeconds": 0,
+      "audioUrl": "https://pub-fbae5ca09eba4fd0820da2b390dd7ca0.r2.dev/speaking/a-skill-you-learned-from-someone-2.mp3"
+    },
+    {
+      "idx": 3,
+      "part": 1,
+      "text": "Is there a skill you would like to improve at the moment?",
+      "cueCardPoints": null,
+      "prepSeconds": 0,
+      "audioUrl": "https://pub-fbae5ca09eba4fd0820da2b390dd7ca0.r2.dev/speaking/a-skill-you-learned-from-someone-3.mp3"
+    },
+    {
+      "idx": 4,
+      "part": 1,
+      "text": "Did you enjoy learning new things when you were a child?",
+      "cueCardPoints": null,
+      "prepSeconds": 0,
+      "audioUrl": "https://pub-fbae5ca09eba4fd0820da2b390dd7ca0.r2.dev/speaking/a-skill-you-learned-from-someone-4.mp3"
+    },
+    {
+      "idx": 5,
+      "part": 2,
+      "text": "Describe a useful skill that someone taught you. You should say:",
+      "cueCardPoints": [
+        "what the skill was",
+        "who taught it to you and when",
+        "how you learned to do it",
+        "and explain why this skill has been useful to you."
+      ],
+      "prepSeconds": 60,
+      "audioUrl": "https://pub-fbae5ca09eba4fd0820da2b390dd7ca0.r2.dev/speaking/a-skill-you-learned-from-someone-5.mp3"
+    },
+    {
+      "idx": 6,
+      "part": 3,
+      "text": "What kinds of practical skills are most important for young people to learn?",
+      "cueCardPoints": null,
+      "prepSeconds": 0,
+      "audioUrl": "https://pub-fbae5ca09eba4fd0820da2b390dd7ca0.r2.dev/speaking/a-skill-you-learned-from-someone-6.mp3"
+    },
+    {
+      "idx": 7,
+      "part": 3,
+      "text": "How does learning directly from another person differ from learning through videos or online courses?",
+      "cueCardPoints": null,
+      "prepSeconds": 0,
+      "audioUrl": "https://pub-fbae5ca09eba4fd0820da2b390dd7ca0.r2.dev/speaking/a-skill-you-learned-from-someone-7.mp3"
+    },
+    {
+      "idx": 8,
+      "part": 3,
+      "text": "Why are some people more willing than others to share their knowledge and skills?",
+      "cueCardPoints": null,
+      "prepSeconds": 0,
+      "audioUrl": "https://pub-fbae5ca09eba4fd0820da2b390dd7ca0.r2.dev/speaking/a-skill-you-learned-from-someone-8.mp3"
+    },
+    {
+      "idx": 9,
+      "part": 3,
+      "text": "How might technology change the way people learn practical skills in the future?",
+      "cueCardPoints": null,
+      "prepSeconds": 0,
+      "audioUrl": "https://pub-fbae5ca09eba4fd0820da2b390dd7ca0.r2.dev/speaking/a-skill-you-learned-from-someone-9.mp3"
+    }
+  ]
+}

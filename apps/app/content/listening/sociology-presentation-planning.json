@@ -1,0 +1,276 @@
+{
+  "slug": "sociology-presentation-planning",
+  "title": "Planning a Sociology Group Presentation",
+  "topic": "Two students divide tasks for a university presentation about public transport",
+  "difficulty": 3,
+  "transcript": "Aisha:\nWe should probably divide the work for our sociology presentation today. We only have ten days left.\nBen:\nAgreed. The topic is public transport and social inequality, and Professor Lewis said we need both statistics and interview material.\nAisha:\nI can handle the statistics. I found a council dataset comparing bus use across different income groups.\nBen:\nGood. I'll work on the interview material because I've already spoken to two students who commute from outside the city.\nAisha:\nWe need at least five interviews, though.\nBen:\nI know. I'll arrange three more by Friday. I was thinking of interviewing only students, but it might be better to include someone who's retired as well.\nAisha:\nDefinitely. It would make the sample less narrow. What should Chloe do?\nBen:\nShe's good at design, so she could create the slides and make the maps easier to read.\nAisha:\nAnd Marcus offered to check academic sources. He can prepare the literature review section.\nBen:\nThat leaves the introduction and conclusion. We can write those together after everyone sends their material.\nAisha:\nWhen should we set the internal deadline?\nBen:\nHow about next Monday evening? That gives us three days to combine everything before the presentation on Thursday.\nAisha:\nLet's make it six o'clock on Monday. If people send things at midnight, we'll lose most of the evening.\nBen:\nFair. We should also decide how long each section will be. The whole presentation is twelve minutes.\nAisha:\nProfessor Lewis said the introduction should be brief, about one minute. The evidence section can take seven minutes, then two minutes for discussion and two for the conclusion.\nBen:\nShould we include the chart showing ticket prices over the last twenty years?\nAisha:\nI don't think so. It's interesting, but our argument is about access rather than long-term inflation. The chart on bus frequency by neighbourhood is more relevant.\nBen:\nAgreed. And for the interview quotes, I'll use short extracts rather than putting whole answers on the slides.\nAisha:\nGood. We also need to upload the slides before the seminar.\nBen:\nThe course page says upload them by nine in the morning on Thursday, but I'd rather do it Wednesday night in case the website has problems.",
+  "speakers": {
+    "Aisha": "female",
+    "Ben": "male"
+  },
+  "matchingOptions": [
+    "Aisha",
+    "Ben",
+    "Chloe",
+    "Marcus",
+    "Professor Lewis",
+    "the whole group",
+    "the council"
+  ],
+  "questions": [
+    {
+      "idx": 1,
+      "kind": "multiple_choice",
+      "prompt": "What two types of evidence does the professor require?",
+      "options": [
+        "maps and photographs",
+        "statistics and interview material",
+        "surveys and newspaper articles",
+        "charts and video recordings"
+      ],
+      "answer": [
+        "statistics and interview material"
+      ],
+      "evidence": "The topic is public transport and social inequality, and Professor Lewis said we need both statistics and interview material.",
+      "explanation": "The presentation must include quantitative statistics and interview evidence."
+    },
+    {
+      "idx": 2,
+      "kind": "matching",
+      "prompt": "Who will analyse the council statistics?",
+      "options": null,
+      "answer": [
+        "Aisha"
+      ],
+      "evidence": "I can handle the statistics.",
+      "explanation": "Aisha volunteers to take responsibility for the statistical data."
+    },
+    {
+      "idx": 3,
+      "kind": "matching",
+      "prompt": "Who will collect the interview material?",
+      "options": null,
+      "answer": [
+        "Ben"
+      ],
+      "evidence": "I'll work on the interview material because I've already spoken to two students who commute from outside the city.",
+      "explanation": "Ben takes responsibility for the interview section."
+    },
+    {
+      "idx": 4,
+      "kind": "matching",
+      "prompt": "Who will prepare the literature review?",
+      "options": null,
+      "answer": [
+        "Marcus"
+      ],
+      "evidence": "And Marcus offered to check academic sources. He can prepare the literature review section.",
+      "explanation": "Marcus will review academic sources and prepare that section."
+    },
+    {
+      "idx": 5,
+      "kind": "sentence_completion",
+      "prompt": "Complete the sentence. Write ONE WORD AND/OR A NUMBER. The group needs at least ________ interviews.",
+      "options": null,
+      "answer": [
+        "five"
+      ],
+      "evidence": "We need at least five interviews, though.",
+      "explanation": "Aisha states the minimum interview requirement is five."
+    },
+    {
+      "idx": 6,
+      "kind": "multiple_choice",
+      "prompt": "Why does Ben consider interviewing a retired person?",
+      "options": [
+        "To increase the number of academic sources",
+        "To make the sample less narrow",
+        "To compare two different cities",
+        "To replace one of the student interviews"
+      ],
+      "answer": [
+        "To make the sample less narrow"
+      ],
+      "evidence": "It would make the sample less narrow.",
+      "explanation": "Including someone outside the student population would broaden the sample."
+    },
+    {
+      "idx": 7,
+      "kind": "sentence_completion",
+      "prompt": "Complete the sentence. Write ONE WORD AND/OR A NUMBER. Group members should send their material by ________ o'clock on Monday.",
+      "options": null,
+      "answer": [
+        "six"
+      ],
+      "evidence": "Let's make it six o'clock on Monday.",
+      "explanation": "The group agrees on a six o'clock internal deadline."
+    },
+    {
+      "idx": 8,
+      "kind": "multiple_choice",
+      "prompt": "How much time is allocated to the evidence section?",
+      "options": [
+        "one minute",
+        "two minutes",
+        "seven minutes",
+        "twelve minutes"
+      ],
+      "answer": [
+        "seven minutes"
+      ],
+      "evidence": "The evidence section can take seven minutes, then two minutes for discussion and two for the conclusion.",
+      "explanation": "Seven of the twelve presentation minutes are allocated to evidence."
+    },
+    {
+      "idx": 9,
+      "kind": "multiple_choice",
+      "prompt": "Which visual does Aisha think is more relevant?",
+      "options": [
+        "ticket prices over twenty years",
+        "bus frequency by neighbourhood",
+        "a map of university buildings",
+        "income changes by age group"
+      ],
+      "answer": [
+        "bus frequency by neighbourhood"
+      ],
+      "evidence": "The chart on bus frequency by neighbourhood is more relevant.",
+      "explanation": "Aisha prefers the chart that directly supports their argument about access."
+    },
+    {
+      "idx": 10,
+      "kind": "sentence_completion",
+      "prompt": "Complete the sentence. Write ONE WORD. Ben would prefer to upload the slides on ________ night.",
+      "options": null,
+      "answer": [
+        "Wednesday"
+      ],
+      "evidence": "The course page says upload them by nine in the morning on Thursday, but I'd rather do it Wednesday night in case the website has problems.",
+      "explanation": "Ben wants to upload the presentation the night before the official deadline."
+    }
+  ],
+  "audioUrl": "https://pub-fbae5ca09eba4fd0820da2b390dd7ca0.r2.dev/listening/sociology-presentation-planning.mp3",
+  "peaks": [
+    0.5063391232788076,
+    0.42439396004818475,
+    0.3649837699691069,
+    0.3317681369221306,
+    0.39531332739308195,
+    0.7619234229041203,
+    0.829224372270478,
+    0.8534187417666935,
+    0.7844273470274414,
+    0.5568032400167303,
+    0.7242657039841824,
+    0.6112411851354526,
+    0.6186741197606759,
+    0.45635969801678405,
+    0.328316179104133,
+    0.43790010714413896,
+    0.41130579971759507,
+    0.36951200631478565,
+    0.373560667813274,
+    0.6782583565808131,
+    0.8377381692682404,
+    0.5919264905959589,
+    0.6273918239224824,
+    0.3948823216254172,
+    0.6559229677457009,
+    0.5346671391282879,
+    0.5040936173113258,
+    0.6680837702446966,
+    0.9580545623820429,
+    0.8234547540809544,
+    0.6293856662933951,
+    0.5281300841374178,
+    0.6899798311413995,
+    0.5006183079271952,
+    0.5503597631970043,
+    0.4006520815865761,
+    0.5268904684971769,
+    0.43115971980909606,
+    0.23299080572087422,
+    0.350029123078605,
+    0.9353454632598424,
+    0.46879950226789424,
+    0.5973800259941032,
+    0.514669596551402,
+    0.47822176725706056,
+    0.5818139350746643,
+    0.41327191748860564,
+    0.2480864123744505,
+    0.5341599304275509,
+    0.3860591134725668,
+    0.694057259719724,
+    0.640536815793466,
+    0.4185690784829241,
+    0.5889402581564332,
+    0.5411345083771288,
+    0.6356669274279605,
+    0.39315413390687093,
+    0.4530178761209638,
+    0.37581915227447615,
+    1,
+    0.7080924493071844,
+    0.780647828004648,
+    0.7172257918881895,
+    0.5815713677076363,
+    0.48924845145029366,
+    0.4925527413443195,
+    0.4026045877185551,
+    0.3676428125843229,
+    0.3809991236485969,
+    0.4177819995848543,
+    0.6364031998717713,
+    0.4972553413305781,
+    0.6438484537866125,
+    0.37330929338019186,
+    0.5452246775420004,
+    0.48292684728894153,
+    0.4068784786325316,
+    0.49831761763065,
+    0.3612803439213953,
+    0.3965904276477163,
+    0.2794002791354374,
+    0.31169722354624696,
+    0.3843835140686662,
+    0.39938300540009747,
+    0.4686775545940324,
+    0.3713855536397271,
+    0.3518786117956306,
+    0.6868924937393232,
+    0.8242137021289516,
+    0.6349571178760206,
+    0.6766527422858136,
+    0.4955315144022689,
+    0.4154086763398813,
+    0.4504160673614006,
+    0.44736767757251006,
+    0.4261455788427664,
+    0.47362308169044576,
+    0.4868614133479425,
+    0.23373303704813755,
+    0.37370976035455244,
+    0.4431737764104094,
+    0.4009169001027964,
+    0.6636957457092612,
+    0.9162992155779663,
+    0.6448535320119653,
+    0.7125119711529624,
+    0.727245216954023,
+    0.568502460231914,
+    0.38552205640913917,
+    0.5727031180337661,
+    0.38398989889916735,
+    0.43613136163678684,
+    0.8445862929551643,
+    0.7684675767857571,
+    0.6055937859575987,
+    0.47703187031250616,
+    0.7665553199414978,
+    0.597710790929054,
+    0.5734165304033845,
+    0.47834707911572444
+  ],
+  "durationSeconds": 131.3146485260771
+}

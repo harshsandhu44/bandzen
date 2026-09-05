@@ -17,7 +17,7 @@
  */
 import { readFileSync, readdirSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
-import { computePeaks, synthesizeSpeech } from '@bandzen/ai/speech';
+import { computePeaks, synthesizeConversation } from '@bandzen/ai/speech';
 import { uploadObject } from '@bandzen/storage/r2';
 import type { GeneratedListeningTrack as Track } from '../src/lib/ai/schemas.ts';
 
@@ -38,6 +38,8 @@ async function run(force: boolean) {
       audioUrl?: string;
       peaks?: number[];
       durationSeconds?: number;
+      /** Sidecar for synthesis only — never written to the DB. */
+      speakers?: Record<string, 'male' | 'female'>;
     };
 
     if (track.audioUrl && !force) {
@@ -46,7 +48,7 @@ async function run(force: boolean) {
     }
 
     console.log(`  … synthesizing ${track.slug}`);
-    const audio = await synthesizeSpeech(track.transcript);
+    const audio = await synthesizeConversation(track.transcript, track.speakers);
 
     track.audioUrl = await uploadObject({
       key: `listening/${track.slug}.mp3`,

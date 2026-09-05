@@ -1,0 +1,267 @@
+{
+  "slug": "municipal-recycling-centre-guide",
+  "title": "Guide to Using the Municipal Recycling Centre",
+  "topic": "A council representative explains how residents should use a local recycling centre",
+  "difficulty": 2,
+  "transcript": "This recording explains how to use the Greenford Recycling Centre, including opening times, vehicle access and where different materials should be placed.\nFrom Monday to Friday, the centre opens at eight in the morning and closes at six in the evening. At weekends, it opens one hour later, at nine, and closes at five.\nResidents do not need to pay to use the centre, but you must bring proof that you live within the Greenford council area. A driving licence, council tax letter or recent utility bill is acceptable.\nCars and small vans may enter without booking. Vans longer than five metres and any vehicle carrying a trailer must reserve a time slot online before arriving.\nWhen you enter the site, follow the one-way road and stop first at the information point if you are unsure where an item belongs. Do not reverse between collection areas unless a member of staff tells you to do so.\nHousehold glass goes into the green containers near the entrance. Please remove plastic bags before depositing bottles or jars, although labels can remain attached.\nLarge cardboard should be flattened and placed in the covered bay. If cardboard is wet or heavily contaminated with food, it cannot be recycled and should go into general waste.\nElectrical items, including kettles, televisions and computer monitors, belong in the electronics section. Do not place batteries inside this area because batteries have a separate collection cabinet beside the office.\nGarden waste such as grass, leaves and small branches goes into the open composting bay. Soil and large tree roots are not accepted as garden waste.\nPaint is accepted only in sealed containers. Partly used tins should be taken to the hazardous household waste area, where a staff member will check them before storage.\nBefore leaving, make sure you have not left boxes or bags on the ground beside a container. Items placed outside the correct collection area may create a safety hazard and can prevent vehicles from moving around the site.",
+  "matchingOptions": [
+    "green containers",
+    "covered bay",
+    "electronics section",
+    "battery cabinet",
+    "composting bay",
+    "hazardous household waste area",
+    "general waste"
+  ],
+  "questions": [
+    {
+      "idx": 1,
+      "kind": "multiple_choice",
+      "prompt": "What time does the recycling centre open at weekends?",
+      "options": [
+        "7:00",
+        "8:00",
+        "9:00",
+        "10:00"
+      ],
+      "answer": [
+        "9:00"
+      ],
+      "evidence": "At weekends, it opens one hour later, at nine, and closes at five.",
+      "explanation": "Weekend opening time is nine in the morning."
+    },
+    {
+      "idx": 2,
+      "kind": "sentence_completion",
+      "prompt": "Complete the sentence. Write TWO WORDS. Residents must bring proof that they live within the council ________.",
+      "options": null,
+      "answer": [
+        "council area"
+      ],
+      "evidence": "Residents do not need to pay to use the centre, but you must bring proof that you live within the Greenford council area.",
+      "explanation": "Users need evidence that they live in the local council area."
+    },
+    {
+      "idx": 3,
+      "kind": "multiple_choice",
+      "prompt": "Which vehicles must book a time slot?",
+      "options": [
+        "all cars",
+        "all small vans",
+        "vehicles carrying a trailer",
+        "electric vehicles only"
+      ],
+      "answer": [
+        "vehicles carrying a trailer"
+      ],
+      "evidence": "Vans longer than five metres and any vehicle carrying a trailer must reserve a time slot online before arriving.",
+      "explanation": "Trailers require advance booking."
+    },
+    {
+      "idx": 4,
+      "kind": "matching",
+      "prompt": "Where should household glass be placed?",
+      "options": null,
+      "answer": [
+        "green containers"
+      ],
+      "evidence": "Household glass goes into the green containers near the entrance.",
+      "explanation": "Glass bottles and jars belong in the green containers."
+    },
+    {
+      "idx": 5,
+      "kind": "matching",
+      "prompt": "Where should flattened cardboard be placed?",
+      "options": null,
+      "answer": [
+        "covered bay"
+      ],
+      "evidence": "Large cardboard should be flattened and placed in the covered bay.",
+      "explanation": "Flattened cardboard is collected in the covered bay."
+    },
+    {
+      "idx": 6,
+      "kind": "multiple_choice",
+      "prompt": "What should happen to cardboard that is heavily contaminated with food?",
+      "options": [
+        "It should be washed",
+        "It should go into general waste",
+        "It should be left beside the covered bay",
+        "It should be placed with garden waste"
+      ],
+      "answer": [
+        "It should go into general waste"
+      ],
+      "evidence": "If cardboard is wet or heavily contaminated with food, it cannot be recycled and should go into general waste.",
+      "explanation": "Contaminated cardboard is not recyclable at the site."
+    },
+    {
+      "idx": 7,
+      "kind": "matching",
+      "prompt": "Where should computer monitors be taken?",
+      "options": null,
+      "answer": [
+        "electronics section"
+      ],
+      "evidence": "Electrical items, including kettles, televisions and computer monitors, belong in the electronics section.",
+      "explanation": "Computer monitors are treated as electrical items."
+    },
+    {
+      "idx": 8,
+      "kind": "sentence_completion",
+      "prompt": "Complete the sentence. Write ONE WORD. Batteries are collected in a separate cabinet beside the ________.",
+      "options": null,
+      "answer": [
+        "office"
+      ],
+      "evidence": "Do not place batteries inside this area because batteries have a separate collection cabinet beside the office.",
+      "explanation": "The battery cabinet is located beside the office."
+    },
+    {
+      "idx": 9,
+      "kind": "matching",
+      "prompt": "Where should grass and leaves be placed?",
+      "options": null,
+      "answer": [
+        "composting bay"
+      ],
+      "evidence": "Garden waste such as grass, leaves and small branches goes into the open composting bay.",
+      "explanation": "Grass and leaves are accepted in the composting bay."
+    },
+    {
+      "idx": 10,
+      "kind": "sentence_completion",
+      "prompt": "Complete the sentence. Write ONE WORD. Paint is accepted only when it is in ________ containers.",
+      "options": null,
+      "answer": [
+        "sealed"
+      ],
+      "evidence": "Paint is accepted only in sealed containers.",
+      "explanation": "Paint containers must be properly sealed."
+    }
+  ],
+  "audioUrl": "https://pub-fbae5ca09eba4fd0820da2b390dd7ca0.r2.dev/listening/municipal-recycling-centre-guide.mp3",
+  "peaks": [
+    0.8584140241439211,
+    0.7963919983173411,
+    0.6752217856535709,
+    0.48186362769457275,
+    0.8281967453174153,
+    0.63733971672364,
+    0.6186695237452479,
+    0.483998645690017,
+    0.19330350490240314,
+    0.9617403265998463,
+    0.67751574041468,
+    0.673156559053252,
+    0.5784489433614793,
+    0.4087554599576953,
+    0.6444247411986,
+    0.7502619469539069,
+    0.6062011897847984,
+    0.6948008301188193,
+    0.3950702679568213,
+    0.5762706632532062,
+    0.7597086533729398,
+    0.5444792745269282,
+    0.909704257284151,
+    0.7454731945831875,
+    0.6970619642250118,
+    0.3821719503113771,
+    0.794896169696189,
+    0.6047481521124202,
+    0.719387743755734,
+    0.48166202664956415,
+    0.21546442615004754,
+    0.9341827758351577,
+    0.6890350983491257,
+    0.2119191690719081,
+    1,
+    0.77277852721168,
+    0.6172328331835959,
+    0.6009146108174316,
+    0.6027452351613742,
+    0.3905095343751495,
+    0.8970207457513927,
+    0.4417182807170032,
+    0.9796468634620548,
+    0.5823013085861776,
+    0.6260748791875778,
+    0.7449167404044373,
+    0.715683983859671,
+    0.37485904585209384,
+    0.877748981355296,
+    0.6390542051163826,
+    0.7818605787832783,
+    0.4998651935953547,
+    0.25057503995687674,
+    0.6277992425332667,
+    0.7713716012822162,
+    0.7002404317518608,
+    0.3558506770936489,
+    0.7873977439606655,
+    0.4891897966243041,
+    0.5724767994144518,
+    0.3314392210052282,
+    0.8301926156131417,
+    0.4147396446583545,
+    0.6179904413834463,
+    0.5193776068596692,
+    0.641623072997438,
+    0.3269222648829617,
+    0.6631117707296837,
+    0.5985290906235097,
+    0.6023033358743073,
+    0.6532184281362151,
+    0.5613000543654535,
+    0.6289472295447998,
+    0.4878675510202796,
+    0.5985431348834885,
+    0.7313112426690956,
+    0.680092801827742,
+    0.42887907034820477,
+    0.9086364517496421,
+    0.352169281418648,
+    0.6258055878855274,
+    0.6222899850313134,
+    0.49861758097210107,
+    0.5772593064075401,
+    0.4580973492411022,
+    0.37994766475530994,
+    0.568793057460752,
+    0.5168835510682662,
+    0.5961455218302392,
+    0.6383001041247717,
+    0.6158393856498697,
+    0.47970642354333354,
+    0.4827019199437184,
+    0.5907338227629839,
+    0.5638364457816192,
+    0.3168922375768766,
+    0.4758185010928426,
+    0.7236315349660456,
+    0.4768377928844174,
+    0.5193302617293138,
+    0.5762595057979253,
+    0.5687747747421127,
+    0.5322910939096492,
+    0.331327065834837,
+    0.8807442631524874,
+    0.4001424128475971,
+    0.13094629190308646,
+    0.7515278256869136,
+    0.8284422655734364,
+    0.4867995481976506,
+    0.575987859879672,
+    0.4367295014414886,
+    0.5069186041527051,
+    0.6634311861923313,
+    0.522575868494509,
+    0.6473980874332077,
+    0.5412707321714071,
+    0.6819419119552411,
+    0.8210354197013845,
+    0.4357070043638567
+  ],
+  "durationSeconds": 127.29179138321996
+}

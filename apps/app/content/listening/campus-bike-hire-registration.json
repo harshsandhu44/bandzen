@@ -1,0 +1,273 @@
+{
+  "slug": "campus-bike-hire-registration",
+  "title": "Registering for the Campus Bike Hire Scheme",
+  "topic": "A student asks about joining a university bicycle rental scheme",
+  "difficulty": 2,
+  "transcript": "Nina:\nHi, I saw the bicycles outside the student centre and wanted to ask how the hire scheme works.\nDaniel:\nIt's quite simple. Students register online first, then bring their student card here so we can activate the account.\nNina:\nIs there a registration fee?\nDaniel:\nThere's a one-off registration fee of twelve pounds, but after that the first thirty minutes of every journey are free.\nNina:\nAnd what happens if I keep a bike for longer than thirty minutes?\nDaniel:\nFrom thirty to sixty minutes, you pay two pounds. After the first hour, the charge increases by three pounds for every additional hour.\nNina:\nI mainly need one for getting to my morning lectures. Where can I collect a bike?\nDaniel:\nThere are four collection points: the student centre, West Hall, the sports complex and the science library.\nNina:\nThe science library would be most convenient. Can I reserve a bicycle in advance?\nDaniel:\nYes, but reservations can only be made through the mobile app, and you can book no more than fifteen minutes before you need the bike.\nNina:\nDo I need to return it to the same place?\nDaniel:\nNo. You can return it to any official collection point as long as there's an empty docking space.\nNina:\nWhat if there isn't one?\nDaniel:\nThe app will show you the nearest station with an available space. Don't leave the bicycle beside a full station because it remains your responsibility until it's properly docked.\nNina:\nAre helmets included?\nDaniel:\nNo, riders have to provide their own helmet. We strongly recommend wearing one, even though the university doesn't make it compulsory.\nNina:\nWhat should I do if there's something wrong with the bike when I collect it?\nDaniel:\nReport any damage in the app before starting your journey. That prevents you from being held responsible for an existing problem.\nNina:\nAnd if I get a flat tyre halfway across campus?\nDaniel:\nCall the support number printed on the bicycle frame. Don't try to repair the bike yourself.\nNina:\nRight. How long does my membership last?\nDaniel:\nMembership runs until the end of the academic year, so you'll need to renew it next September if you're still studying here.",
+  "speakers": {
+    "Nina": "female",
+    "Daniel": "male"
+  },
+  "matchingOptions": null,
+  "questions": [
+    {
+      "idx": 1,
+      "kind": "sentence_completion",
+      "prompt": "Complete the sentence. Write TWO WORDS. Students must bring their ________ after registering online.",
+      "options": null,
+      "answer": [
+        "student card"
+      ],
+      "evidence": "Students register online first, then bring their student card here so we can activate the account.",
+      "explanation": "Daniel says students must bring their student card after completing the online registration."
+    },
+    {
+      "idx": 2,
+      "kind": "multiple_choice",
+      "prompt": "How much is the one-off registration fee?",
+      "options": [
+        "eight pounds",
+        "ten pounds",
+        "twelve pounds",
+        "fifteen pounds"
+      ],
+      "answer": [
+        "twelve pounds"
+      ],
+      "evidence": "There's a one-off registration fee of twelve pounds, but after that the first thirty minutes of every journey are free.",
+      "explanation": "Daniel states that registration costs twelve pounds."
+    },
+    {
+      "idx": 3,
+      "kind": "sentence_completion",
+      "prompt": "Complete the sentence. Write ONE WORD AND/OR A NUMBER. The first ________ minutes of each journey are free.",
+      "options": null,
+      "answer": [
+        "thirty"
+      ],
+      "evidence": "There's a one-off registration fee of twelve pounds, but after that the first thirty minutes of every journey are free.",
+      "explanation": "The free period lasts for the first thirty minutes."
+    },
+    {
+      "idx": 4,
+      "kind": "multiple_choice",
+      "prompt": "Which collection point does Nina say would be most convenient?",
+      "options": [
+        "the student centre",
+        "West Hall",
+        "the sports complex",
+        "the science library"
+      ],
+      "answer": [
+        "the science library"
+      ],
+      "evidence": "The science library would be most convenient.",
+      "explanation": "Nina directly identifies the science library as her preferred collection point."
+    },
+    {
+      "idx": 5,
+      "kind": "sentence_completion",
+      "prompt": "Complete the sentence. Write TWO WORDS. Reservations are made using the ________.",
+      "options": null,
+      "answer": [
+        "mobile app"
+      ],
+      "evidence": "Yes, but reservations can only be made through the mobile app, and you can book no more than fifteen minutes before you need the bike.",
+      "explanation": "Daniel says advance reservations are available only through the mobile app."
+    },
+    {
+      "idx": 6,
+      "kind": "multiple_choice",
+      "prompt": "How early can a bicycle be reserved?",
+      "options": [
+        "five minutes before use",
+        "fifteen minutes before use",
+        "thirty minutes before use",
+        "one hour before use"
+      ],
+      "answer": [
+        "fifteen minutes before use"
+      ],
+      "evidence": "Yes, but reservations can only be made through the mobile app, and you can book no more than fifteen minutes before you need the bike.",
+      "explanation": "Reservations can be made no more than fifteen minutes before the bike is needed."
+    },
+    {
+      "idx": 7,
+      "kind": "sentence_completion",
+      "prompt": "Complete the sentence. Write TWO WORDS. A bike may be returned to any official collection point if there is an empty ________.",
+      "options": null,
+      "answer": [
+        "docking space"
+      ],
+      "evidence": "No. You can return it to any official collection point as long as there's an empty docking space.",
+      "explanation": "An empty docking space is required when returning the bicycle."
+    },
+    {
+      "idx": 8,
+      "kind": "multiple_choice",
+      "prompt": "What does Daniel say about helmets?",
+      "options": [
+        "They can be rented at each station",
+        "They are supplied free to students",
+        "Riders must provide their own",
+        "They are compulsory on campus"
+      ],
+      "answer": [
+        "Riders must provide their own"
+      ],
+      "evidence": "No, riders have to provide their own helmet.",
+      "explanation": "The scheme does not supply helmets, so riders need to bring their own."
+    },
+    {
+      "idx": 9,
+      "kind": "sentence_completion",
+      "prompt": "Complete the sentence. Write ONE WORD. Existing damage should be reported before beginning the ________.",
+      "options": null,
+      "answer": [
+        "journey"
+      ],
+      "evidence": "Report any damage in the app before starting your journey.",
+      "explanation": "Daniel says damage must be reported before the journey starts."
+    },
+    {
+      "idx": 10,
+      "kind": "multiple_choice",
+      "prompt": "When will Nina need to renew the membership if she remains at the university?",
+      "options": [
+        "at the end of this month",
+        "at the start of summer",
+        "next September",
+        "after twelve months exactly"
+      ],
+      "answer": [
+        "next September"
+      ],
+      "evidence": "Membership runs until the end of the academic year, so you'll need to renew it next September if you're still studying here.",
+      "explanation": "Daniel says renewal will be required next September."
+    }
+  ],
+  "audioUrl": "https://pub-fbae5ca09eba4fd0820da2b390dd7ca0.r2.dev/listening/campus-bike-hire-registration.mp3",
+  "peaks": [
+    0.38192385354812036,
+    0.3954482531541129,
+    0.3448802162184106,
+    0.35021952755614355,
+    0.2567681902115794,
+    0.5476453806909563,
+    0.3204851876833625,
+    0.5824482952317898,
+    0.42867985004407655,
+    0.4935568912859425,
+    0.45140709559294007,
+    0.33123747191981306,
+    0.41542259637173157,
+    0.35794213769146477,
+    0.663203639116776,
+    0.4856017353442822,
+    0.45824852121466914,
+    0.3665140027102798,
+    0.5252246206459549,
+    0.5365517413975153,
+    0.5860192586855544,
+    0.633441957824914,
+    0.40905657437897125,
+    0.37832279276141134,
+    0.3704210898506189,
+    0.4828788391667007,
+    0.6392436027648131,
+    0.4775012143224994,
+    0.4292794682063185,
+    0.3684758025111469,
+    0.49979021350973707,
+    0.4555126258443414,
+    0.3890170551305523,
+    0.485873798329418,
+    0.41508006072475484,
+    0.4629640972851827,
+    0.42507934218928717,
+    0.32698495641512787,
+    0.29405903174694525,
+    0.299632729662907,
+    0.5652517991619227,
+    0.5920469015452033,
+    0.27769316159915675,
+    0.3438905105435544,
+    0.38398796188927875,
+    0.4280320355927186,
+    0.3219070904636542,
+    0.4776753539156733,
+    0.2944481748619028,
+    0.375119188157071,
+    0.3560311849336766,
+    0.2455499926360864,
+    0.3469368979567468,
+    0.5319128082107478,
+    0.4601478993827205,
+    0.5663056184913752,
+    0.5378179797066228,
+    0.42528275384377756,
+    0.5597029323743022,
+    0.46413494111678777,
+    0.5548028209093729,
+    0.36920649500173613,
+    0.39370324414270685,
+    0.46582951136997364,
+    0.50635176658908,
+    0.5411164488035951,
+    0.40301934183509863,
+    0.4789554709858388,
+    0.4203498275024733,
+    0.4176803144346569,
+    0.4875303018643111,
+    0.5310945676339123,
+    0.5056799938570206,
+    0.456615816213285,
+    0.4830136104598825,
+    0.5057971218369416,
+    0.44064038802851346,
+    0.4688589348239479,
+    0.49658773795093497,
+    0.41481088983464837,
+    0.47425655257295696,
+    0.4759830540934972,
+    0.5063322058036317,
+    0.5900664685795864,
+    0.5431278274692263,
+    0.28850735181301607,
+    0.5838398031795876,
+    0.37834607164523215,
+    0.47924730062806764,
+    0.4528588342524328,
+    0.26926725293614645,
+    0.40402008301301817,
+    0.39255185675461884,
+    0.25494256323678494,
+    1,
+    0.6309710756273569,
+    0.5317050699532773,
+    0.42526459912148956,
+    0.509076219887244,
+    0.5471792899529856,
+    0.42538075473686165,
+    0.41433330058979284,
+    0.5043049676937701,
+    0.39844031099414406,
+    0.5872481731280206,
+    0.5781353153907804,
+    0.4532010920368789,
+    0.49553980765049066,
+    0.5439195834412716,
+    0.38857255834359644,
+    0.38524731420464303,
+    0.4515995584638241,
+    0.4742168393804097,
+    0.6212400880451238,
+    0.47449322853543874,
+    0.42373926613806967,
+    0.6099324032293969,
+    0.47789849913532173,
+    0.44206970369567383,
+    0.40231219255619927
+  ],
+  "durationSeconds": 122.97287981859411
+}

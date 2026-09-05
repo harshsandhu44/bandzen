@@ -1,0 +1,273 @@
+{
+  "slug": "railway-season-ticket-enquiry",
+  "title": "Enquiring About a Railway Season Ticket",
+  "topic": "A commuter asks a railway employee about ticket options for regular travel",
+  "difficulty": 3,
+  "transcript": "Maya:\nHi. I'm starting a new job next month and I'll be travelling from Oakridge to Central Station five days a week. I'm trying to work out which ticket would be cheapest.\nCaleb:\nIf you're travelling every weekday, a monthly season ticket is usually better value than buying daily returns.\nMaya:\nHow much is the monthly ticket?\nCaleb:\nFor Oakridge to Central, it's one hundred and eighty-four pounds. An annual ticket works out cheaper per month, but obviously the upfront cost is much higher.\nMaya:\nI'd rather start monthly until I'm sure the job works out. Can I use the ticket at weekends as well?\nCaleb:\nYes. The monthly season ticket allows unlimited travel between Oakridge and Central Station every day, including weekends.\nMaya:\nDoes that include the express trains?\nCaleb:\nIt includes all our standard and express services on that route, but not the airport service because that's operated separately.\nMaya:\nI sometimes need to get off at Riverside, which is between Oakridge and Central. Is that allowed?\nCaleb:\nYes. You can start or finish your journey at any intermediate station covered by the route.\nMaya:\nThat's useful. Do I need a photo card?\nCaleb:\nFor a paper season ticket, yes. But if you load the season ticket onto our travel smartcard, you don't need a separate photo card.\nMaya:\nI'd prefer the smartcard. Is there a charge for it?\nCaleb:\nThe first smartcard is free. If you lose it, a replacement costs eight pounds.\nMaya:\nCan I buy everything online?\nCaleb:\nYou can order the smartcard online, but because this is your first season ticket, you'll need to collect it from the ticket office and show identification.\nMaya:\nWhat kind of identification?\nCaleb:\nA passport or driving licence is ideal. A workplace identity card isn't accepted.\nMaya:\nHow early should I order it before I start travelling?\nCaleb:\nAllow at least five working days. Cards sometimes arrive at the station sooner, but five days gives us enough time to process the application.\nMaya:\nIf I go on holiday for two weeks, can I pause the monthly ticket?\nCaleb:\nNo, monthly tickets can't be paused. You can request a refund for the unused period if you stop travelling completely, but an administration fee is deducted.",
+  "speakers": {
+    "Maya": "female",
+    "Caleb": "male"
+  },
+  "matchingOptions": null,
+  "questions": [
+    {
+      "idx": 1,
+      "kind": "multiple_choice",
+      "prompt": "Why does Caleb recommend a monthly season ticket?",
+      "options": [
+        "It includes free airport travel",
+        "It is usually cheaper than daily returns",
+        "It can be paused during holidays",
+        "It does not require identification"
+      ],
+      "answer": [
+        "It is usually cheaper than daily returns"
+      ],
+      "evidence": "If you're travelling every weekday, a monthly season ticket is usually better value than buying daily returns.",
+      "explanation": "Regular weekday travel makes the monthly ticket better value."
+    },
+    {
+      "idx": 2,
+      "kind": "sentence_completion",
+      "prompt": "Complete the sentence. Write ONE WORD AND/OR A NUMBER. The monthly season ticket costs ________ pounds.",
+      "options": null,
+      "answer": [
+        "one hundred and eighty-four"
+      ],
+      "evidence": "For Oakridge to Central, it's one hundred and eighty-four pounds.",
+      "explanation": "Caleb gives the monthly price as one hundred and eighty-four pounds."
+    },
+    {
+      "idx": 3,
+      "kind": "multiple_choice",
+      "prompt": "When can Maya use the monthly season ticket?",
+      "options": [
+        "weekdays only",
+        "weekdays and Saturdays only",
+        "every day including weekends",
+        "only during peak hours"
+      ],
+      "answer": [
+        "every day including weekends"
+      ],
+      "evidence": "Yes. The monthly season ticket allows unlimited travel between Oakridge and Central Station every day, including weekends.",
+      "explanation": "The ticket is valid every day of the week."
+    },
+    {
+      "idx": 4,
+      "kind": "sentence_completion",
+      "prompt": "Complete the sentence. Write TWO WORDS. The season ticket does not cover the ________.",
+      "options": null,
+      "answer": [
+        "airport service"
+      ],
+      "evidence": "It includes all our standard and express services on that route, but not the airport service because that's operated separately.",
+      "explanation": "The separately operated airport service is excluded."
+    },
+    {
+      "idx": 5,
+      "kind": "multiple_choice",
+      "prompt": "What may Maya do at Riverside?",
+      "options": [
+        "Only change trains there",
+        "Start or finish her journey there",
+        "Use only standard trains there",
+        "Buy a discounted airport ticket there"
+      ],
+      "answer": [
+        "Start or finish her journey there"
+      ],
+      "evidence": "You can start or finish your journey at any intermediate station covered by the route.",
+      "explanation": "Intermediate stations such as Riverside can be used as starting or finishing points."
+    },
+    {
+      "idx": 6,
+      "kind": "sentence_completion",
+      "prompt": "Complete the sentence. Write ONE WORD. Maya prefers to put the ticket on a travel ________.",
+      "options": null,
+      "answer": [
+        "smartcard"
+      ],
+      "evidence": "But if you load the season ticket onto our travel smartcard, you don't need a separate photo card.",
+      "explanation": "The electronic option is the travel smartcard."
+    },
+    {
+      "idx": 7,
+      "kind": "multiple_choice",
+      "prompt": "How much does a replacement smartcard cost?",
+      "options": [
+        "nothing",
+        "five pounds",
+        "eight pounds",
+        "ten pounds"
+      ],
+      "answer": [
+        "eight pounds"
+      ],
+      "evidence": "If you lose it, a replacement costs eight pounds.",
+      "explanation": "A replacement card costs eight pounds."
+    },
+    {
+      "idx": 8,
+      "kind": "sentence_completion",
+      "prompt": "Complete the sentence. Write TWO WORDS. Maya must collect her first season ticket from the ________.",
+      "options": null,
+      "answer": [
+        "ticket office"
+      ],
+      "evidence": "You can order the smartcard online, but because this is your first season ticket, you'll need to collect it from the ticket office and show identification.",
+      "explanation": "First-time season tickets must be collected at the ticket office."
+    },
+    {
+      "idx": 9,
+      "kind": "multiple_choice",
+      "prompt": "Which form of identification is NOT accepted?",
+      "options": [
+        "a passport",
+        "a driving licence",
+        "a workplace identity card",
+        "either a passport or driving licence"
+      ],
+      "answer": [
+        "a workplace identity card"
+      ],
+      "evidence": "A workplace identity card isn't accepted.",
+      "explanation": "Caleb specifically says a workplace identity card cannot be used."
+    },
+    {
+      "idx": 10,
+      "kind": "sentence_completion",
+      "prompt": "Complete the sentence. Write ONE WORD AND/OR A NUMBER. Maya should allow at least ________ working days for her application.",
+      "options": null,
+      "answer": [
+        "five"
+      ],
+      "evidence": "Allow at least five working days.",
+      "explanation": "Five working days is the recommended processing period."
+    }
+  ],
+  "audioUrl": "https://pub-fbae5ca09eba4fd0820da2b390dd7ca0.r2.dev/listening/railway-season-ticket-enquiry.mp3",
+  "peaks": [
+    0.3831271518466644,
+    0.4558027269552342,
+    0.3602516322571799,
+    0.38691761510372147,
+    0.28419847602818243,
+    0.34786607387413143,
+    0.2503252374320307,
+    0.29344811233771184,
+    0.20801400368771272,
+    0.661613248240255,
+    0.4400239565489373,
+    0.4719043443081341,
+    0.3705109467248908,
+    0.5856113824567301,
+    0.4777056633833642,
+    0.32953262778938863,
+    0.377159542151206,
+    0.5763289897676055,
+    0.38176196611454477,
+    0.5549763184590334,
+    0.3867815979392448,
+    0.3496992593113097,
+    0.4555100634401768,
+    0.43601649244755764,
+    0.3835982600125851,
+    0.5114205027489382,
+    0.4322851224946129,
+    0.430395831411888,
+    0.40295680582856785,
+    0.291784700271428,
+    0.2876596737044208,
+    0.33321396091893263,
+    0.4011551316453388,
+    0.45311161744289125,
+    0.467158819738678,
+    0.5325203997146651,
+    0.4719434665436948,
+    0.37684387029837135,
+    0.4974425643417484,
+    0.4481555033118849,
+    0.4172562591337124,
+    0.39746463828513856,
+    0.7118136441531084,
+    0.6897196375788917,
+    0.49592693464292364,
+    0.4296733842933934,
+    0.5769677441317687,
+    0.5362835810953102,
+    0.5395116427902508,
+    0.3247570934239804,
+    0.4341749330400642,
+    0.2672533558679983,
+    0.3671990269514025,
+    0.23996111985913537,
+    0.2951572903953083,
+    0.507557551331557,
+    0.6213715004852848,
+    0.4910954217808905,
+    0.4543978752288558,
+    0.5275026148000405,
+    0.32923301860455567,
+    0.4840793430782956,
+    0.5728232682708714,
+    0.5240490554328461,
+    0.6189846038056587,
+    0.49516071112822446,
+    0.5444995333649053,
+    0.6114051698227477,
+    0.47187499219045753,
+    0.3360474520617232,
+    0.34810892102235386,
+    0.35787632558361687,
+    0.5163633187223835,
+    0.7796921861452561,
+    0.41122758856091973,
+    0.49887445986857587,
+    0.49749008463212796,
+    0.40093583226035284,
+    0.6150548031824603,
+    0.8315261242571792,
+    0.7542422862716632,
+    0.45224984723610034,
+    0.39104931800512266,
+    0.4862152168519646,
+    0.6375583092254892,
+    0.4386062616316276,
+    0.3676249130153222,
+    0.3138106036833107,
+    0.39630360156985833,
+    0.5405144871794708,
+    0.7032498820585601,
+    0.3827631229316343,
+    0.6159373034706913,
+    0.5040183667323851,
+    0.33762151068118595,
+    0.46061560318592215,
+    0.3099066572443021,
+    1,
+    0.955499023388269,
+    0.4896932486472066,
+    0.6831722280563632,
+    0.6172727199214154,
+    0.42463230314376454,
+    0.7198711550879409,
+    0.5416583077090428,
+    0.5407143426482368,
+    0.4170938304836824,
+    0.4372832321567369,
+    0.3659850511502822,
+    0.34312489698981247,
+    0.6360064941240973,
+    0.49967830006230524,
+    0.35815280309010206,
+    0.793111054832955,
+    0.46805945817821965,
+    0.5602313957722129,
+    0.5213082289486648,
+    0.42685797560739325,
+    0.4326186802644813,
+    0.34275902971853606
+  ],
+  "durationSeconds": 133.75274376417232
+}

@@ -3,8 +3,950 @@
 
 begin;
 
+-- An Apartment Move-In Inspection
+insert into public.listening_tracks (slug, title, topic, transcript, audio_url, matching_options, peaks, duration_seconds, difficulty)
+values ('apartment-move-in-inspection', 'An Apartment Move-In Inspection', 'A tenant and property manager inspect a rented apartment before move-in', 'Sofia:
+Thanks for meeting me. I thought it would be useful to go through the inspection form before I bring my furniture tomorrow.
+Marcus:
+Definitely. We''ll start in the kitchen and work clockwise around the apartment. Anything we record today won''t be treated as damage caused by you later.
+Sofia:
+I noticed a small crack in one of the kitchen tiles, just beside the fridge.
+Marcus:
+I''ve already written that down. The crack is cosmetic, so we won''t replace the tile immediately, but it''s now on the record.
+Sofia:
+The oven seems fine, but I couldn''t get the light inside it to come on.
+Marcus:
+That''s because the bulb has gone. I''ll ask maintenance to replace the oven bulb before Friday.
+Sofia:
+Thanks. What about this tap? It drips for a few seconds after I turn it off.
+Marcus:
+I''ll add the kitchen tap to the repair list. A plumber is already coming to the building on Thursday afternoon.
+Sofia:
+In the living room, there are two marks on the wall behind where the sofa will go.
+Marcus:
+I can see them. They''re light enough that repainting isn''t necessary, but I''ll photograph both marks for the inspection record.
+Sofia:
+The balcony door was quite stiff when I tried it yesterday.
+Marcus:
+It''s safe, but the lower hinge needs adjusting. Maintenance can do that at the same time as the oven bulb.
+Sofia:
+Should we check the bedroom next?
+Marcus:
+Yes. The carpet was professionally cleaned on Monday, so these darker patches are just areas that haven''t dried completely yet.
+Sofia:
+I was worried they were stains.
+Marcus:
+No, they should disappear by tomorrow. The wardrobe door, however, does have a loose handle, and I''ll arrange for that to be tightened.
+Sofia:
+The bathroom looks fine to me apart from the shower pressure. It seems a little weak.
+Marcus:
+That''s normal for this floor in the morning, but it improves after about ten. We checked the system last month and there isn''t a fault.
+Sofia:
+Right. How do I report a problem after I move in?
+Marcus:
+For routine repairs, use the tenant portal. If it''s something urgent, like a serious water leak, call the emergency number on the notice beside the front door.
+Sofia:
+And when do I receive the final inspection form?
+Marcus:
+I''ll email a copy to you this evening. You have forty-eight hours to tell us if you notice anything we''ve missed.', 'https://pub-fbae5ca09eba4fd0820da2b390dd7ca0.r2.dev/listening/apartment-move-in-inspection.mp3', '["kitchen","living room","balcony","bedroom","bathroom","entrance hall"]'::jsonb, '[0.6108188725846331,0.4526151655254111,0.4169441097259935,0.4334906712867929,0.4900774675970948,0.41926338440126737,0.8419763395737014,0.7295637554316449,0.5473085420354292,0.6820140655344584,0.45749689090016193,0.6015449042008186,0.7276925941328019,0.5093941144554442,0.5823758153996796,0.48477544117396726,0.46918102559621766,0.3582993560470832,0.3052389203504923,0.33737729564667734,0.7370623461832737,0.39622323235820966,0.6181334880231397,0.6113840922147974,0.5764212984932803,0.5817858300077231,0.5506631997210032,0.5463641455559206,0.38523069179119823,0.47359081786742446,0.5741614616870593,1,0.6128965598801542,0.6386898783273848,0.710160249648559,0.5799652684457499,0.36042452505697375,0.558714596785195,0.2633085906981788,0.4272228401409968,0.4164549561786287,0.9095504202542289,0.7091063537201728,0.4582600171100758,0.7493958287282231,0.5192255424808663,0.5555648197688391,0.4933351256920385,0.5166419678684163,0.4412632590985289,0.4265991867600774,0.45138651645540884,0.775026274676172,0.5609552093841714,0.6233862857469823,0.7144585981843046,0.4727890063168942,0.4395466687052434,0.49833748474442396,0.3909730130097412,0.35592580854117495,0.5363375340754121,0.7620786247660029,0.45043333278091036,0.5335636762379026,0.5063908129594382,0.6014033733847524,0.48126589474824377,0.5293276649917718,0.3586426483935839,0.6560593543263269,0.5193140296259726,0.5067404726700729,0.5464399081924118,0.5235621227746583,0.5140147460531149,0.5585903051342717,0.5997750382981052,0.6492587030204539,0.7126906521506748,0.8184200282653941,0.9881282487033122,0.9181437735152089,0.533024261584712,0.9159230792243038,0.4908634847438742,0.4649813722289891,0.5248305134184077,0.38087329984964935,0.4061339559686141,0.6057197248722561,0.8148216918320383,0.6602163956553467,0.8235267054254636,0.5629011023502419,0.6248944067005661,0.6163157642893303,0.8939211706804348,0.3354374021309689,0.586812935814146,0.45353944494937676,0.9443644504206276,0.8818001477866757,0.8497823357454861,0.6543195141623395,0.7750950444870257,0.9748090095377536,0.9044769465020505,0.842887369128974,0.7681342556059305,0.7018154095047097,0.5880452303441824,0.5422174854822623,0.6205730353683706,0.7073514085884975,0.4153281195898049,0.8672323704556807,0.6430921403691294,0.6007099761160132,0.45116574264838905]'::jsonb, 130.18848072562358, 2)
+on conflict (slug) do update set
+  title = excluded.title, topic = excluded.topic, transcript = excluded.transcript,
+  audio_url = excluded.audio_url, matching_options = excluded.matching_options,
+  peaks = excluded.peaks, duration_seconds = excluded.duration_seconds, difficulty = excluded.difficulty;
+
+with tr as (select id from public.listening_tracks where slug = 'apartment-move-in-inspection'),
+     q as (
+       insert into public.questions (track_id, idx, kind, prompt, options, evidence, explanation)
+       select tr.id, 1, 'multiple_choice'::public.question_kind, 'Why are Sofia and Marcus recording problems before she moves in?',
+              '["To decide the monthly rent","To identify damage that already exists","To arrange new furniture","To calculate cleaning costs"]'::jsonb, 'Anything we record today won''t be treated as damage caused by you later.', 'The inspection protects Sofia from being blamed for pre-existing damage.'
+       from tr
+       on conflict (track_id, idx) do update set
+         kind = excluded.kind, prompt = excluded.prompt, options = excluded.options,
+         evidence = excluded.evidence, explanation = excluded.explanation
+       returning id
+     )
+insert into public.question_answers (question_id, answer)
+select q.id, '["To identify damage that already exists"]'::jsonb from q
+on conflict (question_id) do update set answer = excluded.answer;
+
+with tr as (select id from public.listening_tracks where slug = 'apartment-move-in-inspection'),
+     q as (
+       insert into public.questions (track_id, idx, kind, prompt, options, evidence, explanation)
+       select tr.id, 2, 'matching'::public.question_kind, 'In which area is there a cracked tile?',
+              null, 'I noticed a small crack in one of the kitchen tiles, just beside the fridge.', 'Sofia identifies a cracked tile in the kitchen.'
+       from tr
+       on conflict (track_id, idx) do update set
+         kind = excluded.kind, prompt = excluded.prompt, options = excluded.options,
+         evidence = excluded.evidence, explanation = excluded.explanation
+       returning id
+     )
+insert into public.question_answers (question_id, answer)
+select q.id, '["kitchen"]'::jsonb from q
+on conflict (question_id) do update set answer = excluded.answer;
+
+with tr as (select id from public.listening_tracks where slug = 'apartment-move-in-inspection'),
+     q as (
+       insert into public.questions (track_id, idx, kind, prompt, options, evidence, explanation)
+       select tr.id, 3, 'sentence_completion'::public.question_kind, 'Complete the sentence. Write TWO WORDS. Maintenance will replace the ________ before Friday.',
+              null, 'I''ll ask maintenance to replace the oven bulb before Friday.', 'The failed oven light is due to the bulb, which will be replaced.'
+       from tr
+       on conflict (track_id, idx) do update set
+         kind = excluded.kind, prompt = excluded.prompt, options = excluded.options,
+         evidence = excluded.evidence, explanation = excluded.explanation
+       returning id
+     )
+insert into public.question_answers (question_id, answer)
+select q.id, '["oven bulb"]'::jsonb from q
+on conflict (question_id) do update set answer = excluded.answer;
+
+with tr as (select id from public.listening_tracks where slug = 'apartment-move-in-inspection'),
+     q as (
+       insert into public.questions (track_id, idx, kind, prompt, options, evidence, explanation)
+       select tr.id, 4, 'multiple_choice'::public.question_kind, 'When is the plumber expected at the building?',
+              '["Wednesday morning","Thursday morning","Thursday afternoon","Friday afternoon"]'::jsonb, 'A plumber is already coming to the building on Thursday afternoon.', 'Marcus says the plumber is scheduled for Thursday afternoon.'
+       from tr
+       on conflict (track_id, idx) do update set
+         kind = excluded.kind, prompt = excluded.prompt, options = excluded.options,
+         evidence = excluded.evidence, explanation = excluded.explanation
+       returning id
+     )
+insert into public.question_answers (question_id, answer)
+select q.id, '["Thursday afternoon"]'::jsonb from q
+on conflict (question_id) do update set answer = excluded.answer;
+
+with tr as (select id from public.listening_tracks where slug = 'apartment-move-in-inspection'),
+     q as (
+       insert into public.questions (track_id, idx, kind, prompt, options, evidence, explanation)
+       select tr.id, 5, 'matching'::public.question_kind, 'In which area will two existing marks be photographed?',
+              null, 'They''re light enough that repainting isn''t necessary, but I''ll photograph both marks for the inspection record.', 'The marks Sofia identifies are on the living-room wall.'
+       from tr
+       on conflict (track_id, idx) do update set
+         kind = excluded.kind, prompt = excluded.prompt, options = excluded.options,
+         evidence = excluded.evidence, explanation = excluded.explanation
+       returning id
+     )
+insert into public.question_answers (question_id, answer)
+select q.id, '["living room"]'::jsonb from q
+on conflict (question_id) do update set answer = excluded.answer;
+
+with tr as (select id from public.listening_tracks where slug = 'apartment-move-in-inspection'),
+     q as (
+       insert into public.questions (track_id, idx, kind, prompt, options, evidence, explanation)
+       select tr.id, 6, 'matching'::public.question_kind, 'In which area does a hinge need adjusting?',
+              null, 'It''s safe, but the lower hinge needs adjusting.', 'Marcus is discussing the stiff balcony door when he mentions the lower hinge.'
+       from tr
+       on conflict (track_id, idx) do update set
+         kind = excluded.kind, prompt = excluded.prompt, options = excluded.options,
+         evidence = excluded.evidence, explanation = excluded.explanation
+       returning id
+     )
+insert into public.question_answers (question_id, answer)
+select q.id, '["balcony"]'::jsonb from q
+on conflict (question_id) do update set answer = excluded.answer;
+
+with tr as (select id from public.listening_tracks where slug = 'apartment-move-in-inspection'),
+     q as (
+       insert into public.questions (track_id, idx, kind, prompt, options, evidence, explanation)
+       select tr.id, 7, 'sentence_completion'::public.question_kind, 'Complete the sentence. Write ONE WORD. The bedroom ________ was professionally cleaned on Monday.',
+              null, 'The carpet was professionally cleaned on Monday, so these darker patches are just areas that haven''t dried completely yet.', 'The bedroom carpet had recently been professionally cleaned.'
+       from tr
+       on conflict (track_id, idx) do update set
+         kind = excluded.kind, prompt = excluded.prompt, options = excluded.options,
+         evidence = excluded.evidence, explanation = excluded.explanation
+       returning id
+     )
+insert into public.question_answers (question_id, answer)
+select q.id, '["carpet"]'::jsonb from q
+on conflict (question_id) do update set answer = excluded.answer;
+
+with tr as (select id from public.listening_tracks where slug = 'apartment-move-in-inspection'),
+     q as (
+       insert into public.questions (track_id, idx, kind, prompt, options, evidence, explanation)
+       select tr.id, 8, 'multiple_choice'::public.question_kind, 'What does Marcus say about the weak shower pressure?',
+              '["A plumber will repair it","It is caused by a blocked shower head","It is normal on that floor in the morning","It began after a recent inspection"]'::jsonb, 'That''s normal for this floor in the morning, but it improves after about ten.', 'Marcus says the lower morning pressure is normal and not a fault.'
+       from tr
+       on conflict (track_id, idx) do update set
+         kind = excluded.kind, prompt = excluded.prompt, options = excluded.options,
+         evidence = excluded.evidence, explanation = excluded.explanation
+       returning id
+     )
+insert into public.question_answers (question_id, answer)
+select q.id, '["It is normal on that floor in the morning"]'::jsonb from q
+on conflict (question_id) do update set answer = excluded.answer;
+
+with tr as (select id from public.listening_tracks where slug = 'apartment-move-in-inspection'),
+     q as (
+       insert into public.questions (track_id, idx, kind, prompt, options, evidence, explanation)
+       select tr.id, 9, 'sentence_completion'::public.question_kind, 'Complete the sentence. Write TWO WORDS. Routine repairs should be reported through the ________.',
+              null, 'For routine repairs, use the tenant portal.', 'The tenant portal is the required channel for non-urgent repair requests.'
+       from tr
+       on conflict (track_id, idx) do update set
+         kind = excluded.kind, prompt = excluded.prompt, options = excluded.options,
+         evidence = excluded.evidence, explanation = excluded.explanation
+       returning id
+     )
+insert into public.question_answers (question_id, answer)
+select q.id, '["tenant portal"]'::jsonb from q
+on conflict (question_id) do update set answer = excluded.answer;
+
+with tr as (select id from public.listening_tracks where slug = 'apartment-move-in-inspection'),
+     q as (
+       insert into public.questions (track_id, idx, kind, prompt, options, evidence, explanation)
+       select tr.id, 10, 'multiple_choice'::public.question_kind, 'How long does Sofia have to report anything missing from the inspection form?',
+              '["twenty-four hours","forty-eight hours","three days","one week"]'::jsonb, 'You have forty-eight hours to tell us if you notice anything we''ve missed.', 'Marcus gives Sofia forty-eight hours to report additional issues.'
+       from tr
+       on conflict (track_id, idx) do update set
+         kind = excluded.kind, prompt = excluded.prompt, options = excluded.options,
+         evidence = excluded.evidence, explanation = excluded.explanation
+       returning id
+     )
+insert into public.question_answers (question_id, answer)
+select q.id, '["forty-eight hours"]'::jsonb from q
+on conflict (question_id) do update set answer = excluded.answer;
+
+-- Orientation for an Archaeological Field School
+insert into public.listening_tracks (slug, title, topic, transcript, audio_url, matching_options, peaks, duration_seconds, difficulty)
+values ('archaeological-field-school-orientation', 'Orientation for an Archaeological Field School', 'A supervisor briefs students before their first week on an archaeological excavation', 'Welcome to the first morning of the Hartwell archaeological field school. Before anyone starts digging, we need to cover the site routine, safety procedures and the recording system you''ll use throughout the excavation.
+The site opens to students at seven thirty each morning. Please arrive by seven twenty so you''re ready for the daily briefing, which begins beside the equipment shelter at seven twenty-five.
+Your first task every morning is to sign the attendance sheet. After that, collect your gloves and the tools assigned to your excavation area. Do not take tools from another team''s box without asking a supervisor.
+We''ll begin with three work areas. Area A contains the remains of a stone wall and will focus on careful excavation around the foundations. Area B includes several shallow pits, where students will concentrate on collecting soil samples. Area C covers part of an old yard and has produced large quantities of pottery fragments.
+For the first two days, new students will rotate between the areas rather than staying in one place. This gives everyone experience with different excavation methods before permanent teams are assigned on Wednesday.
+When you uncover an object, leave it where it is and call your area supervisor. Do not remove it immediately, even if it appears loose. Its exact position must be recorded before anything is moved.
+Each find receives a number written on a small waterproof label. The label goes into the finds bag with the object. Never write directly on an artefact at the excavation site.
+You''ll also complete a context sheet whenever the soil changes noticeably in colour or texture. If you''re uncertain whether a change is significant, ask a supervisor before beginning a new sheet.
+We stop for lunch from twelve fifteen until one. You can eat in the rest shelter or outside the site fence, but food is not permitted inside the excavation areas.
+At the end of the day, all tools should be cleaned at the washing station. Brushes can be rinsed with water, but metal tools must be dried before they are returned to storage.
+Finally, remember that your field notebook is part of the academic assessment. Make brief notes during the day, then add a fuller summary each evening while the details are still fresh.', 'https://pub-fbae5ca09eba4fd0820da2b390dd7ca0.r2.dev/listening/archaeological-field-school-orientation.mp3', '["Area A","Area B","Area C","equipment shelter","washing station","rest shelter"]'::jsonb, '[1,0.6763956899621549,0.3949749951864939,0.8459391170250149,0.8423977150412334,0.6159781209281306,0.5821473913788271,0.7313865224220718,0.7386133297550842,0.40602679279076526,0.6664601006246719,0.6914179620661427,0.38276739684165373,0.664761030734271,0.645857568982757,0.6549882948865635,0.6092614676793435,0.6722528731178398,0.49769566974317947,0.6096412924175156,0.8202025475334722,0.7474436329790624,0.5832510299468103,0.6698527998619055,0.6881972161972387,0.48947563151183754,0.6857308127441587,0.7313785992843568,0.6670711404761858,0.29082605076996,0.8792359514393274,0.5714778095327948,0.834545306695429,0.759103373546403,0.7653227391114196,0.49483534857010636,0.4331928012343959,0.1316768293784166,0.8165464673375951,0.5374084342564504,0.5771076818825708,0.6193824636623783,0.41456193231992067,0.13113233131125826,0.7705293304621742,0.6767882544766778,0.5376383922394241,0.4716836370235066,0.3478563532604571,0.5557057821626841,0.8152396613138634,0.6260889776683802,0.7486865806448371,0.7113909427617794,0.40053922363660777,0.676752180746058,0.5397116359340679,0.451716152159335,0.71543191048116,0.4817510558384839,0.7357664812825049,0.790154191327817,0.7015045177373176,0.6154463752544272,0.43770201149977833,0.8389530004000669,0.7327708545183638,0.5790068920640544,0.6607320100703267,0.6482497089518474,0.666288141535109,0.35541681322905705,0.7361937620959516,0.7825505056791394,0.607317033795757,0.625287397117204,0.7656743611329824,0.3641620013993178,0.6968436194155609,0.7195689358365099,0.46055477376832815,0.7093572524108647,0.6248068330198759,0.5566088600491973,0.6265745599131965,0.4380713122258967,0.3417450336409762,0.610317048937177,0.5475463846788275,0.46882692154764194,0.4465414923253375,0.33377956055030583,0.6009494922214832,0.5845044007564032,0.4121327267441141,0.8043479136500307,0.6036167840328374,0.34485571306746693,0.6432210935089759,0.6123701805023961,0.3808385049765411,0.5430679400219364,0.6047594939064177,0.6868966260591249,0.3653108793336855,0.7651960742742542,0.5989555844996838,0.9357411382750246,0.5311295977924158,0.4882485296963197,0.625448211568598,0.9777232203303196,0.5812279357900128,0.5193660869369406,0.5068407595435153,0.5702160229521502,0.6958745390318856,0.590778560782556,0.4846455369512746,0.24850619301396062]'::jsonb, 139.1804081632653, 4)
+on conflict (slug) do update set
+  title = excluded.title, topic = excluded.topic, transcript = excluded.transcript,
+  audio_url = excluded.audio_url, matching_options = excluded.matching_options,
+  peaks = excluded.peaks, duration_seconds = excluded.duration_seconds, difficulty = excluded.difficulty;
+
+with tr as (select id from public.listening_tracks where slug = 'archaeological-field-school-orientation'),
+     q as (
+       insert into public.questions (track_id, idx, kind, prompt, options, evidence, explanation)
+       select tr.id, 1, 'multiple_choice'::public.question_kind, 'What time should students arrive at the excavation site?',
+              '["7:15","7:20","7:25","7:30"]'::jsonb, 'Please arrive by seven twenty so you''re ready for the daily briefing, which begins beside the equipment shelter at seven twenty-five.', 'Students should arrive at seven twenty, five minutes before the briefing.'
+       from tr
+       on conflict (track_id, idx) do update set
+         kind = excluded.kind, prompt = excluded.prompt, options = excluded.options,
+         evidence = excluded.evidence, explanation = excluded.explanation
+       returning id
+     )
+insert into public.question_answers (question_id, answer)
+select q.id, '["7:20"]'::jsonb from q
+on conflict (question_id) do update set answer = excluded.answer;
+
+with tr as (select id from public.listening_tracks where slug = 'archaeological-field-school-orientation'),
+     q as (
+       insert into public.questions (track_id, idx, kind, prompt, options, evidence, explanation)
+       select tr.id, 2, 'sentence_completion'::public.question_kind, 'Complete the sentence. Write TWO WORDS. Students must first sign the ________ each morning.',
+              null, 'Your first task every morning is to sign the attendance sheet.', 'Signing the attendance sheet is the first daily task.'
+       from tr
+       on conflict (track_id, idx) do update set
+         kind = excluded.kind, prompt = excluded.prompt, options = excluded.options,
+         evidence = excluded.evidence, explanation = excluded.explanation
+       returning id
+     )
+insert into public.question_answers (question_id, answer)
+select q.id, '["attendance sheet"]'::jsonb from q
+on conflict (question_id) do update set answer = excluded.answer;
+
+with tr as (select id from public.listening_tracks where slug = 'archaeological-field-school-orientation'),
+     q as (
+       insert into public.questions (track_id, idx, kind, prompt, options, evidence, explanation)
+       select tr.id, 3, 'matching'::public.question_kind, 'Which excavation area contains the remains of a stone wall?',
+              null, 'Area A contains the remains of a stone wall and will focus on careful excavation around the foundations.', 'The stone wall and its foundations are located in Area A.'
+       from tr
+       on conflict (track_id, idx) do update set
+         kind = excluded.kind, prompt = excluded.prompt, options = excluded.options,
+         evidence = excluded.evidence, explanation = excluded.explanation
+       returning id
+     )
+insert into public.question_answers (question_id, answer)
+select q.id, '["Area A"]'::jsonb from q
+on conflict (question_id) do update set answer = excluded.answer;
+
+with tr as (select id from public.listening_tracks where slug = 'archaeological-field-school-orientation'),
+     q as (
+       insert into public.questions (track_id, idx, kind, prompt, options, evidence, explanation)
+       select tr.id, 4, 'matching'::public.question_kind, 'Which excavation area will focus on collecting soil samples?',
+              null, 'Area B includes several shallow pits, where students will concentrate on collecting soil samples.', 'Soil sampling is the main task described for Area B.'
+       from tr
+       on conflict (track_id, idx) do update set
+         kind = excluded.kind, prompt = excluded.prompt, options = excluded.options,
+         evidence = excluded.evidence, explanation = excluded.explanation
+       returning id
+     )
+insert into public.question_answers (question_id, answer)
+select q.id, '["Area B"]'::jsonb from q
+on conflict (question_id) do update set answer = excluded.answer;
+
+with tr as (select id from public.listening_tracks where slug = 'archaeological-field-school-orientation'),
+     q as (
+       insert into public.questions (track_id, idx, kind, prompt, options, evidence, explanation)
+       select tr.id, 5, 'matching'::public.question_kind, 'Which excavation area has produced many pottery fragments?',
+              null, 'Area C covers part of an old yard and has produced large quantities of pottery fragments.', 'The large quantity of pottery fragments comes from Area C.'
+       from tr
+       on conflict (track_id, idx) do update set
+         kind = excluded.kind, prompt = excluded.prompt, options = excluded.options,
+         evidence = excluded.evidence, explanation = excluded.explanation
+       returning id
+     )
+insert into public.question_answers (question_id, answer)
+select q.id, '["Area C"]'::jsonb from q
+on conflict (question_id) do update set answer = excluded.answer;
+
+with tr as (select id from public.listening_tracks where slug = 'archaeological-field-school-orientation'),
+     q as (
+       insert into public.questions (track_id, idx, kind, prompt, options, evidence, explanation)
+       select tr.id, 6, 'multiple_choice'::public.question_kind, 'When will permanent excavation teams be assigned?',
+              '["Monday","Tuesday","Wednesday","Friday"]'::jsonb, 'This gives everyone experience with different excavation methods before permanent teams are assigned on Wednesday.', 'Students rotate initially, with permanent teams assigned on Wednesday.'
+       from tr
+       on conflict (track_id, idx) do update set
+         kind = excluded.kind, prompt = excluded.prompt, options = excluded.options,
+         evidence = excluded.evidence, explanation = excluded.explanation
+       returning id
+     )
+insert into public.question_answers (question_id, answer)
+select q.id, '["Wednesday"]'::jsonb from q
+on conflict (question_id) do update set answer = excluded.answer;
+
+with tr as (select id from public.listening_tracks where slug = 'archaeological-field-school-orientation'),
+     q as (
+       insert into public.questions (track_id, idx, kind, prompt, options, evidence, explanation)
+       select tr.id, 7, 'sentence_completion'::public.question_kind, 'Complete the sentence. Write ONE WORD. Before an uncovered object is moved, its exact ________ must be recorded.',
+              null, 'Its exact position must be recorded before anything is moved.', 'The object''s position must be documented before removal.'
+       from tr
+       on conflict (track_id, idx) do update set
+         kind = excluded.kind, prompt = excluded.prompt, options = excluded.options,
+         evidence = excluded.evidence, explanation = excluded.explanation
+       returning id
+     )
+insert into public.question_answers (question_id, answer)
+select q.id, '["position"]'::jsonb from q
+on conflict (question_id) do update set answer = excluded.answer;
+
+with tr as (select id from public.listening_tracks where slug = 'archaeological-field-school-orientation'),
+     q as (
+       insert into public.questions (track_id, idx, kind, prompt, options, evidence, explanation)
+       select tr.id, 8, 'multiple_choice'::public.question_kind, 'Where is the identifying number for a find written?',
+              '["on the artefact itself","on a waterproof label","on the outside of the tool box","on the context sheet only"]'::jsonb, 'Each find receives a number written on a small waterproof label.', 'Find numbers are written on waterproof labels rather than directly on artefacts.'
+       from tr
+       on conflict (track_id, idx) do update set
+         kind = excluded.kind, prompt = excluded.prompt, options = excluded.options,
+         evidence = excluded.evidence, explanation = excluded.explanation
+       returning id
+     )
+insert into public.question_answers (question_id, answer)
+select q.id, '["on a waterproof label"]'::jsonb from q
+on conflict (question_id) do update set answer = excluded.answer;
+
+with tr as (select id from public.listening_tracks where slug = 'archaeological-field-school-orientation'),
+     q as (
+       insert into public.questions (track_id, idx, kind, prompt, options, evidence, explanation)
+       select tr.id, 9, 'sentence_completion'::public.question_kind, 'Complete the sentence. Write TWO WORDS. Students complete a ________ when the soil changes noticeably.',
+              null, 'You''ll also complete a context sheet whenever the soil changes noticeably in colour or texture.', 'A significant soil change requires a new context sheet.'
+       from tr
+       on conflict (track_id, idx) do update set
+         kind = excluded.kind, prompt = excluded.prompt, options = excluded.options,
+         evidence = excluded.evidence, explanation = excluded.explanation
+       returning id
+     )
+insert into public.question_answers (question_id, answer)
+select q.id, '["context sheet"]'::jsonb from q
+on conflict (question_id) do update set answer = excluded.answer;
+
+with tr as (select id from public.listening_tracks where slug = 'archaeological-field-school-orientation'),
+     q as (
+       insert into public.questions (track_id, idx, kind, prompt, options, evidence, explanation)
+       select tr.id, 10, 'multiple_choice'::public.question_kind, 'What must students do with metal tools before returning them to storage?',
+              '["label them","photograph them","dry them","oil them"]'::jsonb, 'Brushes can be rinsed with water, but metal tools must be dried before they are returned to storage.', 'Metal tools need to be dried before storage.'
+       from tr
+       on conflict (track_id, idx) do update set
+         kind = excluded.kind, prompt = excluded.prompt, options = excluded.options,
+         evidence = excluded.evidence, explanation = excluded.explanation
+       returning id
+     )
+insert into public.question_answers (question_id, answer)
+select q.id, '["dry them"]'::jsonb from q
+on conflict (question_id) do update set answer = excluded.answer;
+
+-- Registering for the Campus Bike Hire Scheme
+insert into public.listening_tracks (slug, title, topic, transcript, audio_url, matching_options, peaks, duration_seconds, difficulty)
+values ('campus-bike-hire-registration', 'Registering for the Campus Bike Hire Scheme', 'A student asks about joining a university bicycle rental scheme', 'Nina:
+Hi, I saw the bicycles outside the student centre and wanted to ask how the hire scheme works.
+Daniel:
+It''s quite simple. Students register online first, then bring their student card here so we can activate the account.
+Nina:
+Is there a registration fee?
+Daniel:
+There''s a one-off registration fee of twelve pounds, but after that the first thirty minutes of every journey are free.
+Nina:
+And what happens if I keep a bike for longer than thirty minutes?
+Daniel:
+From thirty to sixty minutes, you pay two pounds. After the first hour, the charge increases by three pounds for every additional hour.
+Nina:
+I mainly need one for getting to my morning lectures. Where can I collect a bike?
+Daniel:
+There are four collection points: the student centre, West Hall, the sports complex and the science library.
+Nina:
+The science library would be most convenient. Can I reserve a bicycle in advance?
+Daniel:
+Yes, but reservations can only be made through the mobile app, and you can book no more than fifteen minutes before you need the bike.
+Nina:
+Do I need to return it to the same place?
+Daniel:
+No. You can return it to any official collection point as long as there''s an empty docking space.
+Nina:
+What if there isn''t one?
+Daniel:
+The app will show you the nearest station with an available space. Don''t leave the bicycle beside a full station because it remains your responsibility until it''s properly docked.
+Nina:
+Are helmets included?
+Daniel:
+No, riders have to provide their own helmet. We strongly recommend wearing one, even though the university doesn''t make it compulsory.
+Nina:
+What should I do if there''s something wrong with the bike when I collect it?
+Daniel:
+Report any damage in the app before starting your journey. That prevents you from being held responsible for an existing problem.
+Nina:
+And if I get a flat tyre halfway across campus?
+Daniel:
+Call the support number printed on the bicycle frame. Don''t try to repair the bike yourself.
+Nina:
+Right. How long does my membership last?
+Daniel:
+Membership runs until the end of the academic year, so you''ll need to renew it next September if you''re still studying here.', 'https://pub-fbae5ca09eba4fd0820da2b390dd7ca0.r2.dev/listening/campus-bike-hire-registration.mp3', null, '[0.38192385354812036,0.3954482531541129,0.3448802162184106,0.35021952755614355,0.2567681902115794,0.5476453806909563,0.3204851876833625,0.5824482952317898,0.42867985004407655,0.4935568912859425,0.45140709559294007,0.33123747191981306,0.41542259637173157,0.35794213769146477,0.663203639116776,0.4856017353442822,0.45824852121466914,0.3665140027102798,0.5252246206459549,0.5365517413975153,0.5860192586855544,0.633441957824914,0.40905657437897125,0.37832279276141134,0.3704210898506189,0.4828788391667007,0.6392436027648131,0.4775012143224994,0.4292794682063185,0.3684758025111469,0.49979021350973707,0.4555126258443414,0.3890170551305523,0.485873798329418,0.41508006072475484,0.4629640972851827,0.42507934218928717,0.32698495641512787,0.29405903174694525,0.299632729662907,0.5652517991619227,0.5920469015452033,0.27769316159915675,0.3438905105435544,0.38398796188927875,0.4280320355927186,0.3219070904636542,0.4776753539156733,0.2944481748619028,0.375119188157071,0.3560311849336766,0.2455499926360864,0.3469368979567468,0.5319128082107478,0.4601478993827205,0.5663056184913752,0.5378179797066228,0.42528275384377756,0.5597029323743022,0.46413494111678777,0.5548028209093729,0.36920649500173613,0.39370324414270685,0.46582951136997364,0.50635176658908,0.5411164488035951,0.40301934183509863,0.4789554709858388,0.4203498275024733,0.4176803144346569,0.4875303018643111,0.5310945676339123,0.5056799938570206,0.456615816213285,0.4830136104598825,0.5057971218369416,0.44064038802851346,0.4688589348239479,0.49658773795093497,0.41481088983464837,0.47425655257295696,0.4759830540934972,0.5063322058036317,0.5900664685795864,0.5431278274692263,0.28850735181301607,0.5838398031795876,0.37834607164523215,0.47924730062806764,0.4528588342524328,0.26926725293614645,0.40402008301301817,0.39255185675461884,0.25494256323678494,1,0.6309710756273569,0.5317050699532773,0.42526459912148956,0.509076219887244,0.5471792899529856,0.42538075473686165,0.41433330058979284,0.5043049676937701,0.39844031099414406,0.5872481731280206,0.5781353153907804,0.4532010920368789,0.49553980765049066,0.5439195834412716,0.38857255834359644,0.38524731420464303,0.4515995584638241,0.4742168393804097,0.6212400880451238,0.47449322853543874,0.42373926613806967,0.6099324032293969,0.47789849913532173,0.44206970369567383,0.40231219255619927]'::jsonb, 122.97287981859411, 2)
+on conflict (slug) do update set
+  title = excluded.title, topic = excluded.topic, transcript = excluded.transcript,
+  audio_url = excluded.audio_url, matching_options = excluded.matching_options,
+  peaks = excluded.peaks, duration_seconds = excluded.duration_seconds, difficulty = excluded.difficulty;
+
+with tr as (select id from public.listening_tracks where slug = 'campus-bike-hire-registration'),
+     q as (
+       insert into public.questions (track_id, idx, kind, prompt, options, evidence, explanation)
+       select tr.id, 1, 'sentence_completion'::public.question_kind, 'Complete the sentence. Write TWO WORDS. Students must bring their ________ after registering online.',
+              null, 'Students register online first, then bring their student card here so we can activate the account.', 'Daniel says students must bring their student card after completing the online registration.'
+       from tr
+       on conflict (track_id, idx) do update set
+         kind = excluded.kind, prompt = excluded.prompt, options = excluded.options,
+         evidence = excluded.evidence, explanation = excluded.explanation
+       returning id
+     )
+insert into public.question_answers (question_id, answer)
+select q.id, '["student card"]'::jsonb from q
+on conflict (question_id) do update set answer = excluded.answer;
+
+with tr as (select id from public.listening_tracks where slug = 'campus-bike-hire-registration'),
+     q as (
+       insert into public.questions (track_id, idx, kind, prompt, options, evidence, explanation)
+       select tr.id, 2, 'multiple_choice'::public.question_kind, 'How much is the one-off registration fee?',
+              '["eight pounds","ten pounds","twelve pounds","fifteen pounds"]'::jsonb, 'There''s a one-off registration fee of twelve pounds, but after that the first thirty minutes of every journey are free.', 'Daniel states that registration costs twelve pounds.'
+       from tr
+       on conflict (track_id, idx) do update set
+         kind = excluded.kind, prompt = excluded.prompt, options = excluded.options,
+         evidence = excluded.evidence, explanation = excluded.explanation
+       returning id
+     )
+insert into public.question_answers (question_id, answer)
+select q.id, '["twelve pounds"]'::jsonb from q
+on conflict (question_id) do update set answer = excluded.answer;
+
+with tr as (select id from public.listening_tracks where slug = 'campus-bike-hire-registration'),
+     q as (
+       insert into public.questions (track_id, idx, kind, prompt, options, evidence, explanation)
+       select tr.id, 3, 'sentence_completion'::public.question_kind, 'Complete the sentence. Write ONE WORD AND/OR A NUMBER. The first ________ minutes of each journey are free.',
+              null, 'There''s a one-off registration fee of twelve pounds, but after that the first thirty minutes of every journey are free.', 'The free period lasts for the first thirty minutes.'
+       from tr
+       on conflict (track_id, idx) do update set
+         kind = excluded.kind, prompt = excluded.prompt, options = excluded.options,
+         evidence = excluded.evidence, explanation = excluded.explanation
+       returning id
+     )
+insert into public.question_answers (question_id, answer)
+select q.id, '["thirty"]'::jsonb from q
+on conflict (question_id) do update set answer = excluded.answer;
+
+with tr as (select id from public.listening_tracks where slug = 'campus-bike-hire-registration'),
+     q as (
+       insert into public.questions (track_id, idx, kind, prompt, options, evidence, explanation)
+       select tr.id, 4, 'multiple_choice'::public.question_kind, 'Which collection point does Nina say would be most convenient?',
+              '["the student centre","West Hall","the sports complex","the science library"]'::jsonb, 'The science library would be most convenient.', 'Nina directly identifies the science library as her preferred collection point.'
+       from tr
+       on conflict (track_id, idx) do update set
+         kind = excluded.kind, prompt = excluded.prompt, options = excluded.options,
+         evidence = excluded.evidence, explanation = excluded.explanation
+       returning id
+     )
+insert into public.question_answers (question_id, answer)
+select q.id, '["the science library"]'::jsonb from q
+on conflict (question_id) do update set answer = excluded.answer;
+
+with tr as (select id from public.listening_tracks where slug = 'campus-bike-hire-registration'),
+     q as (
+       insert into public.questions (track_id, idx, kind, prompt, options, evidence, explanation)
+       select tr.id, 5, 'sentence_completion'::public.question_kind, 'Complete the sentence. Write TWO WORDS. Reservations are made using the ________.',
+              null, 'Yes, but reservations can only be made through the mobile app, and you can book no more than fifteen minutes before you need the bike.', 'Daniel says advance reservations are available only through the mobile app.'
+       from tr
+       on conflict (track_id, idx) do update set
+         kind = excluded.kind, prompt = excluded.prompt, options = excluded.options,
+         evidence = excluded.evidence, explanation = excluded.explanation
+       returning id
+     )
+insert into public.question_answers (question_id, answer)
+select q.id, '["mobile app"]'::jsonb from q
+on conflict (question_id) do update set answer = excluded.answer;
+
+with tr as (select id from public.listening_tracks where slug = 'campus-bike-hire-registration'),
+     q as (
+       insert into public.questions (track_id, idx, kind, prompt, options, evidence, explanation)
+       select tr.id, 6, 'multiple_choice'::public.question_kind, 'How early can a bicycle be reserved?',
+              '["five minutes before use","fifteen minutes before use","thirty minutes before use","one hour before use"]'::jsonb, 'Yes, but reservations can only be made through the mobile app, and you can book no more than fifteen minutes before you need the bike.', 'Reservations can be made no more than fifteen minutes before the bike is needed.'
+       from tr
+       on conflict (track_id, idx) do update set
+         kind = excluded.kind, prompt = excluded.prompt, options = excluded.options,
+         evidence = excluded.evidence, explanation = excluded.explanation
+       returning id
+     )
+insert into public.question_answers (question_id, answer)
+select q.id, '["fifteen minutes before use"]'::jsonb from q
+on conflict (question_id) do update set answer = excluded.answer;
+
+with tr as (select id from public.listening_tracks where slug = 'campus-bike-hire-registration'),
+     q as (
+       insert into public.questions (track_id, idx, kind, prompt, options, evidence, explanation)
+       select tr.id, 7, 'sentence_completion'::public.question_kind, 'Complete the sentence. Write TWO WORDS. A bike may be returned to any official collection point if there is an empty ________.',
+              null, 'No. You can return it to any official collection point as long as there''s an empty docking space.', 'An empty docking space is required when returning the bicycle.'
+       from tr
+       on conflict (track_id, idx) do update set
+         kind = excluded.kind, prompt = excluded.prompt, options = excluded.options,
+         evidence = excluded.evidence, explanation = excluded.explanation
+       returning id
+     )
+insert into public.question_answers (question_id, answer)
+select q.id, '["docking space"]'::jsonb from q
+on conflict (question_id) do update set answer = excluded.answer;
+
+with tr as (select id from public.listening_tracks where slug = 'campus-bike-hire-registration'),
+     q as (
+       insert into public.questions (track_id, idx, kind, prompt, options, evidence, explanation)
+       select tr.id, 8, 'multiple_choice'::public.question_kind, 'What does Daniel say about helmets?',
+              '["They can be rented at each station","They are supplied free to students","Riders must provide their own","They are compulsory on campus"]'::jsonb, 'No, riders have to provide their own helmet.', 'The scheme does not supply helmets, so riders need to bring their own.'
+       from tr
+       on conflict (track_id, idx) do update set
+         kind = excluded.kind, prompt = excluded.prompt, options = excluded.options,
+         evidence = excluded.evidence, explanation = excluded.explanation
+       returning id
+     )
+insert into public.question_answers (question_id, answer)
+select q.id, '["Riders must provide their own"]'::jsonb from q
+on conflict (question_id) do update set answer = excluded.answer;
+
+with tr as (select id from public.listening_tracks where slug = 'campus-bike-hire-registration'),
+     q as (
+       insert into public.questions (track_id, idx, kind, prompt, options, evidence, explanation)
+       select tr.id, 9, 'sentence_completion'::public.question_kind, 'Complete the sentence. Write ONE WORD. Existing damage should be reported before beginning the ________.',
+              null, 'Report any damage in the app before starting your journey.', 'Daniel says damage must be reported before the journey starts.'
+       from tr
+       on conflict (track_id, idx) do update set
+         kind = excluded.kind, prompt = excluded.prompt, options = excluded.options,
+         evidence = excluded.evidence, explanation = excluded.explanation
+       returning id
+     )
+insert into public.question_answers (question_id, answer)
+select q.id, '["journey"]'::jsonb from q
+on conflict (question_id) do update set answer = excluded.answer;
+
+with tr as (select id from public.listening_tracks where slug = 'campus-bike-hire-registration'),
+     q as (
+       insert into public.questions (track_id, idx, kind, prompt, options, evidence, explanation)
+       select tr.id, 10, 'multiple_choice'::public.question_kind, 'When will Nina need to renew the membership if she remains at the university?',
+              '["at the end of this month","at the start of summer","next September","after twelve months exactly"]'::jsonb, 'Membership runs until the end of the academic year, so you''ll need to renew it next September if you''re still studying here.', 'Daniel says renewal will be required next September.'
+       from tr
+       on conflict (track_id, idx) do update set
+         kind = excluded.kind, prompt = excluded.prompt, options = excluded.options,
+         evidence = excluded.evidence, explanation = excluded.explanation
+       returning id
+     )
+insert into public.question_answers (question_id, answer)
+select q.id, '["next September"]'::jsonb from q
+on conflict (question_id) do update set answer = excluded.answer;
+
+-- Briefing for New Museum Volunteers
+insert into public.listening_tracks (slug, title, topic, transcript, audio_url, matching_options, peaks, duration_seconds, difficulty)
+values ('city-museum-volunteer-briefing', 'Briefing for New Museum Volunteers', 'A coordinator explains duties and procedures to new museum volunteers', 'Welcome to your first volunteer briefing at the City History Museum. Before we discuss your individual roles, I''ll explain how a normal shift works. Morning volunteers should arrive at eight forty-five, which gives you fifteen minutes to store your belongings and collect your badge before the museum opens at nine.
+Please leave coats and large bags in the lockers behind the staff room. Small personal items can stay with you, but phones should remain on silent while you''re working.
+Most of you will begin in one of three areas. Volunteers assigned to the entrance hall greet visitors and help them find the ticket desk. Those working in the family gallery prepare activity sheets and replace pencils throughout the day. Volunteers in the archive room assist staff by placing returned reference materials on the sorting trolley.
+If you''re working in the entrance hall, remember that you don''t sell tickets yourself. Direct visitors to the ticket desk on your left. You may, however, hand out museum maps and explain where the main exhibitions are located.
+The family gallery gets especially busy between eleven and two. Activity sheets are stored in the blue cupboard beside the window. Please don''t photocopy extra sheets without checking with the gallery supervisor because some activities change from week to week.
+In the archive room, returned books and folders should go on the sorting trolley rather than directly back onto the shelves. Archive staff need to check each item before it is reshelved.
+Everyone gets a thirty-minute lunch break. Morning volunteers normally take lunch between twelve and one, although the coordinator may adjust the schedule on busy days.
+If a visitor asks about a lost item, don''t take it to the staff room. All lost property must be handed to security at the main entrance. Security keeps a written record of every item received.
+In an emergency, the assembly point is the fountain in Kings Square, directly opposite the museum. Do not gather in the museum courtyard, even if that seems more convenient.
+Finally, please sign out at the volunteer desk at the end of your shift. This is important because the attendance record is used when we prepare references for volunteers who later apply for jobs or university courses.', 'https://pub-fbae5ca09eba4fd0820da2b390dd7ca0.r2.dev/listening/city-museum-volunteer-briefing.mp3', '["entrance hall","family gallery","archive room","ticket desk","staff room","security desk"]'::jsonb, '[1,0.7688861800728594,0.4699977620502449,0.2320089161705304,0.8231556142835491,0.5995987299384273,0.709101030967586,0.19493615983719895,0.7964894005163846,0.5452205874863801,0.49029812009293333,0.5325061577408974,0.7060433682730701,0.4498640538197592,0.8136667649354064,0.2716316498463559,0.5013397261067332,0.5818500654643485,0.5494661678640114,0.20657544291493854,0.6498539092627585,0.45030022294509386,0.5116020707800226,0.6332494884264372,0.26753116940635857,0.7095326572797239,0.6248019455363757,0.3476692101179569,0.6874150046584605,0.6039005860066747,0.5657141581659293,0.4780992010244645,0.5580548278274066,0.7316334618687861,0.41379237507317584,0.6054946511394165,0.4928310851154803,0.2984596746730617,0.8258156362973584,0.4492201559015949,0.47993784009290547,0.6050874752534089,0.49855378496328734,0.22386198478700647,0.8201603463476169,0.6088610518552244,0.7779312367686257,0.28447932442825963,0.7245689041798415,0.4457254836540444,0.381610293856584,0.9105065451581607,0.7236245786671329,0.6167555995938024,0.7555083582667569,0.35305875899495937,0.8428346383430467,0.5529876632668679,0.6406134536607212,0.44293215741268216,0.610192660883435,0.5419446166645412,0.29486648391955245,0.6564245511748655,0.41646063825788776,0.5933626728304536,0.4914251006640966,0.5353396090460406,0.5033844381216787,0.6835490466665226,0.7180993327869659,0.5969876413304325,0.6902978913189481,0.4827017863829813,0.8241637119071512,0.3669553294665213,0.5486520274530263,0.6020139280804725,0.460604677892802,0.2166262411674982,0.790162413101255,0.2557380716364675,0.8812166962443045,0.6927827737140678,0.5395231680054354,0.7718437614109973,0.5480281771906602,0.44700802978340426,0.5168852022593895,0.6964731189778581,0.6365470227763652,0.3595047513202264,0.681361164216164,0.698626956583908,0.5383364789383623,0.37489988752288117,0.6650627514910062,0.5184832729338194,0.27541217419118275,0.9051666552766133,0.7991736211832566,0.6612949861750734,0.5963443340433934,0.5292601141281817,0.44168279448991243,0.9866132416812307,0.5935268832025675,0.6785285656362242,0.23755204568351548,0.5930617825698538,0.7161121296527606,0.5646647089031678,0.23917163687049134,0.7211880367680263,0.6186136252439466,0.5861875957436323,0.5954376796526271,0.5683593196215451,0.6040821156800258,0.28824393089829115]'::jsonb, 135.74385487528346, 3)
+on conflict (slug) do update set
+  title = excluded.title, topic = excluded.topic, transcript = excluded.transcript,
+  audio_url = excluded.audio_url, matching_options = excluded.matching_options,
+  peaks = excluded.peaks, duration_seconds = excluded.duration_seconds, difficulty = excluded.difficulty;
+
+with tr as (select id from public.listening_tracks where slug = 'city-museum-volunteer-briefing'),
+     q as (
+       insert into public.questions (track_id, idx, kind, prompt, options, evidence, explanation)
+       select tr.id, 1, 'multiple_choice'::public.question_kind, 'What time should morning volunteers arrive?',
+              '["8:30","8:45","9:00","9:15"]'::jsonb, 'Morning volunteers should arrive at eight forty-five, which gives you fifteen minutes to store your belongings and collect your badge before the museum opens at nine.', 'Volunteers are asked to arrive fifteen minutes before the museum opens.'
+       from tr
+       on conflict (track_id, idx) do update set
+         kind = excluded.kind, prompt = excluded.prompt, options = excluded.options,
+         evidence = excluded.evidence, explanation = excluded.explanation
+       returning id
+     )
+insert into public.question_answers (question_id, answer)
+select q.id, '["8:45"]'::jsonb from q
+on conflict (question_id) do update set answer = excluded.answer;
+
+with tr as (select id from public.listening_tracks where slug = 'city-museum-volunteer-briefing'),
+     q as (
+       insert into public.questions (track_id, idx, kind, prompt, options, evidence, explanation)
+       select tr.id, 2, 'sentence_completion'::public.question_kind, 'Complete the sentence. Write ONE WORD. Volunteers collect their ________ before the museum opens.',
+              null, 'Morning volunteers should arrive at eight forty-five, which gives you fifteen minutes to store your belongings and collect your badge before the museum opens at nine.', 'The briefing specifically mentions collecting a badge before opening time.'
+       from tr
+       on conflict (track_id, idx) do update set
+         kind = excluded.kind, prompt = excluded.prompt, options = excluded.options,
+         evidence = excluded.evidence, explanation = excluded.explanation
+       returning id
+     )
+insert into public.question_answers (question_id, answer)
+select q.id, '["badge"]'::jsonb from q
+on conflict (question_id) do update set answer = excluded.answer;
+
+with tr as (select id from public.listening_tracks where slug = 'city-museum-volunteer-briefing'),
+     q as (
+       insert into public.questions (track_id, idx, kind, prompt, options, evidence, explanation)
+       select tr.id, 3, 'matching'::public.question_kind, 'Which area is responsible for greeting visitors?',
+              null, 'Volunteers assigned to the entrance hall greet visitors and help them find the ticket desk.', 'Greeting arriving visitors is a duty of volunteers in the entrance hall.'
+       from tr
+       on conflict (track_id, idx) do update set
+         kind = excluded.kind, prompt = excluded.prompt, options = excluded.options,
+         evidence = excluded.evidence, explanation = excluded.explanation
+       returning id
+     )
+insert into public.question_answers (question_id, answer)
+select q.id, '["entrance hall"]'::jsonb from q
+on conflict (question_id) do update set answer = excluded.answer;
+
+with tr as (select id from public.listening_tracks where slug = 'city-museum-volunteer-briefing'),
+     q as (
+       insert into public.questions (track_id, idx, kind, prompt, options, evidence, explanation)
+       select tr.id, 4, 'matching'::public.question_kind, 'Which area involves preparing activity sheets?',
+              null, 'Those working in the family gallery prepare activity sheets and replace pencils throughout the day.', 'The family gallery volunteers prepare activity sheets for visitors.'
+       from tr
+       on conflict (track_id, idx) do update set
+         kind = excluded.kind, prompt = excluded.prompt, options = excluded.options,
+         evidence = excluded.evidence, explanation = excluded.explanation
+       returning id
+     )
+insert into public.question_answers (question_id, answer)
+select q.id, '["family gallery"]'::jsonb from q
+on conflict (question_id) do update set answer = excluded.answer;
+
+with tr as (select id from public.listening_tracks where slug = 'city-museum-volunteer-briefing'),
+     q as (
+       insert into public.questions (track_id, idx, kind, prompt, options, evidence, explanation)
+       select tr.id, 5, 'matching'::public.question_kind, 'Which area involves handling returned reference materials?',
+              null, 'Volunteers in the archive room assist staff by placing returned reference materials on the sorting trolley.', 'Returned reference materials are handled by volunteers assigned to the archive room.'
+       from tr
+       on conflict (track_id, idx) do update set
+         kind = excluded.kind, prompt = excluded.prompt, options = excluded.options,
+         evidence = excluded.evidence, explanation = excluded.explanation
+       returning id
+     )
+insert into public.question_answers (question_id, answer)
+select q.id, '["archive room"]'::jsonb from q
+on conflict (question_id) do update set answer = excluded.answer;
+
+with tr as (select id from public.listening_tracks where slug = 'city-museum-volunteer-briefing'),
+     q as (
+       insert into public.questions (track_id, idx, kind, prompt, options, evidence, explanation)
+       select tr.id, 6, 'sentence_completion'::public.question_kind, 'Complete the sentence. Write TWO WORDS. Activity sheets are kept in the ________.',
+              null, 'Activity sheets are stored in the blue cupboard beside the window.', 'The narrator identifies the blue cupboard as the storage location.'
+       from tr
+       on conflict (track_id, idx) do update set
+         kind = excluded.kind, prompt = excluded.prompt, options = excluded.options,
+         evidence = excluded.evidence, explanation = excluded.explanation
+       returning id
+     )
+insert into public.question_answers (question_id, answer)
+select q.id, '["blue cupboard"]'::jsonb from q
+on conflict (question_id) do update set answer = excluded.answer;
+
+with tr as (select id from public.listening_tracks where slug = 'city-museum-volunteer-briefing'),
+     q as (
+       insert into public.questions (track_id, idx, kind, prompt, options, evidence, explanation)
+       select tr.id, 7, 'multiple_choice'::public.question_kind, 'Why should archive volunteers not return materials directly to shelves?',
+              '["Visitors may still need them","Staff must check them first","The shelves are being reorganised","Volunteers are not allowed near the shelves"]'::jsonb, 'Archive staff need to check each item before it is reshelved.', 'Every returned archive item must first be checked by archive staff.'
+       from tr
+       on conflict (track_id, idx) do update set
+         kind = excluded.kind, prompt = excluded.prompt, options = excluded.options,
+         evidence = excluded.evidence, explanation = excluded.explanation
+       returning id
+     )
+insert into public.question_answers (question_id, answer)
+select q.id, '["Staff must check them first"]'::jsonb from q
+on conflict (question_id) do update set answer = excluded.answer;
+
+with tr as (select id from public.listening_tracks where slug = 'city-museum-volunteer-briefing'),
+     q as (
+       insert into public.questions (track_id, idx, kind, prompt, options, evidence, explanation)
+       select tr.id, 8, 'sentence_completion'::public.question_kind, 'Complete the sentence. Write ONE WORD AND/OR A NUMBER. Each volunteer receives a ________-minute lunch break.',
+              null, 'Everyone gets a thirty-minute lunch break.', 'The specified lunch break lasts thirty minutes.'
+       from tr
+       on conflict (track_id, idx) do update set
+         kind = excluded.kind, prompt = excluded.prompt, options = excluded.options,
+         evidence = excluded.evidence, explanation = excluded.explanation
+       returning id
+     )
+insert into public.question_answers (question_id, answer)
+select q.id, '["thirty"]'::jsonb from q
+on conflict (question_id) do update set answer = excluded.answer;
+
+with tr as (select id from public.listening_tracks where slug = 'city-museum-volunteer-briefing'),
+     q as (
+       insert into public.questions (track_id, idx, kind, prompt, options, evidence, explanation)
+       select tr.id, 9, 'multiple_choice'::public.question_kind, 'Where should lost property be taken?',
+              '["the staff room","the volunteer desk","security at the main entrance","the museum office"]'::jsonb, 'All lost property must be handed to security at the main entrance.', 'Lost items are handled by security at the main entrance.'
+       from tr
+       on conflict (track_id, idx) do update set
+         kind = excluded.kind, prompt = excluded.prompt, options = excluded.options,
+         evidence = excluded.evidence, explanation = excluded.explanation
+       returning id
+     )
+insert into public.question_answers (question_id, answer)
+select q.id, '["security at the main entrance"]'::jsonb from q
+on conflict (question_id) do update set answer = excluded.answer;
+
+with tr as (select id from public.listening_tracks where slug = 'city-museum-volunteer-briefing'),
+     q as (
+       insert into public.questions (track_id, idx, kind, prompt, options, evidence, explanation)
+       select tr.id, 10, 'sentence_completion'::public.question_kind, 'Complete the sentence. Write TWO WORDS. During an emergency, volunteers should assemble at the fountain in ________.',
+              null, 'In an emergency, the assembly point is the fountain in Kings Square, directly opposite the museum.', 'The designated assembly location is the fountain in Kings Square.'
+       from tr
+       on conflict (track_id, idx) do update set
+         kind = excluded.kind, prompt = excluded.prompt, options = excluded.options,
+         evidence = excluded.evidence, explanation = excluded.explanation
+       returning id
+     )
+insert into public.question_answers (question_id, answer)
+select q.id, '["Kings Square"]'::jsonb from q
+on conflict (question_id) do update set answer = excluded.answer;
+
+-- Planning a Coastal Ecology Field Trip
+insert into public.listening_tracks (slug, title, topic, transcript, audio_url, matching_options, peaks, duration_seconds, difficulty)
+values ('coastal-ecology-field-trip-planning', 'Planning a Coastal Ecology Field Trip', 'Two university students discuss arrangements for an ecology field trip', 'Amira:
+Have you seen the final instructions for Thursday''s coastal ecology trip?
+Jonah:
+Yes. The coach leaves the biology building at seven fifteen, not seven thirty like it said on the first timetable.
+Amira:
+That''s early. We''re going to Bracken Bay first, aren''t we?
+Jonah:
+Actually, the order has changed. We''re starting at North Point because the tide will be lowest there in the morning.
+Amira:
+Right. What are we doing at North Point?
+Jonah:
+Our group is measuring the distribution of seaweed species along the rocky shore. We need to record the species found in each quadrat.
+Amira:
+Do we bring quadrats from the lab?
+Jonah:
+No, Dr Patel is bringing all the sampling equipment. We only need our notebooks, waterproof clothing and lunch.
+Amira:
+I was going to bring my tablet for taking notes.
+Jonah:
+You can, but the instructions recommend a pencil and paper because electronic devices can get wet. I''m taking a small waterproof notebook.
+Amira:
+Fair point. What happens after North Point?
+Jonah:
+At eleven thirty we move to Bracken Bay. That''s where we''ll collect water samples near the stream outlet.
+Amira:
+Are we analysing the samples there?
+Jonah:
+Only part of the analysis. We''ll measure temperature and salinity on site, but the nutrient tests will be done back in the laboratory on Friday.
+Amira:
+And lunch is at Bracken Bay?
+Jonah:
+Yes, from twelve thirty to one. There''s a café nearby, but the lecturer warned us not to depend on it because it sometimes closes during quiet weeks.
+Amira:
+So definitely bring food. What''s the final stop?
+Jonah:
+The sand dunes at East Marsh. We''ll compare vegetation in areas with heavy visitor traffic and areas protected by fencing.
+Amira:
+Is that the section where we take photographs?
+Jonah:
+Yes. Each pair needs six photographs showing different levels of vegetation cover.
+Amira:
+What time are we supposed to get back?
+Jonah:
+The coach is scheduled to leave East Marsh at four forty-five, so we should reach campus around six, depending on traffic.
+Amira:
+Do we have to submit anything immediately?
+Jonah:
+Just the field data sheet. Dr Patel wants that uploaded by ten o''clock on Friday morning. The full report isn''t due until the following Wednesday.', 'https://pub-fbae5ca09eba4fd0820da2b390dd7ca0.r2.dev/listening/coastal-ecology-field-trip-planning.mp3', '["North Point","Bracken Bay","East Marsh","biology building","laboratory","campus"]'::jsonb, '[0.5894591371308207,0.4277612283944413,0.3863131759666515,0.45702785936493456,0.4537298614067153,0.675293751062612,0.5059872618340286,0.4516738991625815,0.7553066858670787,0.5372490086178563,0.45158297149560084,0.3642365214212941,0.5927952974862211,0.3453577663314638,0.4531024899490136,0.62009553047167,0.6331159683406518,0.4577955822965909,0.544337377219171,0.5542752703416527,0.25084563168887203,0.5346405861121925,0.4037112374534588,0.6127001044710143,0.39977370464335366,0.43548887041934237,0.5188790890765392,0.4775828676043863,0.4789235684204946,0.5980772613240857,0.5115730227360235,0.5746005981754003,0.7523472674162458,0.7783349004843028,0.7396239468769038,0.6503738615177918,0.7720261237742704,0.7142690174512348,0.47381471048049423,0.4469746031825061,0.40915669905163743,0.4598268768337054,0.6007230319670682,0.48435789249319416,0.5043399924063331,0.5376919867885354,0.34934438641439236,0.6761706231395227,0.7892754376667684,0.3644099133167386,0.35755883767108176,0.4252546760332395,1,0.8991739615668233,0.46694751201684587,0.6866352657142735,0.653062265488612,0.5865467997349614,0.5533667303485461,0.649926602621421,0.5598890207688376,0.5507757782095418,0.4814189934582072,0.4261660290817062,0.4672504750754936,0.4403351303822909,0.4960590957196383,0.6318531792584716,0.48861208870229833,0.35648829437478213,0.4705254011074769,0.5112452121946374,0.8243045258126375,0.39610083125265033,0.5314171879868824,0.4985492287450986,0.6844705804782056,0.553647263663665,0.4551636215606421,0.4702259169572607,0.6303220472461014,0.3729683962185498,0.4585552980360897,0.1726755750820349,0.39832390432414644,0.571095842865813,0.5304699727571764,0.7471140222166295,0.602208407058902,0.6487991565776762,0.5773623251668738,0.6237559897034324,0.44108670748987017,0.4314812758358007,0.36582921740087315,0.5016395318304073,0.5401649054596833,0.46089024805400064,0.5099376086913582,0.35884276277506827,0.42638640419321217,0.3267190617392306,0.5860929572373761,0.6259244849499712,0.5935778563272885,0.45812468676245094,0.5440864040897131,0.5052473218626696,0.48118249144940883,0.42911405322073903,0.4996757069472995,0.5388634225505103,0.7041997913833401,0.4824578256180576,0.6713765154923297,0.6201322333930359,0.5338592206025226,0.6685049798361871,0.6408851123231118,0.4150035955983163]'::jsonb, 126.14820861678004, 3)
+on conflict (slug) do update set
+  title = excluded.title, topic = excluded.topic, transcript = excluded.transcript,
+  audio_url = excluded.audio_url, matching_options = excluded.matching_options,
+  peaks = excluded.peaks, duration_seconds = excluded.duration_seconds, difficulty = excluded.difficulty;
+
+with tr as (select id from public.listening_tracks where slug = 'coastal-ecology-field-trip-planning'),
+     q as (
+       insert into public.questions (track_id, idx, kind, prompt, options, evidence, explanation)
+       select tr.id, 1, 'multiple_choice'::public.question_kind, 'What time will the coach leave?',
+              '["7:00","7:15","7:30","7:45"]'::jsonb, 'The coach leaves the biology building at seven fifteen, not seven thirty like it said on the first timetable.', 'Jonah explains that the departure time was changed to seven fifteen.'
+       from tr
+       on conflict (track_id, idx) do update set
+         kind = excluded.kind, prompt = excluded.prompt, options = excluded.options,
+         evidence = excluded.evidence, explanation = excluded.explanation
+       returning id
+     )
+insert into public.question_answers (question_id, answer)
+select q.id, '["7:15"]'::jsonb from q
+on conflict (question_id) do update set answer = excluded.answer;
+
+with tr as (select id from public.listening_tracks where slug = 'coastal-ecology-field-trip-planning'),
+     q as (
+       insert into public.questions (track_id, idx, kind, prompt, options, evidence, explanation)
+       select tr.id, 2, 'matching'::public.question_kind, 'At which location will students study the distribution of seaweed?',
+              null, 'Our group is measuring the distribution of seaweed species along the rocky shore.', 'This activity is described immediately after Jonah confirms that the first stop is North Point.'
+       from tr
+       on conflict (track_id, idx) do update set
+         kind = excluded.kind, prompt = excluded.prompt, options = excluded.options,
+         evidence = excluded.evidence, explanation = excluded.explanation
+       returning id
+     )
+insert into public.question_answers (question_id, answer)
+select q.id, '["North Point"]'::jsonb from q
+on conflict (question_id) do update set answer = excluded.answer;
+
+with tr as (select id from public.listening_tracks where slug = 'coastal-ecology-field-trip-planning'),
+     q as (
+       insert into public.questions (track_id, idx, kind, prompt, options, evidence, explanation)
+       select tr.id, 3, 'sentence_completion'::public.question_kind, 'Complete the sentence. Write TWO WORDS. Dr Patel will provide all the ________.',
+              null, 'No, Dr Patel is bringing all the sampling equipment.', 'Students do not need to bring the quadrats because the sampling equipment is being provided.'
+       from tr
+       on conflict (track_id, idx) do update set
+         kind = excluded.kind, prompt = excluded.prompt, options = excluded.options,
+         evidence = excluded.evidence, explanation = excluded.explanation
+       returning id
+     )
+insert into public.question_answers (question_id, answer)
+select q.id, '["sampling equipment"]'::jsonb from q
+on conflict (question_id) do update set answer = excluded.answer;
+
+with tr as (select id from public.listening_tracks where slug = 'coastal-ecology-field-trip-planning'),
+     q as (
+       insert into public.questions (track_id, idx, kind, prompt, options, evidence, explanation)
+       select tr.id, 4, 'multiple_choice'::public.question_kind, 'Why are students advised to use pencil and paper?',
+              '["Tablets are too heavy","Electronic devices can get wet","Pencils are required for the report","There is no internet connection"]'::jsonb, 'You can, but the instructions recommend a pencil and paper because electronic devices can get wet.', 'The risk of water damage is the reason given for preferring pencil and paper.'
+       from tr
+       on conflict (track_id, idx) do update set
+         kind = excluded.kind, prompt = excluded.prompt, options = excluded.options,
+         evidence = excluded.evidence, explanation = excluded.explanation
+       returning id
+     )
+insert into public.question_answers (question_id, answer)
+select q.id, '["Electronic devices can get wet"]'::jsonb from q
+on conflict (question_id) do update set answer = excluded.answer;
+
+with tr as (select id from public.listening_tracks where slug = 'coastal-ecology-field-trip-planning'),
+     q as (
+       insert into public.questions (track_id, idx, kind, prompt, options, evidence, explanation)
+       select tr.id, 5, 'matching'::public.question_kind, 'At which location will students collect water samples?',
+              null, 'That''s where we''ll collect water samples near the stream outlet.', 'Jonah says the water sampling will take place at Bracken Bay.'
+       from tr
+       on conflict (track_id, idx) do update set
+         kind = excluded.kind, prompt = excluded.prompt, options = excluded.options,
+         evidence = excluded.evidence, explanation = excluded.explanation
+       returning id
+     )
+insert into public.question_answers (question_id, answer)
+select q.id, '["Bracken Bay"]'::jsonb from q
+on conflict (question_id) do update set answer = excluded.answer;
+
+with tr as (select id from public.listening_tracks where slug = 'coastal-ecology-field-trip-planning'),
+     q as (
+       insert into public.questions (track_id, idx, kind, prompt, options, evidence, explanation)
+       select tr.id, 6, 'sentence_completion'::public.question_kind, 'Complete the sentence. Write ONE WORD. Students will measure temperature and ________ on site.',
+              null, 'We''ll measure temperature and salinity on site, but the nutrient tests will be done back in the laboratory on Friday.', 'The two measurements performed on site are temperature and salinity.'
+       from tr
+       on conflict (track_id, idx) do update set
+         kind = excluded.kind, prompt = excluded.prompt, options = excluded.options,
+         evidence = excluded.evidence, explanation = excluded.explanation
+       returning id
+     )
+insert into public.question_answers (question_id, answer)
+select q.id, '["salinity"]'::jsonb from q
+on conflict (question_id) do update set answer = excluded.answer;
+
+with tr as (select id from public.listening_tracks where slug = 'coastal-ecology-field-trip-planning'),
+     q as (
+       insert into public.questions (track_id, idx, kind, prompt, options, evidence, explanation)
+       select tr.id, 7, 'multiple_choice'::public.question_kind, 'Why should students bring their own lunch?',
+              '["Food is not allowed to be purchased during the trip","The café is too far from the field site","The nearby café may be closed","The café only serves drinks"]'::jsonb, 'There''s a café nearby, but the lecturer warned us not to depend on it because it sometimes closes during quiet weeks.', 'Students are warned that the café is not reliably open.'
+       from tr
+       on conflict (track_id, idx) do update set
+         kind = excluded.kind, prompt = excluded.prompt, options = excluded.options,
+         evidence = excluded.evidence, explanation = excluded.explanation
+       returning id
+     )
+insert into public.question_answers (question_id, answer)
+select q.id, '["The nearby café may be closed"]'::jsonb from q
+on conflict (question_id) do update set answer = excluded.answer;
+
+with tr as (select id from public.listening_tracks where slug = 'coastal-ecology-field-trip-planning'),
+     q as (
+       insert into public.questions (track_id, idx, kind, prompt, options, evidence, explanation)
+       select tr.id, 8, 'matching'::public.question_kind, 'At which location will students compare vegetation in areas with different levels of visitor traffic?',
+              null, 'We''ll compare vegetation in areas with heavy visitor traffic and areas protected by fencing.', 'This comparison is the activity planned for the sand dunes at East Marsh.'
+       from tr
+       on conflict (track_id, idx) do update set
+         kind = excluded.kind, prompt = excluded.prompt, options = excluded.options,
+         evidence = excluded.evidence, explanation = excluded.explanation
+       returning id
+     )
+insert into public.question_answers (question_id, answer)
+select q.id, '["East Marsh"]'::jsonb from q
+on conflict (question_id) do update set answer = excluded.answer;
+
+with tr as (select id from public.listening_tracks where slug = 'coastal-ecology-field-trip-planning'),
+     q as (
+       insert into public.questions (track_id, idx, kind, prompt, options, evidence, explanation)
+       select tr.id, 9, 'sentence_completion'::public.question_kind, 'Complete the sentence. Write ONE WORD AND/OR A NUMBER. Each pair must take ________ photographs.',
+              null, 'Each pair needs six photographs showing different levels of vegetation cover.', 'Jonah specifies six photographs per pair.'
+       from tr
+       on conflict (track_id, idx) do update set
+         kind = excluded.kind, prompt = excluded.prompt, options = excluded.options,
+         evidence = excluded.evidence, explanation = excluded.explanation
+       returning id
+     )
+insert into public.question_answers (question_id, answer)
+select q.id, '["six"]'::jsonb from q
+on conflict (question_id) do update set answer = excluded.answer;
+
+with tr as (select id from public.listening_tracks where slug = 'coastal-ecology-field-trip-planning'),
+     q as (
+       insert into public.questions (track_id, idx, kind, prompt, options, evidence, explanation)
+       select tr.id, 10, 'multiple_choice'::public.question_kind, 'What must be uploaded by ten o''clock on Friday morning?',
+              '["the full report","the field data sheet","the photographs","the nutrient test results"]'::jsonb, 'Dr Patel wants that uploaded by ten o''clock on Friday morning.', 'The preceding statement identifies the item as the field data sheet, while the full report is due later.'
+       from tr
+       on conflict (track_id, idx) do update set
+         kind = excluded.kind, prompt = excluded.prompt, options = excluded.options,
+         evidence = excluded.evidence, explanation = excluded.explanation
+       returning id
+     )
+insert into public.question_answers (question_id, answer)
+select q.id, '["the field data sheet"]'::jsonb from q
+on conflict (question_id) do update set answer = excluded.answer;
+
 -- Orientation at a Community Tool Library
-insert into public.listening_tracks (slug, title, topic, transcript, audio_url, matching_options, difficulty)
+insert into public.listening_tracks (slug, title, topic, transcript, audio_url, matching_options, peaks, duration_seconds, difficulty)
 values ('community-tool-library-orientation', 'Orientation at a Community Tool Library', 'A new member asks about borrowing tools and using shared work areas', 'Maya: Good evening, everyone. Tonight''s short orientation is to explain how borrowing equipment works at the Riverside Tool Library.
 
 Leo: Thanks, Maya. I joined online, but I haven''t visited before. Is this the main building?
@@ -49,11 +991,11 @@ Maya: If anything is missing, don''t try to replace it yourself; email a photo t
 
 Leo: Got it. This seems much easier than buying tools I might only use once.
 
-Maya: That''s the idea. Borrow carefully, return on time, and tell us quickly if something is damaged or incomplete.', 'https://pub-fbae5ca09eba4fd0820da2b390dd7ca0.r2.dev/listening/community-tool-library-orientation.mp3', '["Ask staff for a safety check","Bring your own consumables","Clean it immediately after use","Return it by noon","Use it only outdoors","Label it with your name","Book it two weeks in advance"]'::jsonb, 2)
+Maya: That''s the idea. Borrow carefully, return on time, and tell us quickly if something is damaged or incomplete.', 'https://pub-fbae5ca09eba4fd0820da2b390dd7ca0.r2.dev/listening/community-tool-library-orientation.mp3', '["Ask staff for a safety check","Bring your own consumables","Clean it immediately after use","Return it by noon","Use it only outdoors","Label it with your name","Book it two weeks in advance"]'::jsonb, null, null, 2)
 on conflict (slug) do update set
   title = excluded.title, topic = excluded.topic, transcript = excluded.transcript,
   audio_url = excluded.audio_url, matching_options = excluded.matching_options,
-  difficulty = excluded.difficulty;
+  peaks = excluded.peaks, duration_seconds = excluded.duration_seconds, difficulty = excluded.difficulty;
 
 with tr as (select id from public.listening_tracks where slug = 'community-tool-library-orientation'),
      q as (
@@ -203,6 +1145,2751 @@ with tr as (select id from public.listening_tracks where slug = 'community-tool-
      )
 insert into public.question_answers (question_id, answer)
 select q.id, '["email a photo to the loans desk"]'::jsonb from q
+on conflict (question_id) do update set answer = excluded.answer;
+
+-- Changing a Dental Appointment
+insert into public.listening_tracks (slug, title, topic, transcript, audio_url, matching_options, peaks, duration_seconds, difficulty)
+values ('dental-clinic-appointment-change', 'Changing a Dental Appointment', 'A patient calls a dental clinic to rearrange an appointment and discuss treatment arrangements', 'Lena:
+Good morning, Parkside Dental Clinic. How can I help?
+Owen:
+Hi, I have an appointment next Tuesday afternoon, but I''ve just been given a work meeting at the same time. I was hoping to move it.
+Lena:
+No problem. Can I have your surname, please?
+Owen:
+It''s Mercer. The appointment is for a routine check-up with Dr Shah at three forty-five.
+Lena:
+I''ve found it. We can move you to Wednesday at eleven twenty, or Friday at two fifteen.
+Owen:
+Wednesday would be difficult because I''m usually out of the office in the morning. Friday at two fifteen should work.
+Lena:
+I''ll book Friday, then. I can see from your notes that you also mentioned sensitivity in one of your back teeth when you made the original appointment.
+Owen:
+That''s right. It hurts when I drink something cold, but only for a few seconds.
+Lena:
+I''ll add that to the appointment notes. Dr Shah may want to take an X-ray, so allow about forty minutes rather than the usual twenty-five.
+Owen:
+That''s fine. Is there anything I need to do before I come?
+Lena:
+Just avoid eating for about an hour before the appointment if possible. You can still drink water.
+Owen:
+Will I have to pay for the X-ray separately?
+Lena:
+A standard check-up is thirty-eight pounds. If an X-ray is needed, that''s an additional twelve pounds.
+Owen:
+Right. I think my insurance covers some dental costs. Do you submit claims directly?
+Lena:
+We don''t submit them for patients, but we can give you a detailed receipt showing the treatment code and the amount paid.
+Owen:
+That should be enough. I also changed my mobile number recently. Can I update that now?
+Lena:
+Certainly. I have a number ending in four six two on your account.
+Owen:
+That''s the old one. The new number ends in eight one nine.
+Lena:
+I''ve updated it. We''ll send a reminder text twenty-four hours before the appointment.
+Owen:
+Perfect. And if I need to cancel, how much notice do you require?
+Lena:
+We ask for at least twenty-four hours. Late cancellations may be charged fifteen pounds unless there''s an emergency.', 'https://pub-fbae5ca09eba4fd0820da2b390dd7ca0.r2.dev/listening/dental-clinic-appointment-change.mp3', null, '[0.5762623233936258,0.37511603991247133,0.3529776502906867,0.9359680783089372,0.9066515824892555,0.5366180280608447,0.5721180601592709,0.6653813901632483,0.5498431902474125,0.37135886904664617,0.5252288434552668,0.4965032074835705,0.6161571107673983,0.43474721766209407,0.4385750790278001,0.6400837938539841,0.7401483480180115,0.642930825923012,0.565877669164973,0.6642968983348718,0.5318732371089288,0.5047547712409592,0.6350301554903836,0.4361252974965045,0.3083173064070314,0.4781293631270526,0.3210685166948521,0.650458293759981,0.5567153639301957,0.5581402408665229,0.5950766131082852,0.28782331155951774,0.6762756986931566,0.48431548371609545,0.5307459746399127,0.41224574833008415,0.44056441325574675,0.4683911267167544,0.43488031040455954,0.48506078750363957,0.40179288443096783,0.39886588404731904,0.6259094718503084,0.9256754062413987,0.6045083919636502,0.657743006050079,0.5281714324691027,0.571923775284961,0.4717885763558547,0.46196694410600847,0.4608964423625536,0.39324529051069096,0.39160034993301823,0.44686223402273595,0.4226797479913369,0.40699935594572534,0.5261242307189428,0.45898490518554474,0.7252541132027971,0.5814192778142465,0.49156459272725606,0.5293927620151255,0.4129408588406898,0.4025223745036891,0.31010475334909776,0.4211782842591728,0.8631158002810119,0.8353603616424755,0.5881490016224774,0.49424843270373076,0.48462509592900627,0.30888318311882157,0.4232453972118675,0.3710471737861014,0.4849151357106979,0.39013410740238336,0.49030806275665423,0.5097767200675407,0.6020246669575475,0.36205709814108666,0.4858346935860924,0.5287263284615386,0.6338440157681056,0.40899233829867654,0.5601416845063432,0.38059958401053084,0.4297564856846592,0.3884380678455601,0.319403065451951,0.6268050359135331,0.7315028099558631,0.6783526353844809,0.5503480519387938,0.6300610512362557,0.4886277912157612,0.5763724156979986,0.5695803038182873,0.38063525587237723,0.27085696255886255,0.6267441455750167,0.6370411249048038,0.538512742557552,0.5362891251091613,0.4946941393165614,0.36876714526410087,0.39620633556239054,0.4313943653716931,0.3296448463734107,1,0.8700624941776002,0.5999429443882586,0.7490491944381376,0.47667692529427663,0.5237583290605142,0.32358734657370647,0.4472615739171445,0.4262961651868478,0.4045977170330917,0.4671148585316589,0.39471314424217285]'::jsonb, 114.43664399092971, 2)
+on conflict (slug) do update set
+  title = excluded.title, topic = excluded.topic, transcript = excluded.transcript,
+  audio_url = excluded.audio_url, matching_options = excluded.matching_options,
+  peaks = excluded.peaks, duration_seconds = excluded.duration_seconds, difficulty = excluded.difficulty;
+
+with tr as (select id from public.listening_tracks where slug = 'dental-clinic-appointment-change'),
+     q as (
+       insert into public.questions (track_id, idx, kind, prompt, options, evidence, explanation)
+       select tr.id, 1, 'multiple_choice'::public.question_kind, 'Why does Owen want to change his original appointment?',
+              '["He has a work meeting","He is travelling that day","The clinic changed the dentist","He has another medical appointment"]'::jsonb, 'Hi, I have an appointment next Tuesday afternoon, but I''ve just been given a work meeting at the same time. I was hoping to move it.', 'Owen says a work meeting now conflicts with the original appointment.'
+       from tr
+       on conflict (track_id, idx) do update set
+         kind = excluded.kind, prompt = excluded.prompt, options = excluded.options,
+         evidence = excluded.evidence, explanation = excluded.explanation
+       returning id
+     )
+insert into public.question_answers (question_id, answer)
+select q.id, '["He has a work meeting"]'::jsonb from q
+on conflict (question_id) do update set answer = excluded.answer;
+
+with tr as (select id from public.listening_tracks where slug = 'dental-clinic-appointment-change'),
+     q as (
+       insert into public.questions (track_id, idx, kind, prompt, options, evidence, explanation)
+       select tr.id, 2, 'sentence_completion'::public.question_kind, 'Complete the sentence. Write TWO WORDS. Owen''s original appointment was for a ________.',
+              null, 'It''s Mercer. The appointment is for a routine check-up with Dr Shah at three forty-five.', 'Owen describes the appointment as a routine check-up.'
+       from tr
+       on conflict (track_id, idx) do update set
+         kind = excluded.kind, prompt = excluded.prompt, options = excluded.options,
+         evidence = excluded.evidence, explanation = excluded.explanation
+       returning id
+     )
+insert into public.question_answers (question_id, answer)
+select q.id, '["routine check-up"]'::jsonb from q
+on conflict (question_id) do update set answer = excluded.answer;
+
+with tr as (select id from public.listening_tracks where slug = 'dental-clinic-appointment-change'),
+     q as (
+       insert into public.questions (track_id, idx, kind, prompt, options, evidence, explanation)
+       select tr.id, 3, 'multiple_choice'::public.question_kind, 'Which new appointment does Owen choose?',
+              '["Wednesday at 11:20","Wednesday at 2:15","Friday at 11:20","Friday at 2:15"]'::jsonb, 'Friday at two fifteen should work.', 'Owen selects the Friday afternoon option.'
+       from tr
+       on conflict (track_id, idx) do update set
+         kind = excluded.kind, prompt = excluded.prompt, options = excluded.options,
+         evidence = excluded.evidence, explanation = excluded.explanation
+       returning id
+     )
+insert into public.question_answers (question_id, answer)
+select q.id, '["Friday at 2:15"]'::jsonb from q
+on conflict (question_id) do update set answer = excluded.answer;
+
+with tr as (select id from public.listening_tracks where slug = 'dental-clinic-appointment-change'),
+     q as (
+       insert into public.questions (track_id, idx, kind, prompt, options, evidence, explanation)
+       select tr.id, 4, 'sentence_completion'::public.question_kind, 'Complete the sentence. Write ONE WORD. Owen experiences tooth sensitivity when he drinks something ________.',
+              null, 'It hurts when I drink something cold, but only for a few seconds.', 'Cold drinks trigger the sensitivity.'
+       from tr
+       on conflict (track_id, idx) do update set
+         kind = excluded.kind, prompt = excluded.prompt, options = excluded.options,
+         evidence = excluded.evidence, explanation = excluded.explanation
+       returning id
+     )
+insert into public.question_answers (question_id, answer)
+select q.id, '["cold"]'::jsonb from q
+on conflict (question_id) do update set answer = excluded.answer;
+
+with tr as (select id from public.listening_tracks where slug = 'dental-clinic-appointment-change'),
+     q as (
+       insert into public.questions (track_id, idx, kind, prompt, options, evidence, explanation)
+       select tr.id, 5, 'multiple_choice'::public.question_kind, 'How long should Owen allow for the appointment?',
+              '["twenty minutes","twenty-five minutes","forty minutes","forty-five minutes"]'::jsonb, 'Dr Shah may want to take an X-ray, so allow about forty minutes rather than the usual twenty-five.', 'A possible X-ray means the appointment may take about forty minutes.'
+       from tr
+       on conflict (track_id, idx) do update set
+         kind = excluded.kind, prompt = excluded.prompt, options = excluded.options,
+         evidence = excluded.evidence, explanation = excluded.explanation
+       returning id
+     )
+insert into public.question_answers (question_id, answer)
+select q.id, '["forty minutes"]'::jsonb from q
+on conflict (question_id) do update set answer = excluded.answer;
+
+with tr as (select id from public.listening_tracks where slug = 'dental-clinic-appointment-change'),
+     q as (
+       insert into public.questions (track_id, idx, kind, prompt, options, evidence, explanation)
+       select tr.id, 6, 'sentence_completion'::public.question_kind, 'Complete the sentence. Write ONE WORD. Owen may still drink ________ before the appointment.',
+              null, 'You can still drink water.', 'Water is allowed even though eating should be avoided beforehand.'
+       from tr
+       on conflict (track_id, idx) do update set
+         kind = excluded.kind, prompt = excluded.prompt, options = excluded.options,
+         evidence = excluded.evidence, explanation = excluded.explanation
+       returning id
+     )
+insert into public.question_answers (question_id, answer)
+select q.id, '["water"]'::jsonb from q
+on conflict (question_id) do update set answer = excluded.answer;
+
+with tr as (select id from public.listening_tracks where slug = 'dental-clinic-appointment-change'),
+     q as (
+       insert into public.questions (track_id, idx, kind, prompt, options, evidence, explanation)
+       select tr.id, 7, 'multiple_choice'::public.question_kind, 'How much does an X-ray cost in addition to the check-up?',
+              '["ten pounds","twelve pounds","fifteen pounds","thirty-eight pounds"]'::jsonb, 'If an X-ray is needed, that''s an additional twelve pounds.', 'The X-ray costs twelve pounds on top of the check-up fee.'
+       from tr
+       on conflict (track_id, idx) do update set
+         kind = excluded.kind, prompt = excluded.prompt, options = excluded.options,
+         evidence = excluded.evidence, explanation = excluded.explanation
+       returning id
+     )
+insert into public.question_answers (question_id, answer)
+select q.id, '["twelve pounds"]'::jsonb from q
+on conflict (question_id) do update set answer = excluded.answer;
+
+with tr as (select id from public.listening_tracks where slug = 'dental-clinic-appointment-change'),
+     q as (
+       insert into public.questions (track_id, idx, kind, prompt, options, evidence, explanation)
+       select tr.id, 8, 'sentence_completion'::public.question_kind, 'Complete the sentence. Write TWO WORDS. For an insurance claim, the clinic can provide a ________.',
+              null, 'We don''t submit them for patients, but we can give you a detailed receipt showing the treatment code and the amount paid.', 'The clinic provides a detailed receipt rather than submitting the insurance claim itself.'
+       from tr
+       on conflict (track_id, idx) do update set
+         kind = excluded.kind, prompt = excluded.prompt, options = excluded.options,
+         evidence = excluded.evidence, explanation = excluded.explanation
+       returning id
+     )
+insert into public.question_answers (question_id, answer)
+select q.id, '["detailed receipt"]'::jsonb from q
+on conflict (question_id) do update set answer = excluded.answer;
+
+with tr as (select id from public.listening_tracks where slug = 'dental-clinic-appointment-change'),
+     q as (
+       insert into public.questions (track_id, idx, kind, prompt, options, evidence, explanation)
+       select tr.id, 9, 'multiple_choice'::public.question_kind, 'When will the clinic send Owen a reminder text?',
+              '["twelve hours before","twenty-four hours before","two days before","one week before"]'::jsonb, 'We''ll send a reminder text twenty-four hours before the appointment.', 'The reminder is sent one day before the appointment.'
+       from tr
+       on conflict (track_id, idx) do update set
+         kind = excluded.kind, prompt = excluded.prompt, options = excluded.options,
+         evidence = excluded.evidence, explanation = excluded.explanation
+       returning id
+     )
+insert into public.question_answers (question_id, answer)
+select q.id, '["twenty-four hours before"]'::jsonb from q
+on conflict (question_id) do update set answer = excluded.answer;
+
+with tr as (select id from public.listening_tracks where slug = 'dental-clinic-appointment-change'),
+     q as (
+       insert into public.questions (track_id, idx, kind, prompt, options, evidence, explanation)
+       select tr.id, 10, 'sentence_completion'::public.question_kind, 'Complete the sentence. Write ONE WORD AND/OR A NUMBER. A late cancellation may result in a charge of ________ pounds.',
+              null, 'Late cancellations may be charged fifteen pounds unless there''s an emergency.', 'The clinic may charge fifteen pounds for a late cancellation.'
+       from tr
+       on conflict (track_id, idx) do update set
+         kind = excluded.kind, prompt = excluded.prompt, options = excluded.options,
+         evidence = excluded.evidence, explanation = excluded.explanation
+       returning id
+     )
+insert into public.question_answers (question_id, answer)
+select q.id, '["fifteen"]'::jsonb from q
+on conflict (question_id) do update set answer = excluded.answer;
+
+-- A Workshop on Effective Note-Taking
+insert into public.listening_tracks (slug, title, topic, transcript, audio_url, matching_options, peaks, duration_seconds, difficulty)
+values ('effective-note-taking-workshop', 'A Workshop on Effective Note-Taking', 'A study adviser explains techniques for taking useful lecture notes', 'This session is about making lecture notes that are actually useful when you revise. Many students try to write down almost everything a lecturer says, but that usually produces pages of information without showing which ideas matter most.
+Before a lecture, spend five minutes looking at the title, the weekly topic and any slides that have been released in advance. This gives you a basic structure before you start taking notes.
+During the lecture, listen for verbal signals. A lecturer may say that something is particularly important, give three main reasons for an effect, or announce that they''re moving to a new topic. Those phrases tell you something about the structure of the material.
+Avoid writing complete sentences unless a precise definition is being given. Abbreviations save time, but use ones you will still understand several weeks later. Inventing a new abbreviation every few minutes usually creates more work during revision.
+Leave some blank space between major sections. You can use it later to add examples, definitions or connections that become clearer after reading the textbook.
+One useful method is to divide each page into three areas. Use the largest area for your main notes, a narrow column on the left for key terms or questions, and a small section at the bottom for a summary.
+The summary should be written after the lecture rather than during it. Try to reduce the main idea of the page to two or three sentences. If you cannot do that, it may mean you haven''t yet identified the central point.
+Within twenty-four hours, review your notes and mark anything you do not understand. This first review is more useful than waiting until the week before an examination, when the lecture may no longer be fresh in your memory.
+Don''t simply highlight whole paragraphs. Highlighting works best when you select only a few terms, dates or phrases that will help you locate important information quickly.
+Finally, compare your notes with the lecture objectives. If the objective says you should be able to explain a process but your notes contain only a definition, you probably need to add more detail from the textbook or another reliable source.', 'https://pub-fbae5ca09eba4fd0820da2b390dd7ca0.r2.dev/listening/effective-note-taking-workshop.mp3', null, '[0.7506676649463543,0.6578965207497874,0.5811497952241629,0.39989191761830833,0.5343802116523118,0.6499826129876706,0.6963145455828149,0.3952678657713722,0.5169100534248046,0.5139957279703496,0.5583149223579391,0.5902700309338564,0.43421821051446585,0.31515488814935105,0.4335534010552705,0.645403096957254,0.446404927094087,0.5491901890648754,0.6491881887340192,0.5756514057594927,0.32740013623954445,0.5083130750914351,0.42596485384462224,0.28129865819582184,0.6012374004513622,0.6365473458355603,0.4034762651161736,0.7472445819099551,0.5349322152272428,0.35735816496030137,0.7841807334389495,0.33983516917361134,0.9304741475370355,0.5148740234993484,0.4013280997176999,0.5593887771641719,0.39029598941422444,0.2030581954528185,0.7276463881658233,0.5612751444866547,0.6029994905223762,0.46919039241144966,0.22259663829558302,0.7958167352956348,0.5407747631957188,0.6557672884800767,0.485833986204288,0.17560117207397186,1,0.6524843085569495,0.5443454312032807,0.601360304350276,0.17368689276082142,0.6957763578898756,0.4857422225282418,0.20722116925972853,0.8187378721716149,0.5688325138410755,0.5978252616192679,0.44384027640641455,0.33351270534200517,0.2330259860073865,0.6998110432420568,0.4954452952811728,0.4228469880978905,0.4499640259992626,0.5689647338802081,0.5737413200591868,0.8053407723916681,0.5534555455811454,0.4690022036229529,0.5773173879884449,0.4775539336425575,0.2523871528688981,0.564728054631495,0.6678074988611366,0.42483036876103486,0.10366374269240895,0.7103148512542033,0.5408032712719758,0.39605139555643265,0.17595885763114133,0.502776721490687,0.712914021800383,0.47886664421894515,0.2448504288897132,0.6583839417195451,0.5866078485226583,0.6776821079913528,0.6315099167082906,0.14345137229883329,0.6946172741929911,0.6566443497640063,0.43982743345678477,0.43349413619828864,0.7924293521881905,0.4285562031573995,0.11254002899186101,0.5438256087478315,0.27877764596459065,0.6446980961731414,0.5720644239038797,0.5614061409425067,0.4873259411438192,0.4711533109296808,0.5256565194516823,0.3935291362771909,0.2012598294987421,0.6301725152952004,0.3328042205021186,0.3078426751689799,0.5275897138807978,0.4691786794148556,0.5071730391013064,0.5870830125212025,0.3531033528867215,0.5960918252964943,0.4015071446153531,0.5110548677162204,0.2673599728603837]'::jsonb, 136.62621315192743, 3)
+on conflict (slug) do update set
+  title = excluded.title, topic = excluded.topic, transcript = excluded.transcript,
+  audio_url = excluded.audio_url, matching_options = excluded.matching_options,
+  peaks = excluded.peaks, duration_seconds = excluded.duration_seconds, difficulty = excluded.difficulty;
+
+with tr as (select id from public.listening_tracks where slug = 'effective-note-taking-workshop'),
+     q as (
+       insert into public.questions (track_id, idx, kind, prompt, options, evidence, explanation)
+       select tr.id, 1, 'multiple_choice'::public.question_kind, 'What problem does the speaker identify with trying to record everything a lecturer says?',
+              '["Students miss the lecturer''s examples","The notes fail to show which ideas are most important","Lectures become harder to understand","Students use too many abbreviations"]'::jsonb, 'Many students try to write down almost everything a lecturer says, but that usually produces pages of information without showing which ideas matter most.', 'Recording nearly everything can obscure the relative importance of different ideas.'
+       from tr
+       on conflict (track_id, idx) do update set
+         kind = excluded.kind, prompt = excluded.prompt, options = excluded.options,
+         evidence = excluded.evidence, explanation = excluded.explanation
+       returning id
+     )
+insert into public.question_answers (question_id, answer)
+select q.id, '["The notes fail to show which ideas are most important"]'::jsonb from q
+on conflict (question_id) do update set answer = excluded.answer;
+
+with tr as (select id from public.listening_tracks where slug = 'effective-note-taking-workshop'),
+     q as (
+       insert into public.questions (track_id, idx, kind, prompt, options, evidence, explanation)
+       select tr.id, 2, 'sentence_completion'::public.question_kind, 'Complete the sentence. Write ONE WORD AND/OR A NUMBER. Before a lecture, students should spend about ________ minutes looking at the topic and available slides.',
+              null, 'Before a lecture, spend five minutes looking at the title, the weekly topic and any slides that have been released in advance.', 'The recommended preparation period is five minutes.'
+       from tr
+       on conflict (track_id, idx) do update set
+         kind = excluded.kind, prompt = excluded.prompt, options = excluded.options,
+         evidence = excluded.evidence, explanation = excluded.explanation
+       returning id
+     )
+insert into public.question_answers (question_id, answer)
+select q.id, '["five"]'::jsonb from q
+on conflict (question_id) do update set answer = excluded.answer;
+
+with tr as (select id from public.listening_tracks where slug = 'effective-note-taking-workshop'),
+     q as (
+       insert into public.questions (track_id, idx, kind, prompt, options, evidence, explanation)
+       select tr.id, 3, 'multiple_choice'::public.question_kind, 'What can verbal signals help students identify?',
+              '["The lecturer''s personal opinion","The structure of the material","The difficulty of the examination","The required textbook chapters"]'::jsonb, 'Those phrases tell you something about the structure of the material.', 'Signals such as announcing a new topic help reveal how the lecture is organised.'
+       from tr
+       on conflict (track_id, idx) do update set
+         kind = excluded.kind, prompt = excluded.prompt, options = excluded.options,
+         evidence = excluded.evidence, explanation = excluded.explanation
+       returning id
+     )
+insert into public.question_answers (question_id, answer)
+select q.id, '["The structure of the material"]'::jsonb from q
+on conflict (question_id) do update set answer = excluded.answer;
+
+with tr as (select id from public.listening_tracks where slug = 'effective-note-taking-workshop'),
+     q as (
+       insert into public.questions (track_id, idx, kind, prompt, options, evidence, explanation)
+       select tr.id, 4, 'sentence_completion'::public.question_kind, 'Complete the sentence. Write ONE WORD. Complete sentences are mainly useful when recording a precise ________.',
+              null, 'Avoid writing complete sentences unless a precise definition is being given.', 'The speaker makes precise definitions an exception to the general advice against full sentences.'
+       from tr
+       on conflict (track_id, idx) do update set
+         kind = excluded.kind, prompt = excluded.prompt, options = excluded.options,
+         evidence = excluded.evidence, explanation = excluded.explanation
+       returning id
+     )
+insert into public.question_answers (question_id, answer)
+select q.id, '["definition"]'::jsonb from q
+on conflict (question_id) do update set answer = excluded.answer;
+
+with tr as (select id from public.listening_tracks where slug = 'effective-note-taking-workshop'),
+     q as (
+       insert into public.questions (track_id, idx, kind, prompt, options, evidence, explanation)
+       select tr.id, 5, 'multiple_choice'::public.question_kind, 'Why should students leave blank space between major sections?',
+              '["To make the notes easier to photocopy","To insert material later","To separate different lectures","To practise writing summaries"]'::jsonb, 'You can use it later to add examples, definitions or connections that become clearer after reading the textbook.', 'Blank space allows students to add useful material after the lecture.'
+       from tr
+       on conflict (track_id, idx) do update set
+         kind = excluded.kind, prompt = excluded.prompt, options = excluded.options,
+         evidence = excluded.evidence, explanation = excluded.explanation
+       returning id
+     )
+insert into public.question_answers (question_id, answer)
+select q.id, '["To insert material later"]'::jsonb from q
+on conflict (question_id) do update set answer = excluded.answer;
+
+with tr as (select id from public.listening_tracks where slug = 'effective-note-taking-workshop'),
+     q as (
+       insert into public.questions (track_id, idx, kind, prompt, options, evidence, explanation)
+       select tr.id, 6, 'sentence_completion'::public.question_kind, 'Complete the sentence. Write TWO WORDS. The narrow left-hand column should contain key terms or ________.',
+              null, 'Use the largest area for your main notes, a narrow column on the left for key terms or questions, and a small section at the bottom for a summary.', 'The left column is reserved for key terms or questions.'
+       from tr
+       on conflict (track_id, idx) do update set
+         kind = excluded.kind, prompt = excluded.prompt, options = excluded.options,
+         evidence = excluded.evidence, explanation = excluded.explanation
+       returning id
+     )
+insert into public.question_answers (question_id, answer)
+select q.id, '["questions"]'::jsonb from q
+on conflict (question_id) do update set answer = excluded.answer;
+
+with tr as (select id from public.listening_tracks where slug = 'effective-note-taking-workshop'),
+     q as (
+       insert into public.questions (track_id, idx, kind, prompt, options, evidence, explanation)
+       select tr.id, 7, 'multiple_choice'::public.question_kind, 'When should the page summary be written?',
+              '["before the lecture","during the introduction","after the lecture","just before an examination"]'::jsonb, 'The summary should be written after the lecture rather than during it.', 'Students should write the summary once the lecture has finished.'
+       from tr
+       on conflict (track_id, idx) do update set
+         kind = excluded.kind, prompt = excluded.prompt, options = excluded.options,
+         evidence = excluded.evidence, explanation = excluded.explanation
+       returning id
+     )
+insert into public.question_answers (question_id, answer)
+select q.id, '["after the lecture"]'::jsonb from q
+on conflict (question_id) do update set answer = excluded.answer;
+
+with tr as (select id from public.listening_tracks where slug = 'effective-note-taking-workshop'),
+     q as (
+       insert into public.questions (track_id, idx, kind, prompt, options, evidence, explanation)
+       select tr.id, 8, 'sentence_completion'::public.question_kind, 'Complete the sentence. Write ONE WORD AND/OR A NUMBER. Notes should receive their first review within ________ hours.',
+              null, 'Within twenty-four hours, review your notes and mark anything you do not understand.', 'The advised review window is twenty-four hours.'
+       from tr
+       on conflict (track_id, idx) do update set
+         kind = excluded.kind, prompt = excluded.prompt, options = excluded.options,
+         evidence = excluded.evidence, explanation = excluded.explanation
+       returning id
+     )
+insert into public.question_answers (question_id, answer)
+select q.id, '["twenty-four"]'::jsonb from q
+on conflict (question_id) do update set answer = excluded.answer;
+
+with tr as (select id from public.listening_tracks where slug = 'effective-note-taking-workshop'),
+     q as (
+       insert into public.questions (track_id, idx, kind, prompt, options, evidence, explanation)
+       select tr.id, 9, 'multiple_choice'::public.question_kind, 'What does the speaker recommend highlighting?',
+              '["whole paragraphs","only textbook definitions","a small number of useful terms, dates or phrases","every unfamiliar word"]'::jsonb, 'Highlighting works best when you select only a few terms, dates or phrases that will help you locate important information quickly.', 'Selective highlighting is recommended instead of marking large sections.'
+       from tr
+       on conflict (track_id, idx) do update set
+         kind = excluded.kind, prompt = excluded.prompt, options = excluded.options,
+         evidence = excluded.evidence, explanation = excluded.explanation
+       returning id
+     )
+insert into public.question_answers (question_id, answer)
+select q.id, '["a small number of useful terms, dates or phrases"]'::jsonb from q
+on conflict (question_id) do update set answer = excluded.answer;
+
+with tr as (select id from public.listening_tracks where slug = 'effective-note-taking-workshop'),
+     q as (
+       insert into public.questions (track_id, idx, kind, prompt, options, evidence, explanation)
+       select tr.id, 10, 'sentence_completion'::public.question_kind, 'Complete the sentence. Write TWO WORDS. Students should compare their notes with the lecture ________.',
+              null, 'Finally, compare your notes with the lecture objectives.', 'Lecture objectives help students identify whether important content is missing from their notes.'
+       from tr
+       on conflict (track_id, idx) do update set
+         kind = excluded.kind, prompt = excluded.prompt, options = excluded.options,
+         evidence = excluded.evidence, explanation = excluded.explanation
+       returning id
+     )
+insert into public.question_answers (question_id, answer)
+select q.id, '["lecture objectives"]'::jsonb from q
+on conflict (question_id) do update set answer = excluded.answer;
+
+-- Booking an Evening Cooking Course
+insert into public.listening_tracks (slug, title, topic, transcript, audio_url, matching_options, peaks, duration_seconds, difficulty)
+values ('evening-cooking-course-booking', 'Booking an Evening Cooking Course', 'Two people discuss available classes at a local cookery school', 'Priya:
+Hello, I''m calling about the evening cooking courses advertised on your website. I''m trying to choose one for my brother and me.
+Ethan:
+Sure. We have three beginner courses starting next month: Italian Basics, Street Food at Home and Vegetarian Weeknights.
+Priya:
+We''re both beginners, but my brother doesn''t eat meat, so I suppose Italian Basics might be difficult.
+Ethan:
+Not necessarily, but two of the four sessions include meat dishes. Vegetarian Weeknights would probably suit you better because every recipe is meat-free.
+Priya:
+What day does that course run?
+Ethan:
+Vegetarian Weeknights is on Wednesdays from six thirty to eight thirty. It starts on the ninth of October and runs for four weeks.
+Priya:
+Wednesday works. What does it cost?
+Ethan:
+The full course is ninety-six pounds per person. That includes all ingredients, but students need to bring their own containers if they want to take food home.
+Priya:
+Do we need any special equipment?
+Ethan:
+No. Knives, pans and aprons are provided. We do recommend closed shoes, though, because you''re working around hot liquids.
+Priya:
+How large are the classes?
+Ethan:
+We normally allow twelve people, but the Wednesday class already has eight bookings, so there are four places left.
+Priya:
+Could you tell me what dishes we''ll make?
+Ethan:
+In the first week, it''s a chickpea curry with flatbread. Week two is mushroom dumplings. The third session covers vegetable noodles, and the final week is a lentil pie.
+Priya:
+My brother would love the dumplings. Is the class held at your main building?
+Ethan:
+No, the evening courses are in the teaching kitchen at Brook Street Community Centre. The entrance is at the back of the building beside the small car park.
+Priya:
+Can we park there?
+Ethan:
+Only instructors can use that car park. Students normally use the public car park behind the cinema, which is about a five-minute walk away.
+Priya:
+How do I reserve two places?
+Ethan:
+I can hold them for twenty-four hours. To confirm the booking, you''ll need to pay a twenty-pound deposit for each person through our website.
+Priya:
+And the rest is paid when the course begins?
+Ethan:
+The remaining balance is due seven days before the first class.', 'https://pub-fbae5ca09eba4fd0820da2b390dd7ca0.r2.dev/listening/evening-cooking-course-booking.mp3', '["chickpea curry","mushroom dumplings","vegetable noodles","lentil pie","flatbread","Italian pasta"]'::jsonb, '[0.44307882400445375,0.5503548262392597,0.4142489712495609,0.424485285364605,0.28275461530910695,0.4691837515396616,0.45774316848549296,0.7182409589156611,0.6839214778471838,0.6998557192493345,0.4653210793921394,0.5513932184050045,0.4141944032413624,0.6124636951819128,0.6372029595386102,0.32284654740909624,0.50278102636613,0.5231935154639712,0.30358609047066454,0.39302093900897833,0.4230538543805676,0.2317343453508113,0.685268535398639,0.6713660715113846,0.582164508614078,0.4958815020952526,0.4835187198804189,0.4554176955040803,0.5492632977363257,0.7505245890595797,0.5325772480038052,0.4494815378773385,0.4106844610406731,0.7014270778526326,0.6137575267681148,0.45059432381392334,0.4046895723476526,0.5055614885316326,0.4714485935288513,0.5019439648424858,0.43620779565879453,0.3281040352589169,0.29504325701212225,0.7302037009913541,0.6673742931257572,0.5360890931170292,0.5117682054011727,0.7310151103499367,0.5078762142390153,0.6946895145011243,0.5223746794046537,0.4030041506965658,0.5930728582468129,0.4612255306845561,0.6808639286921977,0.5545620608856885,0.43704780643612345,0.6230315664674246,0.5257931118931883,0.7160162226326091,0.42406990530321814,0.4242495555452464,1,0.6680950654045256,0.4799558607613337,0.6311942203037518,0.39200571977195914,0.7093371415122525,0.4128974757780931,0.5759539450738679,0.36079882163871213,0.8184610080195871,0.5240148846383267,0.7503968480603725,0.45410860332477554,0.6936400177193222,0.5833921953291631,0.7160300344664009,0.673999061211857,0.6145537272871415,0.5955391001521996,0.6720296435240911,0.5258104451204155,0.5211092895550115,0.239344184939082,0.4530420479907834,0.408656349978283,0.6090733345527142,0.5338277668101065,0.413571732189518,0.5882355206822533,0.3484225685641488,0.6467044370579155,0.45620191087693274,0.5096973983654106,0.47667815293829685,0.7469923302011166,0.7469364114537002,0.39437721396616066,0.5695261423412408,0.6482075126162051,0.5956572234011859,0.5955755728299985,0.7743293940406087,0.6394726503025214,0.48935840781408135,0.7777044859767882,0.8668319229687833,0.6046913062021736,0.5970224079559294,0.6942812795547704,0.6453125349576693,0.7051557293916161,0.552460513619935,0.4925882426709305,0.41863455273743666,0.6898849091818782,0.6507818939562738,0.45045674757232257,0.39915653471251544]'::jsonb, 132.70204081632653, 2)
+on conflict (slug) do update set
+  title = excluded.title, topic = excluded.topic, transcript = excluded.transcript,
+  audio_url = excluded.audio_url, matching_options = excluded.matching_options,
+  peaks = excluded.peaks, duration_seconds = excluded.duration_seconds, difficulty = excluded.difficulty;
+
+with tr as (select id from public.listening_tracks where slug = 'evening-cooking-course-booking'),
+     q as (
+       insert into public.questions (track_id, idx, kind, prompt, options, evidence, explanation)
+       select tr.id, 1, 'multiple_choice'::public.question_kind, 'Which course does Ethan recommend for Priya and her brother?',
+              '["Italian Basics","Street Food at Home","Vegetarian Weeknights","Advanced Baking"]'::jsonb, 'Vegetarian Weeknights would probably suit you better because every recipe is meat-free.', 'Ethan recommends Vegetarian Weeknights because Priya''s brother does not eat meat.'
+       from tr
+       on conflict (track_id, idx) do update set
+         kind = excluded.kind, prompt = excluded.prompt, options = excluded.options,
+         evidence = excluded.evidence, explanation = excluded.explanation
+       returning id
+     )
+insert into public.question_answers (question_id, answer)
+select q.id, '["Vegetarian Weeknights"]'::jsonb from q
+on conflict (question_id) do update set answer = excluded.answer;
+
+with tr as (select id from public.listening_tracks where slug = 'evening-cooking-course-booking'),
+     q as (
+       insert into public.questions (track_id, idx, kind, prompt, options, evidence, explanation)
+       select tr.id, 2, 'sentence_completion'::public.question_kind, 'Complete the sentence. Write ONE WORD. The recommended course takes place on ________.',
+              null, 'Vegetarian Weeknights is on Wednesdays from six thirty to eight thirty.', 'The course runs on Wednesday evenings.'
+       from tr
+       on conflict (track_id, idx) do update set
+         kind = excluded.kind, prompt = excluded.prompt, options = excluded.options,
+         evidence = excluded.evidence, explanation = excluded.explanation
+       returning id
+     )
+insert into public.question_answers (question_id, answer)
+select q.id, '["Wednesdays"]'::jsonb from q
+on conflict (question_id) do update set answer = excluded.answer;
+
+with tr as (select id from public.listening_tracks where slug = 'evening-cooking-course-booking'),
+     q as (
+       insert into public.questions (track_id, idx, kind, prompt, options, evidence, explanation)
+       select tr.id, 3, 'multiple_choice'::public.question_kind, 'What is included in the course price?',
+              '["food containers","all ingredients","parking charges","a recipe book"]'::jsonb, 'That includes all ingredients, but students need to bring their own containers if they want to take food home.', 'Ingredients are included, whereas students supply their own takeaway containers.'
+       from tr
+       on conflict (track_id, idx) do update set
+         kind = excluded.kind, prompt = excluded.prompt, options = excluded.options,
+         evidence = excluded.evidence, explanation = excluded.explanation
+       returning id
+     )
+insert into public.question_answers (question_id, answer)
+select q.id, '["all ingredients"]'::jsonb from q
+on conflict (question_id) do update set answer = excluded.answer;
+
+with tr as (select id from public.listening_tracks where slug = 'evening-cooking-course-booking'),
+     q as (
+       insert into public.questions (track_id, idx, kind, prompt, options, evidence, explanation)
+       select tr.id, 4, 'sentence_completion'::public.question_kind, 'Complete the sentence. Write TWO WORDS. Students are advised to wear ________.',
+              null, 'We do recommend closed shoes, though, because you''re working around hot liquids.', 'Closed shoes are recommended for safety.'
+       from tr
+       on conflict (track_id, idx) do update set
+         kind = excluded.kind, prompt = excluded.prompt, options = excluded.options,
+         evidence = excluded.evidence, explanation = excluded.explanation
+       returning id
+     )
+insert into public.question_answers (question_id, answer)
+select q.id, '["closed shoes"]'::jsonb from q
+on conflict (question_id) do update set answer = excluded.answer;
+
+with tr as (select id from public.listening_tracks where slug = 'evening-cooking-course-booking'),
+     q as (
+       insert into public.questions (track_id, idx, kind, prompt, options, evidence, explanation)
+       select tr.id, 5, 'multiple_choice'::public.question_kind, 'How many places remain in the Wednesday class?',
+              '["two","four","eight","twelve"]'::jsonb, 'We normally allow twelve people, but the Wednesday class already has eight bookings, so there are four places left.', 'Eight of twelve places have already been booked, leaving four.'
+       from tr
+       on conflict (track_id, idx) do update set
+         kind = excluded.kind, prompt = excluded.prompt, options = excluded.options,
+         evidence = excluded.evidence, explanation = excluded.explanation
+       returning id
+     )
+insert into public.question_answers (question_id, answer)
+select q.id, '["four"]'::jsonb from q
+on conflict (question_id) do update set answer = excluded.answer;
+
+with tr as (select id from public.listening_tracks where slug = 'evening-cooking-course-booking'),
+     q as (
+       insert into public.questions (track_id, idx, kind, prompt, options, evidence, explanation)
+       select tr.id, 6, 'matching'::public.question_kind, 'Which dish will students make in the first week?',
+              null, 'In the first week, it''s a chickpea curry with flatbread.', 'The first week''s main dish is chickpea curry.'
+       from tr
+       on conflict (track_id, idx) do update set
+         kind = excluded.kind, prompt = excluded.prompt, options = excluded.options,
+         evidence = excluded.evidence, explanation = excluded.explanation
+       returning id
+     )
+insert into public.question_answers (question_id, answer)
+select q.id, '["chickpea curry"]'::jsonb from q
+on conflict (question_id) do update set answer = excluded.answer;
+
+with tr as (select id from public.listening_tracks where slug = 'evening-cooking-course-booking'),
+     q as (
+       insert into public.questions (track_id, idx, kind, prompt, options, evidence, explanation)
+       select tr.id, 7, 'matching'::public.question_kind, 'Which dish will students make in the second week?',
+              null, 'Week two is mushroom dumplings.', 'Mushroom dumplings are scheduled for the second class.'
+       from tr
+       on conflict (track_id, idx) do update set
+         kind = excluded.kind, prompt = excluded.prompt, options = excluded.options,
+         evidence = excluded.evidence, explanation = excluded.explanation
+       returning id
+     )
+insert into public.question_answers (question_id, answer)
+select q.id, '["mushroom dumplings"]'::jsonb from q
+on conflict (question_id) do update set answer = excluded.answer;
+
+with tr as (select id from public.listening_tracks where slug = 'evening-cooking-course-booking'),
+     q as (
+       insert into public.questions (track_id, idx, kind, prompt, options, evidence, explanation)
+       select tr.id, 8, 'matching'::public.question_kind, 'Which dish will students make in the final week?',
+              null, 'The third session covers vegetable noodles, and the final week is a lentil pie.', 'The lentil pie is the dish planned for the fourth and final session.'
+       from tr
+       on conflict (track_id, idx) do update set
+         kind = excluded.kind, prompt = excluded.prompt, options = excluded.options,
+         evidence = excluded.evidence, explanation = excluded.explanation
+       returning id
+     )
+insert into public.question_answers (question_id, answer)
+select q.id, '["lentil pie"]'::jsonb from q
+on conflict (question_id) do update set answer = excluded.answer;
+
+with tr as (select id from public.listening_tracks where slug = 'evening-cooking-course-booking'),
+     q as (
+       insert into public.questions (track_id, idx, kind, prompt, options, evidence, explanation)
+       select tr.id, 9, 'sentence_completion'::public.question_kind, 'Complete the sentence. Write TWO WORDS. The course is held at Brook Street ________.',
+              null, 'No, the evening courses are in the teaching kitchen at Brook Street Community Centre.', 'The teaching kitchen is located at Brook Street Community Centre.'
+       from tr
+       on conflict (track_id, idx) do update set
+         kind = excluded.kind, prompt = excluded.prompt, options = excluded.options,
+         evidence = excluded.evidence, explanation = excluded.explanation
+       returning id
+     )
+insert into public.question_answers (question_id, answer)
+select q.id, '["Community Centre"]'::jsonb from q
+on conflict (question_id) do update set answer = excluded.answer;
+
+with tr as (select id from public.listening_tracks where slug = 'evening-cooking-course-booking'),
+     q as (
+       insert into public.questions (track_id, idx, kind, prompt, options, evidence, explanation)
+       select tr.id, 10, 'multiple_choice'::public.question_kind, 'How much deposit is required for each person?',
+              '["ten pounds","twenty pounds","forty pounds","ninety-six pounds"]'::jsonb, 'To confirm the booking, you''ll need to pay a twenty-pound deposit for each person through our website.', 'Each participant must pay a twenty-pound deposit.'
+       from tr
+       on conflict (track_id, idx) do update set
+         kind = excluded.kind, prompt = excluded.prompt, options = excluded.options,
+         evidence = excluded.evidence, explanation = excluded.explanation
+       returning id
+     )
+insert into public.question_answers (question_id, answer)
+select q.id, '["twenty pounds"]'::jsonb from q
+on conflict (question_id) do update set answer = excluded.answer;
+
+-- Methods Used to Monitor Glaciers
+insert into public.listening_tracks (slug, title, topic, transcript, audio_url, matching_options, peaks, duration_seconds, difficulty)
+values ('glacier-monitoring-methods-lecture', 'Methods Used to Monitor Glaciers', 'A lecturer explains several techniques used by scientists to measure glacier change', 'Today''s lecture looks at how scientists measure changes in glaciers. No single method provides every type of information, so researchers often combine field observations with satellite and aerial data.
+One of the oldest techniques involves placing stakes directly into the ice. Researchers measure how much of each stake becomes exposed over time. If more of the stake is visible at the end of the summer, this usually indicates that surface ice has melted.
+Stake measurements are relatively cheap and easy to understand, but they cover only a very small part of a glacier. For a large glacier, dozens of stakes may be needed to give a useful picture of surface melting.
+Scientists also dig snow pits near the end of winter. Layers in the pit can reveal how much snow accumulated during the cold season. The depth alone is not enough, so researchers also measure snow density.
+Global Positioning System receivers can be placed on the glacier to track movement. Some glaciers move only a few centimetres per day, while others can move much faster during certain seasons.
+Satellite images allow researchers to map glacier area over much larger regions. By comparing images from different years, scientists can identify changes in the position of the glacier''s edge. However, clouds may hide the surface in optical satellite images.
+Radar satellites are useful because radar can collect information through clouds and during darkness. This makes radar particularly valuable in polar regions, where long periods of darkness can make ordinary optical imaging difficult.
+Aircraft and drones provide another source of detailed images. Drones are especially useful for smaller study areas because they can produce high-resolution maps without the cost of a full aircraft survey.
+To estimate changes in glacier thickness, researchers can compare elevation measurements collected at different times. Laser instruments mounted on aircraft or satellites can measure surface height with high precision.
+Finally, scientists combine these different measurements in computer models. The aim is not simply to describe how a glacier has changed in the past, but also to test how it might respond to future changes in temperature and snowfall.', 'https://pub-fbae5ca09eba4fd0820da2b390dd7ca0.r2.dev/listening/glacier-monitoring-methods-lecture.mp3', '["stakes","snow pits","GPS receivers","optical satellite images","radar satellites","drones","laser instruments"]'::jsonb, '[0.7966198508465031,0.7509422856891194,0.633729160214064,0.7243278333069019,0.8019958642713813,0.5320353834555955,0.7320808209719774,0.7509408709538753,0.5677730838580427,0.524824423854195,0.23546749289503388,0.8277599111739249,0.7772236706484564,0.5647117195263601,0.401023641625441,0.7341178266254752,0.774958157806523,0.5234641916563731,0.460210100054254,0.8173415553029226,0.6671966289765278,0.7304960592530046,0.7518220333980339,0.5364253574182188,0.3601624415292756,0.8373634827505123,0.5967307301425168,0.47104777950771803,0.8552508511340579,0.5513106939177165,0.17657766111705367,0.8162918700490546,0.7871147515970951,0.7244231472255838,0.45636406254994594,0.23136719702066988,0.7093771735409362,0.619644793969031,0.42459430829778416,0.942699080576552,0.8735698896854448,0.7057039938776192,0.31339676356963236,0.8793507321633731,0.654137898308789,0.7625865949331717,0.5312174249952574,0.653329385486552,0.7478973462194729,0.6862685808002852,0.5783941241636489,0.29053520057966875,0.9158979663922125,0.9497822870773949,0.6826606228856131,1,0.5406209405720691,0.22880101507690373,0.7913581512727809,0.7583763859259679,0.5498896168079684,0.704478543189622,0.24165156007181393,0.9522669280605932,0.6083528534212193,0.5564377717036537,0.8410615048012519,0.7031723623676905,0.32689755002313187,0.8584035486423306,0.5458844035470382,0.6266069010683831,0.4465304419068414,0.9408623322218485,0.6933185201346513,0.7855079928250616,0.4988238824378226,0.7188555109522606,0.563163164373042,0.8285725630180668,0.736404678069357,0.8640161672601633,0.6816113914826056,0.8614157096663222,0.5731213158555845,0.5326064620132801,0.7817088147408854,0.8000998464154707,0.49637712916921406,0.7811065038020126,0.6772650403528727,0.6013453632612135,0.6799645499967026,0.6991711317880561,0.5614757998112369,0.4408936565671618,0.17610660713549403,0.7890415009140136,0.7625908648702997,0.6103416626389082,0.8456160917237039,0.6340133629456328,0.36871156293770524,0.9295323417555472,0.7876831291426547,0.5970348075750723,0.5973717387274547,0.3474976817844342,0.6213642223991204,0.8065301304425128,0.7563308847033798,0.589933814870106,0.6443925386321092,0.6249346768946313,0.6370891778055463,0.31077722738096125,0.7067350228113605,0.6139237096532619,0.7050666804963245,0.5354004454687019]'::jsonb, 148.93278911564627, 4)
+on conflict (slug) do update set
+  title = excluded.title, topic = excluded.topic, transcript = excluded.transcript,
+  audio_url = excluded.audio_url, matching_options = excluded.matching_options,
+  peaks = excluded.peaks, duration_seconds = excluded.duration_seconds, difficulty = excluded.difficulty;
+
+with tr as (select id from public.listening_tracks where slug = 'glacier-monitoring-methods-lecture'),
+     q as (
+       insert into public.questions (track_id, idx, kind, prompt, options, evidence, explanation)
+       select tr.id, 1, 'multiple_choice'::public.question_kind, 'Why do researchers often combine several glacier-monitoring methods?',
+              '["No single method provides every type of information","Fieldwork is no longer considered reliable","Satellite data is always too expensive","Glaciers can only be studied in summer"]'::jsonb, 'No single method provides every type of information, so researchers often combine field observations with satellite and aerial data.', 'Different methods provide complementary kinds of data.'
+       from tr
+       on conflict (track_id, idx) do update set
+         kind = excluded.kind, prompt = excluded.prompt, options = excluded.options,
+         evidence = excluded.evidence, explanation = excluded.explanation
+       returning id
+     )
+insert into public.question_answers (question_id, answer)
+select q.id, '["No single method provides every type of information"]'::jsonb from q
+on conflict (question_id) do update set answer = excluded.answer;
+
+with tr as (select id from public.listening_tracks where slug = 'glacier-monitoring-methods-lecture'),
+     q as (
+       insert into public.questions (track_id, idx, kind, prompt, options, evidence, explanation)
+       select tr.id, 2, 'matching'::public.question_kind, 'Which method measures surface melting by showing how much equipment becomes exposed?',
+              null, 'Researchers measure how much of each stake becomes exposed over time.', 'Increasing exposure of stakes indicates melting at the surface.'
+       from tr
+       on conflict (track_id, idx) do update set
+         kind = excluded.kind, prompt = excluded.prompt, options = excluded.options,
+         evidence = excluded.evidence, explanation = excluded.explanation
+       returning id
+     )
+insert into public.question_answers (question_id, answer)
+select q.id, '["stakes"]'::jsonb from q
+on conflict (question_id) do update set answer = excluded.answer;
+
+with tr as (select id from public.listening_tracks where slug = 'glacier-monitoring-methods-lecture'),
+     q as (
+       insert into public.questions (track_id, idx, kind, prompt, options, evidence, explanation)
+       select tr.id, 3, 'sentence_completion'::public.question_kind, 'Complete the sentence. Write TWO WORDS. Stake measurements cover only a very ________ of a glacier.',
+              null, 'Stake measurements are relatively cheap and easy to understand, but they cover only a very small part of a glacier.', 'A major limitation is the small area represented by each stake.'
+       from tr
+       on conflict (track_id, idx) do update set
+         kind = excluded.kind, prompt = excluded.prompt, options = excluded.options,
+         evidence = excluded.evidence, explanation = excluded.explanation
+       returning id
+     )
+insert into public.question_answers (question_id, answer)
+select q.id, '["small part"]'::jsonb from q
+on conflict (question_id) do update set answer = excluded.answer;
+
+with tr as (select id from public.listening_tracks where slug = 'glacier-monitoring-methods-lecture'),
+     q as (
+       insert into public.questions (track_id, idx, kind, prompt, options, evidence, explanation)
+       select tr.id, 4, 'matching'::public.question_kind, 'Which method is used to investigate winter snow accumulation?',
+              null, 'Scientists also dig snow pits near the end of winter.', 'Snow pits reveal layers formed by winter accumulation.'
+       from tr
+       on conflict (track_id, idx) do update set
+         kind = excluded.kind, prompt = excluded.prompt, options = excluded.options,
+         evidence = excluded.evidence, explanation = excluded.explanation
+       returning id
+     )
+insert into public.question_answers (question_id, answer)
+select q.id, '["snow pits"]'::jsonb from q
+on conflict (question_id) do update set answer = excluded.answer;
+
+with tr as (select id from public.listening_tracks where slug = 'glacier-monitoring-methods-lecture'),
+     q as (
+       insert into public.questions (track_id, idx, kind, prompt, options, evidence, explanation)
+       select tr.id, 5, 'sentence_completion'::public.question_kind, 'Complete the sentence. Write ONE WORD. Researchers measure both snow depth and snow ________.',
+              null, 'The depth alone is not enough, so researchers also measure snow density.', 'Density is measured in addition to depth.'
+       from tr
+       on conflict (track_id, idx) do update set
+         kind = excluded.kind, prompt = excluded.prompt, options = excluded.options,
+         evidence = excluded.evidence, explanation = excluded.explanation
+       returning id
+     )
+insert into public.question_answers (question_id, answer)
+select q.id, '["density"]'::jsonb from q
+on conflict (question_id) do update set answer = excluded.answer;
+
+with tr as (select id from public.listening_tracks where slug = 'glacier-monitoring-methods-lecture'),
+     q as (
+       insert into public.questions (track_id, idx, kind, prompt, options, evidence, explanation)
+       select tr.id, 6, 'matching'::public.question_kind, 'Which method is used to monitor glacier movement?',
+              null, 'Global Positioning System receivers can be placed on the glacier to track movement.', 'GPS receivers record changes in position over time.'
+       from tr
+       on conflict (track_id, idx) do update set
+         kind = excluded.kind, prompt = excluded.prompt, options = excluded.options,
+         evidence = excluded.evidence, explanation = excluded.explanation
+       returning id
+     )
+insert into public.question_answers (question_id, answer)
+select q.id, '["GPS receivers"]'::jsonb from q
+on conflict (question_id) do update set answer = excluded.answer;
+
+with tr as (select id from public.listening_tracks where slug = 'glacier-monitoring-methods-lecture'),
+     q as (
+       insert into public.questions (track_id, idx, kind, prompt, options, evidence, explanation)
+       select tr.id, 7, 'multiple_choice'::public.question_kind, 'What is a disadvantage of optical satellite images?',
+              '["They cannot cover large areas","Clouds may hide the glacier surface","They only work from aircraft","They cannot show glacier edges"]'::jsonb, 'However, clouds may hide the surface in optical satellite images.', 'Cloud cover can prevent optical satellites from seeing the glacier.'
+       from tr
+       on conflict (track_id, idx) do update set
+         kind = excluded.kind, prompt = excluded.prompt, options = excluded.options,
+         evidence = excluded.evidence, explanation = excluded.explanation
+       returning id
+     )
+insert into public.question_answers (question_id, answer)
+select q.id, '["Clouds may hide the glacier surface"]'::jsonb from q
+on conflict (question_id) do update set answer = excluded.answer;
+
+with tr as (select id from public.listening_tracks where slug = 'glacier-monitoring-methods-lecture'),
+     q as (
+       insert into public.questions (track_id, idx, kind, prompt, options, evidence, explanation)
+       select tr.id, 8, 'multiple_choice'::public.question_kind, 'Why are radar satellites particularly useful in polar regions?',
+              '["They measure snow density directly","They are cheaper than all other methods","They can collect data through clouds and darkness","They can be placed directly on the glacier"]'::jsonb, 'Radar satellites are useful because radar can collect information through clouds and during darkness.', 'Radar is not dependent on visible light and can penetrate cloud cover.'
+       from tr
+       on conflict (track_id, idx) do update set
+         kind = excluded.kind, prompt = excluded.prompt, options = excluded.options,
+         evidence = excluded.evidence, explanation = excluded.explanation
+       returning id
+     )
+insert into public.question_answers (question_id, answer)
+select q.id, '["They can collect data through clouds and darkness"]'::jsonb from q
+on conflict (question_id) do update set answer = excluded.answer;
+
+with tr as (select id from public.listening_tracks where slug = 'glacier-monitoring-methods-lecture'),
+     q as (
+       insert into public.questions (track_id, idx, kind, prompt, options, evidence, explanation)
+       select tr.id, 9, 'sentence_completion'::public.question_kind, 'Complete the sentence. Write TWO WORDS. Drones are useful for producing ________ maps of smaller study areas.',
+              null, 'Drones are especially useful for smaller study areas because they can produce high-resolution maps without the cost of a full aircraft survey.', 'The key advantage mentioned is their ability to produce high-resolution maps.'
+       from tr
+       on conflict (track_id, idx) do update set
+         kind = excluded.kind, prompt = excluded.prompt, options = excluded.options,
+         evidence = excluded.evidence, explanation = excluded.explanation
+       returning id
+     )
+insert into public.question_answers (question_id, answer)
+select q.id, '["high-resolution"]'::jsonb from q
+on conflict (question_id) do update set answer = excluded.answer;
+
+with tr as (select id from public.listening_tracks where slug = 'glacier-monitoring-methods-lecture'),
+     q as (
+       insert into public.questions (track_id, idx, kind, prompt, options, evidence, explanation)
+       select tr.id, 10, 'multiple_choice'::public.question_kind, 'What is one purpose of combining glacier measurements in computer models?',
+              '["To replace all future field observations","To predict responses to future climate conditions","To calculate the age of individual snowflakes","To reduce the number of satellite images needed"]'::jsonb, 'The aim is not simply to describe how a glacier has changed in the past, but also to test how it might respond to future changes in temperature and snowfall.', 'Models are used to explore possible future glacier responses.'
+       from tr
+       on conflict (track_id, idx) do update set
+         kind = excluded.kind, prompt = excluded.prompt, options = excluded.options,
+         evidence = excluded.evidence, explanation = excluded.explanation
+       returning id
+     )
+insert into public.question_answers (question_id, answer)
+select q.id, '["To predict responses to future climate conditions"]'::jsonb from q
+on conflict (question_id) do update set answer = excluded.answer;
+
+-- Reducing Water Use at Home
+insert into public.listening_tracks (slug, title, topic, transcript, audio_url, matching_options, peaks, duration_seconds, difficulty)
+values ('household-water-saving-seminar', 'Reducing Water Use at Home', 'A sustainability adviser explains practical ways households can reduce water consumption', 'Today''s seminar is about reducing household water use without making everyday life unnecessarily difficult. Small changes can make a substantial difference, especially when several measures are used together.
+Let''s begin in the bathroom, where showers and toilets account for a large share of indoor water use. A standard shower can use around twelve litres of water per minute. Installing a low-flow shower head can reduce that amount while maintaining reasonable water pressure.
+The length of the shower matters too. Reducing a ten-minute shower to six minutes can save a significant amount of water over the course of a week.
+Leaks are another common problem. A dripping tap may look minor, but if it continues day and night, the total loss can be surprisingly large. Replace worn washers promptly rather than waiting until the leak becomes worse.
+Toilets can also waste water when the internal valve fails to close properly. One simple sign is the sound of water continuing to run long after the toilet has been flushed.
+In the kitchen, avoid running the tap continuously while washing vegetables. Filling a bowl with water is usually more efficient, and the same water can sometimes be used afterwards for garden plants.
+Dishwashers are often more water-efficient than washing a full load by hand, but only when the machine is properly loaded. Try to run the dishwasher when it is full rather than after every meal.
+Outdoors, watering gardens early in the morning reduces evaporation compared with watering during the hottest part of the day. Evening watering can also reduce evaporation, but in some climates it may increase the risk of fungal disease on plants.
+Collecting rainwater is another useful option. A water butt connected to a roof downpipe can provide water for gardens and outdoor cleaning without using the mains supply.
+If you wash a car at home, use a bucket for most of the cleaning rather than leaving a hose running. A hose should be used only briefly for rinsing.
+Finally, check your water meter regularly if your home has one. An unexplained increase in usage can be an early warning of a hidden leak, particularly if your household routine has not changed.', 'https://pub-fbae5ca09eba4fd0820da2b390dd7ca0.r2.dev/listening/household-water-saving-seminar.mp3', '["bathroom","kitchen","garden","car washing","water meter","roof downpipe","dishwasher"]'::jsonb, '[0.8444913402129413,0.7000210169317067,0.5191294650828799,0.6452952940441066,0.6575769546851478,0.1953787703919996,0.779134288830688,0.641743093339456,0.42021580019995924,0.7927039859207441,0.5600145821498168,0.2177702709583997,0.7375632249604364,0.7817999410496044,0.5389832100219474,0.6326983498525391,0.5050806468588052,0.5561891373518276,0.7760476228373526,0.6450361335136761,0.2835468963287612,1,0.5394871858539378,0.5705049775320661,0.7937400534448228,0.31755838858660074,0.8212739462613189,0.5094984905907731,0.7666925784952188,0.6636867745480993,0.5683615962695643,0.7006623821792507,0.43316902946035907,0.14524413962469154,0.8869540940263646,0.2674885614911734,0.7088465270692323,0.6686755514553767,0.7555455756993353,0.5865026214670351,0.5779709511593818,0.518468297001577,0.15510835802615422,0.9613929013252887,0.5943538844886063,0.6403726501355874,0.46489257453254895,0.6873394588436212,0.6828118862065111,0.7632583759402974,0.4491314889624073,0.47910080458876253,0.7057808554938786,0.6796534997341027,0.8481132302656145,0.5475520269517196,0.26705876502382675,0.7736869312677432,0.8502371281336227,0.7416719265995898,0.534986616852609,0.5016381502195243,0.8677145950079521,0.7010393356015981,0.7620913587459082,0.7845192156605487,0.5225323185221756,0.4468233908259019,0.5481412155696178,0.946786124921783,0.5852952989482335,0.5479345545413877,0.6753669629901792,0.7317984842292158,0.3511916970859386,0.7928719305148227,0.6557629800740935,0.680724108178809,0.6344365223116912,0.7522822152013435,0.6601953606629478,0.5407654137720257,0.4629232740951154,0.5264402108247808,0.2945759575257036,0.7049818137044713,0.6143145322545497,0.37349512199353097,0.7358667744443869,0.655466739154099,0.5879269893445191,0.3882264007726515,0.6228862095260129,0.8275642321511272,0.35927955141553536,0.6451788345174273,0.6681547594416423,0.5967580988256378,0.6573944455504211,0.5595154194817967,0.6707059961944878,0.10688677602669752,0.7372450624261847,0.715489190646803,0.6617374894197435,0.7135824615906421,0.2636355766372265,0.7230369095814444,0.5640365275123859,0.5512729829274895,0.6837453507422844,0.5253533536799687,0.39725419263293554,0.8172290538989967,0.6430855718777457,0.740368102814684,0.47514440281843007,0.5383530100256213,0.49284846838350194,0.28980584744654814]'::jsonb, 132.678820861678, 3)
+on conflict (slug) do update set
+  title = excluded.title, topic = excluded.topic, transcript = excluded.transcript,
+  audio_url = excluded.audio_url, matching_options = excluded.matching_options,
+  peaks = excluded.peaks, duration_seconds = excluded.duration_seconds, difficulty = excluded.difficulty;
+
+with tr as (select id from public.listening_tracks where slug = 'household-water-saving-seminar'),
+     q as (
+       insert into public.questions (track_id, idx, kind, prompt, options, evidence, explanation)
+       select tr.id, 1, 'multiple_choice'::public.question_kind, 'Approximately how much water can a standard shower use per minute?',
+              '["six litres","eight litres","twelve litres","twenty litres"]'::jsonb, 'A standard shower can use around twelve litres of water per minute.', 'The speaker gives twelve litres per minute as a typical figure.'
+       from tr
+       on conflict (track_id, idx) do update set
+         kind = excluded.kind, prompt = excluded.prompt, options = excluded.options,
+         evidence = excluded.evidence, explanation = excluded.explanation
+       returning id
+     )
+insert into public.question_answers (question_id, answer)
+select q.id, '["twelve litres"]'::jsonb from q
+on conflict (question_id) do update set answer = excluded.answer;
+
+with tr as (select id from public.listening_tracks where slug = 'household-water-saving-seminar'),
+     q as (
+       insert into public.questions (track_id, idx, kind, prompt, options, evidence, explanation)
+       select tr.id, 2, 'sentence_completion'::public.question_kind, 'Complete the sentence. Write TWO WORDS. Installing a ________ can reduce shower water use.',
+              null, 'Installing a low-flow shower head can reduce that amount while maintaining reasonable water pressure.', 'A low-flow shower head is recommended to reduce consumption.'
+       from tr
+       on conflict (track_id, idx) do update set
+         kind = excluded.kind, prompt = excluded.prompt, options = excluded.options,
+         evidence = excluded.evidence, explanation = excluded.explanation
+       returning id
+     )
+insert into public.question_answers (question_id, answer)
+select q.id, '["low-flow shower head"]'::jsonb from q
+on conflict (question_id) do update set answer = excluded.answer;
+
+with tr as (select id from public.listening_tracks where slug = 'household-water-saving-seminar'),
+     q as (
+       insert into public.questions (track_id, idx, kind, prompt, options, evidence, explanation)
+       select tr.id, 3, 'multiple_choice'::public.question_kind, 'What shower length is given as an example of a reduced shower?',
+              '["four minutes","six minutes","eight minutes","twelve minutes"]'::jsonb, 'Reducing a ten-minute shower to six minutes can save a significant amount of water over the course of a week.', 'Six minutes is the reduced duration used in the example.'
+       from tr
+       on conflict (track_id, idx) do update set
+         kind = excluded.kind, prompt = excluded.prompt, options = excluded.options,
+         evidence = excluded.evidence, explanation = excluded.explanation
+       returning id
+     )
+insert into public.question_answers (question_id, answer)
+select q.id, '["six minutes"]'::jsonb from q
+on conflict (question_id) do update set answer = excluded.answer;
+
+with tr as (select id from public.listening_tracks where slug = 'household-water-saving-seminar'),
+     q as (
+       insert into public.questions (track_id, idx, kind, prompt, options, evidence, explanation)
+       select tr.id, 4, 'sentence_completion'::public.question_kind, 'Complete the sentence. Write ONE WORD. A dripping tap may need a worn ________ replaced.',
+              null, 'Replace worn washers promptly rather than waiting until the leak becomes worse.', 'Worn washers are identified as a common cause that should be replaced.'
+       from tr
+       on conflict (track_id, idx) do update set
+         kind = excluded.kind, prompt = excluded.prompt, options = excluded.options,
+         evidence = excluded.evidence, explanation = excluded.explanation
+       returning id
+     )
+insert into public.question_answers (question_id, answer)
+select q.id, '["washers"]'::jsonb from q
+on conflict (question_id) do update set answer = excluded.answer;
+
+with tr as (select id from public.listening_tracks where slug = 'household-water-saving-seminar'),
+     q as (
+       insert into public.questions (track_id, idx, kind, prompt, options, evidence, explanation)
+       select tr.id, 5, 'multiple_choice'::public.question_kind, 'What may indicate that a toilet valve is not closing correctly?',
+              '["low water pressure","a weak flushing sound","water continuing to run","condensation on the tank"]'::jsonb, 'One simple sign is the sound of water continuing to run long after the toilet has been flushed.', 'Continued running water can signal a faulty internal valve.'
+       from tr
+       on conflict (track_id, idx) do update set
+         kind = excluded.kind, prompt = excluded.prompt, options = excluded.options,
+         evidence = excluded.evidence, explanation = excluded.explanation
+       returning id
+     )
+insert into public.question_answers (question_id, answer)
+select q.id, '["water continuing to run"]'::jsonb from q
+on conflict (question_id) do update set answer = excluded.answer;
+
+with tr as (select id from public.listening_tracks where slug = 'household-water-saving-seminar'),
+     q as (
+       insert into public.questions (track_id, idx, kind, prompt, options, evidence, explanation)
+       select tr.id, 6, 'matching'::public.question_kind, 'Where does the speaker suggest using a bowl instead of continuous running water?',
+              null, 'In the kitchen, avoid running the tap continuously while washing vegetables.', 'The bowl method is suggested for washing vegetables in the kitchen.'
+       from tr
+       on conflict (track_id, idx) do update set
+         kind = excluded.kind, prompt = excluded.prompt, options = excluded.options,
+         evidence = excluded.evidence, explanation = excluded.explanation
+       returning id
+     )
+insert into public.question_answers (question_id, answer)
+select q.id, '["kitchen"]'::jsonb from q
+on conflict (question_id) do update set answer = excluded.answer;
+
+with tr as (select id from public.listening_tracks where slug = 'household-water-saving-seminar'),
+     q as (
+       insert into public.questions (track_id, idx, kind, prompt, options, evidence, explanation)
+       select tr.id, 7, 'matching'::public.question_kind, 'Where is early-morning watering recommended?',
+              null, 'Outdoors, watering gardens early in the morning reduces evaporation compared with watering during the hottest part of the day.', 'The recommendation applies to garden watering.'
+       from tr
+       on conflict (track_id, idx) do update set
+         kind = excluded.kind, prompt = excluded.prompt, options = excluded.options,
+         evidence = excluded.evidence, explanation = excluded.explanation
+       returning id
+     )
+insert into public.question_answers (question_id, answer)
+select q.id, '["garden"]'::jsonb from q
+on conflict (question_id) do update set answer = excluded.answer;
+
+with tr as (select id from public.listening_tracks where slug = 'household-water-saving-seminar'),
+     q as (
+       insert into public.questions (track_id, idx, kind, prompt, options, evidence, explanation)
+       select tr.id, 8, 'matching'::public.question_kind, 'Which feature should be connected to a water butt?',
+              null, 'A water butt connected to a roof downpipe can provide water for gardens and outdoor cleaning without using the mains supply.', 'Rainwater is collected from a roof downpipe.'
+       from tr
+       on conflict (track_id, idx) do update set
+         kind = excluded.kind, prompt = excluded.prompt, options = excluded.options,
+         evidence = excluded.evidence, explanation = excluded.explanation
+       returning id
+     )
+insert into public.question_answers (question_id, answer)
+select q.id, '["roof downpipe"]'::jsonb from q
+on conflict (question_id) do update set answer = excluded.answer;
+
+with tr as (select id from public.listening_tracks where slug = 'household-water-saving-seminar'),
+     q as (
+       insert into public.questions (track_id, idx, kind, prompt, options, evidence, explanation)
+       select tr.id, 9, 'multiple_choice'::public.question_kind, 'When is a dishwasher most water-efficient?',
+              '["When run after every meal","When used only for plates","When properly loaded and full","When rinsed before each cycle"]'::jsonb, 'Dishwashers are often more water-efficient than washing a full load by hand, but only when the machine is properly loaded.', 'Efficiency depends on loading the dishwasher properly and running full loads.'
+       from tr
+       on conflict (track_id, idx) do update set
+         kind = excluded.kind, prompt = excluded.prompt, options = excluded.options,
+         evidence = excluded.evidence, explanation = excluded.explanation
+       returning id
+     )
+insert into public.question_answers (question_id, answer)
+select q.id, '["When properly loaded and full"]'::jsonb from q
+on conflict (question_id) do update set answer = excluded.answer;
+
+with tr as (select id from public.listening_tracks where slug = 'household-water-saving-seminar'),
+     q as (
+       insert into public.questions (track_id, idx, kind, prompt, options, evidence, explanation)
+       select tr.id, 10, 'sentence_completion'::public.question_kind, 'Complete the sentence. Write TWO WORDS. An unexplained rise in meter readings may indicate a ________.',
+              null, 'An unexplained increase in usage can be an early warning of a hidden leak, particularly if your household routine has not changed.', 'Unexpected higher water use may signal a concealed leak.'
+       from tr
+       on conflict (track_id, idx) do update set
+         kind = excluded.kind, prompt = excluded.prompt, options = excluded.options,
+         evidence = excluded.evidence, explanation = excluded.explanation
+       returning id
+     )
+insert into public.question_answers (question_id, answer)
+select q.id, '["hidden leak"]'::jsonb from q
+on conflict (question_id) do update set answer = excluded.answer;
+
+-- Registering for an Evening Language Course
+insert into public.listening_tracks (slug, title, topic, transcript, audio_url, matching_options, peaks, duration_seconds, difficulty)
+values ('language-centre-course-registration', 'Registering for an Evening Language Course', 'A learner asks about joining an evening Spanish course at a local language centre', 'Elena:
+Good afternoon, Riverside Language Centre. How can I help?
+Martin:
+Hi. I''m interested in joining one of your evening Spanish courses, but I''m not sure which level would suit me.
+Elena:
+Have you studied Spanish before?
+Martin:
+A little. I did one year at school, but that was about eight years ago, so I''ve forgotten quite a lot.
+Elena:
+In that case, I''d recommend taking our online placement test before you enrol. It takes about twenty minutes and doesn''t cost anything.
+Martin:
+Can I do it tonight?
+Elena:
+Yes. Once you finish, the system will recommend a level automatically. If you''re still unsure, you can book a short speaking assessment with a tutor.
+Martin:
+What evening classes are available at the moment?
+Elena:
+Beginner Spanish runs on Mondays, Elementary Spanish on Tuesdays, and Pre-intermediate Spanish on Thursdays. All three start at six forty-five and finish at eight fifteen.
+Martin:
+Tuesday would probably be easiest for me. When does the next course begin?
+Elena:
+The Tuesday course starts on the fourteenth of October and runs for ten weeks.
+Martin:
+Do classes continue during the school holiday at the end of October?
+Elena:
+No. There''s a one-week break, so the course finishes a week later than you might expect.
+Martin:
+How much is the course?
+Elena:
+It''s one hundred and fifty pounds. The course book isn''t included, but students can buy it from reception for twenty-two pounds or order it elsewhere.
+Martin:
+Do I need the book before the first class?
+Elena:
+Not necessarily. The tutor provides photocopied material for the first lesson, but you''ll need the book from week two onward.
+Martin:
+How many students are usually in a class?
+Elena:
+We cap evening classes at fourteen. The Tuesday group currently has nine students registered.
+Martin:
+That''s a good size. How do I enrol after taking the placement test?
+Elena:
+You can enrol through the website. You''ll need to pay a fifty-pound deposit, and the remaining balance must be paid before the second class.
+Martin:
+And if I decide the level is wrong after the first lesson?
+Elena:
+You can move to another level during the first week, provided there''s space in the other class.', 'https://pub-fbae5ca09eba4fd0820da2b390dd7ca0.r2.dev/listening/language-centre-course-registration.mp3', '["Monday","Tuesday","Thursday","Friday","Saturday","Wednesday"]'::jsonb, '[0.6458326733371879,0.6642201358309439,0.32422035123088633,0.0002556073724960551,0.4156015634448455,0.6272242658760073,0.663503641118858,0.8071260939310293,0.6778130126545551,0.4327863524809801,0.7651670286326909,0.7467926214177384,0.4784049406312445,0.6154076368993934,0.7566796664304892,0.8706597757994359,0.7275117240881718,0.6940216607320403,0.5566097184156219,0.8675290851292913,0.5354783743098998,0.521222101860663,0.5473775223152079,0.5055666048903024,0.4034605783193316,0.3961888095587587,0.4112988743921943,0.4691628603800005,0.49583044242732327,0.5980559062209364,0.5662022512738595,0.5621124765787129,0.49532526186033,0.5121538373569349,0.5332903321413331,0.32911442561052784,0.5336152340073094,0.4608296760002281,0.44189553025793726,0.36160928748406596,1,0.7241408390323801,0.5057384911569008,0.660549288507124,0.5068891634831992,0.570068025567644,0.44887471518626004,0.5456270592052365,0.5032401546539106,0.4150737045038893,0.4812160718123688,0.49709274248167334,0.47470879093642615,0.3975566696949522,0.9661344432482563,0.6290424049779797,0.3129298157861835,0.771820243768127,0.5140862346099928,0.7111698542800328,0.5014158514146876,0.4678182575098669,0.37598484292706985,0.7917639679285007,0.7828997207108606,0.7664416531040403,0.7336716314713696,0.45115136208746615,0.7415363324802519,0.473363370798503,0.5457915395498548,0.6027574485353918,0.8554834588077684,0.8203457786308888,0.627455802922336,0.4097844604945868,0.6035221402124112,0.5274007418349282,0.5204818883801193,0.416809483054568,0.5608085690257747,0.9465733823997358,0.9065919754306184,0.5343058012588955,0.4285513368377584,0.5167512654703625,0.4593891614350758,0.4289845627982158,0.5151057873307421,0.481724193663553,0.3696525879443837,0.8165297313621122,0.7895092033707096,0.42330458117390013,0.4658823253176971,0.3225326276336925,0.6277122788751908,0.5214712612205505,0.3431634021958348,0.898842886542602,0.7931818218988523,0.6988661702651662,0.43046815333858635,0.7426839381995641,0.4865162503184732,0.5642470277357086,0.5139094339117132,0.4882520949280151,0.5082132103425189,0.44688682853223266,0.4399287388288684,0.7413722049512971,0.84364182919649,0.48073177047598276,0.722931650539014,0.6760779523661863,0.39215148222709156,0.5162563922289444,0.4731014689271722,0.34307124927363836]'::jsonb, 123.10639455782312, 2)
+on conflict (slug) do update set
+  title = excluded.title, topic = excluded.topic, transcript = excluded.transcript,
+  audio_url = excluded.audio_url, matching_options = excluded.matching_options,
+  peaks = excluded.peaks, duration_seconds = excluded.duration_seconds, difficulty = excluded.difficulty;
+
+with tr as (select id from public.listening_tracks where slug = 'language-centre-course-registration'),
+     q as (
+       insert into public.questions (track_id, idx, kind, prompt, options, evidence, explanation)
+       select tr.id, 1, 'multiple_choice'::public.question_kind, 'Why does Elena recommend the placement test?',
+              '["Martin has never studied Spanish","Martin studied Spanish a long time ago","The test is required for every course","The beginner class is already full"]'::jsonb, 'A little. I did one year at school, but that was about eight years ago, so I''ve forgotten quite a lot.', 'Martin has some previous experience, but it was several years ago, making a placement test useful.'
+       from tr
+       on conflict (track_id, idx) do update set
+         kind = excluded.kind, prompt = excluded.prompt, options = excluded.options,
+         evidence = excluded.evidence, explanation = excluded.explanation
+       returning id
+     )
+insert into public.question_answers (question_id, answer)
+select q.id, '["Martin studied Spanish a long time ago"]'::jsonb from q
+on conflict (question_id) do update set answer = excluded.answer;
+
+with tr as (select id from public.listening_tracks where slug = 'language-centre-course-registration'),
+     q as (
+       insert into public.questions (track_id, idx, kind, prompt, options, evidence, explanation)
+       select tr.id, 2, 'sentence_completion'::public.question_kind, 'Complete the sentence. Write ONE WORD AND/OR A NUMBER. The online placement test takes about ________ minutes.',
+              null, 'In that case, I''d recommend taking our online placement test before you enrol. It takes about twenty minutes and doesn''t cost anything.', 'Elena says the test takes approximately twenty minutes.'
+       from tr
+       on conflict (track_id, idx) do update set
+         kind = excluded.kind, prompt = excluded.prompt, options = excluded.options,
+         evidence = excluded.evidence, explanation = excluded.explanation
+       returning id
+     )
+insert into public.question_answers (question_id, answer)
+select q.id, '["twenty"]'::jsonb from q
+on conflict (question_id) do update set answer = excluded.answer;
+
+with tr as (select id from public.listening_tracks where slug = 'language-centre-course-registration'),
+     q as (
+       insert into public.questions (track_id, idx, kind, prompt, options, evidence, explanation)
+       select tr.id, 3, 'matching'::public.question_kind, 'On which day does Beginner Spanish run?',
+              null, 'Beginner Spanish runs on Mondays, Elementary Spanish on Tuesdays, and Pre-intermediate Spanish on Thursdays.', 'The beginner class is scheduled for Monday evenings.'
+       from tr
+       on conflict (track_id, idx) do update set
+         kind = excluded.kind, prompt = excluded.prompt, options = excluded.options,
+         evidence = excluded.evidence, explanation = excluded.explanation
+       returning id
+     )
+insert into public.question_answers (question_id, answer)
+select q.id, '["Monday"]'::jsonb from q
+on conflict (question_id) do update set answer = excluded.answer;
+
+with tr as (select id from public.listening_tracks where slug = 'language-centre-course-registration'),
+     q as (
+       insert into public.questions (track_id, idx, kind, prompt, options, evidence, explanation)
+       select tr.id, 4, 'matching'::public.question_kind, 'On which day does Elementary Spanish run?',
+              null, 'Beginner Spanish runs on Mondays, Elementary Spanish on Tuesdays, and Pre-intermediate Spanish on Thursdays.', 'The elementary course takes place on Tuesdays.'
+       from tr
+       on conflict (track_id, idx) do update set
+         kind = excluded.kind, prompt = excluded.prompt, options = excluded.options,
+         evidence = excluded.evidence, explanation = excluded.explanation
+       returning id
+     )
+insert into public.question_answers (question_id, answer)
+select q.id, '["Tuesday"]'::jsonb from q
+on conflict (question_id) do update set answer = excluded.answer;
+
+with tr as (select id from public.listening_tracks where slug = 'language-centre-course-registration'),
+     q as (
+       insert into public.questions (track_id, idx, kind, prompt, options, evidence, explanation)
+       select tr.id, 5, 'matching'::public.question_kind, 'On which day does Pre-intermediate Spanish run?',
+              null, 'Beginner Spanish runs on Mondays, Elementary Spanish on Tuesdays, and Pre-intermediate Spanish on Thursdays.', 'The pre-intermediate course is held on Thursdays.'
+       from tr
+       on conflict (track_id, idx) do update set
+         kind = excluded.kind, prompt = excluded.prompt, options = excluded.options,
+         evidence = excluded.evidence, explanation = excluded.explanation
+       returning id
+     )
+insert into public.question_answers (question_id, answer)
+select q.id, '["Thursday"]'::jsonb from q
+on conflict (question_id) do update set answer = excluded.answer;
+
+with tr as (select id from public.listening_tracks where slug = 'language-centre-course-registration'),
+     q as (
+       insert into public.questions (track_id, idx, kind, prompt, options, evidence, explanation)
+       select tr.id, 6, 'sentence_completion'::public.question_kind, 'Complete the sentence. Write ONE WORD AND/OR A NUMBER. The Tuesday course lasts ________ weeks.',
+              null, 'The Tuesday course starts on the fourteenth of October and runs for ten weeks.', 'The course duration is ten weeks.'
+       from tr
+       on conflict (track_id, idx) do update set
+         kind = excluded.kind, prompt = excluded.prompt, options = excluded.options,
+         evidence = excluded.evidence, explanation = excluded.explanation
+       returning id
+     )
+insert into public.question_answers (question_id, answer)
+select q.id, '["ten"]'::jsonb from q
+on conflict (question_id) do update set answer = excluded.answer;
+
+with tr as (select id from public.listening_tracks where slug = 'language-centre-course-registration'),
+     q as (
+       insert into public.questions (track_id, idx, kind, prompt, options, evidence, explanation)
+       select tr.id, 7, 'multiple_choice'::public.question_kind, 'Why does the course finish later than ten consecutive weeks would suggest?',
+              '["One class is cancelled for teacher training","There is a one-week holiday break","The final class is moved to a weekend","Two lessons are taught online"]'::jsonb, 'No. There''s a one-week break, so the course finishes a week later than you might expect.', 'A one-week break interrupts the normal weekly schedule.'
+       from tr
+       on conflict (track_id, idx) do update set
+         kind = excluded.kind, prompt = excluded.prompt, options = excluded.options,
+         evidence = excluded.evidence, explanation = excluded.explanation
+       returning id
+     )
+insert into public.question_answers (question_id, answer)
+select q.id, '["There is a one-week holiday break"]'::jsonb from q
+on conflict (question_id) do update set answer = excluded.answer;
+
+with tr as (select id from public.listening_tracks where slug = 'language-centre-course-registration'),
+     q as (
+       insert into public.questions (track_id, idx, kind, prompt, options, evidence, explanation)
+       select tr.id, 8, 'sentence_completion'::public.question_kind, 'Complete the sentence. Write TWO WORDS. Students can buy the course book from ________.',
+              null, 'The course book isn''t included, but students can buy it from reception for twenty-two pounds or order it elsewhere.', 'The book is available for purchase at reception.'
+       from tr
+       on conflict (track_id, idx) do update set
+         kind = excluded.kind, prompt = excluded.prompt, options = excluded.options,
+         evidence = excluded.evidence, explanation = excluded.explanation
+       returning id
+     )
+insert into public.question_answers (question_id, answer)
+select q.id, '["reception"]'::jsonb from q
+on conflict (question_id) do update set answer = excluded.answer;
+
+with tr as (select id from public.listening_tracks where slug = 'language-centre-course-registration'),
+     q as (
+       insert into public.questions (track_id, idx, kind, prompt, options, evidence, explanation)
+       select tr.id, 9, 'multiple_choice'::public.question_kind, 'How many students are currently registered for the Tuesday class?',
+              '["five","nine","fourteen","twenty-two"]'::jsonb, 'We cap evening classes at fourteen. The Tuesday group currently has nine students registered.', 'Nine students are currently enrolled in the Tuesday group.'
+       from tr
+       on conflict (track_id, idx) do update set
+         kind = excluded.kind, prompt = excluded.prompt, options = excluded.options,
+         evidence = excluded.evidence, explanation = excluded.explanation
+       returning id
+     )
+insert into public.question_answers (question_id, answer)
+select q.id, '["nine"]'::jsonb from q
+on conflict (question_id) do update set answer = excluded.answer;
+
+with tr as (select id from public.listening_tracks where slug = 'language-centre-course-registration'),
+     q as (
+       insert into public.questions (track_id, idx, kind, prompt, options, evidence, explanation)
+       select tr.id, 10, 'sentence_completion'::public.question_kind, 'Complete the sentence. Write ONE WORD AND/OR A NUMBER. A deposit of ________ pounds is required when enrolling.',
+              null, 'You''ll need to pay a fifty-pound deposit, and the remaining balance must be paid before the second class.', 'The enrolment deposit is fifty pounds.'
+       from tr
+       on conflict (track_id, idx) do update set
+         kind = excluded.kind, prompt = excluded.prompt, options = excluded.options,
+         evidence = excluded.evidence, explanation = excluded.explanation
+       returning id
+     )
+insert into public.question_answers (question_id, answer)
+select q.id, '["fifty"]'::jsonb from q
+on conflict (question_id) do update set answer = excluded.answer;
+
+-- Guide to Using the Municipal Recycling Centre
+insert into public.listening_tracks (slug, title, topic, transcript, audio_url, matching_options, peaks, duration_seconds, difficulty)
+values ('municipal-recycling-centre-guide', 'Guide to Using the Municipal Recycling Centre', 'A council representative explains how residents should use a local recycling centre', 'This recording explains how to use the Greenford Recycling Centre, including opening times, vehicle access and where different materials should be placed.
+From Monday to Friday, the centre opens at eight in the morning and closes at six in the evening. At weekends, it opens one hour later, at nine, and closes at five.
+Residents do not need to pay to use the centre, but you must bring proof that you live within the Greenford council area. A driving licence, council tax letter or recent utility bill is acceptable.
+Cars and small vans may enter without booking. Vans longer than five metres and any vehicle carrying a trailer must reserve a time slot online before arriving.
+When you enter the site, follow the one-way road and stop first at the information point if you are unsure where an item belongs. Do not reverse between collection areas unless a member of staff tells you to do so.
+Household glass goes into the green containers near the entrance. Please remove plastic bags before depositing bottles or jars, although labels can remain attached.
+Large cardboard should be flattened and placed in the covered bay. If cardboard is wet or heavily contaminated with food, it cannot be recycled and should go into general waste.
+Electrical items, including kettles, televisions and computer monitors, belong in the electronics section. Do not place batteries inside this area because batteries have a separate collection cabinet beside the office.
+Garden waste such as grass, leaves and small branches goes into the open composting bay. Soil and large tree roots are not accepted as garden waste.
+Paint is accepted only in sealed containers. Partly used tins should be taken to the hazardous household waste area, where a staff member will check them before storage.
+Before leaving, make sure you have not left boxes or bags on the ground beside a container. Items placed outside the correct collection area may create a safety hazard and can prevent vehicles from moving around the site.', 'https://pub-fbae5ca09eba4fd0820da2b390dd7ca0.r2.dev/listening/municipal-recycling-centre-guide.mp3', '["green containers","covered bay","electronics section","battery cabinet","composting bay","hazardous household waste area","general waste"]'::jsonb, '[0.8584140241439211,0.7963919983173411,0.6752217856535709,0.48186362769457275,0.8281967453174153,0.63733971672364,0.6186695237452479,0.483998645690017,0.19330350490240314,0.9617403265998463,0.67751574041468,0.673156559053252,0.5784489433614793,0.4087554599576953,0.6444247411986,0.7502619469539069,0.6062011897847984,0.6948008301188193,0.3950702679568213,0.5762706632532062,0.7597086533729398,0.5444792745269282,0.909704257284151,0.7454731945831875,0.6970619642250118,0.3821719503113771,0.794896169696189,0.6047481521124202,0.719387743755734,0.48166202664956415,0.21546442615004754,0.9341827758351577,0.6890350983491257,0.2119191690719081,1,0.77277852721168,0.6172328331835959,0.6009146108174316,0.6027452351613742,0.3905095343751495,0.8970207457513927,0.4417182807170032,0.9796468634620548,0.5823013085861776,0.6260748791875778,0.7449167404044373,0.715683983859671,0.37485904585209384,0.877748981355296,0.6390542051163826,0.7818605787832783,0.4998651935953547,0.25057503995687674,0.6277992425332667,0.7713716012822162,0.7002404317518608,0.3558506770936489,0.7873977439606655,0.4891897966243041,0.5724767994144518,0.3314392210052282,0.8301926156131417,0.4147396446583545,0.6179904413834463,0.5193776068596692,0.641623072997438,0.3269222648829617,0.6631117707296837,0.5985290906235097,0.6023033358743073,0.6532184281362151,0.5613000543654535,0.6289472295447998,0.4878675510202796,0.5985431348834885,0.7313112426690956,0.680092801827742,0.42887907034820477,0.9086364517496421,0.352169281418648,0.6258055878855274,0.6222899850313134,0.49861758097210107,0.5772593064075401,0.4580973492411022,0.37994766475530994,0.568793057460752,0.5168835510682662,0.5961455218302392,0.6383001041247717,0.6158393856498697,0.47970642354333354,0.4827019199437184,0.5907338227629839,0.5638364457816192,0.3168922375768766,0.4758185010928426,0.7236315349660456,0.4768377928844174,0.5193302617293138,0.5762595057979253,0.5687747747421127,0.5322910939096492,0.331327065834837,0.8807442631524874,0.4001424128475971,0.13094629190308646,0.7515278256869136,0.8284422655734364,0.4867995481976506,0.575987859879672,0.4367295014414886,0.5069186041527051,0.6634311861923313,0.522575868494509,0.6473980874332077,0.5412707321714071,0.6819419119552411,0.8210354197013845,0.4357070043638567]'::jsonb, 127.29179138321996, 2)
+on conflict (slug) do update set
+  title = excluded.title, topic = excluded.topic, transcript = excluded.transcript,
+  audio_url = excluded.audio_url, matching_options = excluded.matching_options,
+  peaks = excluded.peaks, duration_seconds = excluded.duration_seconds, difficulty = excluded.difficulty;
+
+with tr as (select id from public.listening_tracks where slug = 'municipal-recycling-centre-guide'),
+     q as (
+       insert into public.questions (track_id, idx, kind, prompt, options, evidence, explanation)
+       select tr.id, 1, 'multiple_choice'::public.question_kind, 'What time does the recycling centre open at weekends?',
+              '["7:00","8:00","9:00","10:00"]'::jsonb, 'At weekends, it opens one hour later, at nine, and closes at five.', 'Weekend opening time is nine in the morning.'
+       from tr
+       on conflict (track_id, idx) do update set
+         kind = excluded.kind, prompt = excluded.prompt, options = excluded.options,
+         evidence = excluded.evidence, explanation = excluded.explanation
+       returning id
+     )
+insert into public.question_answers (question_id, answer)
+select q.id, '["9:00"]'::jsonb from q
+on conflict (question_id) do update set answer = excluded.answer;
+
+with tr as (select id from public.listening_tracks where slug = 'municipal-recycling-centre-guide'),
+     q as (
+       insert into public.questions (track_id, idx, kind, prompt, options, evidence, explanation)
+       select tr.id, 2, 'sentence_completion'::public.question_kind, 'Complete the sentence. Write TWO WORDS. Residents must bring proof that they live within the council ________.',
+              null, 'Residents do not need to pay to use the centre, but you must bring proof that you live within the Greenford council area.', 'Users need evidence that they live in the local council area.'
+       from tr
+       on conflict (track_id, idx) do update set
+         kind = excluded.kind, prompt = excluded.prompt, options = excluded.options,
+         evidence = excluded.evidence, explanation = excluded.explanation
+       returning id
+     )
+insert into public.question_answers (question_id, answer)
+select q.id, '["council area"]'::jsonb from q
+on conflict (question_id) do update set answer = excluded.answer;
+
+with tr as (select id from public.listening_tracks where slug = 'municipal-recycling-centre-guide'),
+     q as (
+       insert into public.questions (track_id, idx, kind, prompt, options, evidence, explanation)
+       select tr.id, 3, 'multiple_choice'::public.question_kind, 'Which vehicles must book a time slot?',
+              '["all cars","all small vans","vehicles carrying a trailer","electric vehicles only"]'::jsonb, 'Vans longer than five metres and any vehicle carrying a trailer must reserve a time slot online before arriving.', 'Trailers require advance booking.'
+       from tr
+       on conflict (track_id, idx) do update set
+         kind = excluded.kind, prompt = excluded.prompt, options = excluded.options,
+         evidence = excluded.evidence, explanation = excluded.explanation
+       returning id
+     )
+insert into public.question_answers (question_id, answer)
+select q.id, '["vehicles carrying a trailer"]'::jsonb from q
+on conflict (question_id) do update set answer = excluded.answer;
+
+with tr as (select id from public.listening_tracks where slug = 'municipal-recycling-centre-guide'),
+     q as (
+       insert into public.questions (track_id, idx, kind, prompt, options, evidence, explanation)
+       select tr.id, 4, 'matching'::public.question_kind, 'Where should household glass be placed?',
+              null, 'Household glass goes into the green containers near the entrance.', 'Glass bottles and jars belong in the green containers.'
+       from tr
+       on conflict (track_id, idx) do update set
+         kind = excluded.kind, prompt = excluded.prompt, options = excluded.options,
+         evidence = excluded.evidence, explanation = excluded.explanation
+       returning id
+     )
+insert into public.question_answers (question_id, answer)
+select q.id, '["green containers"]'::jsonb from q
+on conflict (question_id) do update set answer = excluded.answer;
+
+with tr as (select id from public.listening_tracks where slug = 'municipal-recycling-centre-guide'),
+     q as (
+       insert into public.questions (track_id, idx, kind, prompt, options, evidence, explanation)
+       select tr.id, 5, 'matching'::public.question_kind, 'Where should flattened cardboard be placed?',
+              null, 'Large cardboard should be flattened and placed in the covered bay.', 'Flattened cardboard is collected in the covered bay.'
+       from tr
+       on conflict (track_id, idx) do update set
+         kind = excluded.kind, prompt = excluded.prompt, options = excluded.options,
+         evidence = excluded.evidence, explanation = excluded.explanation
+       returning id
+     )
+insert into public.question_answers (question_id, answer)
+select q.id, '["covered bay"]'::jsonb from q
+on conflict (question_id) do update set answer = excluded.answer;
+
+with tr as (select id from public.listening_tracks where slug = 'municipal-recycling-centre-guide'),
+     q as (
+       insert into public.questions (track_id, idx, kind, prompt, options, evidence, explanation)
+       select tr.id, 6, 'multiple_choice'::public.question_kind, 'What should happen to cardboard that is heavily contaminated with food?',
+              '["It should be washed","It should go into general waste","It should be left beside the covered bay","It should be placed with garden waste"]'::jsonb, 'If cardboard is wet or heavily contaminated with food, it cannot be recycled and should go into general waste.', 'Contaminated cardboard is not recyclable at the site.'
+       from tr
+       on conflict (track_id, idx) do update set
+         kind = excluded.kind, prompt = excluded.prompt, options = excluded.options,
+         evidence = excluded.evidence, explanation = excluded.explanation
+       returning id
+     )
+insert into public.question_answers (question_id, answer)
+select q.id, '["It should go into general waste"]'::jsonb from q
+on conflict (question_id) do update set answer = excluded.answer;
+
+with tr as (select id from public.listening_tracks where slug = 'municipal-recycling-centre-guide'),
+     q as (
+       insert into public.questions (track_id, idx, kind, prompt, options, evidence, explanation)
+       select tr.id, 7, 'matching'::public.question_kind, 'Where should computer monitors be taken?',
+              null, 'Electrical items, including kettles, televisions and computer monitors, belong in the electronics section.', 'Computer monitors are treated as electrical items.'
+       from tr
+       on conflict (track_id, idx) do update set
+         kind = excluded.kind, prompt = excluded.prompt, options = excluded.options,
+         evidence = excluded.evidence, explanation = excluded.explanation
+       returning id
+     )
+insert into public.question_answers (question_id, answer)
+select q.id, '["electronics section"]'::jsonb from q
+on conflict (question_id) do update set answer = excluded.answer;
+
+with tr as (select id from public.listening_tracks where slug = 'municipal-recycling-centre-guide'),
+     q as (
+       insert into public.questions (track_id, idx, kind, prompt, options, evidence, explanation)
+       select tr.id, 8, 'sentence_completion'::public.question_kind, 'Complete the sentence. Write ONE WORD. Batteries are collected in a separate cabinet beside the ________.',
+              null, 'Do not place batteries inside this area because batteries have a separate collection cabinet beside the office.', 'The battery cabinet is located beside the office.'
+       from tr
+       on conflict (track_id, idx) do update set
+         kind = excluded.kind, prompt = excluded.prompt, options = excluded.options,
+         evidence = excluded.evidence, explanation = excluded.explanation
+       returning id
+     )
+insert into public.question_answers (question_id, answer)
+select q.id, '["office"]'::jsonb from q
+on conflict (question_id) do update set answer = excluded.answer;
+
+with tr as (select id from public.listening_tracks where slug = 'municipal-recycling-centre-guide'),
+     q as (
+       insert into public.questions (track_id, idx, kind, prompt, options, evidence, explanation)
+       select tr.id, 9, 'matching'::public.question_kind, 'Where should grass and leaves be placed?',
+              null, 'Garden waste such as grass, leaves and small branches goes into the open composting bay.', 'Grass and leaves are accepted in the composting bay.'
+       from tr
+       on conflict (track_id, idx) do update set
+         kind = excluded.kind, prompt = excluded.prompt, options = excluded.options,
+         evidence = excluded.evidence, explanation = excluded.explanation
+       returning id
+     )
+insert into public.question_answers (question_id, answer)
+select q.id, '["composting bay"]'::jsonb from q
+on conflict (question_id) do update set answer = excluded.answer;
+
+with tr as (select id from public.listening_tracks where slug = 'municipal-recycling-centre-guide'),
+     q as (
+       insert into public.questions (track_id, idx, kind, prompt, options, evidence, explanation)
+       select tr.id, 10, 'sentence_completion'::public.question_kind, 'Complete the sentence. Write ONE WORD. Paint is accepted only when it is in ________ containers.',
+              null, 'Paint is accepted only in sealed containers.', 'Paint containers must be properly sealed.'
+       from tr
+       on conflict (track_id, idx) do update set
+         kind = excluded.kind, prompt = excluded.prompt, options = excluded.options,
+         evidence = excluded.evidence, explanation = excluded.explanation
+       returning id
+     )
+insert into public.question_answers (question_id, answer)
+select q.id, '["sealed"]'::jsonb from q
+on conflict (question_id) do update set answer = excluded.answer;
+
+-- Office Fire Safety Induction
+insert into public.listening_tracks (slug, title, topic, transcript, audio_url, matching_options, peaks, duration_seconds, difficulty)
+values ('office-fire-safety-induction', 'Office Fire Safety Induction', 'A safety officer explains emergency procedures to new office employees', 'Welcome to the building safety induction. Today I''ll focus mainly on fire procedures, because these apply to everyone regardless of which department you work in.
+The fire alarm is tested every Tuesday at eleven o''clock. During the test, the alarm sounds for about ten seconds and you do not need to leave the building. At any other time, treat the alarm as a real emergency.
+If the alarm sounds, stop what you''re doing and leave by the nearest safe exit. Do not wait to collect coats, bags or laptops. The lifts must never be used during an evacuation.
+There are three emergency staircases. The main staircase beside reception is usually the quickest for staff on the first floor. Staff on the second and third floors may find the east staircase closer, while the rear staircase is mainly used by people working near the loading area.
+Once outside, go directly to the assembly point in Meadow Car Park. Do not gather on the pavement in front of the building because emergency vehicles need clear access.
+Each department has a fire marshal wearing a yellow vest. Fire marshals check work areas as they leave, but they are not expected to delay their own evacuation to search locked rooms.
+If you notice smoke or a small fire, activate the nearest alarm point before doing anything else. Fire extinguishers are available, but employees should only use one if they have received practical training and have a clear escape route behind them.
+Visitors are also your responsibility. If you''re hosting a visitor when the alarm sounds, take them with you and report their presence to your department''s fire marshal at the assembly point.
+Anyone who may need assistance using stairs should complete a personal emergency evacuation plan with Human Resources. This should be arranged before an emergency occurs, not after an alarm has sounded.
+After evacuation, do not re-enter the building until the senior fire marshal or the emergency services say it is safe. Even if the alarm stops, remain at the assembly point until official permission is given.', 'https://pub-fbae5ca09eba4fd0820da2b390dd7ca0.r2.dev/listening/office-fire-safety-induction.mp3', '["main staircase","east staircase","rear staircase","Meadow Car Park","reception","loading area"]'::jsonb, '[0.9068543671232221,0.5811846730381971,0.48758794532923205,0.7315983790858586,0.37710845695684975,0.5172623405664845,0.5825893710893625,0.48282127754634796,0.24474091197046732,0.7804307494418988,0.4839810361854626,0.45200216491500705,0.47389219519522646,0.5255347168648563,0.9607761273053227,0.43473268915306656,1,0.32574806309924237,0.6696515442142496,0.3405816898947609,0.7199126947165395,0.5737502850333535,0.8280493913295491,0.4928437881904978,0.8298664583801325,0.7535334777759132,0.2634719429288983,0.7669786698335543,0.40412217817719953,0.5801011551618553,0.6720564738558888,0.7681953078011109,0.5441287463628306,0.2035504801000137,0.9400043206163108,0.4755397930208095,0.8354280100224498,0.488453268765187,0.6140886182055598,0.4484311665555265,0.3037784062326404,0.577696487550506,0.6643389124790084,0.5759896712962885,0.4067579142822696,0.5898067893208524,0.5438352966263177,0.6549612422828888,0.49341293910322537,0.28942811894127163,0.5772605454339286,0.6981330306883289,0.5430254229986904,0.4506934391048099,0.664356572659798,0.660098704240091,0.5008115935242605,0.5210338609626257,0.5266486118440054,0.2760827617148387,0.5462264953781033,0.5562561578848926,0.5306280231252165,0.5383195362268739,0.6116133778385494,0.40628087358196446,0.555375181404238,0.5521958812856415,0.6425556023564627,0.3695094338513631,0.2586875022775133,0.6528273541869606,0.508194162544148,0.5260650272571562,0.7566372763107014,0.6066984711442583,0.2436162451080989,0.705354121643414,0.37557637353657625,0.6879243597107926,0.7124148793221143,0.4601051685928869,0.4413911609581649,0.4321536939565449,0.18980616331059924,0.7706364798237042,0.6291009803832324,0.41955528266282566,0.8755495817148968,0.8660400382707862,0.6814199328877327,0.7022021740096385,0.5946432399104572,0.49679925886995785,0.36389656820992766,0.7568221879224861,0.9194259911653779,0.5499847046186825,0.5640032361555387,0.7060904297294961,0.5331327094826553,0.5259992363235123,0.3641114948399663,0.6964997355955539,0.6594022821414771,0.5941653826720142,0.5778375951131414,0.14683442737752828,0.6659866865866391,0.7606999342697128,0.6326619221532347,0.7054220071702134,0.6466867752412477,0.6101151877757011,0.3241816929191465,0.3901546928514107,0.7124245836364685,0.7157637504810195,0.39425330052676305,0.4029571291858407]'::jsonb, 128.4063492063492, 2)
+on conflict (slug) do update set
+  title = excluded.title, topic = excluded.topic, transcript = excluded.transcript,
+  audio_url = excluded.audio_url, matching_options = excluded.matching_options,
+  peaks = excluded.peaks, duration_seconds = excluded.duration_seconds, difficulty = excluded.difficulty;
+
+with tr as (select id from public.listening_tracks where slug = 'office-fire-safety-induction'),
+     q as (
+       insert into public.questions (track_id, idx, kind, prompt, options, evidence, explanation)
+       select tr.id, 1, 'multiple_choice'::public.question_kind, 'When is the regular fire alarm test?',
+              '["Monday at 10:00","Tuesday at 11:00","Wednesday at 11:00","Friday at 10:00"]'::jsonb, 'The fire alarm is tested every Tuesday at eleven o''clock.', 'The scheduled alarm test is every Tuesday at eleven.'
+       from tr
+       on conflict (track_id, idx) do update set
+         kind = excluded.kind, prompt = excluded.prompt, options = excluded.options,
+         evidence = excluded.evidence, explanation = excluded.explanation
+       returning id
+     )
+insert into public.question_answers (question_id, answer)
+select q.id, '["Tuesday at 11:00"]'::jsonb from q
+on conflict (question_id) do update set answer = excluded.answer;
+
+with tr as (select id from public.listening_tracks where slug = 'office-fire-safety-induction'),
+     q as (
+       insert into public.questions (track_id, idx, kind, prompt, options, evidence, explanation)
+       select tr.id, 2, 'sentence_completion'::public.question_kind, 'Complete the sentence. Write ONE WORD. Employees must not use the ________ during an evacuation.',
+              null, 'The lifts must never be used during an evacuation.', 'Lifts are prohibited during fire evacuations.'
+       from tr
+       on conflict (track_id, idx) do update set
+         kind = excluded.kind, prompt = excluded.prompt, options = excluded.options,
+         evidence = excluded.evidence, explanation = excluded.explanation
+       returning id
+     )
+insert into public.question_answers (question_id, answer)
+select q.id, '["lifts"]'::jsonb from q
+on conflict (question_id) do update set answer = excluded.answer;
+
+with tr as (select id from public.listening_tracks where slug = 'office-fire-safety-induction'),
+     q as (
+       insert into public.questions (track_id, idx, kind, prompt, options, evidence, explanation)
+       select tr.id, 3, 'matching'::public.question_kind, 'Which staircase is usually quickest for employees on the first floor?',
+              null, 'The main staircase beside reception is usually the quickest for staff on the first floor.', 'First-floor staff are directed toward the main staircase.'
+       from tr
+       on conflict (track_id, idx) do update set
+         kind = excluded.kind, prompt = excluded.prompt, options = excluded.options,
+         evidence = excluded.evidence, explanation = excluded.explanation
+       returning id
+     )
+insert into public.question_answers (question_id, answer)
+select q.id, '["main staircase"]'::jsonb from q
+on conflict (question_id) do update set answer = excluded.answer;
+
+with tr as (select id from public.listening_tracks where slug = 'office-fire-safety-induction'),
+     q as (
+       insert into public.questions (track_id, idx, kind, prompt, options, evidence, explanation)
+       select tr.id, 4, 'matching'::public.question_kind, 'Which staircase may be closer for staff on upper floors?',
+              null, 'Staff on the second and third floors may find the east staircase closer, while the rear staircase is mainly used by people working near the loading area.', 'The east staircase may be the nearest for second- and third-floor staff.'
+       from tr
+       on conflict (track_id, idx) do update set
+         kind = excluded.kind, prompt = excluded.prompt, options = excluded.options,
+         evidence = excluded.evidence, explanation = excluded.explanation
+       returning id
+     )
+insert into public.question_answers (question_id, answer)
+select q.id, '["east staircase"]'::jsonb from q
+on conflict (question_id) do update set answer = excluded.answer;
+
+with tr as (select id from public.listening_tracks where slug = 'office-fire-safety-induction'),
+     q as (
+       insert into public.questions (track_id, idx, kind, prompt, options, evidence, explanation)
+       select tr.id, 5, 'matching'::public.question_kind, 'Where is the evacuation assembly point?',
+              null, 'Once outside, go directly to the assembly point in Meadow Car Park.', 'Meadow Car Park is the designated assembly area.'
+       from tr
+       on conflict (track_id, idx) do update set
+         kind = excluded.kind, prompt = excluded.prompt, options = excluded.options,
+         evidence = excluded.evidence, explanation = excluded.explanation
+       returning id
+     )
+insert into public.question_answers (question_id, answer)
+select q.id, '["Meadow Car Park"]'::jsonb from q
+on conflict (question_id) do update set answer = excluded.answer;
+
+with tr as (select id from public.listening_tracks where slug = 'office-fire-safety-induction'),
+     q as (
+       insert into public.questions (track_id, idx, kind, prompt, options, evidence, explanation)
+       select tr.id, 6, 'sentence_completion'::public.question_kind, 'Complete the sentence. Write TWO WORDS. Department fire marshals wear a ________.',
+              null, 'Each department has a fire marshal wearing a yellow vest.', 'The yellow vest identifies the department fire marshal.'
+       from tr
+       on conflict (track_id, idx) do update set
+         kind = excluded.kind, prompt = excluded.prompt, options = excluded.options,
+         evidence = excluded.evidence, explanation = excluded.explanation
+       returning id
+     )
+insert into public.question_answers (question_id, answer)
+select q.id, '["yellow vest"]'::jsonb from q
+on conflict (question_id) do update set answer = excluded.answer;
+
+with tr as (select id from public.listening_tracks where slug = 'office-fire-safety-induction'),
+     q as (
+       insert into public.questions (track_id, idx, kind, prompt, options, evidence, explanation)
+       select tr.id, 7, 'multiple_choice'::public.question_kind, 'What should an employee do first after noticing smoke or a small fire?',
+              '["Use an extinguisher","Call a colleague","Activate the nearest alarm point","Open a window"]'::jsonb, 'If you notice smoke or a small fire, activate the nearest alarm point before doing anything else.', 'Raising the alarm is the first required action.'
+       from tr
+       on conflict (track_id, idx) do update set
+         kind = excluded.kind, prompt = excluded.prompt, options = excluded.options,
+         evidence = excluded.evidence, explanation = excluded.explanation
+       returning id
+     )
+insert into public.question_answers (question_id, answer)
+select q.id, '["Activate the nearest alarm point"]'::jsonb from q
+on conflict (question_id) do update set answer = excluded.answer;
+
+with tr as (select id from public.listening_tracks where slug = 'office-fire-safety-induction'),
+     q as (
+       insert into public.questions (track_id, idx, kind, prompt, options, evidence, explanation)
+       select tr.id, 8, 'multiple_choice'::public.question_kind, 'When may an employee use a fire extinguisher?',
+              '["Whenever the fire is small","Only after practical training and with a safe escape route","Only when a fire marshal is present","Only in the loading area"]'::jsonb, 'Fire extinguishers are available, but employees should only use one if they have received practical training and have a clear escape route behind them.', 'Training and a safe way out are both required.'
+       from tr
+       on conflict (track_id, idx) do update set
+         kind = excluded.kind, prompt = excluded.prompt, options = excluded.options,
+         evidence = excluded.evidence, explanation = excluded.explanation
+       returning id
+     )
+insert into public.question_answers (question_id, answer)
+select q.id, '["Only after practical training and with a safe escape route"]'::jsonb from q
+on conflict (question_id) do update set answer = excluded.answer;
+
+with tr as (select id from public.listening_tracks where slug = 'office-fire-safety-induction'),
+     q as (
+       insert into public.questions (track_id, idx, kind, prompt, options, evidence, explanation)
+       select tr.id, 9, 'sentence_completion'::public.question_kind, 'Complete the sentence. Write TWO WORDS. Employees who may need help on stairs should complete a personal emergency evacuation plan with ________.',
+              null, 'Anyone who may need assistance using stairs should complete a personal emergency evacuation plan with Human Resources.', 'Human Resources arranges personal emergency evacuation plans.'
+       from tr
+       on conflict (track_id, idx) do update set
+         kind = excluded.kind, prompt = excluded.prompt, options = excluded.options,
+         evidence = excluded.evidence, explanation = excluded.explanation
+       returning id
+     )
+insert into public.question_answers (question_id, answer)
+select q.id, '["Human Resources"]'::jsonb from q
+on conflict (question_id) do update set answer = excluded.answer;
+
+with tr as (select id from public.listening_tracks where slug = 'office-fire-safety-induction'),
+     q as (
+       insert into public.questions (track_id, idx, kind, prompt, options, evidence, explanation)
+       select tr.id, 10, 'multiple_choice'::public.question_kind, 'When may employees return to the building?',
+              '["When the alarm stops","When their manager returns","When official permission is given","After ten minutes"]'::jsonb, 'Even if the alarm stops, remain at the assembly point until official permission is given.', 'The end of the alarm does not itself mean the building is safe to re-enter.'
+       from tr
+       on conflict (track_id, idx) do update set
+         kind = excluded.kind, prompt = excluded.prompt, options = excluded.options,
+         evidence = excluded.evidence, explanation = excluded.explanation
+       returning id
+     )
+insert into public.question_answers (question_id, answer)
+select q.id, '["When official permission is given"]'::jsonb from q
+on conflict (question_id) do update set answer = excluded.answer;
+
+-- Briefing for a Memory Experiment
+insert into public.listening_tracks (slug, title, topic, transcript, audio_url, matching_options, peaks, duration_seconds, difficulty)
+values ('psychology-memory-experiment-briefing', 'Briefing for a Memory Experiment', 'A psychology researcher explains the procedure for a student memory experiment', 'Thank you for taking part in today''s memory study. Before we begin, I''ll explain the procedure so that everyone completes the experiment under the same conditions.
+The study has three stages and should take about forty-five minutes in total. Please switch off your phone rather than putting it on silent, because even a vibration can distract you during the memory tasks.
+In the first stage, you will see a series of twenty-four everyday objects on the computer screen. Each image appears for three seconds. You do not need to write anything down while the images are being shown.
+Immediately afterwards, you will have two minutes to type the names of as many objects as you can remember. Spelling is not important as long as the word is clearly recognisable.
+The second stage uses short word lists. You will hear twelve words through headphones, followed by a thirty-second distraction task involving simple arithmetic. After the arithmetic task, you will write down the words you remember.
+Please do not try to create a story linking the words together. We are interested in spontaneous recall rather than deliberate memory strategies.
+There will then be a five-minute break. You may leave your seat and get water, but please remain inside the laboratory and do not discuss the experiment with other participants.
+The final stage is a recognition test. You will see forty words on the screen. Half appeared in the earlier listening task and half are new. For each word, select either seen before or new.
+Some participants worry that poor performance will affect their course grade. It will not. Your individual score is anonymous and is not shared with teaching staff.
+At the end, you will complete a short questionnaire about sleep, caffeine and how difficult you found each task. Please answer honestly rather than trying to guess what result the researchers expect.
+When everyone has finished, I will explain the purpose of the experiment in more detail. Until then, please avoid discussing the tasks with students who are scheduled to participate later this week.', 'https://pub-fbae5ca09eba4fd0820da2b390dd7ca0.r2.dev/listening/psychology-memory-experiment-briefing.mp3', null, '[0.7520370292631879,0.6021295141825489,0.10589424342659827,0.6537124820611253,0.5865049304963901,0.5782324959737304,0.4789384295225992,0.607823358249363,0.34940722876256114,0.5455734081050906,0.5305215606535177,0.5074996909094696,0.4945995821208167,0.05477827655146988,0.5847903696295914,0.5680650847916026,0.3388405017452999,0.6920092677815824,0.4840698697658614,0.4948229173290332,0.17692053741858293,0.7186783456901676,0.5840082377201405,0.4826159476734191,0.5195443362631352,0.3151398247877428,0.3748858926808339,0.47818349715131936,0.3222026632115647,0.8228300196668547,0.7144070913042148,0.5450659741135216,0.24354161893357051,1,0.6167834650236809,0.46529195025969156,0.6119741901612674,0.39829075315212653,0.23904700563439957,0.553373258737744,0.5504914381937291,0.555390222064362,0.5126973977605706,0.32798912868563274,0.5499446376789509,0.3923411348663584,0.5355638940196313,0.5216563197463094,0.3627939879998186,0.6539970391352351,0.42918628677331927,0.5262292676105028,0.4308873963679443,0.4194840345847686,0.47018000039444025,0.7829837258822727,0.6934000878555542,0.05236483658690387,0.6619247033529444,0.6301618467315688,0.44442379187513453,0.6198036611773156,0.7239986979491211,0.5931164684909388,0.7176700665578761,0.23854396921619764,0.9113481179896257,0.49017643988594056,0.9580500658497432,0.5557791283064333,0.7428129814799981,0.4792967533158881,0.6477727702956182,0.4191806896725041,0.2760102932154231,0.5109890190929843,0.569312813846265,0.3724214236057319,0.840766885650652,0.5007684226924921,0.5089022267909603,0.7763341620551895,0.39768109872227586,0.5411552381747965,0.4556758080357392,0.6606006612641756,0.7007442814660239,0.38454157741434997,0.6680849935839632,0.6258888249797944,0.43464306536916697,0.1748994202451792,0.2882042221972699,0.8005007541679316,0.6510661320505298,0.59416617939891,0.28613919057540926,0.4433022524270007,0.8647763679181631,0.5322902726019424,0.49381435777385946,0.6619821129110169,0.6900487359752698,0.4717091963725312,0.4945411445374377,0.8090727129481351,0.8118123436126808,0.6639353864748478,0.34408781329490046,0.757272701874592,0.7365973362781602,0.6147917657786894,0.6852569812945118,0.26068712785035236,0.7009195364118502,0.5901933051091572,0.4780061452982586,0.5526980700652182,0.39999076174732145,0.29734610116116444]'::jsonb, 123.90167800453514, 4)
+on conflict (slug) do update set
+  title = excluded.title, topic = excluded.topic, transcript = excluded.transcript,
+  audio_url = excluded.audio_url, matching_options = excluded.matching_options,
+  peaks = excluded.peaks, duration_seconds = excluded.duration_seconds, difficulty = excluded.difficulty;
+
+with tr as (select id from public.listening_tracks where slug = 'psychology-memory-experiment-briefing'),
+     q as (
+       insert into public.questions (track_id, idx, kind, prompt, options, evidence, explanation)
+       select tr.id, 1, 'multiple_choice'::public.question_kind, 'Approximately how long will the whole experiment take?',
+              '["thirty minutes","forty-five minutes","one hour","ninety minutes"]'::jsonb, 'The study has three stages and should take about forty-five minutes in total.', 'The researcher estimates the complete study will take about forty-five minutes.'
+       from tr
+       on conflict (track_id, idx) do update set
+         kind = excluded.kind, prompt = excluded.prompt, options = excluded.options,
+         evidence = excluded.evidence, explanation = excluded.explanation
+       returning id
+     )
+insert into public.question_answers (question_id, answer)
+select q.id, '["forty-five minutes"]'::jsonb from q
+on conflict (question_id) do update set answer = excluded.answer;
+
+with tr as (select id from public.listening_tracks where slug = 'psychology-memory-experiment-briefing'),
+     q as (
+       insert into public.questions (track_id, idx, kind, prompt, options, evidence, explanation)
+       select tr.id, 2, 'sentence_completion'::public.question_kind, 'Complete the sentence. Write ONE WORD. Participants should switch off their ________ before the experiment begins.',
+              null, 'Please switch off your phone rather than putting it on silent, because even a vibration can distract you during the memory tasks.', 'Phones must be switched off to reduce distraction.'
+       from tr
+       on conflict (track_id, idx) do update set
+         kind = excluded.kind, prompt = excluded.prompt, options = excluded.options,
+         evidence = excluded.evidence, explanation = excluded.explanation
+       returning id
+     )
+insert into public.question_answers (question_id, answer)
+select q.id, '["phone"]'::jsonb from q
+on conflict (question_id) do update set answer = excluded.answer;
+
+with tr as (select id from public.listening_tracks where slug = 'psychology-memory-experiment-briefing'),
+     q as (
+       insert into public.questions (track_id, idx, kind, prompt, options, evidence, explanation)
+       select tr.id, 3, 'multiple_choice'::public.question_kind, 'How many object images are shown during the first stage?',
+              '["twelve","twenty","twenty-four","forty"]'::jsonb, 'In the first stage, you will see a series of twenty-four everyday objects on the computer screen.', 'The first memory task uses twenty-four object images.'
+       from tr
+       on conflict (track_id, idx) do update set
+         kind = excluded.kind, prompt = excluded.prompt, options = excluded.options,
+         evidence = excluded.evidence, explanation = excluded.explanation
+       returning id
+     )
+insert into public.question_answers (question_id, answer)
+select q.id, '["twenty-four"]'::jsonb from q
+on conflict (question_id) do update set answer = excluded.answer;
+
+with tr as (select id from public.listening_tracks where slug = 'psychology-memory-experiment-briefing'),
+     q as (
+       insert into public.questions (track_id, idx, kind, prompt, options, evidence, explanation)
+       select tr.id, 4, 'sentence_completion'::public.question_kind, 'Complete the sentence. Write ONE WORD AND/OR A NUMBER. Each object image remains on screen for ________ seconds.',
+              null, 'Each image appears for three seconds.', 'Every object is displayed for three seconds.'
+       from tr
+       on conflict (track_id, idx) do update set
+         kind = excluded.kind, prompt = excluded.prompt, options = excluded.options,
+         evidence = excluded.evidence, explanation = excluded.explanation
+       returning id
+     )
+insert into public.question_answers (question_id, answer)
+select q.id, '["three"]'::jsonb from q
+on conflict (question_id) do update set answer = excluded.answer;
+
+with tr as (select id from public.listening_tracks where slug = 'psychology-memory-experiment-briefing'),
+     q as (
+       insert into public.questions (track_id, idx, kind, prompt, options, evidence, explanation)
+       select tr.id, 5, 'multiple_choice'::public.question_kind, 'What happens immediately after the object images are shown?',
+              '["Participants complete arithmetic problems","Participants type the object names they remember","Participants listen to a word list","Participants take a five-minute break"]'::jsonb, 'Immediately afterwards, you will have two minutes to type the names of as many objects as you can remember.', 'The first recall test follows immediately after the images.'
+       from tr
+       on conflict (track_id, idx) do update set
+         kind = excluded.kind, prompt = excluded.prompt, options = excluded.options,
+         evidence = excluded.evidence, explanation = excluded.explanation
+       returning id
+     )
+insert into public.question_answers (question_id, answer)
+select q.id, '["Participants type the object names they remember"]'::jsonb from q
+on conflict (question_id) do update set answer = excluded.answer;
+
+with tr as (select id from public.listening_tracks where slug = 'psychology-memory-experiment-briefing'),
+     q as (
+       insert into public.questions (track_id, idx, kind, prompt, options, evidence, explanation)
+       select tr.id, 6, 'sentence_completion'::public.question_kind, 'Complete the sentence. Write ONE WORD. During the second stage, participants hear the words through ________.',
+              null, 'You will hear twelve words through headphones, followed by a thirty-second distraction task involving simple arithmetic.', 'The word list is delivered through headphones.'
+       from tr
+       on conflict (track_id, idx) do update set
+         kind = excluded.kind, prompt = excluded.prompt, options = excluded.options,
+         evidence = excluded.evidence, explanation = excluded.explanation
+       returning id
+     )
+insert into public.question_answers (question_id, answer)
+select q.id, '["headphones"]'::jsonb from q
+on conflict (question_id) do update set answer = excluded.answer;
+
+with tr as (select id from public.listening_tracks where slug = 'psychology-memory-experiment-briefing'),
+     q as (
+       insert into public.questions (track_id, idx, kind, prompt, options, evidence, explanation)
+       select tr.id, 7, 'multiple_choice'::public.question_kind, 'What is the purpose of the arithmetic task?',
+              '["To test mathematical ability","To distract participants before recall","To determine the final score","To teach a memory strategy"]'::jsonb, 'You will hear twelve words through headphones, followed by a thirty-second distraction task involving simple arithmetic.', 'The arithmetic is explicitly described as a distraction task before recall.'
+       from tr
+       on conflict (track_id, idx) do update set
+         kind = excluded.kind, prompt = excluded.prompt, options = excluded.options,
+         evidence = excluded.evidence, explanation = excluded.explanation
+       returning id
+     )
+insert into public.question_answers (question_id, answer)
+select q.id, '["To distract participants before recall"]'::jsonb from q
+on conflict (question_id) do update set answer = excluded.answer;
+
+with tr as (select id from public.listening_tracks where slug = 'psychology-memory-experiment-briefing'),
+     q as (
+       insert into public.questions (track_id, idx, kind, prompt, options, evidence, explanation)
+       select tr.id, 8, 'sentence_completion'::public.question_kind, 'Complete the sentence. Write ONE WORD AND/OR A NUMBER. The break lasts ________ minutes.',
+              null, 'There will then be a five-minute break.', 'Participants receive a five-minute break.'
+       from tr
+       on conflict (track_id, idx) do update set
+         kind = excluded.kind, prompt = excluded.prompt, options = excluded.options,
+         evidence = excluded.evidence, explanation = excluded.explanation
+       returning id
+     )
+insert into public.question_answers (question_id, answer)
+select q.id, '["five"]'::jsonb from q
+on conflict (question_id) do update set answer = excluded.answer;
+
+with tr as (select id from public.listening_tracks where slug = 'psychology-memory-experiment-briefing'),
+     q as (
+       insert into public.questions (track_id, idx, kind, prompt, options, evidence, explanation)
+       select tr.id, 9, 'multiple_choice'::public.question_kind, 'What proportion of the words in the final recognition test are new?',
+              '["one quarter","one third","one half","three quarters"]'::jsonb, 'Half appeared in the earlier listening task and half are new.', 'Twenty of the forty recognition-test words are new.'
+       from tr
+       on conflict (track_id, idx) do update set
+         kind = excluded.kind, prompt = excluded.prompt, options = excluded.options,
+         evidence = excluded.evidence, explanation = excluded.explanation
+       returning id
+     )
+insert into public.question_answers (question_id, answer)
+select q.id, '["one half"]'::jsonb from q
+on conflict (question_id) do update set answer = excluded.answer;
+
+with tr as (select id from public.listening_tracks where slug = 'psychology-memory-experiment-briefing'),
+     q as (
+       insert into public.questions (track_id, idx, kind, prompt, options, evidence, explanation)
+       select tr.id, 10, 'sentence_completion'::public.question_kind, 'Complete the sentence. Write TWO WORDS. Individual scores are not shared with ________.',
+              null, 'Your individual score is anonymous and is not shared with teaching staff.', 'The researcher reassures participants that teaching staff will not receive individual results.'
+       from tr
+       on conflict (track_id, idx) do update set
+         kind = excluded.kind, prompt = excluded.prompt, options = excluded.options,
+         evidence = excluded.evidence, explanation = excluded.explanation
+       returning id
+     )
+insert into public.question_answers (question_id, answer)
+select q.id, '["teaching staff"]'::jsonb from q
+on conflict (question_id) do update set answer = excluded.answer;
+
+-- Enquiring About a Railway Season Ticket
+insert into public.listening_tracks (slug, title, topic, transcript, audio_url, matching_options, peaks, duration_seconds, difficulty)
+values ('railway-season-ticket-enquiry', 'Enquiring About a Railway Season Ticket', 'A commuter asks a railway employee about ticket options for regular travel', 'Maya:
+Hi. I''m starting a new job next month and I''ll be travelling from Oakridge to Central Station five days a week. I''m trying to work out which ticket would be cheapest.
+Caleb:
+If you''re travelling every weekday, a monthly season ticket is usually better value than buying daily returns.
+Maya:
+How much is the monthly ticket?
+Caleb:
+For Oakridge to Central, it''s one hundred and eighty-four pounds. An annual ticket works out cheaper per month, but obviously the upfront cost is much higher.
+Maya:
+I''d rather start monthly until I''m sure the job works out. Can I use the ticket at weekends as well?
+Caleb:
+Yes. The monthly season ticket allows unlimited travel between Oakridge and Central Station every day, including weekends.
+Maya:
+Does that include the express trains?
+Caleb:
+It includes all our standard and express services on that route, but not the airport service because that''s operated separately.
+Maya:
+I sometimes need to get off at Riverside, which is between Oakridge and Central. Is that allowed?
+Caleb:
+Yes. You can start or finish your journey at any intermediate station covered by the route.
+Maya:
+That''s useful. Do I need a photo card?
+Caleb:
+For a paper season ticket, yes. But if you load the season ticket onto our travel smartcard, you don''t need a separate photo card.
+Maya:
+I''d prefer the smartcard. Is there a charge for it?
+Caleb:
+The first smartcard is free. If you lose it, a replacement costs eight pounds.
+Maya:
+Can I buy everything online?
+Caleb:
+You can order the smartcard online, but because this is your first season ticket, you''ll need to collect it from the ticket office and show identification.
+Maya:
+What kind of identification?
+Caleb:
+A passport or driving licence is ideal. A workplace identity card isn''t accepted.
+Maya:
+How early should I order it before I start travelling?
+Caleb:
+Allow at least five working days. Cards sometimes arrive at the station sooner, but five days gives us enough time to process the application.
+Maya:
+If I go on holiday for two weeks, can I pause the monthly ticket?
+Caleb:
+No, monthly tickets can''t be paused. You can request a refund for the unused period if you stop travelling completely, but an administration fee is deducted.', 'https://pub-fbae5ca09eba4fd0820da2b390dd7ca0.r2.dev/listening/railway-season-ticket-enquiry.mp3', null, '[0.3831271518466644,0.4558027269552342,0.3602516322571799,0.38691761510372147,0.28419847602818243,0.34786607387413143,0.2503252374320307,0.29344811233771184,0.20801400368771272,0.661613248240255,0.4400239565489373,0.4719043443081341,0.3705109467248908,0.5856113824567301,0.4777056633833642,0.32953262778938863,0.377159542151206,0.5763289897676055,0.38176196611454477,0.5549763184590334,0.3867815979392448,0.3496992593113097,0.4555100634401768,0.43601649244755764,0.3835982600125851,0.5114205027489382,0.4322851224946129,0.430395831411888,0.40295680582856785,0.291784700271428,0.2876596737044208,0.33321396091893263,0.4011551316453388,0.45311161744289125,0.467158819738678,0.5325203997146651,0.4719434665436948,0.37684387029837135,0.4974425643417484,0.4481555033118849,0.4172562591337124,0.39746463828513856,0.7118136441531084,0.6897196375788917,0.49592693464292364,0.4296733842933934,0.5769677441317687,0.5362835810953102,0.5395116427902508,0.3247570934239804,0.4341749330400642,0.2672533558679983,0.3671990269514025,0.23996111985913537,0.2951572903953083,0.507557551331557,0.6213715004852848,0.4910954217808905,0.4543978752288558,0.5275026148000405,0.32923301860455567,0.4840793430782956,0.5728232682708714,0.5240490554328461,0.6189846038056587,0.49516071112822446,0.5444995333649053,0.6114051698227477,0.47187499219045753,0.3360474520617232,0.34810892102235386,0.35787632558361687,0.5163633187223835,0.7796921861452561,0.41122758856091973,0.49887445986857587,0.49749008463212796,0.40093583226035284,0.6150548031824603,0.8315261242571792,0.7542422862716632,0.45224984723610034,0.39104931800512266,0.4862152168519646,0.6375583092254892,0.4386062616316276,0.3676249130153222,0.3138106036833107,0.39630360156985833,0.5405144871794708,0.7032498820585601,0.3827631229316343,0.6159373034706913,0.5040183667323851,0.33762151068118595,0.46061560318592215,0.3099066572443021,1,0.955499023388269,0.4896932486472066,0.6831722280563632,0.6172727199214154,0.42463230314376454,0.7198711550879409,0.5416583077090428,0.5407143426482368,0.4170938304836824,0.4372832321567369,0.3659850511502822,0.34312489698981247,0.6360064941240973,0.49967830006230524,0.35815280309010206,0.793111054832955,0.46805945817821965,0.5602313957722129,0.5213082289486648,0.42685797560739325,0.4326186802644813,0.34275902971853606]'::jsonb, 133.75274376417232, 3)
+on conflict (slug) do update set
+  title = excluded.title, topic = excluded.topic, transcript = excluded.transcript,
+  audio_url = excluded.audio_url, matching_options = excluded.matching_options,
+  peaks = excluded.peaks, duration_seconds = excluded.duration_seconds, difficulty = excluded.difficulty;
+
+with tr as (select id from public.listening_tracks where slug = 'railway-season-ticket-enquiry'),
+     q as (
+       insert into public.questions (track_id, idx, kind, prompt, options, evidence, explanation)
+       select tr.id, 1, 'multiple_choice'::public.question_kind, 'Why does Caleb recommend a monthly season ticket?',
+              '["It includes free airport travel","It is usually cheaper than daily returns","It can be paused during holidays","It does not require identification"]'::jsonb, 'If you''re travelling every weekday, a monthly season ticket is usually better value than buying daily returns.', 'Regular weekday travel makes the monthly ticket better value.'
+       from tr
+       on conflict (track_id, idx) do update set
+         kind = excluded.kind, prompt = excluded.prompt, options = excluded.options,
+         evidence = excluded.evidence, explanation = excluded.explanation
+       returning id
+     )
+insert into public.question_answers (question_id, answer)
+select q.id, '["It is usually cheaper than daily returns"]'::jsonb from q
+on conflict (question_id) do update set answer = excluded.answer;
+
+with tr as (select id from public.listening_tracks where slug = 'railway-season-ticket-enquiry'),
+     q as (
+       insert into public.questions (track_id, idx, kind, prompt, options, evidence, explanation)
+       select tr.id, 2, 'sentence_completion'::public.question_kind, 'Complete the sentence. Write ONE WORD AND/OR A NUMBER. The monthly season ticket costs ________ pounds.',
+              null, 'For Oakridge to Central, it''s one hundred and eighty-four pounds.', 'Caleb gives the monthly price as one hundred and eighty-four pounds.'
+       from tr
+       on conflict (track_id, idx) do update set
+         kind = excluded.kind, prompt = excluded.prompt, options = excluded.options,
+         evidence = excluded.evidence, explanation = excluded.explanation
+       returning id
+     )
+insert into public.question_answers (question_id, answer)
+select q.id, '["one hundred and eighty-four"]'::jsonb from q
+on conflict (question_id) do update set answer = excluded.answer;
+
+with tr as (select id from public.listening_tracks where slug = 'railway-season-ticket-enquiry'),
+     q as (
+       insert into public.questions (track_id, idx, kind, prompt, options, evidence, explanation)
+       select tr.id, 3, 'multiple_choice'::public.question_kind, 'When can Maya use the monthly season ticket?',
+              '["weekdays only","weekdays and Saturdays only","every day including weekends","only during peak hours"]'::jsonb, 'Yes. The monthly season ticket allows unlimited travel between Oakridge and Central Station every day, including weekends.', 'The ticket is valid every day of the week.'
+       from tr
+       on conflict (track_id, idx) do update set
+         kind = excluded.kind, prompt = excluded.prompt, options = excluded.options,
+         evidence = excluded.evidence, explanation = excluded.explanation
+       returning id
+     )
+insert into public.question_answers (question_id, answer)
+select q.id, '["every day including weekends"]'::jsonb from q
+on conflict (question_id) do update set answer = excluded.answer;
+
+with tr as (select id from public.listening_tracks where slug = 'railway-season-ticket-enquiry'),
+     q as (
+       insert into public.questions (track_id, idx, kind, prompt, options, evidence, explanation)
+       select tr.id, 4, 'sentence_completion'::public.question_kind, 'Complete the sentence. Write TWO WORDS. The season ticket does not cover the ________.',
+              null, 'It includes all our standard and express services on that route, but not the airport service because that''s operated separately.', 'The separately operated airport service is excluded.'
+       from tr
+       on conflict (track_id, idx) do update set
+         kind = excluded.kind, prompt = excluded.prompt, options = excluded.options,
+         evidence = excluded.evidence, explanation = excluded.explanation
+       returning id
+     )
+insert into public.question_answers (question_id, answer)
+select q.id, '["airport service"]'::jsonb from q
+on conflict (question_id) do update set answer = excluded.answer;
+
+with tr as (select id from public.listening_tracks where slug = 'railway-season-ticket-enquiry'),
+     q as (
+       insert into public.questions (track_id, idx, kind, prompt, options, evidence, explanation)
+       select tr.id, 5, 'multiple_choice'::public.question_kind, 'What may Maya do at Riverside?',
+              '["Only change trains there","Start or finish her journey there","Use only standard trains there","Buy a discounted airport ticket there"]'::jsonb, 'You can start or finish your journey at any intermediate station covered by the route.', 'Intermediate stations such as Riverside can be used as starting or finishing points.'
+       from tr
+       on conflict (track_id, idx) do update set
+         kind = excluded.kind, prompt = excluded.prompt, options = excluded.options,
+         evidence = excluded.evidence, explanation = excluded.explanation
+       returning id
+     )
+insert into public.question_answers (question_id, answer)
+select q.id, '["Start or finish her journey there"]'::jsonb from q
+on conflict (question_id) do update set answer = excluded.answer;
+
+with tr as (select id from public.listening_tracks where slug = 'railway-season-ticket-enquiry'),
+     q as (
+       insert into public.questions (track_id, idx, kind, prompt, options, evidence, explanation)
+       select tr.id, 6, 'sentence_completion'::public.question_kind, 'Complete the sentence. Write ONE WORD. Maya prefers to put the ticket on a travel ________.',
+              null, 'But if you load the season ticket onto our travel smartcard, you don''t need a separate photo card.', 'The electronic option is the travel smartcard.'
+       from tr
+       on conflict (track_id, idx) do update set
+         kind = excluded.kind, prompt = excluded.prompt, options = excluded.options,
+         evidence = excluded.evidence, explanation = excluded.explanation
+       returning id
+     )
+insert into public.question_answers (question_id, answer)
+select q.id, '["smartcard"]'::jsonb from q
+on conflict (question_id) do update set answer = excluded.answer;
+
+with tr as (select id from public.listening_tracks where slug = 'railway-season-ticket-enquiry'),
+     q as (
+       insert into public.questions (track_id, idx, kind, prompt, options, evidence, explanation)
+       select tr.id, 7, 'multiple_choice'::public.question_kind, 'How much does a replacement smartcard cost?',
+              '["nothing","five pounds","eight pounds","ten pounds"]'::jsonb, 'If you lose it, a replacement costs eight pounds.', 'A replacement card costs eight pounds.'
+       from tr
+       on conflict (track_id, idx) do update set
+         kind = excluded.kind, prompt = excluded.prompt, options = excluded.options,
+         evidence = excluded.evidence, explanation = excluded.explanation
+       returning id
+     )
+insert into public.question_answers (question_id, answer)
+select q.id, '["eight pounds"]'::jsonb from q
+on conflict (question_id) do update set answer = excluded.answer;
+
+with tr as (select id from public.listening_tracks where slug = 'railway-season-ticket-enquiry'),
+     q as (
+       insert into public.questions (track_id, idx, kind, prompt, options, evidence, explanation)
+       select tr.id, 8, 'sentence_completion'::public.question_kind, 'Complete the sentence. Write TWO WORDS. Maya must collect her first season ticket from the ________.',
+              null, 'You can order the smartcard online, but because this is your first season ticket, you''ll need to collect it from the ticket office and show identification.', 'First-time season tickets must be collected at the ticket office.'
+       from tr
+       on conflict (track_id, idx) do update set
+         kind = excluded.kind, prompt = excluded.prompt, options = excluded.options,
+         evidence = excluded.evidence, explanation = excluded.explanation
+       returning id
+     )
+insert into public.question_answers (question_id, answer)
+select q.id, '["ticket office"]'::jsonb from q
+on conflict (question_id) do update set answer = excluded.answer;
+
+with tr as (select id from public.listening_tracks where slug = 'railway-season-ticket-enquiry'),
+     q as (
+       insert into public.questions (track_id, idx, kind, prompt, options, evidence, explanation)
+       select tr.id, 9, 'multiple_choice'::public.question_kind, 'Which form of identification is NOT accepted?',
+              '["a passport","a driving licence","a workplace identity card","either a passport or driving licence"]'::jsonb, 'A workplace identity card isn''t accepted.', 'Caleb specifically says a workplace identity card cannot be used.'
+       from tr
+       on conflict (track_id, idx) do update set
+         kind = excluded.kind, prompt = excluded.prompt, options = excluded.options,
+         evidence = excluded.evidence, explanation = excluded.explanation
+       returning id
+     )
+insert into public.question_answers (question_id, answer)
+select q.id, '["a workplace identity card"]'::jsonb from q
+on conflict (question_id) do update set answer = excluded.answer;
+
+with tr as (select id from public.listening_tracks where slug = 'railway-season-ticket-enquiry'),
+     q as (
+       insert into public.questions (track_id, idx, kind, prompt, options, evidence, explanation)
+       select tr.id, 10, 'sentence_completion'::public.question_kind, 'Complete the sentence. Write ONE WORD AND/OR A NUMBER. Maya should allow at least ________ working days for her application.',
+              null, 'Allow at least five working days.', 'Five working days is the recommended processing period.'
+       from tr
+       on conflict (track_id, idx) do update set
+         kind = excluded.kind, prompt = excluded.prompt, options = excluded.options,
+         evidence = excluded.evidence, explanation = excluded.explanation
+       returning id
+     )
+insert into public.question_answers (question_id, answer)
+select q.id, '["five"]'::jsonb from q
+on conflict (question_id) do update set answer = excluded.answer;
+
+-- Planning a Sociology Group Presentation
+insert into public.listening_tracks (slug, title, topic, transcript, audio_url, matching_options, peaks, duration_seconds, difficulty)
+values ('sociology-presentation-planning', 'Planning a Sociology Group Presentation', 'Two students divide tasks for a university presentation about public transport', 'Aisha:
+We should probably divide the work for our sociology presentation today. We only have ten days left.
+Ben:
+Agreed. The topic is public transport and social inequality, and Professor Lewis said we need both statistics and interview material.
+Aisha:
+I can handle the statistics. I found a council dataset comparing bus use across different income groups.
+Ben:
+Good. I''ll work on the interview material because I''ve already spoken to two students who commute from outside the city.
+Aisha:
+We need at least five interviews, though.
+Ben:
+I know. I''ll arrange three more by Friday. I was thinking of interviewing only students, but it might be better to include someone who''s retired as well.
+Aisha:
+Definitely. It would make the sample less narrow. What should Chloe do?
+Ben:
+She''s good at design, so she could create the slides and make the maps easier to read.
+Aisha:
+And Marcus offered to check academic sources. He can prepare the literature review section.
+Ben:
+That leaves the introduction and conclusion. We can write those together after everyone sends their material.
+Aisha:
+When should we set the internal deadline?
+Ben:
+How about next Monday evening? That gives us three days to combine everything before the presentation on Thursday.
+Aisha:
+Let''s make it six o''clock on Monday. If people send things at midnight, we''ll lose most of the evening.
+Ben:
+Fair. We should also decide how long each section will be. The whole presentation is twelve minutes.
+Aisha:
+Professor Lewis said the introduction should be brief, about one minute. The evidence section can take seven minutes, then two minutes for discussion and two for the conclusion.
+Ben:
+Should we include the chart showing ticket prices over the last twenty years?
+Aisha:
+I don''t think so. It''s interesting, but our argument is about access rather than long-term inflation. The chart on bus frequency by neighbourhood is more relevant.
+Ben:
+Agreed. And for the interview quotes, I''ll use short extracts rather than putting whole answers on the slides.
+Aisha:
+Good. We also need to upload the slides before the seminar.
+Ben:
+The course page says upload them by nine in the morning on Thursday, but I''d rather do it Wednesday night in case the website has problems.', 'https://pub-fbae5ca09eba4fd0820da2b390dd7ca0.r2.dev/listening/sociology-presentation-planning.mp3', '["Aisha","Ben","Chloe","Marcus","Professor Lewis","the whole group","the council"]'::jsonb, '[0.5063391232788076,0.42439396004818475,0.3649837699691069,0.3317681369221306,0.39531332739308195,0.7619234229041203,0.829224372270478,0.8534187417666935,0.7844273470274414,0.5568032400167303,0.7242657039841824,0.6112411851354526,0.6186741197606759,0.45635969801678405,0.328316179104133,0.43790010714413896,0.41130579971759507,0.36951200631478565,0.373560667813274,0.6782583565808131,0.8377381692682404,0.5919264905959589,0.6273918239224824,0.3948823216254172,0.6559229677457009,0.5346671391282879,0.5040936173113258,0.6680837702446966,0.9580545623820429,0.8234547540809544,0.6293856662933951,0.5281300841374178,0.6899798311413995,0.5006183079271952,0.5503597631970043,0.4006520815865761,0.5268904684971769,0.43115971980909606,0.23299080572087422,0.350029123078605,0.9353454632598424,0.46879950226789424,0.5973800259941032,0.514669596551402,0.47822176725706056,0.5818139350746643,0.41327191748860564,0.2480864123744505,0.5341599304275509,0.3860591134725668,0.694057259719724,0.640536815793466,0.4185690784829241,0.5889402581564332,0.5411345083771288,0.6356669274279605,0.39315413390687093,0.4530178761209638,0.37581915227447615,1,0.7080924493071844,0.780647828004648,0.7172257918881895,0.5815713677076363,0.48924845145029366,0.4925527413443195,0.4026045877185551,0.3676428125843229,0.3809991236485969,0.4177819995848543,0.6364031998717713,0.4972553413305781,0.6438484537866125,0.37330929338019186,0.5452246775420004,0.48292684728894153,0.4068784786325316,0.49831761763065,0.3612803439213953,0.3965904276477163,0.2794002791354374,0.31169722354624696,0.3843835140686662,0.39938300540009747,0.4686775545940324,0.3713855536397271,0.3518786117956306,0.6868924937393232,0.8242137021289516,0.6349571178760206,0.6766527422858136,0.4955315144022689,0.4154086763398813,0.4504160673614006,0.44736767757251006,0.4261455788427664,0.47362308169044576,0.4868614133479425,0.23373303704813755,0.37370976035455244,0.4431737764104094,0.4009169001027964,0.6636957457092612,0.9162992155779663,0.6448535320119653,0.7125119711529624,0.727245216954023,0.568502460231914,0.38552205640913917,0.5727031180337661,0.38398989889916735,0.43613136163678684,0.8445862929551643,0.7684675767857571,0.6055937859575987,0.47703187031250616,0.7665553199414978,0.597710790929054,0.5734165304033845,0.47834707911572444]'::jsonb, 131.3146485260771, 3)
+on conflict (slug) do update set
+  title = excluded.title, topic = excluded.topic, transcript = excluded.transcript,
+  audio_url = excluded.audio_url, matching_options = excluded.matching_options,
+  peaks = excluded.peaks, duration_seconds = excluded.duration_seconds, difficulty = excluded.difficulty;
+
+with tr as (select id from public.listening_tracks where slug = 'sociology-presentation-planning'),
+     q as (
+       insert into public.questions (track_id, idx, kind, prompt, options, evidence, explanation)
+       select tr.id, 1, 'multiple_choice'::public.question_kind, 'What two types of evidence does the professor require?',
+              '["maps and photographs","statistics and interview material","surveys and newspaper articles","charts and video recordings"]'::jsonb, 'The topic is public transport and social inequality, and Professor Lewis said we need both statistics and interview material.', 'The presentation must include quantitative statistics and interview evidence.'
+       from tr
+       on conflict (track_id, idx) do update set
+         kind = excluded.kind, prompt = excluded.prompt, options = excluded.options,
+         evidence = excluded.evidence, explanation = excluded.explanation
+       returning id
+     )
+insert into public.question_answers (question_id, answer)
+select q.id, '["statistics and interview material"]'::jsonb from q
+on conflict (question_id) do update set answer = excluded.answer;
+
+with tr as (select id from public.listening_tracks where slug = 'sociology-presentation-planning'),
+     q as (
+       insert into public.questions (track_id, idx, kind, prompt, options, evidence, explanation)
+       select tr.id, 2, 'matching'::public.question_kind, 'Who will analyse the council statistics?',
+              null, 'I can handle the statistics.', 'Aisha volunteers to take responsibility for the statistical data.'
+       from tr
+       on conflict (track_id, idx) do update set
+         kind = excluded.kind, prompt = excluded.prompt, options = excluded.options,
+         evidence = excluded.evidence, explanation = excluded.explanation
+       returning id
+     )
+insert into public.question_answers (question_id, answer)
+select q.id, '["Aisha"]'::jsonb from q
+on conflict (question_id) do update set answer = excluded.answer;
+
+with tr as (select id from public.listening_tracks where slug = 'sociology-presentation-planning'),
+     q as (
+       insert into public.questions (track_id, idx, kind, prompt, options, evidence, explanation)
+       select tr.id, 3, 'matching'::public.question_kind, 'Who will collect the interview material?',
+              null, 'I''ll work on the interview material because I''ve already spoken to two students who commute from outside the city.', 'Ben takes responsibility for the interview section.'
+       from tr
+       on conflict (track_id, idx) do update set
+         kind = excluded.kind, prompt = excluded.prompt, options = excluded.options,
+         evidence = excluded.evidence, explanation = excluded.explanation
+       returning id
+     )
+insert into public.question_answers (question_id, answer)
+select q.id, '["Ben"]'::jsonb from q
+on conflict (question_id) do update set answer = excluded.answer;
+
+with tr as (select id from public.listening_tracks where slug = 'sociology-presentation-planning'),
+     q as (
+       insert into public.questions (track_id, idx, kind, prompt, options, evidence, explanation)
+       select tr.id, 4, 'matching'::public.question_kind, 'Who will prepare the literature review?',
+              null, 'And Marcus offered to check academic sources. He can prepare the literature review section.', 'Marcus will review academic sources and prepare that section.'
+       from tr
+       on conflict (track_id, idx) do update set
+         kind = excluded.kind, prompt = excluded.prompt, options = excluded.options,
+         evidence = excluded.evidence, explanation = excluded.explanation
+       returning id
+     )
+insert into public.question_answers (question_id, answer)
+select q.id, '["Marcus"]'::jsonb from q
+on conflict (question_id) do update set answer = excluded.answer;
+
+with tr as (select id from public.listening_tracks where slug = 'sociology-presentation-planning'),
+     q as (
+       insert into public.questions (track_id, idx, kind, prompt, options, evidence, explanation)
+       select tr.id, 5, 'sentence_completion'::public.question_kind, 'Complete the sentence. Write ONE WORD AND/OR A NUMBER. The group needs at least ________ interviews.',
+              null, 'We need at least five interviews, though.', 'Aisha states the minimum interview requirement is five.'
+       from tr
+       on conflict (track_id, idx) do update set
+         kind = excluded.kind, prompt = excluded.prompt, options = excluded.options,
+         evidence = excluded.evidence, explanation = excluded.explanation
+       returning id
+     )
+insert into public.question_answers (question_id, answer)
+select q.id, '["five"]'::jsonb from q
+on conflict (question_id) do update set answer = excluded.answer;
+
+with tr as (select id from public.listening_tracks where slug = 'sociology-presentation-planning'),
+     q as (
+       insert into public.questions (track_id, idx, kind, prompt, options, evidence, explanation)
+       select tr.id, 6, 'multiple_choice'::public.question_kind, 'Why does Ben consider interviewing a retired person?',
+              '["To increase the number of academic sources","To make the sample less narrow","To compare two different cities","To replace one of the student interviews"]'::jsonb, 'It would make the sample less narrow.', 'Including someone outside the student population would broaden the sample.'
+       from tr
+       on conflict (track_id, idx) do update set
+         kind = excluded.kind, prompt = excluded.prompt, options = excluded.options,
+         evidence = excluded.evidence, explanation = excluded.explanation
+       returning id
+     )
+insert into public.question_answers (question_id, answer)
+select q.id, '["To make the sample less narrow"]'::jsonb from q
+on conflict (question_id) do update set answer = excluded.answer;
+
+with tr as (select id from public.listening_tracks where slug = 'sociology-presentation-planning'),
+     q as (
+       insert into public.questions (track_id, idx, kind, prompt, options, evidence, explanation)
+       select tr.id, 7, 'sentence_completion'::public.question_kind, 'Complete the sentence. Write ONE WORD AND/OR A NUMBER. Group members should send their material by ________ o''clock on Monday.',
+              null, 'Let''s make it six o''clock on Monday.', 'The group agrees on a six o''clock internal deadline.'
+       from tr
+       on conflict (track_id, idx) do update set
+         kind = excluded.kind, prompt = excluded.prompt, options = excluded.options,
+         evidence = excluded.evidence, explanation = excluded.explanation
+       returning id
+     )
+insert into public.question_answers (question_id, answer)
+select q.id, '["six"]'::jsonb from q
+on conflict (question_id) do update set answer = excluded.answer;
+
+with tr as (select id from public.listening_tracks where slug = 'sociology-presentation-planning'),
+     q as (
+       insert into public.questions (track_id, idx, kind, prompt, options, evidence, explanation)
+       select tr.id, 8, 'multiple_choice'::public.question_kind, 'How much time is allocated to the evidence section?',
+              '["one minute","two minutes","seven minutes","twelve minutes"]'::jsonb, 'The evidence section can take seven minutes, then two minutes for discussion and two for the conclusion.', 'Seven of the twelve presentation minutes are allocated to evidence.'
+       from tr
+       on conflict (track_id, idx) do update set
+         kind = excluded.kind, prompt = excluded.prompt, options = excluded.options,
+         evidence = excluded.evidence, explanation = excluded.explanation
+       returning id
+     )
+insert into public.question_answers (question_id, answer)
+select q.id, '["seven minutes"]'::jsonb from q
+on conflict (question_id) do update set answer = excluded.answer;
+
+with tr as (select id from public.listening_tracks where slug = 'sociology-presentation-planning'),
+     q as (
+       insert into public.questions (track_id, idx, kind, prompt, options, evidence, explanation)
+       select tr.id, 9, 'multiple_choice'::public.question_kind, 'Which visual does Aisha think is more relevant?',
+              '["ticket prices over twenty years","bus frequency by neighbourhood","a map of university buildings","income changes by age group"]'::jsonb, 'The chart on bus frequency by neighbourhood is more relevant.', 'Aisha prefers the chart that directly supports their argument about access.'
+       from tr
+       on conflict (track_id, idx) do update set
+         kind = excluded.kind, prompt = excluded.prompt, options = excluded.options,
+         evidence = excluded.evidence, explanation = excluded.explanation
+       returning id
+     )
+insert into public.question_answers (question_id, answer)
+select q.id, '["bus frequency by neighbourhood"]'::jsonb from q
+on conflict (question_id) do update set answer = excluded.answer;
+
+with tr as (select id from public.listening_tracks where slug = 'sociology-presentation-planning'),
+     q as (
+       insert into public.questions (track_id, idx, kind, prompt, options, evidence, explanation)
+       select tr.id, 10, 'sentence_completion'::public.question_kind, 'Complete the sentence. Write ONE WORD. Ben would prefer to upload the slides on ________ night.',
+              null, 'The course page says upload them by nine in the morning on Thursday, but I''d rather do it Wednesday night in case the website has problems.', 'Ben wants to upload the presentation the night before the official deadline.'
+       from tr
+       on conflict (track_id, idx) do update set
+         kind = excluded.kind, prompt = excluded.prompt, options = excluded.options,
+         evidence = excluded.evidence, explanation = excluded.explanation
+       returning id
+     )
+insert into public.question_answers (question_id, answer)
+select q.id, '["Wednesday"]'::jsonb from q
+on conflict (question_id) do update set answer = excluded.answer;
+
+-- Preparing a Poster for a Student Conference
+insert into public.listening_tracks (slug, title, topic, transcript, audio_url, matching_options, peaks, duration_seconds, difficulty)
+values ('student-conference-poster-preparation', 'Preparing a Poster for a Student Conference', 'Two postgraduate students discuss how to prepare their research poster for a conference', 'Naomi:
+Have you looked at the poster guidelines for next month''s research conference?
+Ravi:
+Yes. I thought we could use the same poster size as last year, but they''ve changed it. This time it has to be A1 in portrait format.
+Naomi:
+Good thing you checked. I was still working from the old template. What sections do we definitely need?
+Ravi:
+The organisers specify a title, background, methods, results and conclusion. References are optional because space is limited.
+Naomi:
+We should probably keep the background short, then. Our draft has nearly four hundred words before the results even start.
+Ravi:
+Definitely too much. I''d aim for about one hundred and fifty words for the background.
+Naomi:
+What about the methods section?
+Ravi:
+I think a diagram would work better than a paragraph. We can show the three stages of the experiment visually.
+Naomi:
+Good idea. I''ll create the diagram. Could you simplify the results table?
+Ravi:
+Sure. I''ll remove the less important variables and keep the two measures that directly relate to our research question.
+Naomi:
+Should we include all six graphs from the dissertation chapter?
+Ravi:
+No. The guidelines suggest no more than three figures, and honestly two would probably be enough for our data.
+Naomi:
+Which ones would you choose?
+Ravi:
+The response-time graph is essential, and I''d include the accuracy chart as well. The participant-age graph doesn''t really support the main argument.
+Naomi:
+Agreed. We also need to think about font size. I don''t want people standing five centimetres from the poster just to read it.
+Ravi:
+The minimum body text size is twenty-four point. Headings should be at least thirty-two.
+Naomi:
+What about printing? The department printer can''t handle A1 paper.
+Ravi:
+We have to send the final PDF to Campus Print Services. They need it by four o''clock on the Monday before the conference.
+Naomi:
+That''s earlier than I expected. How much does printing cost?
+Ravi:
+Twelve pounds for standard paper or eighteen pounds for the heavier matte finish.
+Naomi:
+Let''s use the matte finish. It will survive the train journey better.
+Ravi:
+Fine. We should also practise the explanation because the judging panel only gives each presenter three minutes before asking questions.', 'https://pub-fbae5ca09eba4fd0820da2b390dd7ca0.r2.dev/listening/student-conference-poster-preparation.mp3', '["Naomi","Ravi","conference organisers","Campus Print Services","judging panel","department printer"]'::jsonb, '[0.45621822260122347,0.45931845327779697,0.3995281927133909,0.7325756073904802,0.7592855476754811,0.5718560565743699,0.6193139870640703,0.6506844016601323,0.5432589072965402,0.7194974470997204,0.6636031542477245,0.39821764377339736,0.24036524345330043,0.47817054258721897,0.29990291099830535,0.29017981865828524,0.422676248219029,0.7141490421553314,0.6771017404569821,0.6495021375090633,0.6984432396193202,0.566654547363493,0.37954632442502656,0.70672635814241,0.4231850704067495,0.36338602358833105,0.4747192377783432,0.37690454599687884,0.39652809442421777,0.38955059677012716,0.3709889000194369,0.2849626725671411,0.5620382798659034,0.4304646691187064,0.6247084815753747,0.44303487562205945,0.4187008833827708,0.4523545891730169,0.47428171020957155,0.9135052117519256,0.8151286283116433,0.39636148450623543,0.6150236449825129,0.7320489202936685,0.8059938152307959,0.3759214655311798,0.38903441250377213,0.39400370251483513,0.2804819720250126,0.38878471494380773,0.7624532695373811,1,0.8436290832489068,0.5174763567416861,0.6880536136842001,0.6741374504882114,0.36950463002423595,0.6110139829642893,0.4512477262087978,0.32306518669875084,0.4812431623444394,0.6272452234897457,0.6184163174800238,0.5016344147521246,0.4781911648204885,0.5390565379897475,0.4697800425728224,0.5704115685160448,0.7142757617505529,0.7421240917528926,0.5002733461431715,0.544143307972516,0.5276355183340065,0.5052453905011411,0.6927028068907495,0.5887949710142559,0.666051509465529,0.4725681275437966,0.39934900608127105,0.4741343068298787,0.21432738033002582,0.45597290355524506,0.4118934491173214,0.3473003242308914,0.6407877477327244,0.8340525261978708,0.48745792040463337,0.4737026200433806,0.5990914801075545,0.45657121291058056,0.3026619906954785,0.4193003691752254,0.36844783962010974,0.5550119407318531,0.6720908748192042,0.5577419655121093,0.32260430614402197,0.647112814321505,0.6394326514768796,0.42568656076452716,0.548864687039569,0.27569163305132777,0.4520883742538949,0.6234799226538374,0.6474734091152572,0.722215753623128,0.5206496696746576,0.6284240379081187,0.4041497088677685,0.3533143097948569,0.369916520476576,0.4109971141706526,0.3862224948010615,0.5317822150821944,0.4976707586706947,0.5137168023132865,0.5265964216390393,0.4485777028543986,0.6067796838561957,0.37161617456408896]'::jsonb, 132.0257596371882, 3)
+on conflict (slug) do update set
+  title = excluded.title, topic = excluded.topic, transcript = excluded.transcript,
+  audio_url = excluded.audio_url, matching_options = excluded.matching_options,
+  peaks = excluded.peaks, duration_seconds = excluded.duration_seconds, difficulty = excluded.difficulty;
+
+with tr as (select id from public.listening_tracks where slug = 'student-conference-poster-preparation'),
+     q as (
+       insert into public.questions (track_id, idx, kind, prompt, options, evidence, explanation)
+       select tr.id, 1, 'multiple_choice'::public.question_kind, 'What has changed compared with last year''s poster requirements?',
+              '["The poster must now be landscape","The required size and format have changed","References are now compulsory","Posters must be printed by students"]'::jsonb, 'I thought we could use the same poster size as last year, but they''ve changed it. This time it has to be A1 in portrait format.', 'The poster is now required to be A1 and portrait.'
+       from tr
+       on conflict (track_id, idx) do update set
+         kind = excluded.kind, prompt = excluded.prompt, options = excluded.options,
+         evidence = excluded.evidence, explanation = excluded.explanation
+       returning id
+     )
+insert into public.question_answers (question_id, answer)
+select q.id, '["The required size and format have changed"]'::jsonb from q
+on conflict (question_id) do update set answer = excluded.answer;
+
+with tr as (select id from public.listening_tracks where slug = 'student-conference-poster-preparation'),
+     q as (
+       insert into public.questions (track_id, idx, kind, prompt, options, evidence, explanation)
+       select tr.id, 2, 'sentence_completion'::public.question_kind, 'Complete the sentence. Write ONE WORD AND/OR A NUMBER. The poster must be size ________.',
+              null, 'This time it has to be A1 in portrait format.', 'A1 is the specified poster size.'
+       from tr
+       on conflict (track_id, idx) do update set
+         kind = excluded.kind, prompt = excluded.prompt, options = excluded.options,
+         evidence = excluded.evidence, explanation = excluded.explanation
+       returning id
+     )
+insert into public.question_answers (question_id, answer)
+select q.id, '["A1"]'::jsonb from q
+on conflict (question_id) do update set answer = excluded.answer;
+
+with tr as (select id from public.listening_tracks where slug = 'student-conference-poster-preparation'),
+     q as (
+       insert into public.questions (track_id, idx, kind, prompt, options, evidence, explanation)
+       select tr.id, 3, 'multiple_choice'::public.question_kind, 'Which section is optional?',
+              '["background","methods","conclusion","references"]'::jsonb, 'References are optional because space is limited.', 'The organisers do not require references.'
+       from tr
+       on conflict (track_id, idx) do update set
+         kind = excluded.kind, prompt = excluded.prompt, options = excluded.options,
+         evidence = excluded.evidence, explanation = excluded.explanation
+       returning id
+     )
+insert into public.question_answers (question_id, answer)
+select q.id, '["references"]'::jsonb from q
+on conflict (question_id) do update set answer = excluded.answer;
+
+with tr as (select id from public.listening_tracks where slug = 'student-conference-poster-preparation'),
+     q as (
+       insert into public.questions (track_id, idx, kind, prompt, options, evidence, explanation)
+       select tr.id, 4, 'sentence_completion'::public.question_kind, 'Complete the sentence. Write ONE WORD AND/OR A NUMBER. Ravi suggests about ________ words for the background.',
+              null, 'I''d aim for about one hundred and fifty words for the background.', 'Ravi proposes shortening the background to about one hundred and fifty words.'
+       from tr
+       on conflict (track_id, idx) do update set
+         kind = excluded.kind, prompt = excluded.prompt, options = excluded.options,
+         evidence = excluded.evidence, explanation = excluded.explanation
+       returning id
+     )
+insert into public.question_answers (question_id, answer)
+select q.id, '["one hundred and fifty"]'::jsonb from q
+on conflict (question_id) do update set answer = excluded.answer;
+
+with tr as (select id from public.listening_tracks where slug = 'student-conference-poster-preparation'),
+     q as (
+       insert into public.questions (track_id, idx, kind, prompt, options, evidence, explanation)
+       select tr.id, 5, 'matching'::public.question_kind, 'Who will create the methods diagram?',
+              null, 'Good idea. I''ll create the diagram.', 'Naomi takes responsibility for the methods diagram.'
+       from tr
+       on conflict (track_id, idx) do update set
+         kind = excluded.kind, prompt = excluded.prompt, options = excluded.options,
+         evidence = excluded.evidence, explanation = excluded.explanation
+       returning id
+     )
+insert into public.question_answers (question_id, answer)
+select q.id, '["Naomi"]'::jsonb from q
+on conflict (question_id) do update set answer = excluded.answer;
+
+with tr as (select id from public.listening_tracks where slug = 'student-conference-poster-preparation'),
+     q as (
+       insert into public.questions (track_id, idx, kind, prompt, options, evidence, explanation)
+       select tr.id, 6, 'matching'::public.question_kind, 'Who will simplify the results table?',
+              null, 'Sure. I''ll remove the less important variables and keep the two measures that directly relate to our research question.', 'Ravi agrees to reduce the table to the most relevant measures.'
+       from tr
+       on conflict (track_id, idx) do update set
+         kind = excluded.kind, prompt = excluded.prompt, options = excluded.options,
+         evidence = excluded.evidence, explanation = excluded.explanation
+       returning id
+     )
+insert into public.question_answers (question_id, answer)
+select q.id, '["Ravi"]'::jsonb from q
+on conflict (question_id) do update set answer = excluded.answer;
+
+with tr as (select id from public.listening_tracks where slug = 'student-conference-poster-preparation'),
+     q as (
+       insert into public.questions (track_id, idx, kind, prompt, options, evidence, explanation)
+       select tr.id, 7, 'multiple_choice'::public.question_kind, 'Which figure does Ravi think should NOT be included?',
+              '["the response-time graph","the accuracy chart","the participant-age graph","the methods diagram"]'::jsonb, 'The participant-age graph doesn''t really support the main argument.', 'Ravi considers the participant-age graph irrelevant to the main argument.'
+       from tr
+       on conflict (track_id, idx) do update set
+         kind = excluded.kind, prompt = excluded.prompt, options = excluded.options,
+         evidence = excluded.evidence, explanation = excluded.explanation
+       returning id
+     )
+insert into public.question_answers (question_id, answer)
+select q.id, '["the participant-age graph"]'::jsonb from q
+on conflict (question_id) do update set answer = excluded.answer;
+
+with tr as (select id from public.listening_tracks where slug = 'student-conference-poster-preparation'),
+     q as (
+       insert into public.questions (track_id, idx, kind, prompt, options, evidence, explanation)
+       select tr.id, 8, 'sentence_completion'::public.question_kind, 'Complete the sentence. Write ONE WORD AND/OR A NUMBER. Body text must be at least ________ point.',
+              null, 'The minimum body text size is twenty-four point.', 'Twenty-four point is the minimum size for body text.'
+       from tr
+       on conflict (track_id, idx) do update set
+         kind = excluded.kind, prompt = excluded.prompt, options = excluded.options,
+         evidence = excluded.evidence, explanation = excluded.explanation
+       returning id
+     )
+insert into public.question_answers (question_id, answer)
+select q.id, '["twenty-four"]'::jsonb from q
+on conflict (question_id) do update set answer = excluded.answer;
+
+with tr as (select id from public.listening_tracks where slug = 'student-conference-poster-preparation'),
+     q as (
+       insert into public.questions (track_id, idx, kind, prompt, options, evidence, explanation)
+       select tr.id, 9, 'matching'::public.question_kind, 'Who must receive the final PDF for printing?',
+              null, 'We have to send the final PDF to Campus Print Services.', 'Campus Print Services handles the A1 printing.'
+       from tr
+       on conflict (track_id, idx) do update set
+         kind = excluded.kind, prompt = excluded.prompt, options = excluded.options,
+         evidence = excluded.evidence, explanation = excluded.explanation
+       returning id
+     )
+insert into public.question_answers (question_id, answer)
+select q.id, '["Campus Print Services"]'::jsonb from q
+on conflict (question_id) do update set answer = excluded.answer;
+
+with tr as (select id from public.listening_tracks where slug = 'student-conference-poster-preparation'),
+     q as (
+       insert into public.questions (track_id, idx, kind, prompt, options, evidence, explanation)
+       select tr.id, 10, 'multiple_choice'::public.question_kind, 'How long does each presenter have before questions begin?',
+              '["two minutes","three minutes","five minutes","ten minutes"]'::jsonb, 'We should also practise the explanation because the judging panel only gives each presenter three minutes before asking questions.', 'Each presenter has three minutes to explain the poster.'
+       from tr
+       on conflict (track_id, idx) do update set
+         kind = excluded.kind, prompt = excluded.prompt, options = excluded.options,
+         evidence = excluded.evidence, explanation = excluded.explanation
+       returning id
+     )
+insert into public.question_answers (question_id, answer)
+select q.id, '["three minutes"]'::jsonb from q
+on conflict (question_id) do update set answer = excluded.answer;
+
+-- Visitor Briefing for a University Observatory
+insert into public.listening_tracks (slug, title, topic, transcript, audio_url, matching_options, peaks, duration_seconds, difficulty)
+values ('university-observatory-visitor-briefing', 'Visitor Briefing for a University Observatory', 'An astronomy guide explains procedures and activities for an evening observatory visit', 'Welcome to tonight''s public observing session at Westmoor University Observatory. Before we begin, I''ll explain the schedule and a few rules that help us protect both the equipment and everyone''s night vision.
+The main building opens to visitors at seven fifteen. The introductory talk begins at seven thirty in Lecture Room Two, so please be seated before then. The talk lasts about twenty minutes and explains what objects should be visible tonight.
+After the introduction, visitors will be divided into three groups. Group One starts at the large reflecting telescope, Group Two begins in the rooftop observing area, and Group Three visits the astronomy exhibition on the ground floor.
+Each group spends approximately twenty-five minutes at a station before moving to the next one. A member of staff will tell you when it is time to rotate.
+At the large telescope, please do not touch the instrument or attempt to move it yourself. The telescope is computer-controlled, and even a small manual adjustment can disturb its alignment.
+The rooftop area contains several smaller telescopes that visitors may look through with guidance from student volunteers. Please keep bags close to the wall so that nobody trips over them in the dark.
+White lights are not permitted in observing areas because they affect night vision. If you need a torch, use one with a red light. Staff can provide red covers for phone torches if necessary.
+Photography is allowed outside, but flash must be switched off. Inside the telescope dome, photography is not permitted because space around the equipment is limited.
+Cloud sometimes prevents direct observing. If the sky becomes completely overcast, the session will continue indoors with a live demonstration using archived telescope images and astronomical software.
+Hot drinks are available from the small café beside reception until nine thirty. Food and drinks must not be taken onto the roof or into the telescope dome.
+The session finishes at ten. When leaving, use the main entrance rather than the side gate, because the side gate is locked automatically after nine o''clock.', 'https://pub-fbae5ca09eba4fd0820da2b390dd7ca0.r2.dev/listening/university-observatory-visitor-briefing.mp3', '["large reflecting telescope","rooftop observing area","astronomy exhibition","Lecture Room Two","small café","main entrance"]'::jsonb, '[1,0.713917842007594,0.7199316555956662,0.3660755363049665,0.7961545530065195,0.7700484975547899,0.6918604479874519,0.4846024929504054,0.5915098792533444,0.5760056064411427,0.7511395204790823,0.8288765203355578,0.6136633604226863,0.4815633347276761,0.7422470509709375,0.7494940666952763,0.7060672854244215,0.5347352485824299,0.3817416347613087,0.6986470708328508,0.6103208789619184,0.6158197396844122,0.47979936921876404,0.139820233078928,0.7581948372383494,0.736871266021023,0.6646174779584014,0.18701359120189093,0.8082320428114916,0.5920194288502268,0.3068384094821572,0.833505434686415,0.6840150149629327,0.7052830545873232,0.591714990173858,0.564499903541319,0.33720743194386904,0.5173090998203964,0.6233631301127973,0.5645406121329049,0.42967521335160125,0.7794993259591445,0.7291921352187842,0.621541557768962,0.7146004025538244,0.2614204940641893,0.6114924837332706,0.5270702974778464,0.58697565347876,0.7278334928438722,0.28485760346077604,0.5831481675660042,0.5480551720578284,0.8545612481742124,0.6019661556344151,0.4836542553896834,0.3888478178843732,0.6628690925798519,0.6316945929064214,0.48345943438339767,0.6859338734872193,0.4544964680164643,0.4960648267863441,0.4061044570012524,0.5182292780771983,0.66531541197339,0.48103124927621177,0.23415828514185724,0.8262070318569985,0.7371089800363236,0.5029313018782016,0.3870117174013284,0.6648354796638326,0.6604707215536609,0.36557633381136784,0.6247335223715621,0.5912634872580389,0.514228388572696,0.30482855282162713,0.5819438719724396,0.5804920929718659,0.4272362512805079,0.3560209566469322,0.6099398246287614,0.556903890836462,0.5482585782458745,0.6701437255838952,0.5686160791791703,0.39333900411594225,0.4592381024795871,0.6648670698604825,0.4401941069452258,0.5084164132811072,0.5813344587089656,0.3849477121558595,0.6967306505047532,0.7238791171789504,0.5989384502925346,0.6012319644746789,0.4980667491539695,0.5510568004889135,0.20108825577529707,0.7518050908565336,0.7002562627519752,0.4837015971018503,0.5757509081158487,0.19336032844525614,0.7344707379968968,0.6468511178547864,0.6281036740805624,0.4078878381008763,0.5629218117512322,0.5217714056036922,0.9020962210774439,0.9385402243371463,0.5503240125381503,0.546484008920033,0.5605036438259123,0.5056160265173565,0.3047907112651681]'::jsonb, 132.12154195011337, 3)
+on conflict (slug) do update set
+  title = excluded.title, topic = excluded.topic, transcript = excluded.transcript,
+  audio_url = excluded.audio_url, matching_options = excluded.matching_options,
+  peaks = excluded.peaks, duration_seconds = excluded.duration_seconds, difficulty = excluded.difficulty;
+
+with tr as (select id from public.listening_tracks where slug = 'university-observatory-visitor-briefing'),
+     q as (
+       insert into public.questions (track_id, idx, kind, prompt, options, evidence, explanation)
+       select tr.id, 1, 'sentence_completion'::public.question_kind, 'Complete the sentence. Write ONE WORD AND/OR A NUMBER. The introductory talk begins at ________.',
+              null, 'The introductory talk begins at seven thirty in Lecture Room Two, so please be seated before then.', 'The talk begins at seven thirty.'
+       from tr
+       on conflict (track_id, idx) do update set
+         kind = excluded.kind, prompt = excluded.prompt, options = excluded.options,
+         evidence = excluded.evidence, explanation = excluded.explanation
+       returning id
+     )
+insert into public.question_answers (question_id, answer)
+select q.id, '["seven thirty"]'::jsonb from q
+on conflict (question_id) do update set answer = excluded.answer;
+
+with tr as (select id from public.listening_tracks where slug = 'university-observatory-visitor-briefing'),
+     q as (
+       insert into public.questions (track_id, idx, kind, prompt, options, evidence, explanation)
+       select tr.id, 2, 'multiple_choice'::public.question_kind, 'How long does the introductory talk last?',
+              '["fifteen minutes","twenty minutes","twenty-five minutes","thirty minutes"]'::jsonb, 'The talk lasts about twenty minutes and explains what objects should be visible tonight.', 'The introduction lasts approximately twenty minutes.'
+       from tr
+       on conflict (track_id, idx) do update set
+         kind = excluded.kind, prompt = excluded.prompt, options = excluded.options,
+         evidence = excluded.evidence, explanation = excluded.explanation
+       returning id
+     )
+insert into public.question_answers (question_id, answer)
+select q.id, '["twenty minutes"]'::jsonb from q
+on conflict (question_id) do update set answer = excluded.answer;
+
+with tr as (select id from public.listening_tracks where slug = 'university-observatory-visitor-briefing'),
+     q as (
+       insert into public.questions (track_id, idx, kind, prompt, options, evidence, explanation)
+       select tr.id, 3, 'matching'::public.question_kind, 'Where does Group One begin?',
+              null, 'Group One starts at the large reflecting telescope, Group Two begins in the rooftop observing area, and Group Three visits the astronomy exhibition on the ground floor.', 'Group One starts with the main reflecting telescope.'
+       from tr
+       on conflict (track_id, idx) do update set
+         kind = excluded.kind, prompt = excluded.prompt, options = excluded.options,
+         evidence = excluded.evidence, explanation = excluded.explanation
+       returning id
+     )
+insert into public.question_answers (question_id, answer)
+select q.id, '["large reflecting telescope"]'::jsonb from q
+on conflict (question_id) do update set answer = excluded.answer;
+
+with tr as (select id from public.listening_tracks where slug = 'university-observatory-visitor-briefing'),
+     q as (
+       insert into public.questions (track_id, idx, kind, prompt, options, evidence, explanation)
+       select tr.id, 4, 'matching'::public.question_kind, 'Where does Group Two begin?',
+              null, 'Group One starts at the large reflecting telescope, Group Two begins in the rooftop observing area, and Group Three visits the astronomy exhibition on the ground floor.', 'Group Two''s first station is the rooftop area.'
+       from tr
+       on conflict (track_id, idx) do update set
+         kind = excluded.kind, prompt = excluded.prompt, options = excluded.options,
+         evidence = excluded.evidence, explanation = excluded.explanation
+       returning id
+     )
+insert into public.question_answers (question_id, answer)
+select q.id, '["rooftop observing area"]'::jsonb from q
+on conflict (question_id) do update set answer = excluded.answer;
+
+with tr as (select id from public.listening_tracks where slug = 'university-observatory-visitor-briefing'),
+     q as (
+       insert into public.questions (track_id, idx, kind, prompt, options, evidence, explanation)
+       select tr.id, 5, 'matching'::public.question_kind, 'Where does Group Three begin?',
+              null, 'Group One starts at the large reflecting telescope, Group Two begins in the rooftop observing area, and Group Three visits the astronomy exhibition on the ground floor.', 'Group Three begins with the ground-floor exhibition.'
+       from tr
+       on conflict (track_id, idx) do update set
+         kind = excluded.kind, prompt = excluded.prompt, options = excluded.options,
+         evidence = excluded.evidence, explanation = excluded.explanation
+       returning id
+     )
+insert into public.question_answers (question_id, answer)
+select q.id, '["astronomy exhibition"]'::jsonb from q
+on conflict (question_id) do update set answer = excluded.answer;
+
+with tr as (select id from public.listening_tracks where slug = 'university-observatory-visitor-briefing'),
+     q as (
+       insert into public.questions (track_id, idx, kind, prompt, options, evidence, explanation)
+       select tr.id, 6, 'multiple_choice'::public.question_kind, 'Why must visitors not move the large telescope themselves?',
+              '["It may become too warm","It is reserved for researchers","Its alignment could be disturbed","The controls are located on the roof"]'::jsonb, 'The telescope is computer-controlled, and even a small manual adjustment can disturb its alignment.', 'Manual movement could interfere with the telescope''s alignment.'
+       from tr
+       on conflict (track_id, idx) do update set
+         kind = excluded.kind, prompt = excluded.prompt, options = excluded.options,
+         evidence = excluded.evidence, explanation = excluded.explanation
+       returning id
+     )
+insert into public.question_answers (question_id, answer)
+select q.id, '["Its alignment could be disturbed"]'::jsonb from q
+on conflict (question_id) do update set answer = excluded.answer;
+
+with tr as (select id from public.listening_tracks where slug = 'university-observatory-visitor-briefing'),
+     q as (
+       insert into public.questions (track_id, idx, kind, prompt, options, evidence, explanation)
+       select tr.id, 7, 'sentence_completion'::public.question_kind, 'Complete the sentence. Write ONE WORD. Visitors should use a ________ light if they need a torch.',
+              null, 'If you need a torch, use one with a red light.', 'Red light helps preserve night vision.'
+       from tr
+       on conflict (track_id, idx) do update set
+         kind = excluded.kind, prompt = excluded.prompt, options = excluded.options,
+         evidence = excluded.evidence, explanation = excluded.explanation
+       returning id
+     )
+insert into public.question_answers (question_id, answer)
+select q.id, '["red"]'::jsonb from q
+on conflict (question_id) do update set answer = excluded.answer;
+
+with tr as (select id from public.listening_tracks where slug = 'university-observatory-visitor-briefing'),
+     q as (
+       insert into public.questions (track_id, idx, kind, prompt, options, evidence, explanation)
+       select tr.id, 8, 'multiple_choice'::public.question_kind, 'Where is photography NOT permitted?',
+              '["outside the observatory","in the telescope dome","beside reception","in the exhibition"]'::jsonb, 'Inside the telescope dome, photography is not permitted because space around the equipment is limited.', 'Photography is prohibited inside the dome.'
+       from tr
+       on conflict (track_id, idx) do update set
+         kind = excluded.kind, prompt = excluded.prompt, options = excluded.options,
+         evidence = excluded.evidence, explanation = excluded.explanation
+       returning id
+     )
+insert into public.question_answers (question_id, answer)
+select q.id, '["in the telescope dome"]'::jsonb from q
+on conflict (question_id) do update set answer = excluded.answer;
+
+with tr as (select id from public.listening_tracks where slug = 'university-observatory-visitor-briefing'),
+     q as (
+       insert into public.questions (track_id, idx, kind, prompt, options, evidence, explanation)
+       select tr.id, 9, 'sentence_completion'::public.question_kind, 'Complete the sentence. Write ONE WORD. If the sky is completely overcast, the session will continue ________.',
+              null, 'If the sky becomes completely overcast, the session will continue indoors with a live demonstration using archived telescope images and astronomical software.', 'Bad weather changes the session to an indoor activity.'
+       from tr
+       on conflict (track_id, idx) do update set
+         kind = excluded.kind, prompt = excluded.prompt, options = excluded.options,
+         evidence = excluded.evidence, explanation = excluded.explanation
+       returning id
+     )
+insert into public.question_answers (question_id, answer)
+select q.id, '["indoors"]'::jsonb from q
+on conflict (question_id) do update set answer = excluded.answer;
+
+with tr as (select id from public.listening_tracks where slug = 'university-observatory-visitor-briefing'),
+     q as (
+       insert into public.questions (track_id, idx, kind, prompt, options, evidence, explanation)
+       select tr.id, 10, 'multiple_choice'::public.question_kind, 'Why must visitors leave through the main entrance?',
+              '["The café blocks the other exit","The side gate is locked after nine","The roof closes before the building","Staff collect tickets there"]'::jsonb, 'When leaving, use the main entrance rather than the side gate, because the side gate is locked automatically after nine o''clock.', 'The side gate is unavailable by the time the session ends.'
+       from tr
+       on conflict (track_id, idx) do update set
+         kind = excluded.kind, prompt = excluded.prompt, options = excluded.options,
+         evidence = excluded.evidence, explanation = excluded.explanation
+       returning id
+     )
+insert into public.question_answers (question_id, answer)
+select q.id, '["The side gate is locked after nine"]'::jsonb from q
+on conflict (question_id) do update set answer = excluded.answer;
+
+-- Researching Urban Community Gardens
+insert into public.listening_tracks (slug, title, topic, transcript, audio_url, matching_options, peaks, duration_seconds, difficulty)
+values ('urban-gardens-research-lecture', 'Researching Urban Community Gardens', 'A lecturer introduces a research project on community gardens in cities', 'Today I''d like to introduce the research project you''ll be working on for the next four weeks. The project looks at how community gardens affect life in densely populated neighbourhoods. We''re interested not only in food production, but also in social contact, biodiversity and residents'' attitudes toward public space.
+You''ll work in teams of four. Each team will study one garden and compare information from three different sources: observations, short interviews and council records. You should not rely on questionnaires for this project because previous classes found that the response rate was too low.
+Your first visit should focus on observation. Spend at least forty minutes at the site and record how people use different areas of the garden. For example, note whether people are gardening alone, talking in groups, supervising children or simply passing through.
+During the second visit, you''ll conduct short interviews. Aim for six participants per team. Keep each interview under ten minutes, because we want spontaneous responses rather than detailed life histories.
+Ask participants what originally brought them to the garden and whether their reasons for visiting have changed over time. Do not ask for their full names. You only need to record their age group and how often they visit.
+The council records provide background information. They may include the year the garden opened, the original funding source and changes in the size of the site. Some councils also record complaints from nearby residents, though this information is not available for every garden.
+For the biodiversity section, you are not expected to identify every species. Instead, record the number of flowering plant types you can distinguish and note any birds or insects observed during a twenty-minute period.
+Be consistent about the time of day. If your first biodiversity observation takes place in the morning, your second should also be in the morning. Comparing a morning visit with an evening visit would introduce an unnecessary variable.
+Your final presentation should last eight minutes, followed by two minutes for questions. Include one map of the garden, two photographs and one graph. The graph should present a comparison, rather than simply showing a list of totals.
+Please upload your presentation slides by six o''clock on the Monday before presentation week. That gives me enough time to check that every file opens correctly before the sessions begin.', 'https://pub-fbae5ca09eba4fd0820da2b390dd7ca0.r2.dev/listening/urban-gardens-research-lecture.mp3', null, '[1,0.6428176141860653,0.6909862704007601,0.3434380688578569,0.5501403140264276,0.7533964549008489,0.483701872041233,0.4057945694848932,0.539176150653999,0.7447044620226574,0.5359773778911291,0.588555385496452,0.6659665510763972,0.5988304095072584,0.3193965968486523,0.7069026265686394,0.49522160592471803,0.6415473482122928,0.7998528143295125,0.6298126941746653,0.4304450356166793,0.6047050452666475,0.7235188020090524,0.3301337860560182,0.6528864016918003,0.4315933461080108,0.5141677489022801,0.582594488385703,0.29873378470801454,0.610039730201797,0.4863470798650715,0.4851270415275826,0.5705851443117101,0.5577361435520922,0.5395275431271377,0.2612272293435382,0.6373580686532021,0.8331482749240864,0.7258560277117576,0.6896708609525918,0.6833094580770194,0.4273299957399048,0.5815819662652458,0.697938704824509,0.47743087245021515,0.528720535111427,0.3545663423223313,0.20113778124968107,0.7679545626439587,0.6940234557980516,0.6491789022040865,0.7310751119969243,0.4096388991928364,0.5148638465493085,0.7137796260364047,0.6477877648855445,0.6423636350620744,0.3954227070969574,0.5619077171974989,0.4119100691649092,0.7852468786933803,0.47600827679574925,0.449938956742291,0.4618433106722798,0.517555617986767,0.2709775272145758,0.8342004228471404,0.5979636253621752,0.8205874645001844,0.6138039191729389,0.42584969587588956,0.6015139752709582,0.5481959616957393,0.6214977315645731,0.6898925564474734,0.5475981511302349,0.23267983376749385,0.6505695717117654,0.5955283167580084,0.6005416650302388,0.3373937312839782,0.6198068639228562,0.6893368916935266,0.5620269944465465,0.6080911151498635,0.674048138162411,0.5197448254791044,0.3907707668901614,0.4700352120819087,0.46297402062284804,0.4979050498680072,0.6278693746265231,0.5391503771535507,0.6133961863003106,0.4714649556097933,0.40220915773977134,0.780027810338785,0.5140066008309536,0.7179025736231344,0.24092676137039198,0.6970408361888615,0.5514107499569163,0.5457103507090112,0.39664831164541914,0.793926063034695,0.3869602192068138,0.48329647502678563,0.4511752009251614,0.5582181372101916,0.7323969923372867,0.5654956036760835,0.387345361560713,0.6577680828739698,0.4856305937665239,0.7007348372773277,0.35380917439106757,0.7107006813989252,0.5278735280454231,0.5169306804508426,0.40372285598389307]'::jsonb, 151.16190476190476, 4)
+on conflict (slug) do update set
+  title = excluded.title, topic = excluded.topic, transcript = excluded.transcript,
+  audio_url = excluded.audio_url, matching_options = excluded.matching_options,
+  peaks = excluded.peaks, duration_seconds = excluded.duration_seconds, difficulty = excluded.difficulty;
+
+with tr as (select id from public.listening_tracks where slug = 'urban-gardens-research-lecture'),
+     q as (
+       insert into public.questions (track_id, idx, kind, prompt, options, evidence, explanation)
+       select tr.id, 1, 'multiple_choice'::public.question_kind, 'How long will students work on the research project?',
+              '["two weeks","three weeks","four weeks","six weeks"]'::jsonb, 'Today I''d like to introduce the research project you''ll be working on for the next four weeks.', 'The lecturer states that the project runs for four weeks.'
+       from tr
+       on conflict (track_id, idx) do update set
+         kind = excluded.kind, prompt = excluded.prompt, options = excluded.options,
+         evidence = excluded.evidence, explanation = excluded.explanation
+       returning id
+     )
+insert into public.question_answers (question_id, answer)
+select q.id, '["four weeks"]'::jsonb from q
+on conflict (question_id) do update set answer = excluded.answer;
+
+with tr as (select id from public.listening_tracks where slug = 'urban-gardens-research-lecture'),
+     q as (
+       insert into public.questions (track_id, idx, kind, prompt, options, evidence, explanation)
+       select tr.id, 2, 'sentence_completion'::public.question_kind, 'Complete the sentence. Write ONE WORD AND/OR A NUMBER. Students will work in teams of ________.',
+              null, 'You''ll work in teams of four.', 'Each team consists of four students.'
+       from tr
+       on conflict (track_id, idx) do update set
+         kind = excluded.kind, prompt = excluded.prompt, options = excluded.options,
+         evidence = excluded.evidence, explanation = excluded.explanation
+       returning id
+     )
+insert into public.question_answers (question_id, answer)
+select q.id, '["four"]'::jsonb from q
+on conflict (question_id) do update set answer = excluded.answer;
+
+with tr as (select id from public.listening_tracks where slug = 'urban-gardens-research-lecture'),
+     q as (
+       insert into public.questions (track_id, idx, kind, prompt, options, evidence, explanation)
+       select tr.id, 3, 'multiple_choice'::public.question_kind, 'Why are questionnaires not being used?',
+              '["They cost too much to print","The questions are difficult to design","The response rate was too low","Council permission is required"]'::jsonb, 'You should not rely on questionnaires for this project because previous classes found that the response rate was too low.', 'Previous students received too few questionnaire responses.'
+       from tr
+       on conflict (track_id, idx) do update set
+         kind = excluded.kind, prompt = excluded.prompt, options = excluded.options,
+         evidence = excluded.evidence, explanation = excluded.explanation
+       returning id
+     )
+insert into public.question_answers (question_id, answer)
+select q.id, '["The response rate was too low"]'::jsonb from q
+on conflict (question_id) do update set answer = excluded.answer;
+
+with tr as (select id from public.listening_tracks where slug = 'urban-gardens-research-lecture'),
+     q as (
+       insert into public.questions (track_id, idx, kind, prompt, options, evidence, explanation)
+       select tr.id, 4, 'sentence_completion'::public.question_kind, 'Complete the sentence. Write ONE WORD AND/OR A NUMBER. Students should spend at least ________ minutes observing the garden during their first visit.',
+              null, 'Spend at least forty minutes at the site and record how people use different areas of the garden.', 'The minimum observation period is forty minutes.'
+       from tr
+       on conflict (track_id, idx) do update set
+         kind = excluded.kind, prompt = excluded.prompt, options = excluded.options,
+         evidence = excluded.evidence, explanation = excluded.explanation
+       returning id
+     )
+insert into public.question_answers (question_id, answer)
+select q.id, '["forty"]'::jsonb from q
+on conflict (question_id) do update set answer = excluded.answer;
+
+with tr as (select id from public.listening_tracks where slug = 'urban-gardens-research-lecture'),
+     q as (
+       insert into public.questions (track_id, idx, kind, prompt, options, evidence, explanation)
+       select tr.id, 5, 'multiple_choice'::public.question_kind, 'How many interview participants should each team aim for?',
+              '["four","six","eight","ten"]'::jsonb, 'Aim for six participants per team.', 'The lecturer sets a target of six interview participants for each team.'
+       from tr
+       on conflict (track_id, idx) do update set
+         kind = excluded.kind, prompt = excluded.prompt, options = excluded.options,
+         evidence = excluded.evidence, explanation = excluded.explanation
+       returning id
+     )
+insert into public.question_answers (question_id, answer)
+select q.id, '["six"]'::jsonb from q
+on conflict (question_id) do update set answer = excluded.answer;
+
+with tr as (select id from public.listening_tracks where slug = 'urban-gardens-research-lecture'),
+     q as (
+       insert into public.questions (track_id, idx, kind, prompt, options, evidence, explanation)
+       select tr.id, 6, 'sentence_completion'::public.question_kind, 'Complete the sentence. Write TWO WORDS. Instead of participants'' full names, students should record their ________.',
+              null, 'You only need to record their age group and how often they visit.', 'Age group is one of the limited pieces of personal information students should record.'
+       from tr
+       on conflict (track_id, idx) do update set
+         kind = excluded.kind, prompt = excluded.prompt, options = excluded.options,
+         evidence = excluded.evidence, explanation = excluded.explanation
+       returning id
+     )
+insert into public.question_answers (question_id, answer)
+select q.id, '["age group"]'::jsonb from q
+on conflict (question_id) do update set answer = excluded.answer;
+
+with tr as (select id from public.listening_tracks where slug = 'urban-gardens-research-lecture'),
+     q as (
+       insert into public.questions (track_id, idx, kind, prompt, options, evidence, explanation)
+       select tr.id, 7, 'multiple_choice'::public.question_kind, 'Which information may be missing from some council records?',
+              '["the opening year","the original funding source","complaints from nearby residents","changes in the size of the site"]'::jsonb, 'Some councils also record complaints from nearby residents, though this information is not available for every garden.', 'Complaints data is specifically described as unavailable for some gardens.'
+       from tr
+       on conflict (track_id, idx) do update set
+         kind = excluded.kind, prompt = excluded.prompt, options = excluded.options,
+         evidence = excluded.evidence, explanation = excluded.explanation
+       returning id
+     )
+insert into public.question_answers (question_id, answer)
+select q.id, '["complaints from nearby residents"]'::jsonb from q
+on conflict (question_id) do update set answer = excluded.answer;
+
+with tr as (select id from public.listening_tracks where slug = 'urban-gardens-research-lecture'),
+     q as (
+       insert into public.questions (track_id, idx, kind, prompt, options, evidence, explanation)
+       select tr.id, 8, 'sentence_completion'::public.question_kind, 'Complete the sentence. Write ONE WORD. During biodiversity observations, students should note birds and ________.',
+              null, 'Instead, record the number of flowering plant types you can distinguish and note any birds or insects observed during a twenty-minute period.', 'The lecturer asks students to record observations of birds and insects.'
+       from tr
+       on conflict (track_id, idx) do update set
+         kind = excluded.kind, prompt = excluded.prompt, options = excluded.options,
+         evidence = excluded.evidence, explanation = excluded.explanation
+       returning id
+     )
+insert into public.question_answers (question_id, answer)
+select q.id, '["insects"]'::jsonb from q
+on conflict (question_id) do update set answer = excluded.answer;
+
+with tr as (select id from public.listening_tracks where slug = 'urban-gardens-research-lecture'),
+     q as (
+       insert into public.questions (track_id, idx, kind, prompt, options, evidence, explanation)
+       select tr.id, 9, 'multiple_choice'::public.question_kind, 'Why should biodiversity observations be carried out at a consistent time of day?',
+              '["The garden may close in the evening","It reduces an unnecessary variable","Birds are only active in the morning","The council requires morning visits"]'::jsonb, 'Comparing a morning visit with an evening visit would introduce an unnecessary variable.', 'Keeping the time consistent prevents time of day from affecting the comparison.'
+       from tr
+       on conflict (track_id, idx) do update set
+         kind = excluded.kind, prompt = excluded.prompt, options = excluded.options,
+         evidence = excluded.evidence, explanation = excluded.explanation
+       returning id
+     )
+insert into public.question_answers (question_id, answer)
+select q.id, '["It reduces an unnecessary variable"]'::jsonb from q
+on conflict (question_id) do update set answer = excluded.answer;
+
+with tr as (select id from public.listening_tracks where slug = 'urban-gardens-research-lecture'),
+     q as (
+       insert into public.questions (track_id, idx, kind, prompt, options, evidence, explanation)
+       select tr.id, 10, 'sentence_completion'::public.question_kind, 'Complete the sentence. Write ONE WORD AND/OR A NUMBER. The final presentation should last ________ minutes before questions.',
+              null, 'Your final presentation should last eight minutes, followed by two minutes for questions.', 'Students have eight minutes for the presentation itself.'
+       from tr
+       on conflict (track_id, idx) do update set
+         kind = excluded.kind, prompt = excluded.prompt, options = excluded.options,
+         evidence = excluded.evidence, explanation = excluded.explanation
+       returning id
+     )
+insert into public.question_answers (question_id, answer)
+select q.id, '["eight"]'::jsonb from q
+on conflict (question_id) do update set answer = excluded.answer;
+
+-- Enrolling in a Wildlife Photography Course
+insert into public.listening_tracks (slug, title, topic, transcript, audio_url, matching_options, peaks, duration_seconds, difficulty)
+values ('wildlife-photography-course-enrolment', 'Enrolling in a Wildlife Photography Course', 'A customer asks about a weekend course in wildlife photography', 'Grace:
+Hello, Northwood Photography Centre. This is Grace speaking.
+Hugo:
+Hi. I''m interested in the wildlife photography course next month. I saw the poster in the library but it didn''t give much detail.
+Grace:
+It''s a three-weekend course for beginners and intermediate photographers. Each Saturday session runs from nine thirty until one.
+Hugo:
+Do I need a professional camera?
+Grace:
+No. A camera with manual settings is useful, but even some compact cameras are suitable. We don''t recommend using a phone because several exercises involve changing shutter speed and aperture.
+Hugo:
+I have a small mirrorless camera, so that should be fine. What happens in the first session?
+Grace:
+The first Saturday focuses on camera settings and photographing moving animals. Most of that session takes place in Riverside Park.
+Hugo:
+And the second weekend?
+Grace:
+That''s mainly about composition and working with natural light. The group visits Hill Farm because there are open fields, woodland edges and plenty of birds.
+Hugo:
+What about the final session?
+Grace:
+The last Saturday covers editing and selecting images. That one is held entirely at the photography centre because everyone works on a computer.
+Hugo:
+Do we need to bring laptops?
+Grace:
+No. Desktop computers are provided, and they already have the editing software installed.
+Hugo:
+How many people are usually in the group?
+Grace:
+We limit the course to ten participants. At the moment, seven places have been booked.
+Hugo:
+Is transport to the outdoor locations included?
+Grace:
+We provide a minibus from the photography centre. It leaves at nine fifteen on the first two Saturdays, so participants need to arrive a little earlier than the official class time.
+Hugo:
+What should we bring for the outdoor sessions?
+Grace:
+Your camera, a spare battery and waterproof clothing. A tripod is optional because we have a few that people can borrow.
+Hugo:
+How much is the course?
+Grace:
+It''s one hundred and twenty pounds. There''s a ten percent discount for full-time students, but you''ll need to show a valid student card when you arrive.
+Hugo:
+Can I reserve a place without paying the full amount today?
+Grace:
+Yes. A thirty-pound deposit secures your place, and the remaining balance is due one week before the course begins.', 'https://pub-fbae5ca09eba4fd0820da2b390dd7ca0.r2.dev/listening/wildlife-photography-course-enrolment.mp3', '["Riverside Park","Hill Farm","photography centre","city library","botanical gardens","lakeside reserve"]'::jsonb, '[0.5074785531336973,0.3025346369070086,0.38472283406621843,0.37693202188032043,0.6283956394933552,0.7000687746488433,0.6086119379303282,0.29233682926465493,0.5393225578780025,0.49831798604124766,0.4325308161860644,0.4444760192224344,0.3834370405306706,0.3644301498265259,0.17509350099050172,0.36747194436810915,0.35989812577013897,0.31315596021117087,0.8255732851003168,1,0.566398508869954,0.4054827825994611,0.3395225679524556,0.34199492909259854,0.32401319486341,0.266050424024281,0.3749398035792668,0.2806041328563401,0.3464206640486956,0.3438381007773372,0.3310635441010805,0.3957345216721087,0.6293002599666212,0.3963433964074927,0.2797237698213236,0.4178377234705586,0.3905805317313754,0.4035216811837925,0.374259927229,0.33435398137038613,0.39036609637952624,0.3049894143429476,0.3181892843426101,0.3743614209173424,0.31836353914007026,0.43933164050738993,0.4151825718341597,0.33548603248486486,0.35201966706488524,0.20837517244948628,0.4003166669992319,0.3720842990800452,0.33301743313265664,0.37483948868416506,0.2509621989815869,0.7633959984380748,0.36681461715115543,0.3684980905031188,0.3567078052416348,0.2657022540817808,0.3121676127188389,0.3111856124606707,0.3165848877267991,0.31320089363480585,0.33525433812192384,0.6166892577884102,0.7770889643721968,0.4374872556400638,0.40128041568062867,0.4069382644789842,0.3472662913060284,0.4621167925775602,0.6535282280564313,0.44434527486171926,0.3880188665368653,0.24952654574346916,0.33045020170219325,0.3466905938514906,0.3735549356423602,0.7161703296603092,0.580665568179422,0.36746020442183486,0.34107843154369005,0.20416229892911733,0.4230147867545862,0.31980132954804236,0.2888696040583517,0.29216622197115216,0.39729255225622256,0.34518779230859004,0.24153844631580026,0.6300084675244245,0.5392057211766345,0.34404180567247017,0.3893372454912339,0.34872486193718055,0.26447101385737937,0.3882032887179628,0.29723813621690476,0.2736915278519523,0.25621614536613974,0.5554194096407022,0.41276928679980174,0.3237905043615143,0.31672254312795284,0.29444319512961414,0.259900947594606,0.4337743241713657,0.2868297954959202,0.3506289277734532,0.8298695777522774,0.715654622311955,0.41942697647639765,0.24023901892790991,0.3902818306584111,0.32974109430660853,0.38918640510421826,0.385376255104587,0.2989438901256641,0.2825633012266956]'::jsonb, 129.98820861678004, 3)
+on conflict (slug) do update set
+  title = excluded.title, topic = excluded.topic, transcript = excluded.transcript,
+  audio_url = excluded.audio_url, matching_options = excluded.matching_options,
+  peaks = excluded.peaks, duration_seconds = excluded.duration_seconds, difficulty = excluded.difficulty;
+
+with tr as (select id from public.listening_tracks where slug = 'wildlife-photography-course-enrolment'),
+     q as (
+       insert into public.questions (track_id, idx, kind, prompt, options, evidence, explanation)
+       select tr.id, 1, 'sentence_completion'::public.question_kind, 'Complete the sentence. Write ONE WORD AND/OR A NUMBER. The course runs over ________ weekends.',
+              null, 'It''s a three-weekend course for beginners and intermediate photographers.', 'The course is spread across three weekends.'
+       from tr
+       on conflict (track_id, idx) do update set
+         kind = excluded.kind, prompt = excluded.prompt, options = excluded.options,
+         evidence = excluded.evidence, explanation = excluded.explanation
+       returning id
+     )
+insert into public.question_answers (question_id, answer)
+select q.id, '["three"]'::jsonb from q
+on conflict (question_id) do update set answer = excluded.answer;
+
+with tr as (select id from public.listening_tracks where slug = 'wildlife-photography-course-enrolment'),
+     q as (
+       insert into public.questions (track_id, idx, kind, prompt, options, evidence, explanation)
+       select tr.id, 2, 'multiple_choice'::public.question_kind, 'Why does Grace advise against using a phone camera?',
+              '["Phones are not allowed outdoors","Phone batteries may not last long enough","Several exercises require manual control of settings","The centre''s software cannot read phone images"]'::jsonb, 'We don''t recommend using a phone because several exercises involve changing shutter speed and aperture.', 'The practical work requires control over photographic settings.'
+       from tr
+       on conflict (track_id, idx) do update set
+         kind = excluded.kind, prompt = excluded.prompt, options = excluded.options,
+         evidence = excluded.evidence, explanation = excluded.explanation
+       returning id
+     )
+insert into public.question_answers (question_id, answer)
+select q.id, '["Several exercises require manual control of settings"]'::jsonb from q
+on conflict (question_id) do update set answer = excluded.answer;
+
+with tr as (select id from public.listening_tracks where slug = 'wildlife-photography-course-enrolment'),
+     q as (
+       insert into public.questions (track_id, idx, kind, prompt, options, evidence, explanation)
+       select tr.id, 3, 'matching'::public.question_kind, 'Where will the first session mainly take place?',
+              null, 'Most of that session takes place in Riverside Park.', 'The first weekend is based mainly in Riverside Park.'
+       from tr
+       on conflict (track_id, idx) do update set
+         kind = excluded.kind, prompt = excluded.prompt, options = excluded.options,
+         evidence = excluded.evidence, explanation = excluded.explanation
+       returning id
+     )
+insert into public.question_answers (question_id, answer)
+select q.id, '["Riverside Park"]'::jsonb from q
+on conflict (question_id) do update set answer = excluded.answer;
+
+with tr as (select id from public.listening_tracks where slug = 'wildlife-photography-course-enrolment'),
+     q as (
+       insert into public.questions (track_id, idx, kind, prompt, options, evidence, explanation)
+       select tr.id, 4, 'matching'::public.question_kind, 'Where will students practise composition and natural-light photography?',
+              null, 'The group visits Hill Farm because there are open fields, woodland edges and plenty of birds.', 'The second session takes the group to Hill Farm.'
+       from tr
+       on conflict (track_id, idx) do update set
+         kind = excluded.kind, prompt = excluded.prompt, options = excluded.options,
+         evidence = excluded.evidence, explanation = excluded.explanation
+       returning id
+     )
+insert into public.question_answers (question_id, answer)
+select q.id, '["Hill Farm"]'::jsonb from q
+on conflict (question_id) do update set answer = excluded.answer;
+
+with tr as (select id from public.listening_tracks where slug = 'wildlife-photography-course-enrolment'),
+     q as (
+       insert into public.questions (track_id, idx, kind, prompt, options, evidence, explanation)
+       select tr.id, 5, 'matching'::public.question_kind, 'Where will the editing session take place?',
+              null, 'That one is held entirely at the photography centre because everyone works on a computer.', 'The final session is indoors at the centre.'
+       from tr
+       on conflict (track_id, idx) do update set
+         kind = excluded.kind, prompt = excluded.prompt, options = excluded.options,
+         evidence = excluded.evidence, explanation = excluded.explanation
+       returning id
+     )
+insert into public.question_answers (question_id, answer)
+select q.id, '["photography centre"]'::jsonb from q
+on conflict (question_id) do update set answer = excluded.answer;
+
+with tr as (select id from public.listening_tracks where slug = 'wildlife-photography-course-enrolment'),
+     q as (
+       insert into public.questions (track_id, idx, kind, prompt, options, evidence, explanation)
+       select tr.id, 6, 'multiple_choice'::public.question_kind, 'What equipment is provided for the final session?',
+              '["laptops","tablet computers","desktop computers","digital cameras"]'::jsonb, 'Desktop computers are provided, and they already have the editing software installed.', 'Participants use the centre''s desktop computers.'
+       from tr
+       on conflict (track_id, idx) do update set
+         kind = excluded.kind, prompt = excluded.prompt, options = excluded.options,
+         evidence = excluded.evidence, explanation = excluded.explanation
+       returning id
+     )
+insert into public.question_answers (question_id, answer)
+select q.id, '["desktop computers"]'::jsonb from q
+on conflict (question_id) do update set answer = excluded.answer;
+
+with tr as (select id from public.listening_tracks where slug = 'wildlife-photography-course-enrolment'),
+     q as (
+       insert into public.questions (track_id, idx, kind, prompt, options, evidence, explanation)
+       select tr.id, 7, 'sentence_completion'::public.question_kind, 'Complete the sentence. Write ONE WORD AND/OR A NUMBER. The maximum group size is ________ participants.',
+              null, 'We limit the course to ten participants.', 'Only ten people can enrol.'
+       from tr
+       on conflict (track_id, idx) do update set
+         kind = excluded.kind, prompt = excluded.prompt, options = excluded.options,
+         evidence = excluded.evidence, explanation = excluded.explanation
+       returning id
+     )
+insert into public.question_answers (question_id, answer)
+select q.id, '["ten"]'::jsonb from q
+on conflict (question_id) do update set answer = excluded.answer;
+
+with tr as (select id from public.listening_tracks where slug = 'wildlife-photography-course-enrolment'),
+     q as (
+       insert into public.questions (track_id, idx, kind, prompt, options, evidence, explanation)
+       select tr.id, 8, 'multiple_choice'::public.question_kind, 'What time does the minibus leave on the first two Saturdays?',
+              '["9:00","9:15","9:30","9:45"]'::jsonb, 'It leaves at nine fifteen on the first two Saturdays, so participants need to arrive a little earlier than the official class time.', 'The transport departs fifteen minutes before the scheduled class start.'
+       from tr
+       on conflict (track_id, idx) do update set
+         kind = excluded.kind, prompt = excluded.prompt, options = excluded.options,
+         evidence = excluded.evidence, explanation = excluded.explanation
+       returning id
+     )
+insert into public.question_answers (question_id, answer)
+select q.id, '["9:15"]'::jsonb from q
+on conflict (question_id) do update set answer = excluded.answer;
+
+with tr as (select id from public.listening_tracks where slug = 'wildlife-photography-course-enrolment'),
+     q as (
+       insert into public.questions (track_id, idx, kind, prompt, options, evidence, explanation)
+       select tr.id, 9, 'sentence_completion'::public.question_kind, 'Complete the sentence. Write TWO WORDS. Participants should bring a camera, spare battery and ________ for outdoor sessions.',
+              null, 'Your camera, a spare battery and waterproof clothing.', 'Waterproof clothing is one of the required items.'
+       from tr
+       on conflict (track_id, idx) do update set
+         kind = excluded.kind, prompt = excluded.prompt, options = excluded.options,
+         evidence = excluded.evidence, explanation = excluded.explanation
+       returning id
+     )
+insert into public.question_answers (question_id, answer)
+select q.id, '["waterproof clothing"]'::jsonb from q
+on conflict (question_id) do update set answer = excluded.answer;
+
+with tr as (select id from public.listening_tracks where slug = 'wildlife-photography-course-enrolment'),
+     q as (
+       insert into public.questions (track_id, idx, kind, prompt, options, evidence, explanation)
+       select tr.id, 10, 'multiple_choice'::public.question_kind, 'How much is the deposit?',
+              '["twenty pounds","thirty pounds","forty pounds","one hundred and twenty pounds"]'::jsonb, 'A thirty-pound deposit secures your place, and the remaining balance is due one week before the course begins.', 'A thirty-pound payment is required to reserve a place.'
+       from tr
+       on conflict (track_id, idx) do update set
+         kind = excluded.kind, prompt = excluded.prompt, options = excluded.options,
+         evidence = excluded.evidence, explanation = excluded.explanation
+       returning id
+     )
+insert into public.question_answers (question_id, answer)
+select q.id, '["thirty pounds"]'::jsonb from q
 on conflict (question_id) do update set answer = excluded.answer;
 
 commit;

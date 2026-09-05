@@ -19,6 +19,17 @@ function requireEnv(name: string) {
 /** Rachel, one of ElevenLabs' premade voices — the single-voice default. */
 const VOICE_ID = process.env.ELEVENLABS_VOICE_ID ?? '21m00Tcm4TlvDq8ikWAM';
 
+/**
+ * A small pool of ElevenLabs premade voices for multi-speaker conversations,
+ * grouped by the gender the generator tags each character with. Distinct
+ * speakers of the same gender in one track cycle through their pool rather
+ * than reusing one voice.
+ */
+const VOICE_POOL: Record<'male' | 'female', string[]> = {
+  female: ['21m00Tcm4TlvDq8ikWAM', 'AZnzlk1XvdvUeBnXmlld'], // Rachel, Domi
+  male: ['TxGEqnHWrfWFTfGW9XjX', 'VR6AewLTigWG4xSOukaG'], // Josh, Arnold
+};
+
 /** OpenAI's stable transcription model. Cheap ($0.006/min) and accurate enough. */
 const TRANSCRIBE_MODEL = process.env.TRANSCRIBE_MODEL ?? 'whisper-1';
 
@@ -26,35 +37,121 @@ const TRANSCRIBE_MODEL = process.env.TRANSCRIBE_MODEL ?? 'whisper-1';
 const MAX_TTS_CHARS = 10_000;
 
 /**
- * Synthesizes a spoken transcript to an MP3. A conversation transcript with
- * "Name:" speaker labels is read by the one voice, labels included — the same
- * v1 tradeoff the offline pipeline makes.
+ * Cheaper, lower-latency model than eleven_multilingual_v2 (1 credit per 2
+ * chars instead of 1:1) — ElevenLabs' own recommended default over both
+ * multilingual and turbo, with no meaningful quality loss for the narration
+ * and dialogue this app synthesizes.
  */
-export async function synthesizeSpeech(transcript: string): Promise<Buffer> {
-  const text = transcript.trim();
-  if (!text)
-    throw new Error('Nothing to synthesize — the transcript is empty.');
+const MODEL_ID = 'eleven_flash_v2_5';
+
+async function synthesizeWithVoice(
+  text: string,
+  voiceId: string,
+): Promise<Buffer> {
   if (text.length > MAX_TTS_CHARS) {
     throw new Error(
-      `Transcript is ${text.length} characters; the ${MAX_TTS_CHARS} limit for one synthesis request would be exceeded.`,
+      `Text is ${text.length} characters; the ${MAX_TTS_CHARS} limit for one synthesis request would be exceeded.`,
     );
   }
-
   const res = await fetch(
-    `https://api.elevenlabs.io/v1/text-to-speech/${VOICE_ID}`,
+    `https://api.elevenlabs.io/v1/text-to-speech/${voiceId}`,
     {
       method: 'POST',
       headers: {
         'xi-api-key': requireEnv('ELEVENLABS_API_KEY'),
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({ text, model_id: 'eleven_multilingual_v2' }),
+      body: JSON.stringify({ text, model_id: MODEL_ID }),
     },
   );
   if (!res.ok) {
     throw new Error(`ElevenLabs ${res.status}: ${await res.text()}`);
   }
   return Buffer.from(await res.arrayBuffer());
+}
+
+/** Synthesizes a spoken transcript to an MP3, read by the one default voice. */
+export async function synthesizeSpeech(transcript: string): Promise<Buffer> {
+  const text = transcript.trim();
+  if (!text)
+    throw new Error('Nothing to synthesize — the transcript is empty.');
+  return synthesizeWithVoice(text, VOICE_ID);
+}
+
+/** One speaker's line, parsed out of a "Name: text" transcript. */
+export type Turn = { speaker: string | null; text: string };
+
+/**
+ * Splits a transcript into per-speaker turns. Each "Name: ..." line starts a
+ * new turn; a monologue with no such labels comes back as a single turn with
+ * speaker: null. Blank lines between turns are just separators.
+ */
+export function parseTurns(transcript: string): Turn[] {
+  const lines = transcript.trim().split('\n');
+  const turns: Turn[] = [];
+  const speakerLine = /^([A-Za-z][A-Za-z '-]{0,30}):\s*(.*)$/;
+
+  for (const rawLine of lines) {
+    const line = rawLine.trim();
+    if (!line) continue;
+    const match = speakerLine.exec(line);
+    if (match) {
+      turns.push({ speaker: match[1]!, text: match[2]! });
+    } else if (turns.length) {
+      // Continuation of the previous speaker's turn (also how a label sitting
+      // alone on its own line picks up the text that follows it).
+      const prev = turns[turns.length - 1]!;
+      prev.text = prev.text ? `${prev.text} ${line}` : line;
+    } else {
+      turns.push({ speaker: null, text: line });
+    }
+  }
+  return turns;
+}
+
+/**
+ * Synthesizes a transcript to one MP3. A dialogue ("Name: ..." lines) gets a
+ * distinct voice per speaker — cycling within the gender pool `speakers`
+ * assigns them, so two speakers of the same gender still sound different —
+ * synthesized turn by turn and concatenated; the spoken audio never reads the
+ * name labels aloud. A monologue (or a transcript with only one speaker)
+ * falls back to `synthesizeSpeech`, one request, no concatenation.
+ */
+export async function synthesizeConversation(
+  transcript: string,
+  speakers?: Record<string, 'male' | 'female'>,
+): Promise<Buffer> {
+  const turns = parseTurns(transcript);
+  const distinctSpeakers = [...new Set(turns.map((t) => t.speaker))].filter(
+    (s): s is string => s !== null,
+  );
+
+  if (distinctSpeakers.length < 2) return synthesizeSpeech(transcript);
+
+  // ponytail: cycles within its gender's pool once it runs out of distinct
+  // voices there; a >2-female or >2-male track reuses a voice rather than
+  // failing — add more premade voices to VOICE_POOL if that gets audible.
+  const nextIndex: Record<'male' | 'female', number> = { male: 0, female: 0 };
+  const voiceBySpeaker = new Map<string, string>();
+  for (const speaker of distinctSpeakers) {
+    const gender = speakers?.[speaker] ?? 'female';
+    const pool = VOICE_POOL[gender];
+    voiceBySpeaker.set(speaker, pool[nextIndex[gender] % pool.length]!);
+    nextIndex[gender] += 1;
+  }
+
+  // Sequential, not Promise.all: ElevenLabs' Starter plan caps concurrent
+  // requests at 6, and a track can have more turns than that.
+  const clips: Buffer[] = [];
+  for (const turn of turns) {
+    clips.push(
+      await synthesizeWithVoice(
+        turn.text,
+        turn.speaker ? voiceBySpeaker.get(turn.speaker)! : VOICE_ID,
+      ),
+    );
+  }
+  return Buffer.concat(clips);
 }
 
 /** Bar count the runner's waveform renders — matches @bandzen/ui's Waveform default. */

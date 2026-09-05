@@ -1,0 +1,275 @@
+{
+  "slug": "wildlife-photography-course-enrolment",
+  "title": "Enrolling in a Wildlife Photography Course",
+  "topic": "A customer asks about a weekend course in wildlife photography",
+  "difficulty": 3,
+  "transcript": "Grace:\nHello, Northwood Photography Centre. This is Grace speaking.\nHugo:\nHi. I'm interested in the wildlife photography course next month. I saw the poster in the library but it didn't give much detail.\nGrace:\nIt's a three-weekend course for beginners and intermediate photographers. Each Saturday session runs from nine thirty until one.\nHugo:\nDo I need a professional camera?\nGrace:\nNo. A camera with manual settings is useful, but even some compact cameras are suitable. We don't recommend using a phone because several exercises involve changing shutter speed and aperture.\nHugo:\nI have a small mirrorless camera, so that should be fine. What happens in the first session?\nGrace:\nThe first Saturday focuses on camera settings and photographing moving animals. Most of that session takes place in Riverside Park.\nHugo:\nAnd the second weekend?\nGrace:\nThat's mainly about composition and working with natural light. The group visits Hill Farm because there are open fields, woodland edges and plenty of birds.\nHugo:\nWhat about the final session?\nGrace:\nThe last Saturday covers editing and selecting images. That one is held entirely at the photography centre because everyone works on a computer.\nHugo:\nDo we need to bring laptops?\nGrace:\nNo. Desktop computers are provided, and they already have the editing software installed.\nHugo:\nHow many people are usually in the group?\nGrace:\nWe limit the course to ten participants. At the moment, seven places have been booked.\nHugo:\nIs transport to the outdoor locations included?\nGrace:\nWe provide a minibus from the photography centre. It leaves at nine fifteen on the first two Saturdays, so participants need to arrive a little earlier than the official class time.\nHugo:\nWhat should we bring for the outdoor sessions?\nGrace:\nYour camera, a spare battery and waterproof clothing. A tripod is optional because we have a few that people can borrow.\nHugo:\nHow much is the course?\nGrace:\nIt's one hundred and twenty pounds. There's a ten percent discount for full-time students, but you'll need to show a valid student card when you arrive.\nHugo:\nCan I reserve a place without paying the full amount today?\nGrace:\nYes. A thirty-pound deposit secures your place, and the remaining balance is due one week before the course begins.",
+  "speakers": {
+    "Grace": "female",
+    "Hugo": "male"
+  },
+  "matchingOptions": [
+    "Riverside Park",
+    "Hill Farm",
+    "photography centre",
+    "city library",
+    "botanical gardens",
+    "lakeside reserve"
+  ],
+  "questions": [
+    {
+      "idx": 1,
+      "kind": "sentence_completion",
+      "prompt": "Complete the sentence. Write ONE WORD AND/OR A NUMBER. The course runs over ________ weekends.",
+      "options": null,
+      "answer": [
+        "three"
+      ],
+      "evidence": "It's a three-weekend course for beginners and intermediate photographers.",
+      "explanation": "The course is spread across three weekends."
+    },
+    {
+      "idx": 2,
+      "kind": "multiple_choice",
+      "prompt": "Why does Grace advise against using a phone camera?",
+      "options": [
+        "Phones are not allowed outdoors",
+        "Phone batteries may not last long enough",
+        "Several exercises require manual control of settings",
+        "The centre's software cannot read phone images"
+      ],
+      "answer": [
+        "Several exercises require manual control of settings"
+      ],
+      "evidence": "We don't recommend using a phone because several exercises involve changing shutter speed and aperture.",
+      "explanation": "The practical work requires control over photographic settings."
+    },
+    {
+      "idx": 3,
+      "kind": "matching",
+      "prompt": "Where will the first session mainly take place?",
+      "options": null,
+      "answer": [
+        "Riverside Park"
+      ],
+      "evidence": "Most of that session takes place in Riverside Park.",
+      "explanation": "The first weekend is based mainly in Riverside Park."
+    },
+    {
+      "idx": 4,
+      "kind": "matching",
+      "prompt": "Where will students practise composition and natural-light photography?",
+      "options": null,
+      "answer": [
+        "Hill Farm"
+      ],
+      "evidence": "The group visits Hill Farm because there are open fields, woodland edges and plenty of birds.",
+      "explanation": "The second session takes the group to Hill Farm."
+    },
+    {
+      "idx": 5,
+      "kind": "matching",
+      "prompt": "Where will the editing session take place?",
+      "options": null,
+      "answer": [
+        "photography centre"
+      ],
+      "evidence": "That one is held entirely at the photography centre because everyone works on a computer.",
+      "explanation": "The final session is indoors at the centre."
+    },
+    {
+      "idx": 6,
+      "kind": "multiple_choice",
+      "prompt": "What equipment is provided for the final session?",
+      "options": [
+        "laptops",
+        "tablet computers",
+        "desktop computers",
+        "digital cameras"
+      ],
+      "answer": [
+        "desktop computers"
+      ],
+      "evidence": "Desktop computers are provided, and they already have the editing software installed.",
+      "explanation": "Participants use the centre's desktop computers."
+    },
+    {
+      "idx": 7,
+      "kind": "sentence_completion",
+      "prompt": "Complete the sentence. Write ONE WORD AND/OR A NUMBER. The maximum group size is ________ participants.",
+      "options": null,
+      "answer": [
+        "ten"
+      ],
+      "evidence": "We limit the course to ten participants.",
+      "explanation": "Only ten people can enrol."
+    },
+    {
+      "idx": 8,
+      "kind": "multiple_choice",
+      "prompt": "What time does the minibus leave on the first two Saturdays?",
+      "options": [
+        "9:00",
+        "9:15",
+        "9:30",
+        "9:45"
+      ],
+      "answer": [
+        "9:15"
+      ],
+      "evidence": "It leaves at nine fifteen on the first two Saturdays, so participants need to arrive a little earlier than the official class time.",
+      "explanation": "The transport departs fifteen minutes before the scheduled class start."
+    },
+    {
+      "idx": 9,
+      "kind": "sentence_completion",
+      "prompt": "Complete the sentence. Write TWO WORDS. Participants should bring a camera, spare battery and ________ for outdoor sessions.",
+      "options": null,
+      "answer": [
+        "waterproof clothing"
+      ],
+      "evidence": "Your camera, a spare battery and waterproof clothing.",
+      "explanation": "Waterproof clothing is one of the required items."
+    },
+    {
+      "idx": 10,
+      "kind": "multiple_choice",
+      "prompt": "How much is the deposit?",
+      "options": [
+        "twenty pounds",
+        "thirty pounds",
+        "forty pounds",
+        "one hundred and twenty pounds"
+      ],
+      "answer": [
+        "thirty pounds"
+      ],
+      "evidence": "A thirty-pound deposit secures your place, and the remaining balance is due one week before the course begins.",
+      "explanation": "A thirty-pound payment is required to reserve a place."
+    }
+  ],
+  "audioUrl": "https://pub-fbae5ca09eba4fd0820da2b390dd7ca0.r2.dev/listening/wildlife-photography-course-enrolment.mp3",
+  "peaks": [
+    0.5074785531336973,
+    0.3025346369070086,
+    0.38472283406621843,
+    0.37693202188032043,
+    0.6283956394933552,
+    0.7000687746488433,
+    0.6086119379303282,
+    0.29233682926465493,
+    0.5393225578780025,
+    0.49831798604124766,
+    0.4325308161860644,
+    0.4444760192224344,
+    0.3834370405306706,
+    0.3644301498265259,
+    0.17509350099050172,
+    0.36747194436810915,
+    0.35989812577013897,
+    0.31315596021117087,
+    0.8255732851003168,
+    1,
+    0.566398508869954,
+    0.4054827825994611,
+    0.3395225679524556,
+    0.34199492909259854,
+    0.32401319486341,
+    0.266050424024281,
+    0.3749398035792668,
+    0.2806041328563401,
+    0.3464206640486956,
+    0.3438381007773372,
+    0.3310635441010805,
+    0.3957345216721087,
+    0.6293002599666212,
+    0.3963433964074927,
+    0.2797237698213236,
+    0.4178377234705586,
+    0.3905805317313754,
+    0.4035216811837925,
+    0.374259927229,
+    0.33435398137038613,
+    0.39036609637952624,
+    0.3049894143429476,
+    0.3181892843426101,
+    0.3743614209173424,
+    0.31836353914007026,
+    0.43933164050738993,
+    0.4151825718341597,
+    0.33548603248486486,
+    0.35201966706488524,
+    0.20837517244948628,
+    0.4003166669992319,
+    0.3720842990800452,
+    0.33301743313265664,
+    0.37483948868416506,
+    0.2509621989815869,
+    0.7633959984380748,
+    0.36681461715115543,
+    0.3684980905031188,
+    0.3567078052416348,
+    0.2657022540817808,
+    0.3121676127188389,
+    0.3111856124606707,
+    0.3165848877267991,
+    0.31320089363480585,
+    0.33525433812192384,
+    0.6166892577884102,
+    0.7770889643721968,
+    0.4374872556400638,
+    0.40128041568062867,
+    0.4069382644789842,
+    0.3472662913060284,
+    0.4621167925775602,
+    0.6535282280564313,
+    0.44434527486171926,
+    0.3880188665368653,
+    0.24952654574346916,
+    0.33045020170219325,
+    0.3466905938514906,
+    0.3735549356423602,
+    0.7161703296603092,
+    0.580665568179422,
+    0.36746020442183486,
+    0.34107843154369005,
+    0.20416229892911733,
+    0.4230147867545862,
+    0.31980132954804236,
+    0.2888696040583517,
+    0.29216622197115216,
+    0.39729255225622256,
+    0.34518779230859004,
+    0.24153844631580026,
+    0.6300084675244245,
+    0.5392057211766345,
+    0.34404180567247017,
+    0.3893372454912339,
+    0.34872486193718055,
+    0.26447101385737937,
+    0.3882032887179628,
+    0.29723813621690476,
+    0.2736915278519523,
+    0.25621614536613974,
+    0.5554194096407022,
+    0.41276928679980174,
+    0.3237905043615143,
+    0.31672254312795284,
+    0.29444319512961414,
+    0.259900947594606,
+    0.4337743241713657,
+    0.2868297954959202,
+    0.3506289277734532,
+    0.8298695777522774,
+    0.715654622311955,
+    0.41942697647639765,
+    0.24023901892790991,
+    0.3902818306584111,
+    0.32974109430660853,
+    0.38918640510421826,
+    0.385376255104587,
+    0.2989438901256641,
+    0.2825633012266956
+  ],
+  "durationSeconds": 129.98820861678004
+}

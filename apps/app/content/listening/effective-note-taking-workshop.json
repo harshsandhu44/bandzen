@@ -1,0 +1,269 @@
+{
+  "slug": "effective-note-taking-workshop",
+  "title": "A Workshop on Effective Note-Taking",
+  "topic": "A study adviser explains techniques for taking useful lecture notes",
+  "difficulty": 3,
+  "transcript": "This session is about making lecture notes that are actually useful when you revise. Many students try to write down almost everything a lecturer says, but that usually produces pages of information without showing which ideas matter most.\nBefore a lecture, spend five minutes looking at the title, the weekly topic and any slides that have been released in advance. This gives you a basic structure before you start taking notes.\nDuring the lecture, listen for verbal signals. A lecturer may say that something is particularly important, give three main reasons for an effect, or announce that they're moving to a new topic. Those phrases tell you something about the structure of the material.\nAvoid writing complete sentences unless a precise definition is being given. Abbreviations save time, but use ones you will still understand several weeks later. Inventing a new abbreviation every few minutes usually creates more work during revision.\nLeave some blank space between major sections. You can use it later to add examples, definitions or connections that become clearer after reading the textbook.\nOne useful method is to divide each page into three areas. Use the largest area for your main notes, a narrow column on the left for key terms or questions, and a small section at the bottom for a summary.\nThe summary should be written after the lecture rather than during it. Try to reduce the main idea of the page to two or three sentences. If you cannot do that, it may mean you haven't yet identified the central point.\nWithin twenty-four hours, review your notes and mark anything you do not understand. This first review is more useful than waiting until the week before an examination, when the lecture may no longer be fresh in your memory.\nDon't simply highlight whole paragraphs. Highlighting works best when you select only a few terms, dates or phrases that will help you locate important information quickly.\nFinally, compare your notes with the lecture objectives. If the objective says you should be able to explain a process but your notes contain only a definition, you probably need to add more detail from the textbook or another reliable source.",
+  "matchingOptions": null,
+  "questions": [
+    {
+      "idx": 1,
+      "kind": "multiple_choice",
+      "prompt": "What problem does the speaker identify with trying to record everything a lecturer says?",
+      "options": [
+        "Students miss the lecturer's examples",
+        "The notes fail to show which ideas are most important",
+        "Lectures become harder to understand",
+        "Students use too many abbreviations"
+      ],
+      "answer": [
+        "The notes fail to show which ideas are most important"
+      ],
+      "evidence": "Many students try to write down almost everything a lecturer says, but that usually produces pages of information without showing which ideas matter most.",
+      "explanation": "Recording nearly everything can obscure the relative importance of different ideas."
+    },
+    {
+      "idx": 2,
+      "kind": "sentence_completion",
+      "prompt": "Complete the sentence. Write ONE WORD AND/OR A NUMBER. Before a lecture, students should spend about ________ minutes looking at the topic and available slides.",
+      "options": null,
+      "answer": [
+        "five"
+      ],
+      "evidence": "Before a lecture, spend five minutes looking at the title, the weekly topic and any slides that have been released in advance.",
+      "explanation": "The recommended preparation period is five minutes."
+    },
+    {
+      "idx": 3,
+      "kind": "multiple_choice",
+      "prompt": "What can verbal signals help students identify?",
+      "options": [
+        "The lecturer's personal opinion",
+        "The structure of the material",
+        "The difficulty of the examination",
+        "The required textbook chapters"
+      ],
+      "answer": [
+        "The structure of the material"
+      ],
+      "evidence": "Those phrases tell you something about the structure of the material.",
+      "explanation": "Signals such as announcing a new topic help reveal how the lecture is organised."
+    },
+    {
+      "idx": 4,
+      "kind": "sentence_completion",
+      "prompt": "Complete the sentence. Write ONE WORD. Complete sentences are mainly useful when recording a precise ________.",
+      "options": null,
+      "answer": [
+        "definition"
+      ],
+      "evidence": "Avoid writing complete sentences unless a precise definition is being given.",
+      "explanation": "The speaker makes precise definitions an exception to the general advice against full sentences."
+    },
+    {
+      "idx": 5,
+      "kind": "multiple_choice",
+      "prompt": "Why should students leave blank space between major sections?",
+      "options": [
+        "To make the notes easier to photocopy",
+        "To insert material later",
+        "To separate different lectures",
+        "To practise writing summaries"
+      ],
+      "answer": [
+        "To insert material later"
+      ],
+      "evidence": "You can use it later to add examples, definitions or connections that become clearer after reading the textbook.",
+      "explanation": "Blank space allows students to add useful material after the lecture."
+    },
+    {
+      "idx": 6,
+      "kind": "sentence_completion",
+      "prompt": "Complete the sentence. Write TWO WORDS. The narrow left-hand column should contain key terms or ________.",
+      "options": null,
+      "answer": [
+        "questions"
+      ],
+      "evidence": "Use the largest area for your main notes, a narrow column on the left for key terms or questions, and a small section at the bottom for a summary.",
+      "explanation": "The left column is reserved for key terms or questions."
+    },
+    {
+      "idx": 7,
+      "kind": "multiple_choice",
+      "prompt": "When should the page summary be written?",
+      "options": [
+        "before the lecture",
+        "during the introduction",
+        "after the lecture",
+        "just before an examination"
+      ],
+      "answer": [
+        "after the lecture"
+      ],
+      "evidence": "The summary should be written after the lecture rather than during it.",
+      "explanation": "Students should write the summary once the lecture has finished."
+    },
+    {
+      "idx": 8,
+      "kind": "sentence_completion",
+      "prompt": "Complete the sentence. Write ONE WORD AND/OR A NUMBER. Notes should receive their first review within ________ hours.",
+      "options": null,
+      "answer": [
+        "twenty-four"
+      ],
+      "evidence": "Within twenty-four hours, review your notes and mark anything you do not understand.",
+      "explanation": "The advised review window is twenty-four hours."
+    },
+    {
+      "idx": 9,
+      "kind": "multiple_choice",
+      "prompt": "What does the speaker recommend highlighting?",
+      "options": [
+        "whole paragraphs",
+        "only textbook definitions",
+        "a small number of useful terms, dates or phrases",
+        "every unfamiliar word"
+      ],
+      "answer": [
+        "a small number of useful terms, dates or phrases"
+      ],
+      "evidence": "Highlighting works best when you select only a few terms, dates or phrases that will help you locate important information quickly.",
+      "explanation": "Selective highlighting is recommended instead of marking large sections."
+    },
+    {
+      "idx": 10,
+      "kind": "sentence_completion",
+      "prompt": "Complete the sentence. Write TWO WORDS. Students should compare their notes with the lecture ________.",
+      "options": null,
+      "answer": [
+        "lecture objectives"
+      ],
+      "evidence": "Finally, compare your notes with the lecture objectives.",
+      "explanation": "Lecture objectives help students identify whether important content is missing from their notes."
+    }
+  ],
+  "audioUrl": "https://pub-fbae5ca09eba4fd0820da2b390dd7ca0.r2.dev/listening/effective-note-taking-workshop.mp3",
+  "peaks": [
+    0.7506676649463543,
+    0.6578965207497874,
+    0.5811497952241629,
+    0.39989191761830833,
+    0.5343802116523118,
+    0.6499826129876706,
+    0.6963145455828149,
+    0.3952678657713722,
+    0.5169100534248046,
+    0.5139957279703496,
+    0.5583149223579391,
+    0.5902700309338564,
+    0.43421821051446585,
+    0.31515488814935105,
+    0.4335534010552705,
+    0.645403096957254,
+    0.446404927094087,
+    0.5491901890648754,
+    0.6491881887340192,
+    0.5756514057594927,
+    0.32740013623954445,
+    0.5083130750914351,
+    0.42596485384462224,
+    0.28129865819582184,
+    0.6012374004513622,
+    0.6365473458355603,
+    0.4034762651161736,
+    0.7472445819099551,
+    0.5349322152272428,
+    0.35735816496030137,
+    0.7841807334389495,
+    0.33983516917361134,
+    0.9304741475370355,
+    0.5148740234993484,
+    0.4013280997176999,
+    0.5593887771641719,
+    0.39029598941422444,
+    0.2030581954528185,
+    0.7276463881658233,
+    0.5612751444866547,
+    0.6029994905223762,
+    0.46919039241144966,
+    0.22259663829558302,
+    0.7958167352956348,
+    0.5407747631957188,
+    0.6557672884800767,
+    0.485833986204288,
+    0.17560117207397186,
+    1,
+    0.6524843085569495,
+    0.5443454312032807,
+    0.601360304350276,
+    0.17368689276082142,
+    0.6957763578898756,
+    0.4857422225282418,
+    0.20722116925972853,
+    0.8187378721716149,
+    0.5688325138410755,
+    0.5978252616192679,
+    0.44384027640641455,
+    0.33351270534200517,
+    0.2330259860073865,
+    0.6998110432420568,
+    0.4954452952811728,
+    0.4228469880978905,
+    0.4499640259992626,
+    0.5689647338802081,
+    0.5737413200591868,
+    0.8053407723916681,
+    0.5534555455811454,
+    0.4690022036229529,
+    0.5773173879884449,
+    0.4775539336425575,
+    0.2523871528688981,
+    0.564728054631495,
+    0.6678074988611366,
+    0.42483036876103486,
+    0.10366374269240895,
+    0.7103148512542033,
+    0.5408032712719758,
+    0.39605139555643265,
+    0.17595885763114133,
+    0.502776721490687,
+    0.712914021800383,
+    0.47886664421894515,
+    0.2448504288897132,
+    0.6583839417195451,
+    0.5866078485226583,
+    0.6776821079913528,
+    0.6315099167082906,
+    0.14345137229883329,
+    0.6946172741929911,
+    0.6566443497640063,
+    0.43982743345678477,
+    0.43349413619828864,
+    0.7924293521881905,
+    0.4285562031573995,
+    0.11254002899186101,
+    0.5438256087478315,
+    0.27877764596459065,
+    0.6446980961731414,
+    0.5720644239038797,
+    0.5614061409425067,
+    0.4873259411438192,
+    0.4711533109296808,
+    0.5256565194516823,
+    0.3935291362771909,
+    0.2012598294987421,
+    0.6301725152952004,
+    0.3328042205021186,
+    0.3078426751689799,
+    0.5275897138807978,
+    0.4691786794148556,
+    0.5071730391013064,
+    0.5870830125212025,
+    0.3531033528867215,
+    0.5960918252964943,
+    0.4015071446153531,
+    0.5110548677162204,
+    0.2673599728603837
+  ],
+  "durationSeconds": 136.62621315192743
+}

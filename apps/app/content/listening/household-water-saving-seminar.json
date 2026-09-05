@@ -1,0 +1,272 @@
+{
+  "slug": "household-water-saving-seminar",
+  "title": "Reducing Water Use at Home",
+  "topic": "A sustainability adviser explains practical ways households can reduce water consumption",
+  "difficulty": 3,
+  "transcript": "Today's seminar is about reducing household water use without making everyday life unnecessarily difficult. Small changes can make a substantial difference, especially when several measures are used together.\nLet's begin in the bathroom, where showers and toilets account for a large share of indoor water use. A standard shower can use around twelve litres of water per minute. Installing a low-flow shower head can reduce that amount while maintaining reasonable water pressure.\nThe length of the shower matters too. Reducing a ten-minute shower to six minutes can save a significant amount of water over the course of a week.\nLeaks are another common problem. A dripping tap may look minor, but if it continues day and night, the total loss can be surprisingly large. Replace worn washers promptly rather than waiting until the leak becomes worse.\nToilets can also waste water when the internal valve fails to close properly. One simple sign is the sound of water continuing to run long after the toilet has been flushed.\nIn the kitchen, avoid running the tap continuously while washing vegetables. Filling a bowl with water is usually more efficient, and the same water can sometimes be used afterwards for garden plants.\nDishwashers are often more water-efficient than washing a full load by hand, but only when the machine is properly loaded. Try to run the dishwasher when it is full rather than after every meal.\nOutdoors, watering gardens early in the morning reduces evaporation compared with watering during the hottest part of the day. Evening watering can also reduce evaporation, but in some climates it may increase the risk of fungal disease on plants.\nCollecting rainwater is another useful option. A water butt connected to a roof downpipe can provide water for gardens and outdoor cleaning without using the mains supply.\nIf you wash a car at home, use a bucket for most of the cleaning rather than leaving a hose running. A hose should be used only briefly for rinsing.\nFinally, check your water meter regularly if your home has one. An unexplained increase in usage can be an early warning of a hidden leak, particularly if your household routine has not changed.",
+  "matchingOptions": [
+    "bathroom",
+    "kitchen",
+    "garden",
+    "car washing",
+    "water meter",
+    "roof downpipe",
+    "dishwasher"
+  ],
+  "questions": [
+    {
+      "idx": 1,
+      "kind": "multiple_choice",
+      "prompt": "Approximately how much water can a standard shower use per minute?",
+      "options": [
+        "six litres",
+        "eight litres",
+        "twelve litres",
+        "twenty litres"
+      ],
+      "answer": [
+        "twelve litres"
+      ],
+      "evidence": "A standard shower can use around twelve litres of water per minute.",
+      "explanation": "The speaker gives twelve litres per minute as a typical figure."
+    },
+    {
+      "idx": 2,
+      "kind": "sentence_completion",
+      "prompt": "Complete the sentence. Write TWO WORDS. Installing a ________ can reduce shower water use.",
+      "options": null,
+      "answer": [
+        "low-flow shower head"
+      ],
+      "evidence": "Installing a low-flow shower head can reduce that amount while maintaining reasonable water pressure.",
+      "explanation": "A low-flow shower head is recommended to reduce consumption."
+    },
+    {
+      "idx": 3,
+      "kind": "multiple_choice",
+      "prompt": "What shower length is given as an example of a reduced shower?",
+      "options": [
+        "four minutes",
+        "six minutes",
+        "eight minutes",
+        "twelve minutes"
+      ],
+      "answer": [
+        "six minutes"
+      ],
+      "evidence": "Reducing a ten-minute shower to six minutes can save a significant amount of water over the course of a week.",
+      "explanation": "Six minutes is the reduced duration used in the example."
+    },
+    {
+      "idx": 4,
+      "kind": "sentence_completion",
+      "prompt": "Complete the sentence. Write ONE WORD. A dripping tap may need a worn ________ replaced.",
+      "options": null,
+      "answer": [
+        "washers"
+      ],
+      "evidence": "Replace worn washers promptly rather than waiting until the leak becomes worse.",
+      "explanation": "Worn washers are identified as a common cause that should be replaced."
+    },
+    {
+      "idx": 5,
+      "kind": "multiple_choice",
+      "prompt": "What may indicate that a toilet valve is not closing correctly?",
+      "options": [
+        "low water pressure",
+        "a weak flushing sound",
+        "water continuing to run",
+        "condensation on the tank"
+      ],
+      "answer": [
+        "water continuing to run"
+      ],
+      "evidence": "One simple sign is the sound of water continuing to run long after the toilet has been flushed.",
+      "explanation": "Continued running water can signal a faulty internal valve."
+    },
+    {
+      "idx": 6,
+      "kind": "matching",
+      "prompt": "Where does the speaker suggest using a bowl instead of continuous running water?",
+      "options": null,
+      "answer": [
+        "kitchen"
+      ],
+      "evidence": "In the kitchen, avoid running the tap continuously while washing vegetables.",
+      "explanation": "The bowl method is suggested for washing vegetables in the kitchen."
+    },
+    {
+      "idx": 7,
+      "kind": "matching",
+      "prompt": "Where is early-morning watering recommended?",
+      "options": null,
+      "answer": [
+        "garden"
+      ],
+      "evidence": "Outdoors, watering gardens early in the morning reduces evaporation compared with watering during the hottest part of the day.",
+      "explanation": "The recommendation applies to garden watering."
+    },
+    {
+      "idx": 8,
+      "kind": "matching",
+      "prompt": "Which feature should be connected to a water butt?",
+      "options": null,
+      "answer": [
+        "roof downpipe"
+      ],
+      "evidence": "A water butt connected to a roof downpipe can provide water for gardens and outdoor cleaning without using the mains supply.",
+      "explanation": "Rainwater is collected from a roof downpipe."
+    },
+    {
+      "idx": 9,
+      "kind": "multiple_choice",
+      "prompt": "When is a dishwasher most water-efficient?",
+      "options": [
+        "When run after every meal",
+        "When used only for plates",
+        "When properly loaded and full",
+        "When rinsed before each cycle"
+      ],
+      "answer": [
+        "When properly loaded and full"
+      ],
+      "evidence": "Dishwashers are often more water-efficient than washing a full load by hand, but only when the machine is properly loaded.",
+      "explanation": "Efficiency depends on loading the dishwasher properly and running full loads."
+    },
+    {
+      "idx": 10,
+      "kind": "sentence_completion",
+      "prompt": "Complete the sentence. Write TWO WORDS. An unexplained rise in meter readings may indicate a ________.",
+      "options": null,
+      "answer": [
+        "hidden leak"
+      ],
+      "evidence": "An unexplained increase in usage can be an early warning of a hidden leak, particularly if your household routine has not changed.",
+      "explanation": "Unexpected higher water use may signal a concealed leak."
+    }
+  ],
+  "audioUrl": "https://pub-fbae5ca09eba4fd0820da2b390dd7ca0.r2.dev/listening/household-water-saving-seminar.mp3",
+  "peaks": [
+    0.8444913402129413,
+    0.7000210169317067,
+    0.5191294650828799,
+    0.6452952940441066,
+    0.6575769546851478,
+    0.1953787703919996,
+    0.779134288830688,
+    0.641743093339456,
+    0.42021580019995924,
+    0.7927039859207441,
+    0.5600145821498168,
+    0.2177702709583997,
+    0.7375632249604364,
+    0.7817999410496044,
+    0.5389832100219474,
+    0.6326983498525391,
+    0.5050806468588052,
+    0.5561891373518276,
+    0.7760476228373526,
+    0.6450361335136761,
+    0.2835468963287612,
+    1,
+    0.5394871858539378,
+    0.5705049775320661,
+    0.7937400534448228,
+    0.31755838858660074,
+    0.8212739462613189,
+    0.5094984905907731,
+    0.7666925784952188,
+    0.6636867745480993,
+    0.5683615962695643,
+    0.7006623821792507,
+    0.43316902946035907,
+    0.14524413962469154,
+    0.8869540940263646,
+    0.2674885614911734,
+    0.7088465270692323,
+    0.6686755514553767,
+    0.7555455756993353,
+    0.5865026214670351,
+    0.5779709511593818,
+    0.518468297001577,
+    0.15510835802615422,
+    0.9613929013252887,
+    0.5943538844886063,
+    0.6403726501355874,
+    0.46489257453254895,
+    0.6873394588436212,
+    0.6828118862065111,
+    0.7632583759402974,
+    0.4491314889624073,
+    0.47910080458876253,
+    0.7057808554938786,
+    0.6796534997341027,
+    0.8481132302656145,
+    0.5475520269517196,
+    0.26705876502382675,
+    0.7736869312677432,
+    0.8502371281336227,
+    0.7416719265995898,
+    0.534986616852609,
+    0.5016381502195243,
+    0.8677145950079521,
+    0.7010393356015981,
+    0.7620913587459082,
+    0.7845192156605487,
+    0.5225323185221756,
+    0.4468233908259019,
+    0.5481412155696178,
+    0.946786124921783,
+    0.5852952989482335,
+    0.5479345545413877,
+    0.6753669629901792,
+    0.7317984842292158,
+    0.3511916970859386,
+    0.7928719305148227,
+    0.6557629800740935,
+    0.680724108178809,
+    0.6344365223116912,
+    0.7522822152013435,
+    0.6601953606629478,
+    0.5407654137720257,
+    0.4629232740951154,
+    0.5264402108247808,
+    0.2945759575257036,
+    0.7049818137044713,
+    0.6143145322545497,
+    0.37349512199353097,
+    0.7358667744443869,
+    0.655466739154099,
+    0.5879269893445191,
+    0.3882264007726515,
+    0.6228862095260129,
+    0.8275642321511272,
+    0.35927955141553536,
+    0.6451788345174273,
+    0.6681547594416423,
+    0.5967580988256378,
+    0.6573944455504211,
+    0.5595154194817967,
+    0.6707059961944878,
+    0.10688677602669752,
+    0.7372450624261847,
+    0.715489190646803,
+    0.6617374894197435,
+    0.7135824615906421,
+    0.2636355766372265,
+    0.7230369095814444,
+    0.5640365275123859,
+    0.5512729829274895,
+    0.6837453507422844,
+    0.5253533536799687,
+    0.39725419263293554,
+    0.8172290538989967,
+    0.6430855718777457,
+    0.740368102814684,
+    0.47514440281843007,
+    0.5383530100256213,
+    0.49284846838350194,
+    0.28980584744654814
+  ],
+  "durationSeconds": 132.678820861678
+}
