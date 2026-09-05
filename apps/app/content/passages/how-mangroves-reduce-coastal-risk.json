@@ -1,0 +1,177 @@
+{
+  "slug": "how-mangroves-reduce-coastal-risk",
+  "title": "How Mangroves Reduce Coastal Risk",
+  "topic": "coastal ecology",
+  "difficulty": 3,
+  "headings": [
+    "A forest adapted to unstable coastal ground",
+    "How roots and trunks weaken waves",
+    "Why mangroves cannot stop every storm",
+    "Sediment trapping and the changing height of a coast",
+    "The ecological consequences of coastal development",
+    "Restoration depends on recovering the right physical conditions",
+    "Measuring protection in the field and with models",
+    "Combining natural defenses with engineered protection"
+  ],
+  "body": "A\nMangroves are communities of salt-tolerant trees and shrubs that occupy sheltered tropical and subtropical coasts. They grow in environments that challenge most land plants: soils may be waterlogged, oxygen-poor, saline, and repeatedly flooded by tides. Different mangrove species have evolved roots that stabilize them in soft sediment and structures that help them exchange gases when the soil contains little oxygen. Some species also exclude salt at their roots or remove it through leaves. These adaptations allow mangrove forests to occupy the boundary between land and sea, where they influence sediment movement, provide habitat, store carbon, and alter the way waves and currents reach the shoreline.\n\nB\nOne reason mangroves attract attention in coastal engineering is that their trunks, branches, and roots create resistance to flowing water. As waves pass through a forest, part of their energy is lost through friction and turbulence around this vegetation. The reduction is usually greater across wider and denser stands, although the exact effect depends on water depth, wave period, tree structure, and the arrangement of roots and stems. Mangroves therefore do not act like a solid wall. They gradually weaken wave energy as water moves through them, and the amount of protection changes with both forest condition and the characteristics of an incoming storm.\n\nC\nThe limits of this protection matter. A narrow or degraded mangrove belt may provide only modest reduction during an extreme event, and very deep storm surge can submerge much of the vegetation that normally creates resistance. Trees can also be broken, uprooted, or stripped of branches by severe winds and waves. Mangroves cannot prevent the regional rise in water level produced by a large cyclone. Their contribution is better understood as one part of risk reduction rather than a guarantee against flooding. Coastal planning therefore needs to consider evacuation, building design, warning systems, and engineered structures alongside ecosystem-based protection.\n\nD\nMangroves also alter shorelines over longer timescales by trapping suspended sediment. Water slows among roots, allowing some particles to settle instead of being carried offshore. Organic material from roots and fallen leaves can also contribute to soil formation. If sediment accumulation and root production raise the soil surface quickly enough, a mangrove wetland may keep pace with a moderate increase in relative sea level. This capacity is not unlimited. Where sediment supply is low, the land is subsiding rapidly, or development blocks the forest from moving inland, mangroves may gradually lose suitable habitat as water levels rise.\n\nE\nHuman alteration has removed or fragmented mangroves in many regions. Forests have been cleared for aquaculture, agriculture, roads, ports, housing, and other coastal development. Dams and embankments can also change the delivery of freshwater and sediment even when trees are not cut directly. The loss is ecological as well as physical because mangrove habitats support juvenile fish, crustaceans, birds, and other organisms. Clearing may also expose carbon-rich soils to erosion or decomposition. Protecting an existing forest can therefore preserve several functions at once, whereas replacing a mature ecosystem after it has been destroyed is much more difficult.\n\nF\nMangrove restoration is not simply a matter of planting large numbers of seedlings. Many unsuccessful projects have placed trees where tidal flooding, elevation, salinity, or wave exposure does not match the requirements of the chosen species. In some cases, natural recolonization occurs once blocked tidal channels are reopened or inappropriate barriers are removed. Restoring hydrology can be more important than planting because it recreates the physical conditions in which seedlings can establish without continuous human assistance. Site selection also requires attention to land ownership and future shoreline movement, especially where a recovering forest may need space to migrate inland.\n\nG\nResearchers evaluate coastal protection using field observations, laboratory experiments, remote sensing, and numerical models. Instruments can record wave heights before and after water passes through vegetation, while satellite images reveal changes in forest width and shoreline position. Models help explore conditions that are too dangerous or rare to measure directly, but their results depend on assumptions about vegetation density, storm characteristics, and seabed shape. For practical planning, mangroves are increasingly treated as components of hybrid defenses that may also include dunes, levees, elevated buildings, or seawalls. The objective is not to choose between nature and engineering in every case, but to understand where each layer of protection is most effective.",
+  "questions": [
+    {
+      "idx": 1,
+      "kind": "matching_headings",
+      "prompt": "Choose the most suitable heading for paragraph B.",
+      "options": null,
+      "answer": [
+        "How roots and trunks weaken waves"
+      ],
+      "evidence": "As waves pass through a forest, part of their energy is lost through friction and turbulence around this vegetation.",
+      "explanation": "The paragraph explains how mangrove structures reduce wave energy as water moves through the forest."
+    },
+    {
+      "idx": 2,
+      "kind": "matching_headings",
+      "prompt": "Choose the most suitable heading for paragraph C.",
+      "options": null,
+      "answer": [
+        "Why mangroves cannot stop every storm"
+      ],
+      "evidence": "Mangroves cannot prevent the regional rise in water level produced by a large cyclone.",
+      "explanation": "The paragraph describes the limits of mangrove protection during severe storms."
+    },
+    {
+      "idx": 3,
+      "kind": "matching_headings",
+      "prompt": "Choose the most suitable heading for paragraph D.",
+      "options": null,
+      "answer": [
+        "Sediment trapping and the changing height of a coast"
+      ],
+      "evidence": "Mangroves also alter shorelines over longer timescales by trapping suspended sediment.",
+      "explanation": "The paragraph focuses on sediment deposition, soil formation, and whether mangrove surfaces can keep pace with rising water."
+    },
+    {
+      "idx": 4,
+      "kind": "matching_headings",
+      "prompt": "Choose the most suitable heading for paragraph F.",
+      "options": null,
+      "answer": [
+        "Restoration depends on recovering the right physical conditions"
+      ],
+      "evidence": "Restoring hydrology can be more important than planting because it recreates the physical conditions in which seedlings can establish without continuous human assistance.",
+      "explanation": "The paragraph explains why appropriate tidal and hydrological conditions are central to successful restoration."
+    },
+    {
+      "idx": 5,
+      "kind": "true_false_not_given",
+      "prompt": "Mangroves reduce wave energy partly because water encounters resistance from vegetation.",
+      "options": null,
+      "answer": [
+        "TRUE"
+      ],
+      "evidence": "One reason mangroves attract attention in coastal engineering is that their trunks, branches, and roots create resistance to flowing water.",
+      "explanation": "The passage directly states that mangrove structures resist flowing water."
+    },
+    {
+      "idx": 6,
+      "kind": "true_false_not_given",
+      "prompt": "A mangrove forest can completely prevent storm surge from a large cyclone.",
+      "options": null,
+      "answer": [
+        "FALSE"
+      ],
+      "evidence": "Mangroves cannot prevent the regional rise in water level produced by a large cyclone.",
+      "explanation": "The passage explicitly contradicts the claim."
+    },
+    {
+      "idx": 7,
+      "kind": "true_false_not_given",
+      "prompt": "The passage states that mangrove restoration always becomes successful within five years.",
+      "options": null,
+      "answer": [
+        "NOT GIVEN"
+      ],
+      "evidence": "Mangrove restoration is not simply a matter of planting large numbers of seedlings.",
+      "explanation": "The passage discusses factors affecting restoration but gives no universal five-year timescale."
+    },
+    {
+      "idx": 8,
+      "kind": "multiple_choice",
+      "prompt": "Why can water moving through a mangrove forest lose wave energy?",
+      "options": [
+        "Vegetation creates friction and turbulence.",
+        "Roots permanently lower regional sea level.",
+        "Leaves prevent tides from entering the coast.",
+        "Sediment eliminates all incoming currents."
+      ],
+      "answer": [
+        "Vegetation creates friction and turbulence."
+      ],
+      "evidence": "As waves pass through a forest, part of their energy is lost through friction and turbulence around this vegetation.",
+      "explanation": "The passage identifies friction and turbulence around vegetation as the mechanism."
+    },
+    {
+      "idx": 9,
+      "kind": "multiple_choice",
+      "prompt": "What can prevent a mangrove wetland from keeping pace with rising relative sea level?",
+      "options": [
+        "Low sediment supply.",
+        "Dense juvenile fish populations.",
+        "Gas exchange through specialized roots.",
+        "The presence of satellite monitoring."
+      ],
+      "answer": [
+        "Low sediment supply."
+      ],
+      "evidence": "Where sediment supply is low, the land is subsiding rapidly, or development blocks the forest from moving inland, mangroves may gradually lose suitable habitat as water levels rise.",
+      "explanation": "Low sediment supply is directly identified as one factor that can make adjustment difficult."
+    },
+    {
+      "idx": 10,
+      "kind": "multiple_choice",
+      "prompt": "According to the passage, what may be more important than planting seedlings in some restoration projects?",
+      "options": [
+        "Restoring hydrology.",
+        "Building a port.",
+        "Removing all suspended sediment.",
+        "Increasing wave exposure."
+      ],
+      "answer": [
+        "Restoring hydrology."
+      ],
+      "evidence": "Restoring hydrology can be more important than planting because it recreates the physical conditions in which seedlings can establish without continuous human assistance.",
+      "explanation": "The passage explicitly gives restoration of hydrology priority in some situations."
+    },
+    {
+      "idx": 11,
+      "kind": "sentence_completion",
+      "prompt": "Complete the sentence using NO MORE THAN TWO WORDS from the passage: Mangroves grow in soils that may be waterlogged, saline, and ______.",
+      "options": null,
+      "answer": [
+        "oxygen-poor"
+      ],
+      "evidence": "They grow in environments that challenge most land plants: soils may be waterlogged, oxygen-poor, saline, and repeatedly flooded by tides.",
+      "explanation": "The answer is copied directly from the passage."
+    },
+    {
+      "idx": 12,
+      "kind": "sentence_completion",
+      "prompt": "Complete the sentence using NO MORE THAN TWO WORDS from the passage: Mangrove roots can trap suspended ______.",
+      "options": null,
+      "answer": [
+        "sediment"
+      ],
+      "evidence": "Mangroves also alter shorelines over longer timescales by trapping suspended sediment.",
+      "explanation": "The required word appears verbatim in the passage."
+    },
+    {
+      "idx": 13,
+      "kind": "sentence_completion",
+      "prompt": "Complete the sentence using NO MORE THAN TWO WORDS from the passage: Instruments can compare ______ before and after water crosses vegetation.",
+      "options": null,
+      "answer": [
+        "wave heights"
+      ],
+      "evidence": "Instruments can record wave heights before and after water passes through vegetation, while satellite images reveal changes in forest width and shoreline position.",
+      "explanation": "The exact phrase from the passage is wave heights."
+    }
+  ]
+}

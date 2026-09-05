@@ -1,0 +1,178 @@
+{
+  "slug": "recovering-history-from-ancient-dna",
+  "title": "Recovering History from Ancient DNA",
+  "topic": "archaeogenetics",
+  "difficulty": 4,
+  "headings": [
+    "Why ancient genetic material is difficult to recover",
+    "Laboratory methods designed to limit contamination",
+    "Choosing bones that preserve more genetic material",
+    "How genetic evidence can reveal population movement",
+    "Why DNA cannot replace archaeology and history",
+    "The growing importance of ethical consultation",
+    "Early failures caused by inaccurate radiocarbon dating",
+    "What ancient DNA reveals about individual personalities",
+    "Using modern genomes to reconstruct extinct languages"
+  ],
+  "body": "A\nDNA begins to break down after an organism dies. Water, heat, microorganisms and chemical reactions fragment the long molecules that once existed in living cells, and over time the surviving pieces become shorter and rarer. This creates an obvious difficulty for researchers attempting to recover genetic information from ancient human remains. Samples can also contain large quantities of DNA from soil organisms and from people who handled the material after excavation. In many ancient specimens, the proportion of authentic human DNA is therefore extremely small. Successful analysis depends not only on detecting DNA but on distinguishing genuinely ancient molecules from modern contamination and other genetic material present in the sample.\n\nB\nTo reduce contamination, specialised ancient-DNA laboratories operate under conditions very different from ordinary molecular biology facilities. Researchers wear protective clothing, clean surfaces carefully and often work in rooms where air pressure and filtration are controlled. Samples may be treated to remove contamination from their outer surfaces before material is taken from the interior. Scientists also examine characteristic patterns of molecular damage that accumulate in old DNA. These patterns cannot by themselves prove that every sequence is ancient, but they provide evidence that helps distinguish old fragments from recent contamination. Independent replication and comparisons with DNA from laboratory personnel can provide additional safeguards.\n\nC\nThe choice of skeletal material can greatly affect the amount of usable DNA recovered. For many years, researchers commonly sampled teeth and long bones, but studies later showed that the dense petrous portion of the temporal bone often preserves unusually high concentrations of ancient DNA. This discovery dramatically increased the success rate of genetic analysis from some poorly preserved remains. However, taking a sample is destructive because a small quantity of bone must be drilled or cut away. Researchers therefore have to balance the scientific value of testing against preservation of the specimen, particularly when remains are rare, culturally significant or held in museum collections.\n\nD\nWhen sufficient DNA is obtained, researchers can compare genetic similarities among individuals from different places and periods. Such comparisons have transformed understanding of prehistoric population movement. In Europe, for example, genetic evidence has shown that major demographic changes accompanied the spread of farming and later movements from the Eurasian steppe. These findings demonstrated that cultural changes visible in archaeological remains were sometimes associated with substantial migration rather than being caused only by the transfer of ideas. Ancient DNA can also reveal close biological relationships between individuals buried at the same site, allowing researchers to investigate family structure and patterns of residence that would be difficult to detect from artefacts alone.\n\nE\nGenetic evidence nevertheless has important limits. Similar DNA does not tell researchers what language a person spoke, what political identity they claimed or how they understood their community. Archaeological context remains essential for interpreting how people lived, while written sources, where available, provide forms of information that genomes cannot contain. Even biological ancestry requires careful description because ancient populations rarely correspond neatly to modern national or ethnic categories. Genetic data are therefore most informative when combined with evidence from archaeology, anthropology, history, isotope analysis and other fields rather than treated as a complete explanation of the past.\n\nF\nEthical questions have become increasingly prominent as ancient-DNA research has expanded. Human remains may have cultural, spiritual or familial significance for living communities, and destructive sampling can create conflict if research proceeds without consultation. Some institutions and research groups now place greater emphasis on collaboration with descendant or affiliated communities when projects are planned. Questions also arise over where samples should be stored, who controls genetic data and how findings about ancestry are communicated to the public. There is no single policy that applies to every region or community, but the broader trend is toward recognising that technical ability to extract DNA does not automatically provide an unrestricted right to study human remains.",
+  "questions": [
+    {
+      "idx": 1,
+      "kind": "matching_headings",
+      "prompt": "Choose the most suitable heading for paragraph A.",
+      "options": null,
+      "answer": [
+        "Why ancient genetic material is difficult to recover"
+      ],
+      "evidence": "Water, heat, microorganisms and chemical reactions fragment the long molecules that once existed in living cells, and over time the surviving pieces become shorter and rarer.",
+      "explanation": "Paragraph A outlines degradation and contamination problems that make ancient DNA difficult to analyse."
+    },
+    {
+      "idx": 2,
+      "kind": "matching_headings",
+      "prompt": "Choose the most suitable heading for paragraph B.",
+      "options": null,
+      "answer": [
+        "Laboratory methods designed to limit contamination"
+      ],
+      "evidence": "To reduce contamination, specialised ancient-DNA laboratories operate under conditions very different from ordinary molecular biology facilities.",
+      "explanation": "The paragraph describes protective clothing, cleaning, filtration and other measures used against contamination."
+    },
+    {
+      "idx": 3,
+      "kind": "matching_headings",
+      "prompt": "Choose the most suitable heading for paragraph C.",
+      "options": null,
+      "answer": [
+        "Choosing bones that preserve more genetic material"
+      ],
+      "evidence": "The choice of skeletal material can greatly affect the amount of usable DNA recovered.",
+      "explanation": "Paragraph C focuses on which skeletal elements preserve DNA especially well."
+    },
+    {
+      "idx": 4,
+      "kind": "matching_headings",
+      "prompt": "Choose the most suitable heading for paragraph D.",
+      "options": null,
+      "answer": [
+        "How genetic evidence can reveal population movement"
+      ],
+      "evidence": "Such comparisons have transformed understanding of prehistoric population movement.",
+      "explanation": "Paragraph D explains how comparisons among ancient genomes reveal migration and demographic change."
+    },
+    {
+      "idx": 5,
+      "kind": "true_false_not_given",
+      "prompt": "Ancient human samples may contain DNA from organisms living in the surrounding soil.",
+      "options": null,
+      "answer": [
+        "TRUE"
+      ],
+      "evidence": "Samples can also contain large quantities of DNA from soil organisms and from people who handled the material after excavation.",
+      "explanation": "The passage explicitly identifies soil organisms as a source of DNA in ancient samples."
+    },
+    {
+      "idx": 6,
+      "kind": "true_false_not_given",
+      "prompt": "Damage patterns in DNA are sufficient on their own to prove that every recovered sequence is ancient.",
+      "options": null,
+      "answer": [
+        "FALSE"
+      ],
+      "evidence": "These patterns cannot by themselves prove that every sequence is ancient, but they provide evidence that helps distinguish old fragments from recent contamination.",
+      "explanation": "The passage directly rejects the idea that damage patterns alone provide complete proof."
+    },
+    {
+      "idx": 7,
+      "kind": "true_false_not_given",
+      "prompt": "The petrous portion of the temporal bone was first identified as a useful DNA source by researchers working in Scandinavia.",
+      "options": null,
+      "answer": [
+        "NOT GIVEN"
+      ],
+      "evidence": "For many years, researchers commonly sampled teeth and long bones, but studies later showed that the dense petrous portion of the temporal bone often preserves unusually high concentrations of ancient DNA.",
+      "explanation": "The passage identifies the petrous bone as useful but does not say where the discovery was first made."
+    },
+    {
+      "idx": 8,
+      "kind": "multiple_choice",
+      "prompt": "Why does sampling ancient skeletal material create a preservation issue?",
+      "options": [
+        "The analysis requires some bone to be removed or drilled.",
+        "Bones must be exposed to high temperatures during testing.",
+        "Samples cannot be returned to museum collections.",
+        "Genetic analysis permanently changes the age of the specimen."
+      ],
+      "answer": [
+        "The analysis requires some bone to be removed or drilled."
+      ],
+      "evidence": "However, taking a sample is destructive because a small quantity of bone must be drilled or cut away.",
+      "explanation": "The destructive aspect of sampling comes from physically removing part of the specimen."
+    },
+    {
+      "idx": 9,
+      "kind": "multiple_choice",
+      "prompt": "What has ancient DNA shown about some cultural changes in prehistoric Europe?",
+      "options": [
+        "They were sometimes accompanied by large-scale migration.",
+        "They occurred without any movement of people.",
+        "They were caused mainly by changes in spoken language.",
+        "They can be explained entirely through family relationships."
+      ],
+      "answer": [
+        "They were sometimes accompanied by large-scale migration."
+      ],
+      "evidence": "These findings demonstrated that cultural changes visible in archaeological remains were sometimes associated with substantial migration rather than being caused only by the transfer of ideas.",
+      "explanation": "The genetic evidence indicates that migration sometimes accompanied cultural change."
+    },
+    {
+      "idx": 10,
+      "kind": "multiple_choice",
+      "prompt": "Why does the author argue that genetic evidence should be combined with other disciplines?",
+      "options": [
+        "Genomes contain no information about biological relationships.",
+        "DNA cannot reveal every social and cultural aspect of past lives.",
+        "Archaeological evidence is always more precise than genetic evidence.",
+        "Written sources can determine the exact ancestry of every individual."
+      ],
+      "answer": [
+        "DNA cannot reveal every social and cultural aspect of past lives."
+      ],
+      "evidence": "Similar DNA does not tell researchers what language a person spoke, what political identity they claimed or how they understood their community.",
+      "explanation": "The passage stresses that genetic similarity cannot answer many cultural and social questions."
+    },
+    {
+      "idx": 11,
+      "kind": "sentence_completion",
+      "prompt": "Complete the sentence using NO MORE THAN TWO WORDS from the passage: Ancient DNA fragments become progressively shorter and ______ over time.",
+      "options": null,
+      "answer": [
+        "rarer"
+      ],
+      "evidence": "Water, heat, microorganisms and chemical reactions fragment the long molecules that once existed in living cells, and over time the surviving pieces become shorter and rarer.",
+      "explanation": "The missing word is taken directly from the passage."
+    },
+    {
+      "idx": 12,
+      "kind": "sentence_completion",
+      "prompt": "Complete the sentence using NO MORE THAN THREE WORDS from the passage: The ______ of the temporal bone often contains high concentrations of ancient DNA.",
+      "options": null,
+      "answer": [
+        "dense petrous portion"
+      ],
+      "evidence": "For many years, researchers commonly sampled teeth and long bones, but studies later showed that the dense petrous portion of the temporal bone often preserves unusually high concentrations of ancient DNA.",
+      "explanation": "The three-word answer appears verbatim in the passage."
+    },
+    {
+      "idx": 13,
+      "kind": "sentence_completion",
+      "prompt": "Complete the sentence using NO MORE THAN TWO WORDS from the passage: Some researchers increasingly collaborate with ______ when planning ancient-DNA projects.",
+      "options": null,
+      "answer": [
+        "descendant"
+      ],
+      "evidence": "Some institutions and research groups now place greater emphasis on collaboration with descendant or affiliated communities when projects are planned.",
+      "explanation": "The required word is stated directly in the passage."
+    }
+  ]
+}

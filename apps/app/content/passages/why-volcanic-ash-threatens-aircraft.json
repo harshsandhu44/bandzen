@@ -1,0 +1,177 @@
+{
+  "slug": "why-volcanic-ash-threatens-aircraft",
+  "title": "Why Volcanic Ash Threatens Aircraft",
+  "topic": "aviation and volcanology",
+  "difficulty": 4,
+  "headings": [
+    "What volcanic ash actually consists of",
+    "Why jet engines are vulnerable to ash",
+    "Damage to windscreens and external surfaces",
+    "Tracking clouds that may be invisible to pilots",
+    "How volcanic ash advisories support route decisions",
+    "Why uncertainty remains after an eruption",
+    "Lessons from aircraft encounters with ash clouds",
+    "The difficulty of predicting where ash concentrations will be highest"
+  ],
+  "body": "A\nVolcanic ash is not the soft residue produced by burning wood. It consists of tiny fragments of rock, mineral crystals, and volcanic glass created when magma is violently broken apart during an eruption. Fine particles can be carried high into the atmosphere and transported hundreds or thousands of kilometres by winds. An ash cloud may spread across busy air routes even when the volcano itself is far from an airport. Because individual particles can be extremely small, pilots may not always see a clear boundary between clean air and contaminated air, especially at night or when meteorological clouds obscure the view.\n\nB\nJet engines are particularly vulnerable because they draw enormous volumes of air through compressors and combustion chambers. When ash enters an engine, some particles can melt or soften in the high-temperature section. Farther through the engine, the material may cool and stick to internal components, interfering with airflow and reducing engine performance. Ash can also erode compressor blades and contaminate sensors. In a severe encounter, several engines may lose thrust. Engines can sometimes recover after an aircraft leaves the ash cloud, but crews cannot safely assume that recovery will occur, so avoiding significant ash concentrations is the primary strategy.\n\nC\nThe hazard is not limited to engines. Fast-moving ash particles can abrade the leading edges of wings and damage lights, antennas, and other exposed surfaces. Windscreens may become scratched or frosted, reducing a pilot's forward visibility. Ash entering ventilation systems can contaminate the cabin, while deposits can affect moving components. Even after landing, maintenance teams may need to inspect engines, sensors, and air systems before the aircraft returns to service. These effects make volcanic ash both an immediate flight hazard and a potential source of expensive maintenance even when an encounter does not lead to engine failure.\n\nD\nDetecting and forecasting ash clouds requires information from several sources. Weather satellites can identify some volcanic plumes by measuring radiation at different wavelengths, while ground-based radar, cameras, lightning sensors, and observations from aircraft can provide additional evidence. Satellite detection becomes more difficult when ash lies beneath thick meteorological cloud or when the concentration is low. Observatories near volcanoes monitor earthquakes, gas emissions, and deformation to recognize unrest, but the exact size and duration of an eruption cannot always be predicted in advance. Once an eruption begins, scientists must rapidly estimate how much ash is entering the atmosphere and at what altitude.\n\nE\nSpecialized volcanic ash advisory centers use observations together with atmospheric dispersion models. These models combine estimates of the eruption with wind fields to predict where ash is likely to travel at different heights. Aviation authorities, airlines, and air-traffic managers can use the resulting advisories when deciding whether to reroute, delay, or cancel flights. The process is more complicated than drawing a single line around an ash cloud because concentration varies within the plume and model predictions change as new observations arrive. Route planning therefore involves both the expected location of ash and uncertainty about how the cloud may evolve.\n\nF\nUncertainty comes from several sources. Wind forecasts are imperfect, and an eruption can change intensity rapidly. The amount of ash released at different altitudes may be poorly known, especially during bad weather or at remote volcanoes. Particles also fall out of the atmosphere at rates that depend on their size and on processes such as aggregation, in which small particles clump together. Rain can remove ash from the air, while strong winds can later remobilize deposits from the ground. Consequently, a forecast produced soon after an eruption may need repeated revision as measurements improve.\n\nG\nAviation procedures have been shaped by serious encounters in which aircraft entered ash clouds without recognizing the danger in time. Such events demonstrated that visual avoidance alone was inadequate and encouraged international coordination among volcanologists, meteorologists, regulators, and airlines. Modern practice emphasizes rapid reporting of eruptions, standardized advisories, satellite monitoring, forecasting, and operational planning. The objective is not to predict every particle perfectly. It is to reduce the probability that an aircraft enters a concentration capable of causing significant damage while avoiding unnecessary disruption of airspace that is actually safe.",
+  "questions": [
+    {
+      "idx": 1,
+      "kind": "matching_headings",
+      "prompt": "Choose the most suitable heading for paragraph B.",
+      "options": null,
+      "answer": [
+        "Why jet engines are vulnerable to ash"
+      ],
+      "evidence": "Jet engines are particularly vulnerable because they draw enormous volumes of air through compressors and combustion chambers.",
+      "explanation": "The paragraph describes several ways ash can damage or disrupt jet engines."
+    },
+    {
+      "idx": 2,
+      "kind": "matching_headings",
+      "prompt": "Choose the most suitable heading for paragraph C.",
+      "options": null,
+      "answer": [
+        "Damage to windscreens and external surfaces"
+      ],
+      "evidence": "The hazard is not limited to engines.",
+      "explanation": "The paragraph focuses on abrasion, windshield damage, cabin contamination, and maintenance outside the engine itself."
+    },
+    {
+      "idx": 3,
+      "kind": "matching_headings",
+      "prompt": "Choose the most suitable heading for paragraph D.",
+      "options": null,
+      "answer": [
+        "Tracking clouds that may be invisible to pilots"
+      ],
+      "evidence": "Detecting and forecasting ash clouds requires information from several sources.",
+      "explanation": "The paragraph describes satellite and ground observations used to detect and characterize ash."
+    },
+    {
+      "idx": 4,
+      "kind": "matching_headings",
+      "prompt": "Choose the most suitable heading for paragraph F.",
+      "options": null,
+      "answer": [
+        "Why uncertainty remains after an eruption"
+      ],
+      "evidence": "Uncertainty comes from several sources.",
+      "explanation": "The paragraph explains uncertainty in winds, eruption intensity, ash release, particle behavior, and weather."
+    },
+    {
+      "idx": 5,
+      "kind": "true_false_not_given",
+      "prompt": "Volcanic ash can contain fragments of volcanic glass.",
+      "options": null,
+      "answer": [
+        "TRUE"
+      ],
+      "evidence": "It consists of tiny fragments of rock, mineral crystals, and volcanic glass created when magma is violently broken apart during an eruption.",
+      "explanation": "The passage explicitly includes volcanic glass among the components."
+    },
+    {
+      "idx": 6,
+      "kind": "true_false_not_given",
+      "prompt": "Pilots can always identify the edge of an ash cloud visually.",
+      "options": null,
+      "answer": [
+        "FALSE"
+      ],
+      "evidence": "Because individual particles can be extremely small, pilots may not always see a clear boundary between clean air and contaminated air, especially at night or when meteorological clouds obscure the view.",
+      "explanation": "The passage states that the boundary may not be visible."
+    },
+    {
+      "idx": 7,
+      "kind": "true_false_not_given",
+      "prompt": "The passage states that every ash encounter causes permanent engine failure.",
+      "options": null,
+      "answer": [
+        "NOT GIVEN"
+      ],
+      "evidence": "Engines can sometimes recover after an aircraft leaves the ash cloud, but crews cannot safely assume that recovery will occur, so avoiding significant ash concentrations is the primary strategy.",
+      "explanation": "The passage says recovery is sometimes possible and does not give a universal statement that every encounter causes permanent failure."
+    },
+    {
+      "idx": 8,
+      "kind": "multiple_choice",
+      "prompt": "What can happen to ash inside the hot section of a jet engine?",
+      "options": [
+        "Particles can melt or soften.",
+        "Particles become harmless water vapor.",
+        "Particles increase the strength of compressor blades.",
+        "Particles automatically leave through the cabin."
+      ],
+      "answer": [
+        "Particles can melt or soften."
+      ],
+      "evidence": "When ash enters an engine, some particles can melt or soften in the high-temperature section.",
+      "explanation": "The passage directly states that high temperatures can melt or soften ash particles."
+    },
+    {
+      "idx": 9,
+      "kind": "multiple_choice",
+      "prompt": "Why can satellite detection of ash become difficult?",
+      "options": [
+        "Ash may lie beneath thick meteorological cloud.",
+        "Satellites cannot observe atmospheric radiation.",
+        "Aircraft always disperse the plume before detection.",
+        "Volcanic ash exists only at ground level."
+      ],
+      "answer": [
+        "Ash may lie beneath thick meteorological cloud."
+      ],
+      "evidence": "Satellite detection becomes more difficult when ash lies beneath thick meteorological cloud or when the concentration is low.",
+      "explanation": "The passage identifies cloud cover and low concentration as detection challenges."
+    },
+    {
+      "idx": 10,
+      "kind": "multiple_choice",
+      "prompt": "What do dispersion models combine to forecast ash movement?",
+      "options": [
+        "Estimates of the eruption and wind fields.",
+        "Passenger numbers and airport lighting.",
+        "Engine age and runway length.",
+        "Ticket prices and aircraft weight."
+      ],
+      "answer": [
+        "Estimates of the eruption and wind fields."
+      ],
+      "evidence": "These models combine estimates of the eruption with wind fields to predict where ash is likely to travel at different heights.",
+      "explanation": "The passage explicitly states the two main model inputs."
+    },
+    {
+      "idx": 11,
+      "kind": "sentence_completion",
+      "prompt": "Complete the sentence using NO MORE THAN TWO WORDS from the passage: Ash may abrade the leading edges of ______.",
+      "options": null,
+      "answer": [
+        "wings"
+      ],
+      "evidence": "Fast-moving ash particles can abrade the leading edges of wings and damage lights, antennas, and other exposed surfaces.",
+      "explanation": "The answer is taken directly from the sentence."
+    },
+    {
+      "idx": 12,
+      "kind": "sentence_completion",
+      "prompt": "Complete the sentence using NO MORE THAN TWO WORDS from the passage: Advisory centers use observations together with atmospheric ______.",
+      "options": null,
+      "answer": [
+        "dispersion models"
+      ],
+      "evidence": "Specialized volcanic ash advisory centers use observations together with atmospheric dispersion models.",
+      "explanation": "The exact phrase is dispersion models."
+    },
+    {
+      "idx": 13,
+      "kind": "sentence_completion",
+      "prompt": "Complete the sentence using NO MORE THAN TWO WORDS from the passage: Small ash particles may join together through ______.",
+      "options": null,
+      "answer": [
+        "aggregation"
+      ],
+      "evidence": "Particles also fall out of the atmosphere at rates that depend on their size and on processes such as aggregation, in which small particles clump together.",
+      "explanation": "The required word appears verbatim in the passage."
+    }
+  ]
+}

@@ -1,0 +1,177 @@
+{
+  "slug": "forensic-entomology-and-the-timing-of-death",
+  "title": "Forensic Entomology and the Timing of Death",
+  "topic": "forensic science",
+  "difficulty": 4,
+  "headings": [
+    "Why insects become useful after death",
+    "Temperature and the predictable pace of larval growth",
+    "Succession as evidence from changing insect communities",
+    "How investigators collect samples at a scene",
+    "Why laboratory rearing can improve identification",
+    "Environmental factors that complicate estimates",
+    "Combining insect evidence with other forensic information",
+    "The limits of turning insect age into an exact time of death"
+  ],
+  "body": "A\nForensic entomology applies the study of insects and other arthropods to legal investigations. One of its best-known uses is estimating how long a person or animal has been dead, particularly when the usual signs of early decomposition are no longer informative. A dead body becomes a temporary habitat that attracts insects seeking food or a place to reproduce. Blow flies are often among the earliest arrivals when a body is accessible, and females may lay eggs in moist openings or wounds. The resulting larvae feed and grow through recognizable stages. Their development can provide a biological clock, although interpreting that clock requires knowledge of temperature, species, and the conditions surrounding the remains.\n\nB\nInsect development is strongly controlled by temperature. Within a suitable range, larvae generally develop faster in warmer conditions and more slowly when it is cooler. Researchers rear particular species under controlled temperatures to measure the time required to reach each developmental stage. These data can be expressed using accumulated thermal units that combine temperature and time. If investigators identify the species and determine the age of the oldest larvae, they can estimate when eggs were probably laid. This estimate describes the minimum period of insect activity rather than automatically giving the exact time of death, because insects may not have reached the body immediately.\n\nC\nA second approach examines succession, the changing community of insects associated with decomposition. Fresh remains attract a different mixture of species from remains that have dried or entered later stages of decay. Carrion beetles, flies, predatory insects, and other arthropods may become more or less common as tissues and environmental conditions change. Researchers build regional datasets from field experiments and case records to understand typical patterns. Succession can be useful when decomposition has continued for longer than the full development period of a single generation of flies, but its interpretation is strongly influenced by season, climate, habitat, and accessibility.\n\nD\nCareful collection at the scene is essential because poorly handled specimens can destroy information. Investigators may collect larvae from several body regions, record where each sample was found, and preserve some specimens immediately so their developmental stage does not change. Other live specimens may be transported for rearing. Temperatures are recorded at the scene and, where possible, weather records are obtained for the relevant period. Investigators also note whether remains were indoors, buried, wrapped, exposed to sunlight, or accessible to insects. These observations matter because the same species can develop differently under different thermal conditions.\n\nE\nSome larvae are difficult to identify reliably from external appearance alone. Rearing them until adulthood can reveal clearer anatomical characteristics and confirm species identification. Modern laboratories may also use DNA-based methods when specimens are damaged or closely related species are difficult to separate morphologically. Correct identification matters because development rates are species-specific. Using growth data from the wrong species could shift an estimate substantially. Laboratories therefore maintain reference collections and experimental datasets for insects commonly encountered in their region rather than assuming that a developmental schedule measured elsewhere will always apply locally.\n\nF\nReal cases contain complications that laboratory experiments cannot reproduce perfectly. A large mass of feeding larvae can generate heat and become warmer than the surrounding air. Drugs or toxins in tissues may alter development in some species. Clothing, burial, closed rooms, rain, shade, and access through windows can affect when insects arrive and which species can reach the remains. A body may also have been moved from one environment to another. These factors do not make insect evidence useless, but they increase uncertainty. Forensic entomologists therefore reconstruct the thermal and environmental history as carefully as possible instead of relying on a single recorded air temperature.\n\nG\nThe strongest conclusions combine insect evidence with pathology, scene observations, weather data, and other forensic findings. Entomologists usually report an estimated interval and the assumptions behind it rather than claiming a perfectly precise hour of death. In some cases, insect evidence may also indicate that a body was moved or that wounds were colonized before other areas, but such interpretations require caution. The scientific value of forensic entomology comes from its ability to convert patterns of insect growth and succession into testable time constraints. Its reliability depends less on a dramatic discovery than on careful species identification, environmental reconstruction, and transparent treatment of uncertainty.",
+  "questions": [
+    {
+      "idx": 1,
+      "kind": "matching_headings",
+      "prompt": "Choose the most suitable heading for paragraph B.",
+      "options": null,
+      "answer": [
+        "Temperature and the predictable pace of larval growth"
+      ],
+      "evidence": "Insect development is strongly controlled by temperature.",
+      "explanation": "The paragraph explains how temperature affects development and how thermal data are used to estimate larval age."
+    },
+    {
+      "idx": 2,
+      "kind": "matching_headings",
+      "prompt": "Choose the most suitable heading for paragraph C.",
+      "options": null,
+      "answer": [
+        "Succession as evidence from changing insect communities"
+      ],
+      "evidence": "A second approach examines succession, the changing community of insects associated with decomposition.",
+      "explanation": "The paragraph focuses on changes in insect communities through different stages of decomposition."
+    },
+    {
+      "idx": 3,
+      "kind": "matching_headings",
+      "prompt": "Choose the most suitable heading for paragraph D.",
+      "options": null,
+      "answer": [
+        "How investigators collect samples at a scene"
+      ],
+      "evidence": "Careful collection at the scene is essential because poorly handled specimens can destroy information.",
+      "explanation": "The paragraph describes specimen collection, preservation, environmental recording, and scene observations."
+    },
+    {
+      "idx": 4,
+      "kind": "matching_headings",
+      "prompt": "Choose the most suitable heading for paragraph F.",
+      "options": null,
+      "answer": [
+        "Environmental factors that complicate estimates"
+      ],
+      "evidence": "Real cases contain complications that laboratory experiments cannot reproduce perfectly.",
+      "explanation": "The paragraph lists several environmental and biological factors that can alter development or insect access."
+    },
+    {
+      "idx": 5,
+      "kind": "true_false_not_given",
+      "prompt": "Larvae usually develop more quickly when temperatures are warmer, provided conditions remain suitable.",
+      "options": null,
+      "answer": [
+        "TRUE"
+      ],
+      "evidence": "Within a suitable range, larvae generally develop faster in warmer conditions and more slowly when it is cooler.",
+      "explanation": "The passage directly states this relationship."
+    },
+    {
+      "idx": 6,
+      "kind": "true_false_not_given",
+      "prompt": "The age of the oldest larvae always reveals the exact time of death.",
+      "options": null,
+      "answer": [
+        "FALSE"
+      ],
+      "evidence": "This estimate describes the minimum period of insect activity rather than automatically giving the exact time of death, because insects may not have reached the body immediately.",
+      "explanation": "The passage explicitly states that larval age does not automatically equal the exact time since death."
+    },
+    {
+      "idx": 7,
+      "kind": "true_false_not_given",
+      "prompt": "The passage states that blow flies always arrive within ten minutes of death.",
+      "options": null,
+      "answer": [
+        "NOT GIVEN"
+      ],
+      "evidence": "Blow flies are often among the earliest arrivals when a body is accessible, and females may lay eggs in moist openings or wounds.",
+      "explanation": "The passage says blow flies are often early arrivals but gives no fixed ten-minute interval."
+    },
+    {
+      "idx": 8,
+      "kind": "multiple_choice",
+      "prompt": "What do accumulated thermal units combine?",
+      "options": [
+        "Temperature and time.",
+        "Species and body weight.",
+        "Rainfall and wind direction.",
+        "Larval mass and DNA sequence."
+      ],
+      "answer": [
+        "Temperature and time."
+      ],
+      "evidence": "These data can be expressed using accumulated thermal units that combine temperature and time.",
+      "explanation": "The passage directly defines what the units combine."
+    },
+    {
+      "idx": 9,
+      "kind": "multiple_choice",
+      "prompt": "Why may some larvae be reared until adulthood?",
+      "options": [
+        "Adult characteristics may make species identification easier.",
+        "Adults always reveal the exact location of death.",
+        "Rearing removes the effect of temperature from development.",
+        "Adult insects contain no DNA variation."
+      ],
+      "answer": [
+        "Adult characteristics may make species identification easier."
+      ],
+      "evidence": "Rearing them until adulthood can reveal clearer anatomical characteristics and confirm species identification.",
+      "explanation": "The passage says adulthood can provide clearer features for identification."
+    },
+    {
+      "idx": 10,
+      "kind": "multiple_choice",
+      "prompt": "Why can a mass of feeding larvae complicate temperature reconstruction?",
+      "options": [
+        "It can generate its own heat.",
+        "It prevents all insects from reaching the body.",
+        "It always cools the surrounding tissue.",
+        "It eliminates species differences in growth."
+      ],
+      "answer": [
+        "It can generate its own heat."
+      ],
+      "evidence": "A large mass of feeding larvae can generate heat and become warmer than the surrounding air.",
+      "explanation": "The passage directly identifies heat produced by larval masses as a complication."
+    },
+    {
+      "idx": 11,
+      "kind": "sentence_completion",
+      "prompt": "Complete the sentence using NO MORE THAN TWO WORDS from the passage: Blow flies may lay eggs in moist openings or ______.",
+      "options": null,
+      "answer": [
+        "wounds"
+      ],
+      "evidence": "Blow flies are often among the earliest arrivals when a body is accessible, and females may lay eggs in moist openings or wounds.",
+      "explanation": "The answer is lifted verbatim from the passage."
+    },
+    {
+      "idx": 12,
+      "kind": "sentence_completion",
+      "prompt": "Complete the sentence using NO MORE THAN TWO WORDS from the passage: Some collected specimens are preserved immediately to prevent changes in their ______.",
+      "options": null,
+      "answer": [
+        "developmental stage"
+      ],
+      "evidence": "Investigators may collect larvae from several body regions, record where each sample was found, and preserve some specimens immediately so their developmental stage does not change.",
+      "explanation": "The exact phrase is developmental stage."
+    },
+    {
+      "idx": 13,
+      "kind": "sentence_completion",
+      "prompt": "Complete the sentence using NO MORE THAN TWO WORDS from the passage: Laboratories may maintain ______ for commonly encountered insects.",
+      "options": null,
+      "answer": [
+        "reference collections"
+      ],
+      "evidence": "Laboratories therefore maintain reference collections and experimental datasets for insects commonly encountered in their region rather than assuming that a developmental schedule measured elsewhere will always apply locally.",
+      "explanation": "The answer appears exactly in the passage."
+    }
+  ]
+}

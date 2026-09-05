@@ -1,0 +1,178 @@
+{
+  "slug": "how-whales-use-sound-in-the-ocean",
+  "title": "How Whales Use Sound in the Ocean",
+  "topic": "marine bioacoustics",
+  "difficulty": 3,
+  "headings": [
+    "Why low frequencies can support communication over distance",
+    "Echolocation as an active way of sensing prey",
+    "How human and natural noise can mask whale signals",
+    "Combining hydrophones and tags to study hidden behavior",
+    "Why recordings cannot be treated as a direct whale count",
+    "Using acoustic evidence in conservation decisions",
+    "The physical advantage of sound in dark ocean environments",
+    "Environmental factors that alter how calls travel",
+    "The limits of interpreting behavioral responses to noise"
+  ],
+  "body": "A\nSound travels through seawater far more effectively than light, especially across long distances or at depth. That physical fact has shaped the sensory world of whales, whose lives often unfold where vision is limited by darkness, suspended particles, or simple distance. Different whale groups use sound in very different ways. Baleen whales are known for powerful, often low-frequency calls that may travel over large areas, while many toothed whales produce rapid high-frequency clicks. These sounds are not decorative additions to behavior. They can help animals maintain contact, advertise, coordinate, navigate, or locate prey in an environment where a visual signal may disappear within metres.\n\nB\nLow-frequency sound is particularly useful for long-range communication because lower frequencies are generally absorbed less rapidly by seawater than high ones. Some large baleen whales produce calls that can be detected many kilometres from the caller under favorable ocean conditions. The exact distance is not fixed, because sound propagation depends on water temperature, depth, salinity, seafloor shape, and background noise. Whales may also change calling behavior with context. A call that travels efficiently through deep water may behave differently near a coast or in a shallow shelf sea. Researchers therefore study both the animal's signal and the acoustic structure of the water through which it passes.\n\nC\nToothed whales such as dolphins and sperm whales use echolocation, a system in which an animal emits clicks and listens for returning echoes. The interval between a click and its echo provides information about distance, while the strength and spectral details of the return can reveal features of the target. Rapid click sequences are often produced during prey pursuit. Echolocation is especially valuable where prey cannot be seen clearly. It is not, however, a passive sense: the whale is actively creating the signal that makes the target acoustically visible. This gives researchers a way to infer moments of searching and capture attempts from recordings made on or near the animals.\n\nD\nThe ocean is not acoustically empty when whales call. Wind, waves, rain, cracking ice, other animals, ships, construction, and seismic surveys can all contribute sound. When noise overlaps the frequencies that an animal uses, it can reduce the distance over which a call is detectable, a process often described as masking. Some whales respond by calling more loudly, altering timing, or shifting frequency, but these adjustments do not guarantee that communication remains unaffected. The biological consequence depends on the species, the sound source, the duration of exposure, and what the whale was trying to do at the time.\n\nE\nScientists cannot usually watch a whale continuously beneath the surface, so acoustic research relies on several complementary tools. Fixed hydrophones can listen at one location for months, revealing seasonal patterns in calling activity. Arrays of hydrophones can estimate the direction or position of a sound by comparing when it reaches different sensors. Animal-borne tags add another perspective by recording sound together with depth, movement, and sometimes acceleration. A tag can show, for example, whether a burst of clicks occurred during a deep dive or close to a rapid movement associated with prey capture. Each method samples only part of the animal's behavior.\n\nF\nInterpreting recordings requires caution because hearing a call is not the same as counting whales. One individual may call repeatedly, while another may remain silent. A quiet recording period may mean that animals left the area, stopped vocalizing, or moved beyond the detector's effective range. Detection also changes with sea conditions and equipment. Researchers therefore combine acoustic records with visual surveys, tagging, photographic identification, or environmental measurements when possible. Statistical models can then estimate how observation conditions affect the probability of detecting a signal. This prevents a convenient stream of audio data from being mistaken for a complete census.\n\nG\nAcoustic science has become important in conservation because many human activities introduce sound into whale habitat. Regulators and researchers may use listening networks to detect seasonal presence, identify heavily used areas, or evaluate how animals respond to particular noise sources. Such information can support measures such as changing vessel routes, reducing speed, or limiting especially noisy work at sensitive times. Acoustic monitoring does not remove every uncertainty, and not every detected change in behavior implies lasting harm. Its strength is that it makes otherwise hidden activity measurable, allowing decisions to be based on when, where, and how whales actually use sound.",
+  "questions": [
+    {
+      "idx": 1,
+      "kind": "matching_headings",
+      "prompt": "Choose the most suitable heading for paragraph B.",
+      "options": null,
+      "answer": [
+        "Why low frequencies can support communication over distance"
+      ],
+      "evidence": "Low-frequency sound is particularly useful for long-range communication because lower frequencies are generally absorbed less rapidly by seawater than high ones.",
+      "explanation": "The paragraph centers on why low-frequency calls can travel far and what affects that travel."
+    },
+    {
+      "idx": 2,
+      "kind": "matching_headings",
+      "prompt": "Choose the most suitable heading for paragraph C.",
+      "options": null,
+      "answer": [
+        "Echolocation as an active way of sensing prey"
+      ],
+      "evidence": "Toothed whales such as dolphins and sperm whales use echolocation, a system in which an animal emits clicks and listens for returning echoes.",
+      "explanation": "The paragraph explains how toothed whales actively produce clicks and interpret returning echoes."
+    },
+    {
+      "idx": 3,
+      "kind": "matching_headings",
+      "prompt": "Choose the most suitable heading for paragraph D.",
+      "options": null,
+      "answer": [
+        "How human and natural noise can mask whale signals"
+      ],
+      "evidence": "When noise overlaps the frequencies that an animal uses, it can reduce the distance over which a call is detectable, a process often described as masking.",
+      "explanation": "The paragraph describes sources of ocean noise and the masking of whale communication."
+    },
+    {
+      "idx": 4,
+      "kind": "matching_headings",
+      "prompt": "Choose the most suitable heading for paragraph E.",
+      "options": null,
+      "answer": [
+        "Combining hydrophones and tags to study hidden behavior"
+      ],
+      "evidence": "Scientists cannot usually watch a whale continuously beneath the surface, so acoustic research relies on several complementary tools.",
+      "explanation": "The paragraph compares fixed hydrophones, arrays and animal-borne tags as complementary research tools."
+    },
+    {
+      "idx": 5,
+      "kind": "true_false_not_given",
+      "prompt": "Lower-frequency whale sounds are generally absorbed by seawater more slowly than higher-frequency sounds.",
+      "options": null,
+      "answer": [
+        "TRUE"
+      ],
+      "evidence": "Low-frequency sound is particularly useful for long-range communication because lower frequencies are generally absorbed less rapidly by seawater than high ones.",
+      "explanation": "The statement restates the passage's explanation of lower absorption at low frequencies."
+    },
+    {
+      "idx": 6,
+      "kind": "true_false_not_given",
+      "prompt": "A quiet hydrophone recording always means that whales have left the area.",
+      "options": null,
+      "answer": [
+        "FALSE"
+      ],
+      "evidence": "A quiet recording period may mean that animals left the area, stopped vocalizing, or moved beyond the detector's effective range.",
+      "explanation": "The passage gives several possible explanations, so departure is not the only one."
+    },
+    {
+      "idx": 7,
+      "kind": "true_false_not_given",
+      "prompt": "The passage states that sperm whales can identify the exact species of every prey item from a single echo.",
+      "options": null,
+      "answer": [
+        "NOT GIVEN"
+      ],
+      "evidence": "The interval between a click and its echo provides information about distance, while the strength and spectral details of the return can reveal features of the target.",
+      "explanation": "The passage says echoes reveal target features but does not state that sperm whales can identify every prey species from one echo."
+    },
+    {
+      "idx": 8,
+      "kind": "multiple_choice",
+      "prompt": "What can an array of hydrophones estimate by comparing arrival times?",
+      "options": [
+        "The direction or position of a sound.",
+        "Seasonal patterns in calling activity at one fixed site.",
+        "The depth and movement of a tagged whale.",
+        "Whether a quiet period represents a complete census."
+      ],
+      "answer": [
+        "The direction or position of a sound."
+      ],
+      "evidence": "Arrays of hydrophones can estimate the direction or position of a sound by comparing when it reaches different sensors.",
+      "explanation": "The passage directly identifies direction or position as the information derived from arrival-time differences."
+    },
+    {
+      "idx": 9,
+      "kind": "multiple_choice",
+      "prompt": "Why is echolocation described as an active sense?",
+      "options": [
+        "The whale produces the signal used to detect the target.",
+        "The whale listens only to sounds produced naturally by prey.",
+        "The whale depends on a fixed hydrophone to create the signal.",
+        "The whale changes the ocean's background noise before listening."
+      ],
+      "answer": [
+        "The whale produces the signal used to detect the target."
+      ],
+      "evidence": "It is not, however, a passive sense: the whale is actively creating the signal that makes the target acoustically visible.",
+      "explanation": "The whale creates the outgoing signal itself, which distinguishes echolocation from passive listening."
+    },
+    {
+      "idx": 10,
+      "kind": "multiple_choice",
+      "prompt": "According to the passage, which action can acoustic information help support?",
+      "options": [
+        "Changing vessel routes in heavily used whale areas.",
+        "Replacing all visual surveys with underwater microphones.",
+        "Increasing ship speed so vessels leave whale habitat sooner.",
+        "Treating every short-term behavior change as evidence of lasting harm."
+      ],
+      "answer": [
+        "Changing vessel routes in heavily used whale areas."
+      ],
+      "evidence": "Such information can support measures such as changing vessel routes, reducing speed, or limiting especially noisy work at sensitive times.",
+      "explanation": "Changing vessel routes is explicitly listed as a possible conservation measure."
+    },
+    {
+      "idx": 11,
+      "kind": "sentence_completion",
+      "prompt": "Complete the sentence using NO MORE THAN TWO WORDS from the passage: Overlapping noise can cause a process known as ______.",
+      "options": null,
+      "answer": [
+        "masking"
+      ],
+      "evidence": "When noise overlaps the frequencies that an animal uses, it can reduce the distance over which a call is detectable, a process often described as masking.",
+      "explanation": "The required word appears exactly in the passage."
+    },
+    {
+      "idx": 12,
+      "kind": "sentence_completion",
+      "prompt": "Complete the sentence using NO MORE THAN TWO WORDS from the passage: Fixed ______ can listen at one location for months.",
+      "options": null,
+      "answer": [
+        "hydrophones"
+      ],
+      "evidence": "Fixed hydrophones can listen at one location for months, revealing seasonal patterns in calling activity.",
+      "explanation": "The answer is copied directly from the passage."
+    },
+    {
+      "idx": 13,
+      "kind": "sentence_completion",
+      "prompt": "Complete the sentence using NO MORE THAN TWO WORDS from the passage: Researchers may use statistical models to estimate the probability of detecting a ______.",
+      "options": null,
+      "answer": [
+        "signal"
+      ],
+      "evidence": "Statistical models can then estimate how observation conditions affect the probability of detecting a signal.",
+      "explanation": "The exact word required by the sentence is \"signal\"."
+    }
+  ]
+}

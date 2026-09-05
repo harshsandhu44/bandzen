@@ -1,0 +1,177 @@
+{
+  "slug": "the-hidden-life-of-soil-seed-banks",
+  "title": "The Hidden Life of Soil Seed Banks",
+  "topic": "plant ecology",
+  "difficulty": 3,
+  "headings": [
+    "Seeds waiting beneath an apparently empty surface",
+    "Dormancy as a strategy for surviving unfavorable periods",
+    "How seeds enter, move through, and leave the soil",
+    "Why disturbance can release a hidden plant community",
+    "Methods used to measure buried seed populations",
+    "Why seed banks do not perfectly preserve former vegetation",
+    "The importance of seed banks in ecological restoration",
+    "How seed longevity varies among species"
+  ],
+  "body": "A\nA patch of bare soil may contain the beginnings of a future plant community. Seeds released in previous seasons can remain buried after the adult plants that produced them have disappeared, forming what ecologists call a soil seed bank. Some seeds survive only briefly, while others remain viable for years or even decades. The seed bank is therefore both a record of earlier reproduction and a reserve for future growth. Its composition can differ greatly from the vegetation visible above ground because some species produce many persistent seeds while others depend on fresh dispersal each year. This hidden population influences how ecosystems respond to disturbance, management, and environmental change.\n\nB\nDormancy allows a viable seed to delay germination even when it encounters water. The mechanism differs among species. A hard seed coat may prevent water from entering, chemical inhibitors may suppress growth, or an embryo may require a period of cold or warm conditions before it can develop. These delays can be advantageous because germinating at the first brief rainfall might expose a seedling to drought soon afterward. By spreading germination across different times, a population reduces the risk that every offspring will encounter the same unfavorable season. Dormancy therefore acts as a form of biological risk distribution rather than simple inactivity.\n\nC\nSeeds reach the soil in many ways. Some fall close to the parent plant, while others are carried by wind, water, animals, or human activity. Once on the ground, they may be buried by soil movement, earthworms, trampling, or sediment deposition. Burial can protect seeds from predators and fire, but it may also place them too deep to receive the light or temperature cues required for germination. Seeds leave the bank when they germinate, die, decay, or are eaten. The size of a seed bank at any moment reflects the balance among new inputs, losses, and the different survival rates of species already present.\n\nD\nDisturbance can reveal the seed bank dramatically. Fire, ploughing, flood erosion, tree fall, or deliberate soil disturbance may remove vegetation and change light, temperature, moisture, or chemical conditions at the surface. Seeds that were previously dormant can then germinate in large numbers. This response helps explain why plants absent from a site for several years may suddenly reappear after disturbance. However, not every post-disturbance species comes from buried seeds. Some arrive rapidly from nearby populations, so researchers need evidence before attributing vegetation recovery entirely to the seed bank.\n\nE\nEcologists use two main approaches to study buried seeds. In a germination method, soil samples are placed under suitable conditions and emerging seedlings are counted and identified over time. This reveals viable seeds capable of germination under the experimental conditions but may miss dormant seeds whose cues are not provided. A second method separates seeds physically from soil using sieves, flotation, or careful sorting. Those seeds can then be identified and tested for viability. Both approaches have limitations, and researchers often take many samples because seed distribution can be extremely patchy even within a small area.\n\nF\nA soil seed bank is not a perfect archive of past vegetation. Species differ greatly in how many seeds they produce, how far those seeds travel, and how long they remain viable. Many forest trees, for example, produce seeds that germinate quickly or survive poorly in soil, even though the adult trees dominate the vegetation above. Small annual plants may contribute enormous numbers of persistent seeds despite covering little ground in a particular year. As a result, finding abundant seeds of one species does not prove that it was historically the most abundant adult plant at the site.\n\nG\nSeed banks can assist restoration after farming, grazing, fire, or other disturbance, but their usefulness depends on what remains viable. If characteristic native species persist underground, reducing disturbance or restoring suitable environmental conditions may allow some vegetation to recover without extensive planting. Where the seed bank is dominated by weeds or lacks important species, active reintroduction may be necessary. Restoration practitioners therefore sample soils before deciding whether natural regeneration is likely to be sufficient. The seed bank should be treated as one source of ecological resilience, not an unlimited backup copy of the original ecosystem.",
+  "questions": [
+    {
+      "idx": 1,
+      "kind": "matching_headings",
+      "prompt": "Choose the most suitable heading for paragraph B.",
+      "options": null,
+      "answer": [
+        "Dormancy as a strategy for surviving unfavorable periods"
+      ],
+      "evidence": "Dormancy therefore acts as a form of biological risk distribution rather than simple inactivity.",
+      "explanation": "The paragraph explains how delayed germination can spread risk across changing environmental conditions."
+    },
+    {
+      "idx": 2,
+      "kind": "matching_headings",
+      "prompt": "Choose the most suitable heading for paragraph C.",
+      "options": null,
+      "answer": [
+        "How seeds enter, move through, and leave the soil"
+      ],
+      "evidence": "The size of a seed bank at any moment reflects the balance among new inputs, losses, and the different survival rates of species already present.",
+      "explanation": "The paragraph describes dispersal, burial, germination, death, predation, and other processes affecting the seed bank."
+    },
+    {
+      "idx": 3,
+      "kind": "matching_headings",
+      "prompt": "Choose the most suitable heading for paragraph D.",
+      "options": null,
+      "answer": [
+        "Why disturbance can release a hidden plant community"
+      ],
+      "evidence": "Seeds that were previously dormant can then germinate in large numbers.",
+      "explanation": "The paragraph focuses on how disturbance changes conditions and triggers germination."
+    },
+    {
+      "idx": 4,
+      "kind": "matching_headings",
+      "prompt": "Choose the most suitable heading for paragraph F.",
+      "options": null,
+      "answer": [
+        "Why seed banks do not perfectly preserve former vegetation"
+      ],
+      "evidence": "A soil seed bank is not a perfect archive of past vegetation.",
+      "explanation": "The paragraph explains several biases that make buried seeds an incomplete representation of earlier plant communities."
+    },
+    {
+      "idx": 5,
+      "kind": "true_false_not_given",
+      "prompt": "The species found in a soil seed bank may differ from the plants currently visible above ground.",
+      "options": null,
+      "answer": [
+        "TRUE"
+      ],
+      "evidence": "Its composition can differ greatly from the vegetation visible above ground because some species produce many persistent seeds while others depend on fresh dispersal each year.",
+      "explanation": "The passage directly states that below-ground and above-ground composition can differ."
+    },
+    {
+      "idx": 6,
+      "kind": "true_false_not_given",
+      "prompt": "Burial always improves the probability that a seed will germinate.",
+      "options": null,
+      "answer": [
+        "FALSE"
+      ],
+      "evidence": "Burial can protect seeds from predators and fire, but it may also place them too deep to receive the light or temperature cues required for germination.",
+      "explanation": "The passage says burial can both help and hinder seeds."
+    },
+    {
+      "idx": 7,
+      "kind": "true_false_not_given",
+      "prompt": "The passage states that the oldest viable seed ever discovered was more than two thousand years old.",
+      "options": null,
+      "answer": [
+        "NOT GIVEN"
+      ],
+      "evidence": "Some seeds survive only briefly, while others remain viable for years or even decades.",
+      "explanation": "The passage discusses differences in longevity but provides no record age for the oldest viable seed."
+    },
+    {
+      "idx": 8,
+      "kind": "multiple_choice",
+      "prompt": "Why can dormancy be advantageous to a plant population?",
+      "options": [
+        "It reduces the chance that all offspring face the same bad season.",
+        "It guarantees that every seed remains viable for decades.",
+        "It prevents seeds from being transported by animals.",
+        "It makes seedlings independent of water."
+      ],
+      "answer": [
+        "It reduces the chance that all offspring face the same bad season."
+      ],
+      "evidence": "By spreading germination across different times, a population reduces the risk that every offspring will encounter the same unfavorable season.",
+      "explanation": "The paragraph explicitly describes dormancy as a way of distributing environmental risk."
+    },
+    {
+      "idx": 9,
+      "kind": "multiple_choice",
+      "prompt": "What is a limitation of the germination method used to study seed banks?",
+      "options": [
+        "It may miss dormant seeds whose germination cues are absent.",
+        "It can identify only dead seeds.",
+        "It cannot use soil collected from the field.",
+        "It requires every seed to be separated physically first."
+      ],
+      "answer": [
+        "It may miss dormant seeds whose germination cues are absent."
+      ],
+      "evidence": "This reveals viable seeds capable of germination under the experimental conditions but may miss dormant seeds whose cues are not provided.",
+      "explanation": "The passage directly states this limitation."
+    },
+    {
+      "idx": 10,
+      "kind": "multiple_choice",
+      "prompt": "Why might active reintroduction be necessary during restoration?",
+      "options": [
+        "Important native species may be missing from the remaining seed bank.",
+        "Natural regeneration always eliminates native species.",
+        "All disturbed soils lose every viable seed.",
+        "Sampling automatically destroys the entire seed bank."
+      ],
+      "answer": [
+        "Important native species may be missing from the remaining seed bank."
+      ],
+      "evidence": "Where the seed bank is dominated by weeds or lacks important species, active reintroduction may be necessary.",
+      "explanation": "The passage states that missing important species can make reintroduction necessary."
+    },
+    {
+      "idx": 11,
+      "kind": "sentence_completion",
+      "prompt": "Complete the sentence using NO MORE THAN TWO WORDS from the passage: A buried population of viable seeds is called a soil ______.",
+      "options": null,
+      "answer": [
+        "seed bank"
+      ],
+      "evidence": "Seeds released in previous seasons can remain buried after the adult plants that produced them have disappeared, forming what ecologists call a soil seed bank.",
+      "explanation": "The exact phrase in the passage is seed bank."
+    },
+    {
+      "idx": 12,
+      "kind": "sentence_completion",
+      "prompt": "Complete the sentence using NO MORE THAN TWO WORDS from the passage: A hard seed coat may prevent ______ from entering.",
+      "options": null,
+      "answer": [
+        "water"
+      ],
+      "evidence": "A hard seed coat may prevent water from entering, chemical inhibitors may suppress growth, or an embryo may require a period of cold or warm conditions before it can develop.",
+      "explanation": "The required word is water."
+    },
+    {
+      "idx": 13,
+      "kind": "sentence_completion",
+      "prompt": "Complete the sentence using NO MORE THAN TWO WORDS from the passage: Researchers often take many samples because buried seeds can be extremely ______.",
+      "options": null,
+      "answer": [
+        "patchy"
+      ],
+      "evidence": "Both approaches have limitations, and researchers often take many samples because seed distribution can be extremely patchy even within a small area.",
+      "explanation": "The answer is copied directly from the passage."
+    }
+  ]
+}

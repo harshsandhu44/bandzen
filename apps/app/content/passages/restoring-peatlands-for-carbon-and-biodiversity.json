@@ -1,0 +1,178 @@
+{
+  "slug": "restoring-peatlands-for-carbon-and-biodiversity",
+  "title": "Restoring Peatlands for Carbon and Biodiversity",
+  "topic": "wetland ecology",
+  "difficulty": 4,
+  "headings": [
+    "Why waterlogged soils can preserve carbon for millennia",
+    "Drainage as a trigger for decomposition, subsidence and fire",
+    "Rewetting as a hydrological rather than purely botanical repair",
+    "The methane trade-off after water levels are restored",
+    "The role of peat-forming plants in recovery",
+    "Measuring restoration with several kinds of evidence",
+    "Balancing ecological recovery with local land use",
+    "How different peatland types depend on different water and nutrient sources",
+    "Wet agriculture as an alternative to deep drainage"
+  ],
+  "body": "A\nPeatlands are wetlands in which partially decayed plant material accumulates faster than it decomposes. They cover only a modest share of the world's land surface, yet they store exceptionally large quantities of carbon in their soils. The reason is water. When the ground remains saturated, oxygen moves slowly into the soil and microbial decomposition is restricted. Dead mosses, sedges, shrubs, and other plants can therefore persist and build layers of peat over centuries or millennia. This slow accumulation turns a living wetland into a long-term carbon store, but the same carbon can become vulnerable when drainage, burning, extraction, or warming changes the conditions that preserved it.\n\nB\nDrainage is one of the most important disturbances because it lowers the water table and exposes previously saturated peat to air. Oxygen allows decomposer organisms to break down organic matter more rapidly, releasing carbon dioxide. The soil can also shrink and subside as it dries, creating physical changes that make restoration harder. Drained peat is often used for farming, forestry, or peat extraction, so the hydrological alteration may be tied to an economic land use rather than a single damaged ditch. In tropical peatlands, drainage can also increase fire risk because dry peat can smoulder below the surface and continue burning after visible flames have disappeared.\n\nC\nThe central technique in many restoration projects is rewetting. Managers block drainage channels, raise water levels, or alter water-control structures so that peat becomes saturated again. The goal is not simply to create open water. A successful project tries to restore a water table that supports peat-forming vegetation without causing unacceptable flooding elsewhere. Hydrology can be surprisingly local: a ditch, road, slope, or compacted layer may redirect water over short distances. For that reason, restoration planning often begins with maps of elevation and drainage rather than with planting. If the water regime remains wrong, vegetation treatments alone are unlikely to recreate a functioning peatland.\n\nD\nRewetting changes greenhouse-gas emissions in complicated ways. Carbon dioxide emissions from decomposing peat generally fall when oxygen is excluded, but methane can rise because methane-producing microbes thrive in waterlogged, oxygen-poor conditions. Methane is a powerful greenhouse gas, although it remains in the atmosphere for a much shorter time than carbon dioxide. The balance therefore depends on the timescale considered, the previous condition of the site, vegetation, temperature, and water level. Restored peatlands are not expected to become climate-neutral instantly. Their value is usually assessed over years or decades, as avoided carbon loss and renewed peat formation accumulate.\n\nE\nPlants matter because peat is ultimately built from plant material. In many northern bogs, Sphagnum mosses are especially important because they can hold large amounts of water and create acidic, nutrient-poor conditions that slow decomposition. Restoration may involve reducing grazing pressure, removing trees that increase water loss, or reintroducing peat-forming vegetation where natural recovery is slow. Yet importing plants without fixing hydrology is rarely sufficient. Managers also have to consider whether the site was originally a bog, fen, swamp, or another peatland type, because each depends on a different relationship among rainfall, groundwater, nutrients, and vegetation.\n\nF\nMonitoring determines whether restoration is actually working. Water-table depth can be measured with wells or automated sensors, while vegetation surveys track the return of characteristic species. Instruments can measure exchanges of carbon dioxide and methane between the land and atmosphere, and repeated elevation surveys can reveal whether the surface is subsiding or stabilizing. Satellite data increasingly help researchers observe moisture, fire damage, and vegetation change over large regions. No single measurement captures the whole process. A site may look greener while still losing carbon, or show improved carbon balance before its original plant community has returned.\n\nG\nPeatland restoration also has a social dimension because damaged peatlands are often productive landscapes for local communities. Rewetting can conflict with conventional drainage-based farming or forestry, and water raised on one property may affect neighboring land. Some projects therefore explore forms of wet agriculture, sometimes called paludiculture, in which crops adapted to high water tables are harvested without deeply draining the peat. Whether such systems are economically competitive varies by crop, market, and region. Long-term restoration succeeds most reliably when hydrological goals, carbon benefits, biodiversity, fire risk, and local livelihoods are considered together rather than treated as separate problems.",
+  "questions": [
+    {
+      "idx": 1,
+      "kind": "matching_headings",
+      "prompt": "Choose the most suitable heading for paragraph B.",
+      "options": null,
+      "answer": [
+        "Drainage as a trigger for decomposition, subsidence and fire"
+      ],
+      "evidence": "Drainage is one of the most important disturbances because it lowers the water table and exposes previously saturated peat to air.",
+      "explanation": "The paragraph explains several consequences of drainage, including faster decay, subsidence and greater fire risk."
+    },
+    {
+      "idx": 2,
+      "kind": "matching_headings",
+      "prompt": "Choose the most suitable heading for paragraph C.",
+      "options": null,
+      "answer": [
+        "Rewetting as a hydrological rather than purely botanical repair"
+      ],
+      "evidence": "The central technique in many restoration projects is rewetting.",
+      "explanation": "The paragraph focuses on restoring water levels and explains why hydrology must be corrected before vegetation alone can succeed."
+    },
+    {
+      "idx": 3,
+      "kind": "matching_headings",
+      "prompt": "Choose the most suitable heading for paragraph D.",
+      "options": null,
+      "answer": [
+        "The methane trade-off after water levels are restored"
+      ],
+      "evidence": "Rewetting changes greenhouse-gas emissions in complicated ways.",
+      "explanation": "The paragraph contrasts falling carbon dioxide emissions with potentially rising methane emissions."
+    },
+    {
+      "idx": 4,
+      "kind": "matching_headings",
+      "prompt": "Choose the most suitable heading for paragraph F.",
+      "options": null,
+      "answer": [
+        "Measuring restoration with several kinds of evidence"
+      ],
+      "evidence": "Monitoring determines whether restoration is actually working.",
+      "explanation": "The paragraph lists water-table, vegetation, gas-flux, elevation and satellite measurements used to evaluate recovery."
+    },
+    {
+      "idx": 5,
+      "kind": "true_false_not_given",
+      "prompt": "Saturated peat tends to decompose slowly because oxygen enters the soil slowly.",
+      "options": null,
+      "answer": [
+        "TRUE"
+      ],
+      "evidence": "When the ground remains saturated, oxygen moves slowly into the soil and microbial decomposition is restricted.",
+      "explanation": "The passage directly links saturation, slow oxygen movement and restricted decomposition."
+    },
+    {
+      "idx": 6,
+      "kind": "true_false_not_given",
+      "prompt": "Rewetting is intended simply to convert damaged peatland into permanent open water.",
+      "options": null,
+      "answer": [
+        "FALSE"
+      ],
+      "evidence": "The goal is not simply to create open water.",
+      "explanation": "The passage explicitly rejects this description of the goal."
+    },
+    {
+      "idx": 7,
+      "kind": "true_false_not_given",
+      "prompt": "The passage states that every paludiculture crop is more profitable than conventional farming.",
+      "options": null,
+      "answer": [
+        "NOT GIVEN"
+      ],
+      "evidence": "Whether such systems are economically competitive varies by crop, market, and region.",
+      "explanation": "The passage says competitiveness varies and gives no claim that every crop is more profitable."
+    },
+    {
+      "idx": 8,
+      "kind": "multiple_choice",
+      "prompt": "Why can drained peat continue burning after surface flames are gone?",
+      "options": [
+        "Dry peat can smoulder below the surface.",
+        "Drainage can expose peat to oxygen and speed decomposition.",
+        "Waterlogged peat can support methane-producing microbes.",
+        "Tree removal can reduce water loss from a restoration site."
+      ],
+      "answer": [
+        "Dry peat can smoulder below the surface."
+      ],
+      "evidence": "In tropical peatlands, drainage can also increase fire risk because dry peat can smoulder below the surface and continue burning after visible flames have disappeared.",
+      "explanation": "The passage specifically attributes the persistence of fire to subsurface smouldering."
+    },
+    {
+      "idx": 9,
+      "kind": "multiple_choice",
+      "prompt": "Why may vegetation treatment fail if used without hydrological repair?",
+      "options": [
+        "The site may remain under the wrong water regime.",
+        "All peat-forming plants require seawater.",
+        "Vegetation always increases oxygen in the soil.",
+        "Plants prevent managers from mapping elevation."
+      ],
+      "answer": [
+        "The site may remain under the wrong water regime."
+      ],
+      "evidence": "If the water regime remains wrong, vegetation treatments alone are unlikely to recreate a functioning peatland.",
+      "explanation": "The passage directly states that an unsuitable water regime can undermine vegetation-only restoration."
+    },
+    {
+      "idx": 10,
+      "kind": "multiple_choice",
+      "prompt": "Which plant group is highlighted as especially important in many northern bogs?",
+      "options": [
+        "Sphagnum mosses",
+        "Sedges",
+        "Shrubs",
+        "Trees"
+      ],
+      "answer": [
+        "Sphagnum mosses"
+      ],
+      "evidence": "In many northern bogs, Sphagnum mosses are especially important because they can hold large amounts of water and create acidic, nutrient-poor conditions that slow decomposition.",
+      "explanation": "The passage names Sphagnum mosses specifically."
+    },
+    {
+      "idx": 11,
+      "kind": "sentence_completion",
+      "prompt": "Complete the sentence using NO MORE THAN TWO WORDS from the passage: Rewetting often begins by raising the ______.",
+      "options": null,
+      "answer": [
+        "water levels"
+      ],
+      "evidence": "Managers block drainage channels, raise water levels, or alter water-control structures so that peat becomes saturated again.",
+      "explanation": "The phrase \"water levels\" is lifted directly from the passage."
+    },
+    {
+      "idx": 12,
+      "kind": "sentence_completion",
+      "prompt": "Complete the sentence using NO MORE THAN TWO WORDS from the passage: Restored peatlands may initially emit more ______.",
+      "options": null,
+      "answer": [
+        "methane"
+      ],
+      "evidence": "Carbon dioxide emissions from decomposing peat generally fall when oxygen is excluded, but methane can rise because methane-producing microbes thrive in waterlogged, oxygen-poor conditions.",
+      "explanation": "The exact gas named in the passage is methane."
+    },
+    {
+      "idx": 13,
+      "kind": "sentence_completion",
+      "prompt": "Complete the sentence using NO MORE THAN TWO WORDS from the passage: Repeated elevation surveys can show whether the peat surface is subsiding or ______.",
+      "options": null,
+      "answer": [
+        "stabilizing"
+      ],
+      "evidence": "Instruments can measure exchanges of carbon dioxide and methane between the land and atmosphere, and repeated elevation surveys can reveal whether the surface is subsiding or stabilizing.",
+      "explanation": "The required word is taken verbatim from the sentence."
+    }
+  ]
+}

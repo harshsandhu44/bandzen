@@ -1,0 +1,178 @@
+{
+  "slug": "the-physics-of-moving-sand-dunes",
+  "title": "The Physics of Moving Sand Dunes",
+  "topic": "geomorphology",
+  "difficulty": 3,
+  "headings": [
+    "The threshold that starts grains moving",
+    "How airflow creates migration through erosion and deposition",
+    "Why dune speed depends on size and environmental conditions",
+    "Dune shape as evidence of wind regime and sand supply",
+    "Vegetation as both stabilizer and ecological complication",
+    "Ancient and extraterrestrial dunes as scientific archives",
+    "Why loose sediment alone does not guarantee a dune",
+    "Different ways grains travel near the ground",
+    "Why modern dune shape may preserve earlier wind conditions"
+  ],
+  "body": "A\nA sand dune is a moving landform created by an interaction among loose sediment, wind, and the surface over which grains travel. Not every sandy place develops dunes. The wind must be strong enough to move grains, there must be a supply of transportable sediment, and some change in airflow or surface roughness must encourage deposition. Once a small mound forms, it can alter the wind and trap more sand, allowing the feature to grow. Dunes occur in deserts, on coasts, beside lakes, and even on other planetary bodies, making them useful natural laboratories for studying how granular materials respond to flowing air.\n\nB\nMost sand transport begins only when wind stress exceeds a threshold that depends on grain size, density, moisture, and surface condition. Once moving, many grains travel by saltation, a sequence of short hops above the ground. A landing grain can knock other grains into motion, so transport may continue even if wind speed falls somewhat below the value needed to start movement. Finer particles can remain suspended for much longer distances, while coarser grains may roll or creep along the surface. This mixture of transport modes explains why a dune is not simply pushed forward as a solid heap.\n\nC\nSmall ripples and large dunes arise through related but different processes. Ripples can form when impacts from saltating grains sort particles and create repeated low ridges. Dunes, by contrast, depend strongly on the way a growing mound modifies airflow. Wind accelerates up the gentle windward slope and carries sand toward the crest. On many dunes, flow separates on the sheltered side, where sand is deposited on a steeper slip face. When enough grains accumulate, small avalanches move material downslope. Repetition of erosion on one side and deposition on the other causes the entire dune form to migrate.\n\nD\nThe rate of migration varies greatly. A small dune supplied with abundant sand can move much faster than a large dune because a similar quantity of transported sediment must shift a smaller volume. Wind strength and direction also matter, as does vegetation or moisture that anchors the surface. Measurements using repeated surveys, aerial photographs, and satellite images can track changes in crest position through time. Migration is important where dunes approach roads, farms, buildings, or archaeological sites. It is equally useful scientifically because movement provides a visible measure of sediment transport integrated over months or years.\n\nE\nDune shape records the wind regime and sand supply. Crescent-shaped barchan dunes often form where sand is limited and winds blow mainly from one direction. Long linear dunes are associated with more complex wind patterns, while star dunes can develop where winds arrive from several directions and build high central peaks. These categories are useful, but real landscapes contain transitions and combinations. A dune's present shape may also preserve the influence of earlier winds, so researchers avoid treating morphology as a perfect snapshot of today's weather. Form is evidence, but it must be interpreted with measurements of modern transport.\n\nF\nVegetation can transform dune behavior by reducing wind speed near the surface and binding sand with roots. Coastal grasses often trap windblown sediment, helping foredunes grow behind beaches. If plants expand across a mobile dune, migration may slow and the landform can become partly stabilized. Disturbance can reverse the process: grazing, trampling, fire, or drought may expose sand again and reactivate movement. Stabilization is not automatically desirable in every environment, because some specialist species depend on open, shifting sand. Management therefore involves deciding which degree of mobility supports both ecological and human objectives.\n\nG\nAncient dunes can preserve information long after movement stops. Buried soils, sediment layers, grain properties, and dating methods can reveal episodes when sand was active or stable. On Mars, orbital images of dunes and ripples allow scientists to compare familiar physical processes under a thinner atmosphere and lower gravity. Such comparisons test whether models built on Earth capture the underlying mechanics rather than only local conditions. Dunes are therefore more than scenic piles of sand. Their shapes and motion connect fluid dynamics, sediment transport, ecology, climate history, engineering hazards, and planetary science within the same deceptively simple landform. Field experiments also help test these models at smaller scales.",
+  "questions": [
+    {
+      "idx": 1,
+      "kind": "matching_headings",
+      "prompt": "Choose the most suitable heading for paragraph B.",
+      "options": null,
+      "answer": [
+        "The threshold that starts grains moving"
+      ],
+      "evidence": "Most sand transport begins only when wind stress exceeds a threshold that depends on grain size, density, moisture, and surface condition.",
+      "explanation": "The paragraph explains the threshold for motion and the transport modes that follow."
+    },
+    {
+      "idx": 2,
+      "kind": "matching_headings",
+      "prompt": "Choose the most suitable heading for paragraph C.",
+      "options": null,
+      "answer": [
+        "How airflow creates migration through erosion and deposition"
+      ],
+      "evidence": "Repetition of erosion on one side and deposition on the other causes the entire dune form to migrate.",
+      "explanation": "The paragraph describes airflow over a dune and how erosion and deposition shift the landform."
+    },
+    {
+      "idx": 3,
+      "kind": "matching_headings",
+      "prompt": "Choose the most suitable heading for paragraph D.",
+      "options": null,
+      "answer": [
+        "Why dune speed depends on size and environmental conditions"
+      ],
+      "evidence": "A small dune supplied with abundant sand can move much faster than a large dune because a similar quantity of transported sediment must shift a smaller volume.",
+      "explanation": "The paragraph explains why migration rates vary with dune size, wind, moisture and vegetation."
+    },
+    {
+      "idx": 4,
+      "kind": "matching_headings",
+      "prompt": "Choose the most suitable heading for paragraph E.",
+      "options": null,
+      "answer": [
+        "Dune shape as evidence of wind regime and sand supply"
+      ],
+      "evidence": "Dune shape records the wind regime and sand supply.",
+      "explanation": "The paragraph links barchan, linear and star dunes to different wind and sediment conditions."
+    },
+    {
+      "idx": 5,
+      "kind": "true_false_not_given",
+      "prompt": "Sand transport can sometimes continue after wind speed falls below the level needed to initiate movement.",
+      "options": null,
+      "answer": [
+        "TRUE"
+      ],
+      "evidence": "A landing grain can knock other grains into motion, so transport may continue even if wind speed falls somewhat below the value needed to start movement.",
+      "explanation": "The passage explicitly says moving grains can sustain transport below the initial threshold."
+    },
+    {
+      "idx": 6,
+      "kind": "true_false_not_given",
+      "prompt": "All stabilized dunes are ecologically preferable to mobile dunes.",
+      "options": null,
+      "answer": [
+        "FALSE"
+      ],
+      "evidence": "Stabilization is not automatically desirable in every environment, because some specialist species depend on open, shifting sand.",
+      "explanation": "The passage directly states that stabilization is not always desirable."
+    },
+    {
+      "idx": 7,
+      "kind": "true_false_not_given",
+      "prompt": "The passage states that barchan dunes migrate exactly twice as fast as star dunes.",
+      "options": null,
+      "answer": [
+        "NOT GIVEN"
+      ],
+      "evidence": "Crescent-shaped barchan dunes often form where sand is limited and winds blow mainly from one direction.",
+      "explanation": "The passage describes how barchans form but provides no fixed migration-rate comparison with star dunes."
+    },
+    {
+      "idx": 8,
+      "kind": "multiple_choice",
+      "prompt": "What happens on the sheltered side of many dunes?",
+      "options": [
+        "Airflow separates and sand is deposited.",
+        "All sand becomes suspended indefinitely.",
+        "Roots immediately bind every moving grain.",
+        "Wind speeds always increase down the slip face."
+      ],
+      "answer": [
+        "Airflow separates and sand is deposited."
+      ],
+      "evidence": "On many dunes, flow separates on the sheltered side, where sand is deposited on a steeper slip face.",
+      "explanation": "The passage explicitly describes flow separation and deposition on the sheltered side."
+    },
+    {
+      "idx": 9,
+      "kind": "multiple_choice",
+      "prompt": "Why can a small dune migrate faster than a large one under similar sediment transport?",
+      "options": [
+        "A smaller volume must be shifted.",
+        "Small dunes contain no coarse grains.",
+        "Large dunes cannot form slip faces.",
+        "Small dunes always receive stronger winds."
+      ],
+      "answer": [
+        "A smaller volume must be shifted."
+      ],
+      "evidence": "A small dune supplied with abundant sand can move much faster than a large dune because a similar quantity of transported sediment must shift a smaller volume.",
+      "explanation": "The passage gives the smaller volume as the reason."
+    },
+    {
+      "idx": 10,
+      "kind": "multiple_choice",
+      "prompt": "Why do researchers avoid reading dune shape as a perfect record of present-day weather?",
+      "options": [
+        "The shape may preserve the influence of earlier winds.",
+        "Satellite images cannot detect dune crests.",
+        "All dune shapes are produced by vegetation alone.",
+        "Modern winds never move established dunes."
+      ],
+      "answer": [
+        "The shape may preserve the influence of earlier winds."
+      ],
+      "evidence": "A dune's present shape may also preserve the influence of earlier winds, so researchers avoid treating morphology as a perfect snapshot of today's weather.",
+      "explanation": "The passage says inherited effects from earlier winds can remain visible in present morphology."
+    },
+    {
+      "idx": 11,
+      "kind": "sentence_completion",
+      "prompt": "Complete the sentence using NO MORE THAN TWO WORDS from the passage: Many grains move in short hops known as ______.",
+      "options": null,
+      "answer": [
+        "saltation"
+      ],
+      "evidence": "Once moving, many grains travel by saltation, a sequence of short hops above the ground.",
+      "explanation": "The exact technical term in the passage is saltation."
+    },
+    {
+      "idx": 12,
+      "kind": "sentence_completion",
+      "prompt": "Complete the sentence using NO MORE THAN TWO WORDS from the passage: Coastal grasses can help ______ grow behind beaches.",
+      "options": null,
+      "answer": [
+        "foredunes"
+      ],
+      "evidence": "Coastal grasses often trap windblown sediment, helping foredunes grow behind beaches.",
+      "explanation": "The answer is lifted directly from the passage."
+    },
+    {
+      "idx": 13,
+      "kind": "sentence_completion",
+      "prompt": "Complete the sentence using NO MORE THAN TWO WORDS from the passage: On Mars, dune studies test models under lower gravity and a ______.",
+      "options": null,
+      "answer": [
+        "thinner atmosphere"
+      ],
+      "evidence": "On Mars, orbital images of dunes and ripples allow scientists to compare familiar physical processes under a thinner atmosphere and lower gravity.",
+      "explanation": "The exact two-word phrase is \"thinner atmosphere\"."
+    }
+  ]
+}

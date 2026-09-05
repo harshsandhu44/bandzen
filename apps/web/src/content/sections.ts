@@ -425,7 +425,7 @@ export const pricing = {
         { label: 'Retake the diagnostic any time', planned: false },
         { label: 'Your full band history and insights', planned: false },
         { label: 'AI Speaking analysis', planned: false },
-        { label: 'Full mock tests', planned: true },
+        { label: 'Full mock tests', planned: false },
       ],
       cta: 'Start free',
       featured: true,

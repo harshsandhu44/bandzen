@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect } from 'react';
+import * as Sentry from '@sentry/nextjs';
 import { Button } from '@bandzen/ui/components/button';
 
 /**
@@ -18,7 +19,7 @@ export default function AppError({
   reset: () => void;
 }) {
   useEffect(() => {
-    console.error('[app] unhandled', error);
+    Sentry.captureException(error);
   }, [error]);
 
   return (

@@ -1,0 +1,178 @@
+{
+  "slug": "life-around-hydrothermal-vents",
+  "title": "Life Around Hydrothermal Vents",
+  "topic": "deep-sea biology",
+  "difficulty": 3,
+  "headings": [
+    "An ecosystem discovered where sunlight cannot reach",
+    "Chemical energy at the base of the food web",
+    "Animals that depend on microbial partners",
+    "Why vent communities repeatedly disappear and return",
+    "How larvae may travel between isolated vent fields",
+    "The early assumption that the deep sea was lifeless",
+    "Mineral deposits created by hot vent fluids",
+    "Threats created by possible seabed mining",
+    "Why every vent species occurs throughout the world's oceans"
+  ],
+  "body": "A\nHydrothermal vents were first observed directly on the deep ocean floor in the late 1970s, and the discovery changed ideas about where abundant life could exist. At depths where sunlight does not support photosynthesis, researchers found dense communities of worms, shellfish, crustaceans and microorganisms clustered around places where heated water emerged from the seabed. The water had circulated through cracks in the oceanic crust, where it was warmed by underlying geological activity and reacted chemically with surrounding rock. When the altered fluid returned to the seafloor, its temperature and chemistry differed sharply from those of ordinary deep-ocean water. These unusual conditions created habitats unlike most environments previously studied by biologists.\n\nB\nThe ecological foundation of many vent communities is chemosynthesis. Certain bacteria and archaea obtain energy from chemical reactions involving substances such as hydrogen sulfide, hydrogen and methane rather than from sunlight. They use this energy to build organic matter from carbon-containing compounds, providing food that can support larger organisms. Some microbes grow freely on surfaces or in the water, where they are consumed by animals. Others live inside or on the bodies of specialised hosts. Because chemical conditions vary among vents, different microbial metabolisms may dominate at different locations. The result is not one identical vent ecosystem but a range of communities shaped partly by the chemical energy available.\n\nC\nThe giant tubeworm Riftia pachyptila provides a striking example of dependence on microbial partners. As adults, these animals have no functional mouth or digestive tract. Instead, bacteria living in a specialised internal organ use compounds delivered by the worm's blood to produce organic nutrients. The animal supplies the microbes with access to hydrogen sulfide, oxygen and carbon dioxide, while receiving nutrition in return. This relationship allows tubeworms to grow rapidly in suitable vent environments. Other vent animals also form partnerships with microbes, although the details differ among species. Such symbioses demonstrate that an animal can obtain a major portion of its nutrition indirectly through chemical reactions carried out by microorganisms.\n\nD\nVent habitats are highly productive but often temporary. Individual vents can change or shut down when geological activity redirects the flow of heated fluid beneath the seabed. Volcanic eruptions may destroy established communities, covering organisms with lava or altering the pattern of fluid discharge. New vents can then appear nearby or at considerable distances. As a result, many vent species live in a landscape of habitats that repeatedly form, disappear and re-form. Rapid growth, high reproductive output or effective dispersal may therefore be valuable traits. Ecologists are especially interested in how populations remain connected when suitable sites are separated by kilometres or even hundreds of kilometres of cold deep ocean.\n\nE\nMany vent animals release larvae that spend part of their development in the water column. Ocean currents can transport these larvae away from their birthplace, potentially allowing them to reach new vent fields. However, dispersal is not unlimited. Larvae must survive long enough, encounter appropriate currents and locate suitable chemical and physical conditions before settlement. Seafloor ridges, current patterns and distances between active vents can therefore influence genetic connections among populations. Researchers combine oceanographic models, genetic data and observations of larval biology to estimate these patterns. Even species that appear widely distributed may consist of populations that exchange individuals only occasionally.\n\nF\nInterest in hydrothermal vents now extends beyond biology because some vent systems produce mineral-rich deposits containing metals of economic value. This has contributed to debate over possible deep-sea mining. Disturbance could directly remove organisms and alter vent structures, while sediment plumes and equipment might affect nearby habitats. At the same time, the ecological consequences remain difficult to predict because vent systems differ greatly in age, chemistry, species composition and natural disturbance frequency. Some scientists argue that strong protection is necessary for rare or poorly understood sites, whereas others emphasise the need for more mapping and baseline research before risks can be evaluated reliably. The debate illustrates the difficulty of managing environments that are scientifically important, geographically remote and still incompletely known.",
+  "questions": [
+    {
+      "idx": 1,
+      "kind": "matching_headings",
+      "prompt": "Choose the most suitable heading for paragraph A.",
+      "options": null,
+      "answer": [
+        "An ecosystem discovered where sunlight cannot reach"
+      ],
+      "evidence": "At depths where sunlight does not support photosynthesis, researchers found dense communities of worms, shellfish, crustaceans and microorganisms clustered around places where heated water emerged from the seabed.",
+      "explanation": "Paragraph A introduces the discovery of unexpectedly rich ecosystems in the dark deep ocean."
+    },
+    {
+      "idx": 2,
+      "kind": "matching_headings",
+      "prompt": "Choose the most suitable heading for paragraph B.",
+      "options": null,
+      "answer": [
+        "Chemical energy at the base of the food web"
+      ],
+      "evidence": "The ecological foundation of many vent communities is chemosynthesis.",
+      "explanation": "The paragraph explains how microbes use chemical reactions rather than sunlight to support vent food webs."
+    },
+    {
+      "idx": 3,
+      "kind": "matching_headings",
+      "prompt": "Choose the most suitable heading for paragraph C.",
+      "options": null,
+      "answer": [
+        "Animals that depend on microbial partners"
+      ],
+      "evidence": "The giant tubeworm Riftia pachyptila provides a striking example of dependence on microbial partners.",
+      "explanation": "Paragraph C centres on symbiosis between animals and microorganisms."
+    },
+    {
+      "idx": 4,
+      "kind": "matching_headings",
+      "prompt": "Choose the most suitable heading for paragraph D.",
+      "options": null,
+      "answer": [
+        "Why vent communities repeatedly disappear and return"
+      ],
+      "evidence": "As a result, many vent species live in a landscape of habitats that repeatedly form, disappear and re-form.",
+      "explanation": "The paragraph explains how geological change continually destroys and creates vent habitats."
+    },
+    {
+      "idx": 5,
+      "kind": "true_false_not_given",
+      "prompt": "Hydrothermal vent fluid has the same chemical composition as ordinary deep-ocean water.",
+      "options": null,
+      "answer": [
+        "FALSE"
+      ],
+      "evidence": "When the altered fluid returned to the seafloor, its temperature and chemistry differed sharply from those of ordinary deep-ocean water.",
+      "explanation": "The passage explicitly states that vent fluid differs significantly from ordinary deep-ocean water."
+    },
+    {
+      "idx": 6,
+      "kind": "true_false_not_given",
+      "prompt": "Some microorganisms at hydrothermal vents live inside animals.",
+      "options": null,
+      "answer": [
+        "TRUE"
+      ],
+      "evidence": "Others live inside or on the bodies of specialised hosts.",
+      "explanation": "The statement is directly supported by the passage."
+    },
+    {
+      "idx": 7,
+      "kind": "true_false_not_given",
+      "prompt": "Most vent larvae remain within ten kilometres of the place where they were released.",
+      "options": null,
+      "answer": [
+        "NOT GIVEN"
+      ],
+      "evidence": "Ocean currents can transport these larvae away from their birthplace, potentially allowing them to reach new vent fields.",
+      "explanation": "The passage says larvae can be transported away but gives no figure for the distance travelled by most larvae."
+    },
+    {
+      "idx": 8,
+      "kind": "multiple_choice",
+      "prompt": "How do adult Riftia pachyptila obtain nutrition?",
+      "options": [
+        "They filter free-swimming bacteria through a digestive tract.",
+        "They consume mineral particles released from the seabed.",
+        "Internal bacteria produce nutrients using chemicals supplied by the worm.",
+        "They carry out photosynthesis using light emitted by vent minerals."
+      ],
+      "answer": [
+        "Internal bacteria produce nutrients using chemicals supplied by the worm."
+      ],
+      "evidence": "Instead, bacteria living in a specialised internal organ use compounds delivered by the worm's blood to produce organic nutrients.",
+      "explanation": "The tubeworm relies on internal symbiotic bacteria rather than feeding through a normal digestive system."
+    },
+    {
+      "idx": 9,
+      "kind": "multiple_choice",
+      "prompt": "Why may effective dispersal be particularly useful for vent species?",
+      "options": [
+        "Vent habitats can disappear and new ones can form elsewhere.",
+        "Sunlight levels at vents change rapidly during the day.",
+        "Most vent organisms cannot reproduce near volcanic rocks.",
+        "Deep-sea currents prevent larvae from leaving their birthplace."
+      ],
+      "answer": [
+        "Vent habitats can disappear and new ones can form elsewhere."
+      ],
+      "evidence": "As a result, many vent species live in a landscape of habitats that repeatedly form, disappear and re-form.",
+      "explanation": "Because vent habitats are temporary and spatially shifting, species benefit from reaching new suitable sites."
+    },
+    {
+      "idx": 10,
+      "kind": "multiple_choice",
+      "prompt": "Why are the environmental effects of potential vent mining hard to predict?",
+      "options": [
+        "All vent ecosystems contain exactly the same species.",
+        "Vent systems differ considerably and many remain poorly understood.",
+        "Mining equipment cannot operate at deep-ocean temperatures.",
+        "Mineral deposits occur only at inactive vent sites."
+      ],
+      "answer": [
+        "Vent systems differ considerably and many remain poorly understood."
+      ],
+      "evidence": "At the same time, the ecological consequences remain difficult to predict because vent systems differ greatly in age, chemistry, species composition and natural disturbance frequency.",
+      "explanation": "Variation among vent systems makes it difficult to generalise about ecological impacts."
+    },
+    {
+      "idx": 11,
+      "kind": "sentence_completion",
+      "prompt": "Complete the sentence using NO MORE THAN ONE WORD from the passage: The process forming the ecological foundation of many vent communities is ______.",
+      "options": null,
+      "answer": [
+        "chemosynthesis"
+      ],
+      "evidence": "The ecological foundation of many vent communities is chemosynthesis.",
+      "explanation": "The required term appears exactly in the passage."
+    },
+    {
+      "idx": 12,
+      "kind": "sentence_completion",
+      "prompt": "Complete the sentence using NO MORE THAN TWO WORDS from the passage: Adult Riftia pachyptila have no functional mouth or ______.",
+      "options": null,
+      "answer": [
+        "digestive tract"
+      ],
+      "evidence": "As adults, these animals have no functional mouth or digestive tract.",
+      "explanation": "The two-word answer is copied verbatim."
+    },
+    {
+      "idx": 13,
+      "kind": "sentence_completion",
+      "prompt": "Complete the sentence using NO MORE THAN TWO WORDS from the passage: Potential mining could generate ______ that affect habitats beyond the immediate extraction site.",
+      "options": null,
+      "answer": [
+        "sediment plumes"
+      ],
+      "evidence": "Disturbance could directly remove organisms and alter vent structures, while sediment plumes and equipment might affect nearby habitats.",
+      "explanation": "The phrase 'sediment plumes' is stated directly in the passage."
+    }
+  ]
+}
