@@ -3,8 +3,24 @@
 import { useRef, useState } from 'react';
 import Link from 'next/link';
 import { ArrowUp, Square } from 'lucide-react';
+import { Avatar, AvatarFallback } from '@bandzen/ui/components/avatar';
+import { Bubble, BubbleContent } from '@bandzen/ui/components/bubble';
 import { Button } from '@bandzen/ui/components/button';
-import { cn } from '@bandzen/ui/lib/utils';
+import { Mark } from '@bandzen/ui/components/mark';
+import { Marker, MarkerContent } from '@bandzen/ui/components/marker';
+import {
+  Message,
+  MessageAvatar,
+  MessageContent,
+  MessageHeader,
+} from '@bandzen/ui/components/message';
+import {
+  MessageScroller,
+  MessageScrollerContent,
+  MessageScrollerItem,
+  MessageScrollerProvider,
+  MessageScrollerViewport,
+} from '@bandzen/ui/components/message-scroller';
 import { QuotaMeter, resetLabel } from '@/components/billing/pro';
 import { Markdown } from '@/components/coach/markdown';
 import type { Allowance } from '@/lib/entitlements';
@@ -39,7 +55,6 @@ export function CoachChat({
   const [left, setLeft] = useState(quota.remaining);
   const [spent, setSpent] = useState(!quota.allowed);
   const abortRef = useRef<AbortController | null>(null);
-  const logRef = useRef<HTMLDivElement>(null);
 
   async function send(text: string) {
     const question = text.trim();
@@ -85,9 +100,9 @@ export function CoachChat({
         const { done, value } = await reader.read();
         if (done) break;
         answer += decoder.decode(value, { stream: true });
-        // Replace the trailing assistant message as text arrives.
+        // Replace the trailing assistant message as text arrives — the
+        // scroller (autoScroll) keeps it in view on its own.
         setMessages([...next, { role: 'assistant', content: answer }]);
-        logRef.current?.scrollTo({ top: logRef.current.scrollHeight });
       }
 
       if (!answer) throw new Error('Coach returned nothing');
@@ -108,75 +123,99 @@ export function CoachChat({
 
   return (
     <div className="flex min-h-[60vh] flex-col gap-6">
-      <div
-        ref={logRef}
-        role="log"
-        aria-live="polite"
-        aria-label="Conversation"
-        className="flex-1 space-y-6 overflow-y-auto"
-      >
-        {messages.length === 0 ? (
-          <div className="space-y-4">
-            <p className="max-w-prose text-sm text-muted-foreground text-pretty">
-              Coach can see your estimated bands, your marked essays and which
-              question types you get wrong. Ask about any of it.
-            </p>
-            <ul className="grid gap-2 sm:grid-cols-2">
-              {prompts.map((prompt) => (
-                <li key={prompt}>
-                  <button
-                    type="button"
-                    onClick={() => void send(prompt)}
-                    className="w-full border border-border px-3 py-2.5 text-left text-sm transition-colors hover:border-foreground/30"
-                  >
-                    {prompt}
-                  </button>
-                </li>
-              ))}
-            </ul>
-          </div>
-        ) : (
-          messages.map((message, i) => (
-            <div
-              key={i}
-              className={cn(
-                'space-y-1.5',
-                message.role === 'user' && 'border-l-2 border-primary pl-4',
-              )}
-            >
-              <p className="font-mono text-[0.6875rem] tracking-[0.18em] text-muted-foreground uppercase">
-                {message.role === 'user' ? 'You' : 'Bandzen Coach'}
-              </p>
-              {message.content ? (
-                message.role === 'assistant' ? (
-                  <Markdown>{message.content}</Markdown>
-                ) : (
-                  <div className="max-w-prose space-y-3 text-sm/relaxed text-pretty">
-                    {message.content.split('\n\n').map((para, j) => (
-                      <p key={j}>{para}</p>
+      <MessageScrollerProvider autoScroll defaultScrollPosition="last-anchor">
+        <MessageScroller className="flex-1">
+          <MessageScrollerViewport aria-label="Conversation">
+            <MessageScrollerContent>
+              {messages.length === 0 ? (
+                <div className="space-y-4">
+                  <p className="max-w-prose text-sm text-muted-foreground text-pretty">
+                    Coach can see your estimated bands, your marked essays and
+                    which question types you get wrong. Ask about any of it.
+                  </p>
+                  <ul className="grid gap-2 sm:grid-cols-2">
+                    {prompts.map((prompt) => (
+                      <li key={prompt}>
+                        <button
+                          type="button"
+                          onClick={() => void send(prompt)}
+                          className="w-full border border-border px-3 py-2.5 text-left text-sm transition-colors hover:border-foreground/30"
+                        >
+                          {prompt}
+                        </button>
+                      </li>
                     ))}
-                  </div>
-                )
+                  </ul>
+                </div>
               ) : (
-                <p className="text-sm text-muted-foreground">Thinking…</p>
+                messages.map((message, i) => (
+                  <MessageScrollerItem
+                    key={i}
+                    messageId={`msg-${i}`}
+                    scrollAnchor={message.role === 'user'}
+                  >
+                    <Message align={message.role === 'user' ? 'end' : 'start'}>
+                      <MessageAvatar>
+                        <Avatar size="sm">
+                          <AvatarFallback className="font-mono text-[0.625rem]">
+                            {message.role === 'user' ? (
+                              'You'
+                            ) : (
+                              <Mark className="text-primary text-[0.55rem]" />
+                            )}
+                          </AvatarFallback>
+                        </Avatar>
+                      </MessageAvatar>
+                      <MessageContent>
+                        <MessageHeader>
+                          {message.role === 'user' ? 'You' : 'Bandzen Coach'}
+                        </MessageHeader>
+                        <Bubble
+                          variant={message.role === 'user' ? 'tinted' : 'muted'}
+                          align={message.role === 'user' ? 'end' : 'start'}
+                        >
+                          <BubbleContent>
+                            {message.content ? (
+                              message.role === 'assistant' ? (
+                                <Markdown>{message.content}</Markdown>
+                              ) : (
+                                <div className="space-y-3 text-sm/relaxed text-pretty">
+                                  {message.content
+                                    .split('\n\n')
+                                    .map((para, j) => (
+                                      <p key={j}>{para}</p>
+                                    ))}
+                                </div>
+                              )
+                            ) : (
+                              <p className="text-sm text-muted-foreground">
+                                Thinking…
+                              </p>
+                            )}
+                          </BubbleContent>
+                        </Bubble>
+                      </MessageContent>
+                    </Message>
+                  </MessageScrollerItem>
+                ))
               )}
-            </div>
-          ))
-        )}
 
-        {error ? (
-          <p role="alert" className="text-sm text-destructive">
-            {error}
-          </p>
-        ) : null}
-      </div>
+              {error ? (
+                <p role="alert" className="text-sm text-destructive">
+                  {error}
+                </p>
+              ) : null}
+            </MessageScrollerContent>
+          </MessageScrollerViewport>
+        </MessageScroller>
+      </MessageScrollerProvider>
 
       {/* Replaces the composer rather than disabling it. A dead input a
           candidate can still type into is a worse answer than a sentence
           saying what happened and when it changes. */}
       {spent ? (
-        <div className="space-y-2 border-t border-border pt-4">
-          <p className="text-sm">
+        <Marker className="flex-col items-start gap-3 border-t border-border pt-4">
+          <MarkerContent className="text-sm text-foreground">
             You have used this week&rsquo;s {quota.limit} Coach messages.
             {quota.resetsAt ? (
               <>
@@ -185,7 +224,7 @@ export function CoachChat({
                 .
               </>
             ) : null}
-          </p>
+          </MarkerContent>
           <Button
             nativeButton={false}
             render={<Link href="/upgrade?from=coach_wall" />}
@@ -193,7 +232,7 @@ export function CoachChat({
             Unlimited Coach with Pro
             <ArrowUp className="rotate-90" />
           </Button>
-        </div>
+        </Marker>
       ) : (
         <form
           onSubmit={(event) => {

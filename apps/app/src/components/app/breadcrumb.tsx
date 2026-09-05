@@ -1,5 +1,12 @@
 import { Fragment } from 'react';
-import Link from 'next/link';
+import {
+  Breadcrumb as BreadcrumbRoot,
+  BreadcrumbItem,
+  BreadcrumbLink,
+  BreadcrumbList,
+  BreadcrumbPage,
+  BreadcrumbSeparator,
+} from '@bandzen/ui/components/breadcrumb';
 
 /**
  * The trail back up a section. Learn now has three levels (hub -> module ->
@@ -14,38 +21,26 @@ export function Breadcrumb({
   segments: readonly { label: string; href?: string }[];
 }) {
   return (
-    <nav aria-label="Breadcrumb">
-      <ol className="flex flex-wrap items-center gap-1.5 text-xs text-muted-foreground">
+    <BreadcrumbRoot>
+      <BreadcrumbList>
         {segments.map((segment, i) => {
           const last = i === segments.length - 1;
           return (
             <Fragment key={i}>
-              {i > 0 ? (
-                <li aria-hidden className="opacity-50">
-                  /
-                </li>
-              ) : null}
-              <li>
+              {i > 0 ? <BreadcrumbSeparator /> : null}
+              <BreadcrumbItem>
                 {segment.href && !last ? (
-                  <Link
-                    href={segment.href}
-                    className="underline-offset-4 hover:text-foreground hover:underline"
-                  >
+                  <BreadcrumbLink href={segment.href}>
                     {segment.label}
-                  </Link>
+                  </BreadcrumbLink>
                 ) : (
-                  <span
-                    aria-current={last ? 'page' : undefined}
-                    className={last ? 'text-foreground' : undefined}
-                  >
-                    {segment.label}
-                  </span>
+                  <BreadcrumbPage>{segment.label}</BreadcrumbPage>
                 )}
-              </li>
+              </BreadcrumbItem>
             </Fragment>
           );
         })}
-      </ol>
-    </nav>
+      </BreadcrumbList>
+    </BreadcrumbRoot>
   );
 }

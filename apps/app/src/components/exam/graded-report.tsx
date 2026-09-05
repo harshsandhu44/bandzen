@@ -1,6 +1,7 @@
 import type { ReactNode } from 'react';
 import { BandScale } from '@bandzen/ui/components/band-scale';
 import { Button } from '@bandzen/ui/components/button';
+import { Progress } from '@bandzen/ui/components/progress';
 import { cn } from '@bandzen/ui/lib/utils';
 import { GradingWatch } from '@/components/app/grading-watch';
 import { InsightBar, Watermark } from '@/components/app/primitives';
@@ -74,9 +75,11 @@ export function GradedReport({
           {grading.note}
         </p>
         {/* Indeterminate — a fake percentage is a lie about progress. */}
-        <div className="h-px w-full overflow-hidden bg-border">
-          <div className="h-px w-1/3 animate-pulse bg-primary" />
-        </div>
+        <Progress
+          value={null}
+          className="[&_[data-slot=progress-track]]:h-px"
+          indicatorClassName="w-1/3 animate-pulse"
+        />
       </div>
     );
   }

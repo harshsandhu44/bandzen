@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import { ArrowRight } from 'lucide-react';
 import { Button } from '@bandzen/ui/components/button';
+import { Progress } from '@bandzen/ui/components/progress';
 import { PageHeader, Panel } from '@/components/app/primitives';
 import { requireUserId } from '@/lib/auth';
 import { learnOverview, nextLearnStep } from '@/lib/learn';
@@ -101,19 +102,10 @@ export default async function LearnPage() {
                 }
               >
                 {m.total > 0 ? (
-                  <div
-                    role="progressbar"
-                    aria-valuenow={m.done}
-                    aria-valuemin={0}
-                    aria-valuemax={m.total}
+                  <Progress
+                    value={pct}
                     aria-label={`${MODULE_LABEL[m.module]} lessons finished`}
-                    className="h-1 w-full bg-border"
-                  >
-                    <div
-                      className="h-1 bg-primary"
-                      style={{ width: `${pct}%` }}
-                    />
-                  </div>
+                  />
                 ) : null}
                 <p className="mt-3 flex items-center gap-1.5 text-sm text-muted-foreground">
                   {m.total === 0 ? (
