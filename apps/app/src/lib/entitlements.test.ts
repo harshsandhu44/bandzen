@@ -6,6 +6,7 @@ import {
   PLANS,
   allowance,
   canStartDiagnostic,
+  canStartMock,
   formatInr,
   grantEndsAt,
   isFoundingActive,
@@ -103,6 +104,35 @@ test('the first diagnostic is free, the second is not', () => {
   assert.equal(canStartDiagnostic({ isPro: false, taken: 0 }), true);
   assert.equal(canStartDiagnostic({ isPro: false, taken: 1 }), false);
   assert.equal(canStartDiagnostic({ isPro: true, taken: 3 }), true);
+});
+
+test('Free cannot start a mock at all, however few they have used', () => {
+  const a = canStartMock({ isPro: false, startsInWindow: [], now: NOW });
+  assert.equal(a.allowed, false);
+  assert.equal(a.resetsAt, null);
+});
+
+test('Pro gets one mock a week, not unlimited', () => {
+  const fresh = canStartMock({ isPro: true, startsInWindow: [], now: NOW });
+  assert.equal(fresh.allowed, true);
+  assert.equal(fresh.unlimited, false);
+
+  const used = canStartMock({
+    isPro: true,
+    startsInWindow: [ago(1)],
+    now: NOW,
+  });
+  assert.equal(used.allowed, false);
+  assert.deepEqual(used.resetsAt, new Date(NOW.getTime() + 6 * DAY));
+});
+
+test('a Pro mock start that has aged out of the window frees up again', () => {
+  const a = canStartMock({
+    isPro: true,
+    startsInWindow: [ago(8)],
+    now: NOW,
+  });
+  assert.equal(a.allowed, true);
 });
 
 test('a grant expires the given number of days out', () => {

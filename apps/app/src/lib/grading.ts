@@ -31,6 +31,29 @@ export function readingBand(correct: number, total: number): number {
   return 2.5;
 }
 
+const toHalfBand = (n: number) => Math.round(n * 2) / 2;
+
+/** Task 1 and Task 2 combined, Task 2 weighted double — the IELTS convention. */
+export function writingSectionBand(task1: number, task2: number): number {
+  return toHalfBand((task1 + 2 * task2) / 3);
+}
+
+/**
+ * The official overall band: the mean of the four skills, rounded
+ * asymmetrically rather than to the nearest half. A mean-fraction under .25
+ * rounds down, .25-.74 rounds to the half band, .75+ rounds up to the next
+ * whole band — e.g. 6.25 -> 6.5, but 6.75 -> 7.0.
+ */
+export function overallBand(
+  bands: readonly [number, number, number, number],
+): number {
+  const mean = bands.reduce((a, b) => a + b, 0) / 4;
+  const frac = mean - Math.floor(mean);
+  if (frac < 0.25) return Math.floor(mean);
+  if (frac < 0.75) return Math.floor(mean) + 0.5;
+  return Math.ceil(mean);
+}
+
 const normalise = (s: string) => s.trim().toLowerCase();
 
 /**
