@@ -63,11 +63,12 @@ export async function saveSpeakingRecording(
 
   const bytes = Buffer.from(await file.arrayBuffer());
 
-  // The client always sends a WAV (see lib/wav.ts's blobToWav) — checking the
-  // RIFF/WAVE header rejects anything else before it's stored under an
-  // audio/wav content-type or handed to the grader's transcription call.
+  // The client always sends a 16 kHz mono WAV (see lib/pcm-recorder.ts).
+  // Checking the RIFF/WAVE header and that there is a non-empty `data` chunk
+  // rejects anything malformed or silent before it is stored or handed to the
+  // grader — a header-only WAV is exactly the "recording came back empty" bug.
   const isWav =
-    bytes.length >= 12 &&
+    bytes.length > 44 &&
     bytes.toString('ascii', 0, 4) === 'RIFF' &&
     bytes.toString('ascii', 8, 12) === 'WAVE';
   if (!isWav) return { ok: false };
