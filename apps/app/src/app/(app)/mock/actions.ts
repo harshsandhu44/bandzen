@@ -16,6 +16,7 @@ import {
   pickRandomPrompt,
   pickRandomSpeakingTest,
   pickRandomTracks,
+  restartSectionClock,
 } from '@/lib/db/queries';
 import { mockPosition, mockSectionUrl } from '@/lib/mock';
 
@@ -166,7 +167,18 @@ export async function enterMockSection(formData: FormData) {
     redirect(`/writing/${row.id}`);
   }
 
-  if (existing[0]) redirect(`/${position}/${existing[0].id}`);
+  if (existing[0]) {
+    // Re-entering Listening through the interstitial means restarting it: the
+    // audio plays once and cannot be "resumed" from where a wall-clock says
+    // you'd be — you would have missed content. Re-anchor so it plays from the
+    // first track. (Reading/Writing keep their elapsed time; a plain reload of
+    // the engine URL does not route through here, so an accidental refresh
+    // still resumes in place.)
+    if (position === 'listening') {
+      await restartSectionClock(userId, mockAttemptId, 'listening');
+    }
+    redirect(`/${position}/${existing[0].id}`);
+  }
 
   const attempt = await createAttempt({
     userId,

@@ -437,6 +437,33 @@ export async function getMockSectionAttempts(
     );
 }
 
+/**
+ * Re-anchor a section's clock to now. Called when the candidate re-enters a
+ * section through the interstitial — its copy says "the section's clock
+ * starts" on Continue, so a section abandoned earlier and resumed this way
+ * starts fresh: Listening plays from the first track, Reading and Writing get
+ * their full time back. Only touches `in_progress` rows, so a section already
+ * submitted is never rewound. A plain reload of the engine URL does not route
+ * through here, so an accidental refresh mid-section still resumes in place.
+ */
+export async function restartSectionClock(
+  userId: string,
+  mockAttemptId: string,
+  module: Skill,
+) {
+  await db
+    .update(attempts)
+    .set({ startedAt: new Date() })
+    .where(
+      and(
+        eq(attempts.userId, userId),
+        eq(attempts.mockAttemptId, mockAttemptId),
+        eq(attempts.module, module),
+        eq(attempts.status, 'in_progress'),
+      ),
+    );
+}
+
 /** Every section attempt under one sitting, sorted onto the 5 slots the result page needs. */
 export async function getMockResult(userId: string, mockAttemptId: string) {
   const mock = await getMockAttempt(userId, mockAttemptId);
