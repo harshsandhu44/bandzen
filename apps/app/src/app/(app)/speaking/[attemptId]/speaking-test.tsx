@@ -6,6 +6,7 @@ import { Button } from '@bandzen/ui/components/button';
 import { LiveWaveform } from '@bandzen/ui/components/live-waveform';
 import { SubmitConfirm } from '@/components/app/submit-confirm';
 import { ExamNavigator } from '@/components/exam/exam-navigator';
+import { MockBlurBanner } from '@/components/exam/mock-blur-banner';
 import { blobToWav } from '@/lib/wav';
 import { saveSpeakingRecording, submitSpeakingAttempt } from '../actions';
 
@@ -28,6 +29,8 @@ type Props = {
     audioUrl: string;
     durationSeconds: number | null;
   }[];
+  /** The soft tab-blur warning is a mock-only exam-condition guardrail. */
+  mock?: boolean;
 };
 
 type Status = 'none' | 'uploading' | 'saved' | 'failed';
@@ -44,7 +47,13 @@ const PART_TITLE: Record<number, string> = {
 const mmss = (s: number) =>
   `${Math.floor(s / 60)}:${String(Math.floor(s % 60)).padStart(2, '0')}`;
 
-export function SpeakingTest({ attemptId, title, prompts, saved }: Props) {
+export function SpeakingTest({
+  attemptId,
+  title,
+  prompts,
+  saved,
+  mock = false,
+}: Props) {
   const [current, setCurrent] = useState(() => {
     const done = new Set(saved.map((s) => s.promptId));
     const next = prompts.findIndex((p) => !done.has(p.id));
@@ -203,6 +212,7 @@ export function SpeakingTest({ attemptId, title, prompts, saved }: Props) {
 
   return (
     <div className="-m-6 flex h-svh flex-col overflow-hidden sm:-m-10">
+      {mock ? <MockBlurBanner /> : null}
       <header className="flex shrink-0 items-center justify-between gap-4 border-b border-border bg-background px-6 py-3">
         <p className="min-w-0 truncate font-mono text-[0.6875rem] tracking-[0.18em] text-muted-foreground uppercase">
           <span className="text-foreground">{title}</span> · {savedCount} /{' '}

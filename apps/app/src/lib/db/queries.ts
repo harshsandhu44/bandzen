@@ -8,6 +8,7 @@ import {
   eq,
   gt,
   gte,
+  inArray,
   isNotNull,
   isNull,
   lt,
@@ -18,6 +19,7 @@ import {
   FREE_COACH_MESSAGES_PER_WINDOW,
   FREE_ESSAYS_PER_WINDOW,
   allowance,
+  canStartMock,
   isProAt,
   windowStart,
 } from '@/lib/entitlements';
@@ -33,6 +35,7 @@ import {
   essays,
   lessonProgress,
   listeningTracks,
+  mockAttempts,
   passages,
   profiles,
   questionAnswers,
@@ -61,6 +64,10 @@ export {
   pickEasiestPassage,
   pickEasiestSpeakingTest,
   pickEasiestTrack,
+  pickRandomPassages,
+  pickRandomPrompt,
+  pickRandomSpeakingTest,
+  pickRandomTracks,
   pickTask2Prompt,
 } from '@bandzen/db/queries';
 
@@ -220,6 +227,183 @@ export async function essayAllowance(userId: string) {
     used: starts,
     limit: FREE_ESSAYS_PER_WINDOW,
   });
+}
+
+async function mockStartsInWindow(userId: string, since: Date) {
+  const rows = await db
+    .select({ startedAt: mockAttempts.startedAt })
+    .from(mockAttempts)
+    .where(
+      and(eq(mockAttempts.userId, userId), gt(mockAttempts.startedAt, since)),
+    );
+  return rows.map((r) => r.startedAt);
+}
+
+/** One function for the `/mock` hub and `startMock` both — see `essayAllowance`. */
+export async function mockAllowance(userId: string) {
+  const [until, starts] = await Promise.all([
+    proUntil(userId),
+    mockStartsInWindow(userId, windowStart()),
+  ]);
+  return canStartMock({ isPro: isProAt(until), startsInWindow: starts });
+}
+
+/**
+ * Content this candidate has already seen — practice, diagnostic, or a prior
+ * mock — so `startMock`'s random selection can skip it. `pickRandom*` fall
+ * back to no exclusion on their own if a set here would empty the pool, so
+ * this only ever narrows the choice, never blocks it.
+ */
+export async function mockContentExclusions(userId: string) {
+  const [attemptRows, mockRows] = await Promise.all([
+    db
+      .select({
+        passageId: attempts.passageId,
+        trackId: attempts.trackId,
+        promptId: attempts.promptId,
+        speakingTestId: attempts.speakingTestId,
+      })
+      .from(attempts)
+      .where(eq(attempts.userId, userId)),
+    db
+      .select({
+        readingPassageIds: mockAttempts.readingPassageIds,
+        listeningTrackIds: mockAttempts.listeningTrackIds,
+        writingTask1PromptId: mockAttempts.writingTask1PromptId,
+        writingTask2PromptId: mockAttempts.writingTask2PromptId,
+        speakingTestId: mockAttempts.speakingTestId,
+      })
+      .from(mockAttempts)
+      .where(eq(mockAttempts.userId, userId)),
+  ]);
+
+  const passageIds = new Set<string>();
+  const trackIds = new Set<string>();
+  const promptIds = new Set<string>();
+  const speakingTestIds = new Set<string>();
+
+  for (const a of attemptRows) {
+    if (a.passageId) passageIds.add(a.passageId);
+    if (a.trackId) trackIds.add(a.trackId);
+    if (a.promptId) promptIds.add(a.promptId);
+    if (a.speakingTestId) speakingTestIds.add(a.speakingTestId);
+  }
+  for (const m of mockRows) {
+    for (const id of m.readingPassageIds) passageIds.add(id);
+    for (const id of m.listeningTrackIds) trackIds.add(id);
+    promptIds.add(m.writingTask1PromptId);
+    promptIds.add(m.writingTask2PromptId);
+    speakingTestIds.add(m.speakingTestId);
+  }
+
+  return {
+    passageIds: [...passageIds],
+    trackIds: [...trackIds],
+    promptIds: [...promptIds],
+    speakingTestIds: [...speakingTestIds],
+  };
+}
+
+export async function createMockAttempt(values: {
+  userId: string;
+  readingPassageIds: string[];
+  listeningTrackIds: string[];
+  writingTask1PromptId: string;
+  writingTask2PromptId: string;
+  speakingTestId: string;
+}) {
+  const [row] = await db.insert(mockAttempts).values(values).returning();
+  if (!row) throw new Error('Could not create mock attempt');
+  return row;
+}
+
+export async function getMockAttempt(userId: string, mockAttemptId: string) {
+  return firstRow(
+    await db
+      .select()
+      .from(mockAttempts)
+      .where(
+        and(
+          eq(mockAttempts.id, mockAttemptId),
+          eq(mockAttempts.userId, userId),
+        ),
+      ),
+  );
+}
+
+/** The most recent sitting still open, for `startMock` to resume instead of starting a second one. */
+export async function latestOpenMock(userId: string) {
+  return firstRow(
+    await db
+      .select()
+      .from(mockAttempts)
+      .where(
+        and(eq(mockAttempts.userId, userId), isNull(mockAttempts.submittedAt)),
+      )
+      .orderBy(desc(mockAttempts.startedAt))
+      .limit(1),
+  );
+}
+
+/** This sitting's child attempt(s) for one module — 0, 1 (every module but Writing) or 2 (Writing). */
+export async function getMockSectionAttempts(
+  userId: string,
+  mockAttemptId: string,
+  module: Skill,
+) {
+  return db
+    .select()
+    .from(attempts)
+    .where(
+      and(
+        eq(attempts.userId, userId),
+        eq(attempts.mockAttemptId, mockAttemptId),
+        eq(attempts.module, module),
+      ),
+    );
+}
+
+/** Every section attempt under one sitting, sorted onto the 5 slots the result page needs. */
+export async function getMockResult(userId: string, mockAttemptId: string) {
+  const mock = await getMockAttempt(userId, mockAttemptId);
+  if (!mock) return null;
+
+  const rows = await db
+    .select()
+    .from(attempts)
+    .where(
+      and(
+        eq(attempts.userId, userId),
+        eq(attempts.mockAttemptId, mockAttemptId),
+      ),
+    );
+
+  return {
+    mock,
+    listening: rows.find((r) => r.module === 'listening') ?? null,
+    reading: rows.find((r) => r.module === 'reading') ?? null,
+    task1:
+      rows.find(
+        (r) =>
+          r.module === 'writing' && r.promptId === mock.writingTask1PromptId,
+      ) ?? null,
+    task2:
+      rows.find(
+        (r) =>
+          r.module === 'writing' && r.promptId === mock.writingTask2PromptId,
+      ) ?? null,
+    speaking: rows.find((r) => r.module === 'speaking') ?? null,
+  };
+}
+
+/** Speaking is the last section — this is what closes the sitting and frees the weekly cap. */
+export async function submitMockAttempt(mockAttemptId: string) {
+  await db
+    .update(mockAttempts)
+    .set({ submittedAt: new Date() })
+    .where(
+      and(eq(mockAttempts.id, mockAttemptId), isNull(mockAttempts.submittedAt)),
+    );
 }
 
 export async function coachAllowance(userId: string) {
@@ -384,6 +568,19 @@ export async function getAttempt(userId: string, attemptId: string) {
   );
 }
 
+/** Every section attempt created so far under one mock sitting — `mockPosition` reads this. */
+export async function getMockSiblings(userId: string, mockAttemptId: string) {
+  return db
+    .select({ module: attempts.module, status: attempts.status })
+    .from(attempts)
+    .where(
+      and(
+        eq(attempts.userId, userId),
+        eq(attempts.mockAttemptId, mockAttemptId),
+      ),
+    );
+}
+
 export async function listCompletedAttempts(userId: string, limit = 20) {
   return db
     .select({
@@ -453,6 +650,7 @@ export async function createAttempt(values: {
   trackId?: string;
   speakingTestId?: string;
   parentId?: string;
+  mockAttemptId?: string;
 }) {
   const [row] = await db
     .insert(attempts)
@@ -559,6 +757,132 @@ export async function submitReading(userId: string, attemptId: string) {
       ),
     )
     .where(eq(questions.passageId, attempt.passageId));
+
+  const total = rows.length;
+  const correct = rows.filter((r) => isAnswerCorrect(r.answer, r.given)).length;
+
+  const [updated] = await db
+    .update(attempts)
+    .set({
+      status: 'complete',
+      rawScore: correct,
+      total,
+      band: readingBand(correct, total),
+      submittedAt: new Date(),
+    })
+    .where(
+      and(ownAttempt(userId, attemptId), eq(attempts.status, 'in_progress')),
+    )
+    .returning();
+
+  return updated ?? (await getAttempt(userId, attemptId));
+}
+
+/**
+ * The mock's Reading section: the 3 passages `startMock` picked, stacked
+ * under one attempt row. `questions.idx` is only unique per passage
+ * (`questions_passage_idx_key`), so it is renumbered 1..N across all three
+ * here — the DB column itself is untouched — which is also what lets
+ * `ObjectiveRunner`'s jump-to-question logic work unmodified. Each passage
+ * keeps its own heading list for `matching_headings`, so the caller gets a
+ * per-question lookup rather than one shared list.
+ */
+export async function getMockReadingTest(userId: string, attemptId: string) {
+  const attempt = await getAttempt(userId, attemptId);
+  if (!attempt?.mockAttemptId || attempt.module !== 'reading') return null;
+
+  const mock = await getMockAttempt(userId, attempt.mockAttemptId);
+  if (!mock) return null;
+
+  const passageRows = await db
+    .select({
+      id: passages.id,
+      title: passages.title,
+      body: passages.body,
+      headings: passages.headings,
+    })
+    .from(passages)
+    .where(inArray(passages.id, mock.readingPassageIds));
+  const byId = new Map(passageRows.map((p) => [p.id, p]));
+  const orderedPassages = mock.readingPassageIds
+    .map((id) => byId.get(id))
+    .filter((p): p is NonNullable<typeof p> => p != null);
+  if (orderedPassages.length !== mock.readingPassageIds.length) return null;
+
+  const qs = await db
+    .select({
+      id: questions.id,
+      idx: questions.idx,
+      kind: questions.kind,
+      prompt: questions.prompt,
+      options: questions.options,
+      passageId: questions.passageId,
+    })
+    .from(questions)
+    .where(inArray(questions.passageId, mock.readingPassageIds));
+
+  let n = 0;
+  const headingsByQuestion = new Map<string, string[] | null>();
+  const renumbered = orderedPassages.flatMap((p) =>
+    qs
+      .filter((q) => q.passageId === p.id)
+      .sort((a, b) => a.idx - b.idx)
+      .map((q) => {
+        n += 1;
+        headingsByQuestion.set(q.id, p.headings);
+        return {
+          id: q.id,
+          idx: n,
+          kind: q.kind,
+          prompt: q.prompt,
+          options: q.options,
+        };
+      }),
+  );
+
+  const saved = await db
+    .select({
+      questionId: attemptAnswers.questionId,
+      value: attemptAnswers.value,
+      flagged: attemptAnswers.flagged,
+    })
+    .from(attemptAnswers)
+    .where(eq(attemptAnswers.attemptId, attemptId));
+
+  return {
+    attempt,
+    passages: orderedPassages,
+    questions: renumbered,
+    headingsByQuestion,
+    saved,
+  };
+}
+
+/** Grades all 3 passages in one pass and writes one aggregate band, same rule as `submitReading`. */
+export async function submitMockReading(userId: string, attemptId: string) {
+  const attempt = await getAttempt(userId, attemptId);
+  if (!attempt?.mockAttemptId || attempt.module !== 'reading') return null;
+  if (attempt.status === 'complete') return attempt;
+
+  const mock = await getMockAttempt(userId, attempt.mockAttemptId);
+  if (!mock) return null;
+
+  const rows = await db
+    .select({
+      questionId: questions.id,
+      answer: questionAnswers.answer,
+      given: attemptAnswers.value,
+    })
+    .from(questions)
+    .innerJoin(questionAnswers, eq(questionAnswers.questionId, questions.id))
+    .leftJoin(
+      attemptAnswers,
+      and(
+        eq(attemptAnswers.questionId, questions.id),
+        eq(attemptAnswers.attemptId, attemptId),
+      ),
+    )
+    .where(inArray(questions.passageId, mock.readingPassageIds));
 
   const total = rows.length;
   const correct = rows.filter((r) => isAnswerCorrect(r.answer, r.given)).length;
@@ -695,6 +1019,139 @@ export async function submitListening(userId: string, attemptId: string) {
       ),
     )
     .where(eq(questions.trackId, attempt.trackId));
+
+  const total = rows.length;
+  const correct = rows.filter((r) => isAnswerCorrect(r.answer, r.given)).length;
+
+  const [updated] = await db
+    .update(attempts)
+    .set({
+      status: 'complete',
+      rawScore: correct,
+      total,
+      band: readingBand(correct, total),
+      submittedAt: new Date(),
+    })
+    .where(
+      and(ownAttempt(userId, attemptId), eq(attempts.status, 'in_progress')),
+    )
+    .returning();
+
+  return updated ?? (await getAttempt(userId, attemptId));
+}
+
+/**
+ * The mock's Listening section: the 4 tracks `startMock` picked, played in
+ * that order under one attempt row — see `getMockReadingTest` for why
+ * `questions.idx` is renumbered across all of them. Tracks missing audio (a
+ * CMS generation still in flight) fail the whole section rather than play a
+ * silent gap.
+ */
+export async function getMockListeningTest(userId: string, attemptId: string) {
+  const attempt = await getAttempt(userId, attemptId);
+  if (!attempt?.mockAttemptId || attempt.module !== 'listening') return null;
+
+  const mock = await getMockAttempt(userId, attempt.mockAttemptId);
+  if (!mock) return null;
+
+  const trackRows = await db
+    .select({
+      id: listeningTracks.id,
+      title: listeningTracks.title,
+      audioUrl: listeningTracks.audioUrl,
+      matchingOptions: listeningTracks.matchingOptions,
+      peaks: listeningTracks.peaks,
+      durationSeconds: listeningTracks.durationSeconds,
+    })
+    .from(listeningTracks)
+    .where(inArray(listeningTracks.id, mock.listeningTrackIds));
+  const byId = new Map(trackRows.map((t) => [t.id, t]));
+  const orderedTracks = mock.listeningTrackIds
+    .map((id) => byId.get(id))
+    .filter(
+      (
+        t,
+      ): t is NonNullable<typeof t> & {
+        audioUrl: string;
+        durationSeconds: number;
+      } => t != null && t.audioUrl != null && t.durationSeconds != null,
+    );
+  if (orderedTracks.length !== mock.listeningTrackIds.length) return null;
+
+  const qs = await db
+    .select({
+      id: questions.id,
+      idx: questions.idx,
+      kind: questions.kind,
+      prompt: questions.prompt,
+      options: questions.options,
+      trackId: questions.trackId,
+    })
+    .from(questions)
+    .where(inArray(questions.trackId, mock.listeningTrackIds));
+
+  let n = 0;
+  const matchingOptionsByQuestion = new Map<string, string[] | null>();
+  const renumbered = orderedTracks.flatMap((t) =>
+    qs
+      .filter((q) => q.trackId === t.id)
+      .sort((a, b) => a.idx - b.idx)
+      .map((q) => {
+        n += 1;
+        matchingOptionsByQuestion.set(q.id, t.matchingOptions);
+        return {
+          id: q.id,
+          idx: n,
+          kind: q.kind,
+          prompt: q.prompt,
+          options: q.options,
+        };
+      }),
+  );
+
+  const saved = await db
+    .select({
+      questionId: attemptAnswers.questionId,
+      value: attemptAnswers.value,
+      flagged: attemptAnswers.flagged,
+    })
+    .from(attemptAnswers)
+    .where(eq(attemptAnswers.attemptId, attemptId));
+
+  return {
+    attempt,
+    tracks: orderedTracks,
+    questions: renumbered,
+    matchingOptionsByQuestion,
+    saved,
+  };
+}
+
+/** Grades all 4 tracks in one pass and writes one aggregate band, same rule as `submitListening`. */
+export async function submitMockListening(userId: string, attemptId: string) {
+  const attempt = await getAttempt(userId, attemptId);
+  if (!attempt?.mockAttemptId || attempt.module !== 'listening') return null;
+  if (attempt.status === 'complete') return attempt;
+
+  const mock = await getMockAttempt(userId, attempt.mockAttemptId);
+  if (!mock) return null;
+
+  const rows = await db
+    .select({
+      questionId: questions.id,
+      answer: questionAnswers.answer,
+      given: attemptAnswers.value,
+    })
+    .from(questions)
+    .innerJoin(questionAnswers, eq(questionAnswers.questionId, questions.id))
+    .leftJoin(
+      attemptAnswers,
+      and(
+        eq(attemptAnswers.questionId, questions.id),
+        eq(attemptAnswers.attemptId, attemptId),
+      ),
+    )
+    .where(inArray(questions.trackId, mock.listeningTrackIds));
 
   const total = rows.length;
   const correct = rows.filter((r) => isAnswerCorrect(r.answer, r.given)).length;
@@ -926,6 +1383,7 @@ export async function getWritingTest(userId: string, attemptId: string) {
     .select({
       task: writingPrompts.task,
       promptText: writingPrompts.promptText,
+      chartData: writingPrompts.chartData,
     })
     .from(writingPrompts)
     .where(eq(writingPrompts.id, attempt.promptId));
@@ -937,6 +1395,59 @@ export async function getWritingTest(userId: string, attemptId: string) {
     .where(eq(essays.attemptId, attemptId));
 
   return { attempt, prompt, body: essay?.body ?? '' };
+}
+
+/**
+ * The mock's Writing section: both tasks, keyed by which prompt each
+ * attempt row was created for (there is no other way to tell them apart —
+ * both rows are `module: 'writing'`, same `mockAttemptId`, same `startedAt`).
+ * `startedAt` comes off the rows themselves rather than `mockAttempts`,
+ * because that's the actual clock anchor `MOCK_SECTION_MINUTES.writing`
+ * counts down from.
+ */
+export async function getMockWritingTest(
+  userId: string,
+  mockAttemptId: string,
+) {
+  const mock = await getMockAttempt(userId, mockAttemptId);
+  if (!mock) return null;
+
+  const [rows, promptRows] = await Promise.all([
+    getMockSectionAttempts(userId, mockAttemptId, 'writing'),
+    db
+      .select({
+        id: writingPrompts.id,
+        task: writingPrompts.task,
+        promptText: writingPrompts.promptText,
+        chartData: writingPrompts.chartData,
+      })
+      .from(writingPrompts)
+      .where(
+        inArray(writingPrompts.id, [
+          mock.writingTask1PromptId,
+          mock.writingTask2PromptId,
+        ]),
+      ),
+  ]);
+
+  const row1 = rows.find((r) => r.promptId === mock.writingTask1PromptId);
+  const row2 = rows.find((r) => r.promptId === mock.writingTask2PromptId);
+  const prompt1 = promptRows.find((p) => p.id === mock.writingTask1PromptId);
+  const prompt2 = promptRows.find((p) => p.id === mock.writingTask2PromptId);
+  if (!row1 || !row2 || !prompt1 || !prompt2) return null;
+
+  const essayRows = await db
+    .select({ attemptId: essays.attemptId, body: essays.body })
+    .from(essays)
+    .where(inArray(essays.attemptId, [row1.id, row2.id]));
+  const bodyFor = (attemptId: string) =>
+    essayRows.find((e) => e.attemptId === attemptId)?.body ?? '';
+
+  return {
+    startedAt: row1.startedAt,
+    task1: { attemptId: row1.id, ...prompt1, body: bodyFor(row1.id) },
+    task2: { attemptId: row2.id, ...prompt2, body: bodyFor(row2.id) },
+  };
 }
 
 export async function saveEssay(

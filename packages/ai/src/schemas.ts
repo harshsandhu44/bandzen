@@ -349,12 +349,54 @@ export const speakingTestSchema = z.object({
     .min(1),
 });
 
+/**
+ * Task 1's figure. `prompt-chart.tsx` renders either shape — `points` is what
+ * new content should use; `categories`/`values` is an earlier shape already
+ * sitting in real rows, still accepted here so existing content re-imports
+ * cleanly rather than being rejected by a schema written after the fact.
+ */
+const writingChartDataSchema = z.union([
+  z.object({
+    kind: z.enum(['line', 'bar']),
+    title: z.string(),
+    unit: z.string().optional(),
+    xLabel: z.string().optional(),
+    series: z
+      .array(
+        z.object({
+          name: z.string(),
+          points: z
+            .array(z.tuple([z.union([z.number(), z.string()]), z.number()]))
+            .min(1),
+        }),
+      )
+      .min(1),
+  }),
+  z.object({
+    type: z.enum(['bar', 'pie']),
+    title: z.string(),
+    unit: z.string().optional(),
+    categories: z.array(z.string()).optional(),
+    series: z
+      .array(
+        z.object({
+          name: z.string(),
+          values: z.union([
+            z.array(z.number()),
+            z.record(z.string(), z.number()),
+          ]),
+        }),
+      )
+      .min(1),
+  }),
+]);
+
 export const writingPromptSchema = z.object({
   slug,
   task: z.number().int().min(1).max(2),
   format: z.enum(FORMATS).optional(),
   promptText: z.string(),
-  chartData: z.unknown().optional(),
+  chartData: writingChartDataSchema.optional(),
 });
 
 export const lessonBlockSchema = z.discriminatedUnion('kind', [

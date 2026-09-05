@@ -138,6 +138,42 @@ export function canStartDiagnostic(input: {
   return input.isPro || input.taken === 0;
 }
 
+/** Full mock sittings a Pro candidate may start per rolling week. */
+export const MOCK_TESTS_PER_WINDOW = 1;
+
+/**
+ * Whether a mock sitting may start.
+ *
+ * Free cannot start one at all — Speaking is already Pro-only, and a mock
+ * commits three LLM grading calls (two essays, one speaking test) the moment
+ * it starts. Pro is capped, not unlimited: `allowance` is called with
+ * `isPro: false` even for a Pro candidate, because its unconditional
+ * "Pro is unlimited" shortcut is exactly wrong here — the cap is the whole
+ * point once someone can reach this feature at all.
+ */
+export function canStartMock(input: {
+  isPro: boolean;
+  startsInWindow: Date[];
+  now?: Date;
+}): Allowance {
+  if (!input.isPro) {
+    return {
+      allowed: false,
+      unlimited: false,
+      used: 0,
+      limit: 0,
+      remaining: 0,
+      resetsAt: null,
+    };
+  }
+  return allowance({
+    isPro: false,
+    used: input.startsInWindow,
+    limit: MOCK_TESTS_PER_WINDOW,
+    now: input.now,
+  });
+}
+
 /** When a grant of `days` should expire, measured from now. */
 export function grantEndsAt(days: number, now: Date = new Date()): Date {
   return new Date(now.getTime() + days * DAY_MS);

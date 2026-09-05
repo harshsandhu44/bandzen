@@ -288,13 +288,45 @@ export const questionAnswers = pgTable('question_answers', {
   answer: jsonb('answer').$type<string[]>().notNull(),
 });
 
+/**
+ * Task 1's stimulus. Two shapes exist in the wild, because this column was
+ * `jsonb` with no schema for a long time before anything rendered it:
+ *
+ * - `points`: what the CMS import templates (`task1-academic`) teach the
+ *   generator to produce now. Line or bar, series as `[x, y]` pairs.
+ * - `categories`/`values`: an earlier, more free-form shape already sitting
+ *   in real rows — bar or pie, a shared `categories` list, and each series
+ *   either an array aligned to `categories` or an object keyed by category
+ *   (pie's shape). `PromptChart` normalizes both into one render model
+ *   rather than picking a winner and breaking the other's existing content.
+ *
+ * Pie renders as a bar chart for now (categories on one axis) — full pie
+ * support and process diagrams are a follow-up.
+ */
+export type WritingChartData =
+  | {
+      kind: 'line' | 'bar';
+      title: string;
+      unit?: string;
+      xLabel?: string;
+      series: { name: string; points: [number | string, number][] }[];
+    }
+  | {
+      type: 'bar' | 'pie';
+      title: string;
+      unit?: string;
+      categories?: string[];
+      series: { name: string; values: number[] | Record<string, number> }[];
+    };
+
 export const writingPrompts = pgTable('writing_prompts', {
   id: uuid('id').primaryKey().defaultRandom(),
   slug: text('slug').notNull().unique(),
   task: integer('task').notNull(),
   format: testFormat('format').notNull().default('academic'),
   promptText: text('prompt_text').notNull(),
-  chartData: jsonb('chart_data'),
+  /** Task 1 only; null for Task 2. */
+  chartData: jsonb('chart_data').$type<WritingChartData | null>(),
   /** New rows default to 'published' — draft is set explicitly by the CMS on create. */
   status: contentStatus('status').notNull().default('published'),
   updatedBy: text('updated_by'),
@@ -330,6 +362,8 @@ export const listeningTracks = pgTable('listening_tracks', {
   matchingOptions: jsonb('matching_options').$type<string[] | null>(),
   /** Downsampled amplitude peaks (0-1) for the runner's waveform display. Computed once alongside audioUrl. */
   peaks: jsonb('peaks').$type<number[] | null>(),
+  /** Audio length. Computed once alongside peaks — the mock test's server-anchored Listening deadline sums these. */
+  durationSeconds: integer('duration_seconds'),
   /** Last CMS generation failure (TTS or transcription). Null once it succeeds. */
   generationError: text('generation_error'),
   /** Set while a CMS generation is in flight, so a page refresh can't start a second. Cleared on settle. */
@@ -409,6 +443,43 @@ export const speakingPrompts = pgTable(
   (t) => [uniqueIndex('speaking_prompts_test_idx_key').on(t.testId, t.idx)],
 );
 
+/**
+ * One full four-skill mock sitting. Holds the content picked at start time —
+ * 3 passages, 4 tracks, both writing prompts, one speaking test — so the
+ * random selection and the weekly cap are decided up front, even though the
+ * five `attempts` rows underneath (Listening, Reading, Task 1, Task 2,
+ * Speaking) are created lazily, one per section, as the candidate reaches it.
+ *
+ * `submittedAt` is stamped when Speaking (the last section) submits. Until
+ * then the sitting is resumable; a null here is what `startMock` checks to
+ * find an in-progress sitting instead of starting a second one.
+ */
+export const mockAttempts = pgTable(
+  'mock_attempts',
+  {
+    id: uuid('id').primaryKey().defaultRandom(),
+    userId: text('user_id').notNull(),
+    readingPassageIds: jsonb('reading_passage_ids').$type<string[]>().notNull(),
+    listeningTrackIds: jsonb('listening_track_ids').$type<string[]>().notNull(),
+    writingTask1PromptId: uuid('writing_task1_prompt_id')
+      .notNull()
+      .references(() => writingPrompts.id),
+    writingTask2PromptId: uuid('writing_task2_prompt_id')
+      .notNull()
+      .references(() => writingPrompts.id),
+    speakingTestId: uuid('speaking_test_id')
+      .notNull()
+      .references(() => speakingTests.id),
+    startedAt: timestamp('started_at', { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+    submittedAt: timestamp('submitted_at', { withTimezone: true }),
+  },
+  (t) => [
+    index('mock_attempts_user_started_idx').on(t.userId, desc(t.startedAt)),
+  ],
+);
+
 // ---------------------------------------------------------------------------
 // Attempts
 // ---------------------------------------------------------------------------
@@ -438,6 +509,10 @@ export const attempts = pgTable(
     parentId: uuid('parent_id').references((): AnyPgColumn => attempts.id, {
       onDelete: 'cascade',
     }),
+    /** Set on all five sections of a mock sitting, pointing at the mockAttempts row that groups them. */
+    mockAttemptId: uuid('mock_attempt_id').references(() => mockAttempts.id, {
+      onDelete: 'cascade',
+    }),
     rawScore: integer('raw_score'),
     total: integer('total'),
     band: numeric('band', { precision: 2, scale: 1, mode: 'number' }),
@@ -452,6 +527,7 @@ export const attempts = pgTable(
     index('attempts_user_submitted_idx').on(t.userId, desc(t.submittedAt)),
     index('attempts_user_status_idx').on(t.userId, t.status),
     index('attempts_parent_idx').on(t.parentId),
+    index('attempts_mock_idx').on(t.mockAttemptId),
   ],
 );
 
@@ -750,6 +826,7 @@ export type SpeakingResponse = typeof speakingResponses.$inferSelect;
 export type Question = typeof questions.$inferSelect;
 export type WritingPrompt = typeof writingPrompts.$inferSelect;
 export type Attempt = typeof attempts.$inferSelect;
+export type MockAttempt = typeof mockAttempts.$inferSelect;
 export type AttemptAnswer = typeof attemptAnswers.$inferSelect;
 export type Report = typeof reports.$inferSelect;
 export type Profile = typeof profiles.$inferSelect;

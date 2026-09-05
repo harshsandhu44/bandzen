@@ -10,6 +10,7 @@ import {
   getAttempt,
   pickTask2Prompt,
   saveAnswer,
+  submitMockReading,
   submitReading,
 } from '@/lib/db/queries';
 
@@ -54,7 +55,18 @@ export async function submitReadingAttempt(formData: FormData) {
   if (!attemptId) throw new Error('Missing attempt');
 
   const userId = await requireUserId();
-  const graded = await submitReading(userId, attemptId);
+
+  // Which grading function applies is decided by kind, so it has to be known
+  // before grading runs, not after — `submitReading` and `submitMockReading`
+  // aggregate over a different set of questions (one passage vs. the mock's
+  // three) and neither one is a superset of the other.
+  const before = await getAttempt(userId, attemptId);
+  if (!before) throw new Error('Attempt not found');
+
+  const graded =
+    before.kind === 'mock'
+      ? await submitMockReading(userId, attemptId)
+      : await submitReading(userId, attemptId);
   if (!graded) throw new Error('Attempt not found');
 
   // Before the redirects below, not after: `redirect` throws to unwind, so
@@ -80,6 +92,10 @@ export async function submitReadingAttempt(formData: FormData) {
     }
     // No Task 2 prompt seeded: fall through to review rather than stranding
     // the candidate on a dead end.
+  }
+
+  if (graded.kind === 'mock' && graded.mockAttemptId) {
+    redirect(`/mock/${graded.mockAttemptId}/next?section=writing`);
   }
 
   redirect(`/reading/${attemptId}/review`);

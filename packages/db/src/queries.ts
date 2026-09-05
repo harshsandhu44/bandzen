@@ -11,6 +11,7 @@ import {
   isNotNull,
   lt,
   lte,
+  notInArray,
   or,
   sql,
 } from 'drizzle-orm';
@@ -30,6 +31,7 @@ import {
   speakingPrompts,
   speakingTests,
   writingPrompts,
+  type WritingChartData,
   type ContentEventAction,
   type ContentStatus,
   type Lesson,
@@ -278,6 +280,112 @@ export async function pickTask2Prompt() {
       )
       .limit(1),
   );
+}
+
+// ---------------------------------------------------------------------------
+// Random content selection — the mock's random assembly
+// ---------------------------------------------------------------------------
+//
+// `excludeIds` is how the mock's content-freshness rule (don't repeat what a
+// candidate has already attempted) reaches the query: the caller computes the
+// set from `attempts`/`mock_attempts`, a user-scoped join these functions have
+// no business making — see apps/app/src/lib/db/queries.ts. Each falls back to
+// no exclusion when it would leave nothing to pick, rather than fail a mock
+// that a small content library can't yet keep fully fresh.
+
+async function randomPublished<T extends { id: unknown }>(
+  select: (excluded: boolean) => Promise<T[]>,
+  n: number,
+) {
+  const fresh = await select(true);
+  return fresh.length >= n ? fresh : select(false);
+}
+
+/** Academic only — `readingBand`'s table is Academic-only, and the mock is Academic for now (General Training is a follow-up). */
+export async function pickRandomPassages(n: number, excludeIds: string[]) {
+  return randomPublished(
+    (excluded) =>
+      db
+        .select({ id: passages.id })
+        .from(passages)
+        .where(
+          and(
+            eq(passages.status, 'published'),
+            eq(passages.format, 'academic'),
+            excluded && excludeIds.length
+              ? notInArray(passages.id, excludeIds)
+              : undefined,
+          ),
+        )
+        .orderBy(sql`random()`)
+        .limit(n),
+    n,
+  );
+}
+
+/** No format filter — real IELTS Listening is identical for Academic and General Training. */
+export async function pickRandomTracks(n: number, excludeIds: string[]) {
+  return randomPublished(
+    (excluded) =>
+      db
+        .select({ id: listeningTracks.id })
+        .from(listeningTracks)
+        .where(
+          and(
+            eq(listeningTracks.status, 'published'),
+            excluded && excludeIds.length
+              ? notInArray(listeningTracks.id, excludeIds)
+              : undefined,
+          ),
+        )
+        .orderBy(sql`random()`)
+        .limit(n),
+    n,
+  );
+}
+
+export async function pickRandomPrompt(task: 1 | 2, excludeIds: string[]) {
+  const rows = await randomPublished(
+    (excluded) =>
+      db
+        .select({ id: writingPrompts.id })
+        .from(writingPrompts)
+        .where(
+          and(
+            eq(writingPrompts.task, task),
+            eq(writingPrompts.format, 'academic'),
+            eq(writingPrompts.status, 'published'),
+            excluded && excludeIds.length
+              ? notInArray(writingPrompts.id, excludeIds)
+              : undefined,
+          ),
+        )
+        .orderBy(sql`random()`)
+        .limit(1),
+    1,
+  );
+  return firstRow(rows);
+}
+
+export async function pickRandomSpeakingTest(excludeIds: string[]) {
+  const rows = await randomPublished(
+    (excluded) =>
+      db
+        .select({ id: speakingTests.id })
+        .from(speakingTests)
+        .where(
+          and(
+            eq(speakingTests.status, 'published'),
+            excluded && excludeIds.length
+              ? notInArray(speakingTests.id, excludeIds)
+              : undefined,
+          ),
+        )
+        .orderBy(sql`random()`)
+        .limit(1),
+    1,
+  );
+  return firstRow(rows);
 }
 
 // ---------------------------------------------------------------------------
@@ -700,6 +808,7 @@ export async function updateTrack(
     topic: string | null;
     matchingOptions: string[] | null;
     peaks: number[] | null;
+    durationSeconds: number | null;
     difficulty: number;
     generationError: string | null;
     generationStartedAt: Date | null;
@@ -1078,7 +1187,7 @@ export async function createWritingPrompt(input: {
   format?: 'academic' | 'general';
   promptText: string;
   /** The Task 1 figure. Only the JSON import sets it; no form edits it yet. */
-  chartData?: unknown;
+  chartData?: WritingChartData | null;
   updatedBy: string;
 }) {
   return firstRow(

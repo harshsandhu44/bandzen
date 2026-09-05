@@ -11,6 +11,7 @@ import {
   essayAllowance,
   findInProgress,
   getAttempt,
+  getMockSectionAttempts,
   saveEssay,
 } from '@/lib/db/queries';
 
@@ -77,6 +78,36 @@ export async function submitEssay(formData: FormData) {
   }
 
   redirect(`/writing/${attemptId}/report`);
+}
+
+/**
+ * Submit the mock's Writing section: both tasks, claimed and graded
+ * together. `formData`'s `attemptId` is Task 1's — the canonical URL the
+ * candidate is on — and this looks up its sibling under the same
+ * `mockAttemptId` rather than trusting a second hidden field for it. Same
+ * claim-then-grade-after shape as `submitEssay`, just twice.
+ */
+export async function submitMockWriting(formData: FormData) {
+  const attemptId = String(formData.get('attemptId') ?? '');
+  if (!attemptId) throw new Error('Missing attempt');
+
+  const userId = await requireUserId();
+  const attempt = await getAttempt(userId, attemptId);
+  if (!attempt?.mockAttemptId) notFound();
+
+  const siblings = await getMockSectionAttempts(
+    userId,
+    attempt.mockAttemptId,
+    'writing',
+  );
+
+  for (const row of siblings) {
+    if (await claimForGrading(userId, row.id)) {
+      after(() => gradeEssay(row.id));
+    }
+  }
+
+  redirect(`/mock/${attempt.mockAttemptId}/next?section=speaking`);
 }
 
 /**

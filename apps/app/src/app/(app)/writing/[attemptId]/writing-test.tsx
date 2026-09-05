@@ -2,10 +2,12 @@
 
 import { useRef, useState } from 'react';
 import { cn } from '@bandzen/ui/lib/utils';
+import type { WritingChartData } from '@bandzen/db/schema';
 import { SaveStatus } from '@/components/app/save-status';
 import { SubmitConfirm } from '@/components/app/submit-confirm';
 import { useAutosave } from '@/lib/use-autosave';
 import { Timer } from '@/components/app/timer';
+import { PromptChart } from '@/components/exam/prompt-chart';
 import { saveEssayDraft, submitEssay } from '../actions';
 
 const countWords = (s: string) => (s.trim() ? s.trim().split(/\s+/).length : 0);
@@ -17,6 +19,7 @@ type Props = {
   minWords: number;
   task: number;
   promptText: string;
+  chartData: WritingChartData | null;
   initialBody: string;
   /** Diagnostic and mock attempts auto-submit at 0:00; practice only warns. */
   autoSubmit: boolean;
@@ -29,6 +32,7 @@ export function WritingTest({
   minWords,
   task,
   promptText,
+  chartData,
   initialBody,
   autoSubmit,
 }: Props) {
@@ -98,6 +102,8 @@ export function WritingTest({
           </p>
           <p className="mt-2 text-sm leading-7">{promptText}</p>
         </div>
+
+        {chartData ? <PromptChart data={chartData} /> : null}
 
         {/* Deliberately plain. This is the screen where the app's furniture
             is most harmful to the person using it. */}

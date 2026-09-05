@@ -37,6 +37,7 @@ async function run(force: boolean) {
     const track = JSON.parse(readFileSync(path, 'utf8')) as Track & {
       audioUrl?: string;
       peaks?: number[];
+      durationSeconds?: number;
     };
 
     if (track.audioUrl && !force) {
@@ -52,7 +53,9 @@ async function run(force: boolean) {
       body: audio,
       contentType: 'audio/mpeg',
     });
-    track.peaks = await computePeaks(audio);
+    const { peaks, durationSeconds } = await computePeaks(audio);
+    track.peaks = peaks;
+    track.durationSeconds = durationSeconds;
     writeFileSync(path, `${JSON.stringify(track, null, 2)}\n`);
     console.log(`  ✓ ${track.slug} — ${track.audioUrl}`);
   }

@@ -1,15 +1,20 @@
 import Link from 'next/link';
-import { ArrowRight, Lock } from 'lucide-react';
+import { ArrowRight } from 'lucide-react';
 import { Button } from '@bandzen/ui/components/button';
 import { Progress } from '@bandzen/ui/components/progress';
 import { Eyebrow, PageHeader, Panel } from '@/components/app/primitives';
 import { ProTag } from '@/components/billing/pro';
 import { requireUserId } from '@/lib/auth';
-import { diagnosticCount, isPro, latestDiagnostic } from '@/lib/db/queries';
+import {
+  diagnosticCount,
+  isPro,
+  latestDiagnostic,
+  latestOpenMock,
+} from '@/lib/db/queries';
 import { canStartDiagnostic } from '@/lib/entitlements';
 import { nextPracticeStep, practiceOverview } from '@/lib/practice';
 import { MODULE_LABEL } from '@/lib/modules';
-import { DIAGNOSTIC_DURATION_LABEL } from '@/lib/timing';
+import { DIAGNOSTIC_DURATION_LABEL, MOCK_DURATION_LABEL } from '@/lib/timing';
 
 export const metadata = { title: 'Practice' };
 
@@ -31,12 +36,13 @@ const MODULE_BLURB: Record<string, string> = {
  */
 export default async function PracticePage() {
   const userId = await requireUserId();
-  const [overview, next, diagnostic, taken, pro] = await Promise.all([
+  const [overview, next, diagnostic, taken, pro, openMock] = await Promise.all([
     practiceOverview(userId),
     nextPracticeStep(userId),
     latestDiagnostic(userId),
     diagnosticCount(userId),
     isPro(userId),
+    latestOpenMock(userId),
   ]);
 
   const canRetake = canStartDiagnostic({ isPro: pro, taken });
@@ -164,22 +170,38 @@ export default async function PracticePage() {
           </div>
         </article>
 
-        {/* The honest state of a four-skill mock: it does not exist, and saying
-            so is better than a card that cannot be started. */}
-        <div className="mt-3 flex items-start gap-3 border border-dashed border-border px-5 py-6">
-          <Lock
-            className="mt-0.5 size-4 shrink-0 text-muted-foreground"
-            aria-hidden
-          />
-          <div>
-            <p className="font-title text-sm">Full four-skill mock</p>
+        <article className="mt-3 border border-border">
+          <div className="border-b border-border px-5 py-4">
+            <h3 className="font-title text-title">Full mock test</h3>
             <p className="mt-1 max-w-prose text-sm text-muted-foreground text-pretty">
-              All four modules exist now, but a single sitting that chains them
-              under one timer and one combined band is still being built.
-              Practise them individually above in the meantime.
+              All four skills, back to back, in real IELTS order and real IELTS
+              lockstep — the closest this app gets to exam day.{' '}
+              {!pro ? 'Pro.' : null}
             </p>
           </div>
-        </div>
+
+          <dl className="grid grid-cols-2 divide-x divide-y divide-border border-b border-border sm:grid-cols-4 sm:divide-y-0">
+            {[
+              ['Sections', 'Listening · Reading · Writing · Speaking'],
+              ['Duration', MOCK_DURATION_LABEL],
+              ['Difficulty', 'Full exam pace'],
+              ['Status', openMock ? 'In progress' : 'Not started'],
+            ].map(([label, value]) => (
+              <div key={label} className="px-5 py-3">
+                <Eyebrow as="dt">{label!}</Eyebrow>
+                <dd className="mt-0.5 text-sm tabular-nums">{value}</dd>
+              </div>
+            ))}
+          </dl>
+
+          <div className="px-5 py-4">
+            <Button nativeButton={false} render={<Link href="/mock" />}>
+              {openMock ? 'Resume mock test' : 'Start mock test'}
+              {!pro ? <ProTag className="ml-2" /> : null}
+              <ArrowRight />
+            </Button>
+          </div>
+        </article>
       </Panel>
     </div>
   );

@@ -25,10 +25,20 @@ const SEED_DIR = join(import.meta.dirname, '..', 'content', 'passages');
 const PROMPTS_FILE = join(import.meta.dirname, '..', 'content', 'prompts.json');
 const SQL_OUT = join(import.meta.dirname, '..', 'content', 'seed.sql');
 
+type WritingChartData = {
+  kind: 'line' | 'bar';
+  title: string;
+  unit?: string;
+  xLabel?: string;
+  series: { name: string; points: [number | string, number][] }[];
+};
+
 type Prompt = {
   slug: string;
   task: 1 | 2;
+  format?: 'academic' | 'general';
   promptText: string;
+  chartData?: WritingChartData;
 };
 
 async function generate(count: number) {
@@ -120,10 +130,11 @@ function toSql() {
     promptCount = prompts.length;
     for (const prompt of prompts) {
       out.push(
-        `insert into public.writing_prompts (slug, task, prompt_text)`,
-        `values (${quote(prompt.slug)}, ${prompt.task}, ${quote(prompt.promptText)})`,
+        `insert into public.writing_prompts (slug, task, format, prompt_text, chart_data)`,
+        `values (${quote(prompt.slug)}, ${prompt.task}, ${quote(prompt.format ?? 'academic')}::public.test_format, ${quote(prompt.promptText)}, ${prompt.chartData ? jsonb(prompt.chartData) : 'null'})`,
         `on conflict (slug) do update set`,
-        `  task = excluded.task, prompt_text = excluded.prompt_text;`,
+        `  task = excluded.task, format = excluded.format, prompt_text = excluded.prompt_text,`,
+        `  chart_data = excluded.chart_data;`,
         '',
       );
     }

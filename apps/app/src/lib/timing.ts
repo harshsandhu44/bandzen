@@ -44,3 +44,19 @@ export const READING_SECTION_DURATION_LABEL = `${minutesFor(
 
 /** A single Task 2 essay's allowance, for prose. */
 export const WRITING_TASK2_DURATION_LABEL = `${taskRules(2).minutes} min`;
+
+/**
+ * The mock's Reading and Writing clocks. Literal, not derived from
+ * `minutesFor`/`taskRules`: real IELTS gives 60 minutes for Reading and 60
+ * for Writing regardless of how many questions or which two tasks a
+ * particular sitting has, and the mock's 3 randomly-assembled passages won't
+ * land on exactly 40 questions. `minutesFor(SEEDED_QUESTIONS_PER_PASSAGE * 3)`
+ * would give 59, not 60 -- close enough to be a worse bug than an unused import.
+ */
+export const MOCK_SECTION_MINUTES = { reading: 60, writing: 60 } as const;
+
+/** Silent pause between mock Listening tracks, while the next section's questions can be read ahead. */
+export const LISTENING_TRACK_PAUSE_SECONDS = 30;
+
+/** The mock's length, for prose. An estimate — Listening's real length depends on the 4 tracks picked. */
+export const MOCK_DURATION_LABEL = 'About 2 hr 45 min';

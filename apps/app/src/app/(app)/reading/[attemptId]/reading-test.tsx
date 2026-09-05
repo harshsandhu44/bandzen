@@ -7,11 +7,11 @@ import {
 } from '@/components/exam/objective-runner';
 import { saveReadingAnswer, submitReadingAttempt } from '../actions';
 
-const TFNG = ['TRUE', 'FALSE', 'NOT GIVEN'];
-const YNNG = ['YES', 'NO', 'NOT GIVEN'];
+export const TFNG = ['TRUE', 'FALSE', 'NOT GIVEN'];
+export const YNNG = ['YES', 'NO', 'NOT GIVEN'];
 
 /** Roman numerals, the way a real paper labels its heading list. */
-const ROMAN = [
+export const ROMAN = [
   'i',
   'ii',
   'iii',
