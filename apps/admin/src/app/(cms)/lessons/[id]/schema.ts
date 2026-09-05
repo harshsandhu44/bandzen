@@ -152,7 +152,7 @@ const lessonBlockSchema = z.discriminatedUnion('kind', [
   }),
   z.object({
     kind: z.literal('video'),
-    url: z.string(),
+    url: z.string().regex(/^https:\/\//, 'Must be an https:// URL'),
     title: z.string().optional(),
   }),
 ]);
