@@ -5,6 +5,7 @@ import {
   overallBand,
   readingBand,
   speakingCoverageCeiling,
+  writingLengthCeiling,
   writingSectionBand,
 } from './grading.ts';
 
@@ -98,4 +99,19 @@ test('a barely-attempted speaking test is capped low', () => {
 
 test('speakingCoverageCeiling handles a zero-prompt test without dividing by zero', () => {
   assert.equal(speakingCoverageCeiling(0, 0), 9);
+});
+
+test('a blank essay has a Band 1 ceiling', () => {
+  assert.equal(writingLengthCeiling(0, 1), 1);
+  assert.equal(writingLengthCeiling(0, 2), 1);
+});
+
+test('an under-length essay is capped at Band 2', () => {
+  assert.equal(writingLengthCeiling(30, 1), 2); // Task 1 minimum ~40
+  assert.equal(writingLengthCeiling(45, 2), 2); // Task 2 minimum ~50
+});
+
+test('a full-length essay has no length ceiling', () => {
+  assert.equal(writingLengthCeiling(260, 2), 9);
+  assert.equal(writingLengthCeiling(160, 1), 9);
 });

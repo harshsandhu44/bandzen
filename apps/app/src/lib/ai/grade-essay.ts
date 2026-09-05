@@ -6,10 +6,11 @@ import {
   writeReport,
 } from '@/lib/db/queries';
 import { checkAwards } from '@/lib/award-check';
+import { writingLengthCeiling } from '@/lib/grading';
 import { openai } from './client';
 import { GRADER_MODEL } from './models';
 import { WRITING_RUBRIC } from './rubric';
-import { writingEvaluationSchema } from './schemas';
+import { CRITERION_NAMES, writingEvaluationSchema } from './schemas';
 import { parseStructured, strictJsonSchema } from './structured';
 
 const REPORT_SCHEMA = strictJsonSchema(writingEvaluationSchema);
@@ -31,6 +32,29 @@ export async function gradeEssay(attemptId: string) {
   try {
     const work = await loadForGrading(attemptId);
     if (!work) throw new Error('Attempt, essay or prompt missing');
+
+    // Trust the text, not the client-reported count.
+    const words = work.body.trim() ? work.body.trim().split(/\s+/).length : 0;
+    const ceiling = writingLengthCeiling(words, work.task);
+
+    // A blank response has nothing for the model to assess — write the floor
+    // directly and skip the call.
+    if (words === 0) {
+      const userId = await writeReport(attemptId, {
+        band: 1,
+        criteria: CRITERION_NAMES.map((name) => ({
+          name,
+          band: 1,
+          comment: 'No response was submitted for this task.',
+        })),
+        annotations: [],
+        strengths: [],
+        weaknesses: ['Nothing was written for this task.'],
+        model: 'none',
+      });
+      if (userId) await checkAwards(userId);
+      return;
+    }
 
     const response = await openai().chat.completions.create({
       model: GRADER_MODEL,
@@ -60,11 +84,15 @@ export async function gradeEssay(attemptId: string) {
     const annotations = parsed.annotations.filter((a) =>
       work.body.includes(a.quote),
     );
-    const band = toBand(parsed.band);
+    // An under-length response is capped at Band 2 whatever the model said.
+    const band = Math.min(toBand(parsed.band), ceiling);
 
     const userId = await writeReport(attemptId, {
       band,
-      criteria: parsed.criteria.map((c) => ({ ...c, band: toBand(c.band) })),
+      criteria: parsed.criteria.map((c) => ({
+        ...c,
+        band: Math.min(toBand(c.band), ceiling),
+      })),
       annotations,
       strengths: parsed.strengths,
       weaknesses: parsed.weaknesses,

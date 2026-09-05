@@ -66,12 +66,37 @@ const PART_LABEL: Record<number, string> = {
 export async function gradeSpeaking(attemptId: string) {
   try {
     const work = await loadSpeakingForGrading(attemptId);
-    const answered = work?.prompts.filter((p) => p.audioUrl) ?? [];
-    if (!work || answered.length === 0) {
-      throw new Error('Test, prompts or recordings missing');
+    if (!work || work.prompts.length === 0) {
+      throw new Error('Test or prompts missing');
     }
+    const answered = work.prompts.filter((p) => p.audioUrl);
     const totalPrompts = work.prompts.length;
     const missing = totalPrompts - answered.length;
+
+    // Nothing recorded at all: write the floor and skip the model, the same
+    // as a blank essay. The section still gets a band so a mock overall can
+    // still be computed.
+    if (answered.length === 0) {
+      const userId = await writeReport(attemptId, {
+        band: 1,
+        criteria: [
+          'Fluency and Coherence',
+          'Lexical Resource',
+          'Grammatical Range and Accuracy',
+          'Pronunciation',
+        ].map((name) => ({
+          name,
+          band: 1,
+          comment: 'No answers were recorded for this test.',
+        })),
+        annotations: [],
+        strengths: [],
+        weaknesses: ['Nothing was recorded — record your answers to get an estimate.'],
+        model: 'none',
+      });
+      if (userId) await checkAwards(userId);
+      return;
+    }
 
     // Fetch every recording once. Reused for both Whisper and the grader.
     const clips = await Promise.all(

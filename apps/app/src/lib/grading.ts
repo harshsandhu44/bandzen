@@ -39,6 +39,19 @@ export function writingSectionBand(task1: number, task2: number): number {
 }
 
 /**
+ * The highest band an essay can be estimated at given its length. IELTS caps
+ * a response shorter than ~40 words (Task 1) / ~50 words (Task 2) at Band 2,
+ * and a blank response has no assessable language at all. Above that the
+ * length penalty is the grader's to apply within Task Response.
+ */
+export function writingLengthCeiling(wordCount: number, task: number): number {
+  if (wordCount <= 0) return 1;
+  const minimum = task === 1 ? 40 : 50;
+  if (wordCount < minimum) return 2;
+  return 9;
+}
+
+/**
  * The highest Speaking band a candidate can be estimated at given how much of
  * the test they actually answered. A speaking band rewards *sustained*
  * production across Parts 1-3; someone who answered one prompt of ten cannot
