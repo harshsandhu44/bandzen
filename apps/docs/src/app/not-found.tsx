@@ -1,8 +1,7 @@
 import Link from 'next/link';
 
 import { Button } from '@bandzen/ui/components/button';
-
-import { Ruler } from '@/components/ruler';
+import { Wordmark } from '@bandzen/ui/components/wordmark';
 
 export const metadata = { title: 'Page not found' };
 
@@ -12,24 +11,29 @@ export const metadata = { title: 'Page not found' };
  */
 export default function NotFound() {
   return (
-    <main className="mx-auto flex w-full max-w-lg flex-1 flex-col justify-center px-6 py-24">
-      <Ruler className="mb-10" />
-      <h1 className="font-pixel text-title-lg text-balance">
+    <main className="flex flex-1 flex-col items-center justify-center gap-8 px-6 py-24 text-center">
+      <Wordmark href="/" />
+      <p className="font-mono text-[0.6875rem] tracking-[0.22em] text-muted-foreground uppercase">
+        Error 404
+      </p>
+      <p aria-hidden className="font-pixel text-7xl leading-none md:text-8xl">
+        404
+      </p>
+      <h1 className="font-title max-w-2xl text-4xl text-balance">
         This page does not exist
       </h1>
-      <p className="mt-4 text-[0.9375rem] leading-7 text-pretty">
+      <p className="max-w-md text-sm text-muted-foreground text-balance">
         The link may be out of date, or the page may have been renamed. The
         documentation index lists everything there is.
       </p>
-      <div className="mt-8">
-        <Button
-          render={<Link href="/" />}
-          nativeButton={false}
-          className="font-mono text-xs tracking-[0.14em] uppercase"
-        >
-          Documentation index
-        </Button>
-      </div>
+      <Button
+        render={<Link href="/" />}
+        nativeButton={false}
+        size="xl"
+        className="font-mono text-xs tracking-[0.14em] uppercase"
+      >
+        Documentation index
+      </Button>
     </main>
   );
 }

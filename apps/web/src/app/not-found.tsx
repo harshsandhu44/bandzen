@@ -14,7 +14,7 @@ export default function NotFound() {
       <p aria-hidden className="font-pixel text-ink text-7xl leading-none md:text-8xl">
         404
       </p>
-      <h1 className="font-pixel text-display-3 max-w-2xl leading-tight">
+      <h1 className="font-display text-display-2 max-w-2xl">
         That page isn&rsquo;t here yet.
       </h1>
       <p className="text-slate max-w-md text-balance">
