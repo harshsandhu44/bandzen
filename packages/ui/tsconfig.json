@@ -1,6 +1,7 @@
 {
   "extends": "@bandzen/tsconfig/base.json",
   "compilerOptions": {
+    "allowImportingTsExtensions": true,
     "paths": {
       "@bandzen/ui/*": ["./src/*"]
     }

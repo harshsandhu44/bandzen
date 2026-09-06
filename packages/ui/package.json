@@ -15,7 +15,8 @@
   },
   "scripts": {
     "lint": "eslint",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "test": "node --test \"src/**/*.test.ts\""
   },
   "dependencies": {
     "@base-ui/react": "^1.7.0",
@@ -36,6 +37,7 @@
   "devDependencies": {
     "@bandzen/eslint-config": "workspace:*",
     "@bandzen/tsconfig": "workspace:*",
+    "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "eslint": "^9",

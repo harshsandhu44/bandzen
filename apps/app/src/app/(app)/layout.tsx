@@ -23,6 +23,7 @@ import {
 } from '@/lib/entitlements';
 import { foundingEndsAt } from '@/lib/razorpay';
 import { daysUntil } from '@/lib/dates';
+import { PostHogAnalytics } from '@/components/analytics/posthog';
 import { MobileNav } from './mobile-nav';
 import { Nav } from './nav';
 import { TopBar } from './top-bar';
@@ -126,6 +127,7 @@ export default async function AppLayout({ children }: LayoutProps<'/'>) {
       </SidebarInset>
 
       <Toaster position="bottom-center" />
+      <PostHogAnalytics userId={userId} />
     </SidebarProvider>
   );
 }

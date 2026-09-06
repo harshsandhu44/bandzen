@@ -9,6 +9,7 @@ import {
   TabsTrigger,
 } from '@bandzen/ui/components/tabs';
 import { ThemeToggle } from '@bandzen/ui/components/theme-toggle';
+import { CookieSettingsButton } from '@bandzen/ui/components/consent';
 import { Version } from '@bandzen/ui/components/version';
 import { PageHeader } from '@/components/app/primitives';
 import { PreparationForm } from '@/components/app/preparation-form';
@@ -128,6 +129,14 @@ export default async function SettingsPage() {
               <dt className="text-sm text-muted-foreground">Appearance</dt>
               <dd>
                 <ThemeToggle />
+              </dd>
+            </div>
+            <div className="flex items-baseline justify-between gap-4 py-3">
+              <dt className="text-sm text-muted-foreground">Cookies</dt>
+              <dd>
+                <CookieSettingsButton className="text-sm decoration-border underline-offset-4 transition-colors hover:decoration-foreground">
+                  Manage
+                </CookieSettingsButton>
               </dd>
             </div>
             <div className="flex items-baseline justify-between gap-4 py-3">

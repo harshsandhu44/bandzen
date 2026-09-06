@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from 'next';
 import { fontClassName } from '@bandzen/ui/fonts';
+import { ConsentProvider, CookieConsent } from '@bandzen/ui/components/consent';
 import './globals.css';
 
 export const viewport: Viewport = {
@@ -45,7 +46,10 @@ export default function RootLayout({ children }: LayoutProps<'/'>) {
         >
           Skip to content
         </a>
-        {children}
+        <ConsentProvider>
+          {children}
+          <CookieConsent />
+        </ConsentProvider>
       </body>
     </html>
   );

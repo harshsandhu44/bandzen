@@ -1,3 +1,5 @@
+import Link from 'next/link';
+
 import {
   Clause,
   LegalPage,
@@ -58,6 +60,18 @@ export default function PrivacyPage() {
           (Razorpay), and the AI models that generate marking and coaching. Your
           essays are sent to a model provider in order to be marked; they are
           not used to train anyone&rsquo;s models.
+        </p>
+      </Clause>
+
+      <Clause title="Cookies">
+        <p>
+          We use necessary cookies to sign you in and run the site, and optional
+          cookies for analytics and marketing that are only set if you allow
+          them. The full list, and how to change your choice, is in the{' '}
+          <Link href="/cookies" className="underline underline-offset-4">
+            cookie policy
+          </Link>
+          .
         </p>
       </Clause>
 

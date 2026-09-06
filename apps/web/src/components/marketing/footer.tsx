@@ -6,6 +6,7 @@ import { Container } from './section';
 import { Wordmark } from './wordmark';
 
 import { Version } from '@bandzen/ui/components/version';
+import { CookieSettingsButton } from '@bandzen/ui/components/consent';
 
 import pkg from '../../../package.json';
 
@@ -49,6 +50,7 @@ export function Footer() {
             {brand.disclaimerShort}
           </p>
           <div className="shrink-0 space-y-1.5">
+            <CookieSettingsButton className="text-paper/70 hover:text-paper block text-xs transition-colors" />
             <p className="text-paper/70 font-mono text-[0.625rem] tracking-[0.16em] uppercase">
               © {new Date().getFullYear()} {brand.name}
             </p>
