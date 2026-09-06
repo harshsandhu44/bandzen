@@ -143,7 +143,7 @@ function BandScale({
       <div
         aria-hidden
         className={cn(
-          'font-pixel relative h-4 text-xs tabular-nums',
+          'relative h-4 font-mono text-[0.625rem] tabular-nums',
           inverse ? 'text-paper/70' : 'text-muted-foreground',
         )}
       >
