@@ -1,3 +1,10 @@
+# app [1.6.0](https://github.com/harshsandhu44/bandzen/compare/app@1.5.0...app@1.6.0) (2026-09-06)
+
+
+### Features
+
+* **app:** measure habit — retention script + attempt_id funnel stitching ([#59](https://github.com/harshsandhu44/bandzen/issues/59)) ([f005d25](https://github.com/harshsandhu44/bandzen/commit/f005d25b7b915509d004ea3778441d1769235ddd)), closes [#57](https://github.com/harshsandhu44/bandzen/issues/57)
+
 # app [1.5.0](https://github.com/harshsandhu44/bandzen/compare/app@1.4.0...app@1.5.0) (2026-09-06)
 
 
