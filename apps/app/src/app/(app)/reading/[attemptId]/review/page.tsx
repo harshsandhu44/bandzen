@@ -24,6 +24,7 @@ export default async function ReadingReviewPage({
   after(() =>
     capture(userId, 'report_viewed', {
       module: 'reading',
+      attempt_id: attemptId,
       overall_band: attempt.band,
     }),
   );

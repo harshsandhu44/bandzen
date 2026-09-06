@@ -38,6 +38,7 @@ export default async function SpeakingReportPage({
     after(() =>
       capture(userId, 'report_viewed', {
         module: 'speaking',
+        attempt_id: attemptId,
         overall_band: attempt.band,
       }),
     );

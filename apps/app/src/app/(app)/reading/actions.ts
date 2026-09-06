@@ -92,8 +92,8 @@ export async function submitReadingAttempt(formData: FormData) {
     after(() =>
       capture(userId, 'attempt_graded', {
         module: 'reading',
+        attempt_id: attemptId,
         outcome: 'graded',
-        duration_ms: 0,
         overall_band: graded.band,
       }),
     );

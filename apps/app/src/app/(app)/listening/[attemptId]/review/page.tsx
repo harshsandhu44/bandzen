@@ -24,6 +24,7 @@ export default async function ListeningReviewPage({
   after(() =>
     capture(userId, 'report_viewed', {
       module: 'listening',
+      attempt_id: attemptId,
       overall_band: attempt.band,
     }),
   );
