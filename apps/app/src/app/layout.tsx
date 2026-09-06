@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from 'next';
 import { fontClassName } from '@bandzen/ui/fonts';
+import { ConsentProvider, CookieConsent } from '@bandzen/ui/components/consent';
 import { ClerkProvider } from '@clerk/nextjs';
 import { ThemeProvider } from 'next-themes';
 import './globals.css';
@@ -26,7 +27,10 @@ export default function RootLayout({ children }: LayoutProps<'/'>) {
       >
         <body className="min-h-full flex flex-col">
           <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
-            {children}
+            <ConsentProvider>
+              {children}
+              <CookieConsent />
+            </ConsentProvider>
           </ThemeProvider>
         </body>
       </html>
