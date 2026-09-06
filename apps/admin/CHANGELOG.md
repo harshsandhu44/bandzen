@@ -1,3 +1,10 @@
+# admin [0.11.0](https://github.com/harshsandhu44/bandzen/compare/admin@0.10.1...admin@0.11.0) (2026-09-06)
+
+
+### Features
+
+* Geist type system across all apps; remove the reverse trial ([#55](https://github.com/harshsandhu44/bandzen/issues/55)) ([95284c4](https://github.com/harshsandhu44/bandzen/commit/95284c40b855ff7a19e59786a2dd274a7d327594))
+
 # admin [0.10.0](https://github.com/harshsandhu44/bandzen/compare/admin@0.9.0...admin@0.10.0) (2026-09-05)
 
 
