@@ -2,6 +2,7 @@
 
 import { after } from 'next/server';
 import { notFound, redirect } from 'next/navigation';
+import { capture } from '@/lib/analytics';
 import { requireUserId } from '@/lib/auth';
 import { gradeEssay } from '@/lib/ai/grade-essay';
 import {
@@ -40,6 +41,7 @@ export async function startWritingAttempt(formData: FormData) {
   if (!quota.allowed) redirect('/upgrade?from=writing_wall');
 
   const attempt = await createAttempt({ userId, module: 'writing', promptId });
+  after(() => capture(userId, 'attempt_started', { module: 'writing' }));
   redirect(`/writing/${attempt.id}`);
 }
 
@@ -67,6 +69,17 @@ export async function submitEssay(formData: FormData) {
   const userId = await requireUserId();
   const attempt = await getAttempt(userId, attemptId);
   if (!attempt) notFound();
+
+  // Practice essays only; mock/diagnostic writing goes through
+  // `submitMockWriting`. `attempt_graded` fires from `gradeEssay`.
+  if (!attempt.mockAttemptId) {
+    after(() =>
+      capture(userId, 'attempt_submitted', {
+        module: 'writing',
+        attempt_id: attemptId,
+      }),
+    );
+  }
 
   // claimForGrading only succeeds for the caller that actually moves the row
   // out of in_progress, so a double submit never grades the same essay twice.

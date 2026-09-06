@@ -14,21 +14,40 @@ import 'server-only';
  */
 
 export type AnalyticsEvent =
+  // Monetisation.
   | 'quota_exhausted'
   | 'pro_feature_locked'
   | 'upgrade_viewed'
   | 'checkout_started'
   | 'subscription_activated'
-  | 'subscription_cancelled';
+  | 'subscription_cancelled'
+  // Activation funnel.
+  | 'onboarding_started'
+  | 'onboarding_completed'
+  | 'diagnostic_completed'
+  | 'attempt_started'
+  | 'attempt_submitted'
+  | 'attempt_graded'
+  | 'report_viewed'
+  | 'lesson_completed'
+  | 'coach_message_sent'
+  | 'mock_started';
+
+type PropertyValue = string | number | boolean | null;
 
 /**
  * Never throws and never blocks anything that matters. An analytics outage is
  * not a reason a candidate cannot start an essay.
+ *
+ * `set` writes person properties (PostHog's `$set`): pass the handful of user
+ * attributes you want to break funnels down by — target band, plan — and they
+ * follow the person rather than the single event.
  */
 export async function capture(
   distinctId: string,
   event: AnalyticsEvent,
-  properties: Record<string, string | number | boolean | null> = {},
+  properties: Record<string, PropertyValue> = {},
+  set?: Record<string, PropertyValue>,
 ): Promise<void> {
   // NEXT_PUBLIC_, even though this only ever runs on the server: a PostHog
   // project token is public by design — it is what browser SDKs ship — so one
@@ -49,7 +68,7 @@ export async function capture(
         api_key: apiKey,
         event,
         distinct_id: distinctId,
-        properties,
+        properties: set ? { ...properties, $set: set } : properties,
         timestamp: new Date().toISOString(),
       }),
       cache: 'no-store',

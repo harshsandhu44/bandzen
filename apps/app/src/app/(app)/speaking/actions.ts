@@ -2,6 +2,7 @@
 
 import { after } from 'next/server';
 import { notFound, redirect } from 'next/navigation';
+import { capture } from '@/lib/analytics';
 import { requireUserId } from '@/lib/auth';
 import { gradeSpeaking } from '@/lib/ai/grade-speaking';
 import {
@@ -36,6 +37,7 @@ export async function startSpeakingAttempt(formData: FormData) {
     module: 'speaking',
     speakingTestId: testId,
   });
+  after(() => capture(userId, 'attempt_started', { module: 'speaking' }));
   redirect(`/speaking/${attempt.id}`);
 }
 
@@ -98,6 +100,17 @@ export async function submitSpeakingAttempt(formData: FormData) {
   const userId = await requireUserId();
   const attempt = await getAttempt(userId, attemptId);
   if (!attempt) notFound();
+
+  // Practice only; sitting speaking is covered elsewhere. `attempt_graded`
+  // fires from `gradeSpeaking`.
+  if (!attempt.mockAttemptId) {
+    after(() =>
+      capture(userId, 'attempt_submitted', {
+        module: 'speaking',
+        attempt_id: attemptId,
+      }),
+    );
+  }
 
   if (await claimForGrading(userId, attemptId)) {
     after(() => gradeSpeaking(attemptId));

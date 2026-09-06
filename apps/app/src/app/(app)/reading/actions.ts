@@ -1,6 +1,8 @@
 'use server';
 
+import { after } from 'next/server';
 import { redirect } from 'next/navigation';
+import { capture } from '@/lib/analytics';
 import { requireUserId } from '@/lib/auth';
 import { checkAwards } from '@/lib/award-check';
 import {
@@ -30,6 +32,7 @@ export async function startReadingAttempt(formData: FormData) {
   if (!quota.allowed) redirect('/upgrade?from=reading_wall');
 
   const attempt = await createAttempt({ userId, module: 'reading', passageId });
+  after(() => capture(userId, 'attempt_started', { module: 'reading' }));
   redirect(`/reading/${attempt.id}`);
 }
 
@@ -68,10 +71,33 @@ export async function submitReadingAttempt(formData: FormData) {
   const before = await getAttempt(userId, attemptId);
   if (!before) throw new Error('Attempt not found');
 
+  // Practice attempts only — mock sections are covered by mock_started /
+  // diagnostic_completed. Reading is auto-scored, so submitted and graded are
+  // the same instant.
+  if (!before.mockAttemptId) {
+    after(() =>
+      capture(userId, 'attempt_submitted', {
+        module: 'reading',
+        attempt_id: attemptId,
+      }),
+    );
+  }
+
   const graded = before.mockAttemptId
     ? await submitMockReading(userId, attemptId)
     : await submitReading(userId, attemptId);
   if (!graded) throw new Error('Attempt not found');
+
+  if (!before.mockAttemptId) {
+    after(() =>
+      capture(userId, 'attempt_graded', {
+        module: 'reading',
+        outcome: 'graded',
+        duration_ms: 0,
+        overall_band: graded.band,
+      }),
+    );
+  }
 
   // Before the redirects below, not after: `redirect` throws to unwind, so
   // nothing past one of them ever runs.

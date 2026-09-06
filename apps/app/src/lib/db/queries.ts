@@ -1556,7 +1556,12 @@ export async function getMockWritingTest(
   const essayRows = await db
     .select({ attemptId: essays.attemptId, body: essays.body })
     .from(essays)
-    .where(inArray(essays.attemptId, rows.map((r) => r.id)));
+    .where(
+      inArray(
+        essays.attemptId,
+        rows.map((r) => r.id),
+      ),
+    );
   const bodyFor = (attemptId: string) =>
     essayRows.find((e) => e.attemptId === attemptId)?.body ?? '';
 
@@ -1910,10 +1915,14 @@ export async function claimFailedForGrading(userId: string, attemptId: string) {
 }
 
 export async function markGradingFailed(attemptId: string) {
-  await db
+  // Returns the owner for the same reason `writeReport` does: the grader has
+  // no userId of its own and needs one to report the failed attempt.
+  const [row] = await db
     .update(attempts)
     .set({ status: 'failed' })
-    .where(eq(attempts.id, attemptId));
+    .where(eq(attempts.id, attemptId))
+    .returning({ userId: attempts.userId });
+  return row?.userId ?? null;
 }
 
 export { isAnswerCorrect, readingBand };

@@ -1,3 +1,4 @@
+import { after } from 'next/server';
 import { notFound } from 'next/navigation';
 import {
   Accordion,
@@ -5,6 +6,7 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from '@bandzen/ui/components/accordion';
+import { capture } from '@/lib/analytics';
 import { requireUserId } from '@/lib/auth';
 import {
   essayAllowance,
@@ -30,6 +32,17 @@ export default async function WritingReportPage({
   const { attempt, report, essay } = data;
   const done = attempt.status === 'complete';
   if (done && !report) notFound();
+
+  // Only once the report exists — a landing while grading still runs is not a
+  // report view. Fires again on refresh; see analytics.ts.
+  if (done && report) {
+    after(() =>
+      capture(userId, 'report_viewed', {
+        module: 'writing',
+        overall_band: attempt.band,
+      }),
+    );
+  }
 
   // The two upgrade "moments": the first marked essay (demonstrated value, no
   // scarcity) and the one that empties the weekly allowance (value plus a real

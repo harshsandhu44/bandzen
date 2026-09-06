@@ -128,11 +128,16 @@ export async function confirmSubscription(input: {
     lastEventAt: null,
   });
 
-  await capture(userId, 'subscription_activated', {
-    plan: subscription.plan_id,
-    source: input.source,
-    via: 'checkout',
-  });
+  await capture(
+    userId,
+    'subscription_activated',
+    {
+      plan: subscription.plan_id,
+      source: input.source,
+      via: 'checkout',
+    },
+    { plan: 'pro' },
+  );
 
   // The sidebar block, every meter and every locked control are server
   // rendered, so without this they stay Free until something else happens to

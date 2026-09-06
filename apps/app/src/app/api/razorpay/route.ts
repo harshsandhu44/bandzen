@@ -89,10 +89,15 @@ export async function POST(request: Request) {
   });
 
   if (body.event === 'subscription.charged') {
-    await capture(userId, 'subscription_activated', {
-      plan: entity.plan_id ?? 'unknown',
-      via: 'webhook',
-    });
+    await capture(
+      userId,
+      'subscription_activated',
+      {
+        plan: entity.plan_id ?? 'unknown',
+        via: 'webhook',
+      },
+      { plan: 'pro' },
+    );
   }
 
   // 200 on anything we have processed or deliberately skipped. A non-2xx tells
