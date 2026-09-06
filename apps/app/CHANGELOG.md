@@ -1,3 +1,11 @@
+# app [1.5.0](https://github.com/harshsandhu44/bandzen/compare/app@1.4.0...app@1.5.0) (2026-09-06)
+
+
+### Features
+
+* **app:** instrument the activation funnel with PostHog events ([#57](https://github.com/harshsandhu44/bandzen/issues/57)) ([fb0f506](https://github.com/harshsandhu44/bandzen/commit/fb0f5065c1e97596f485d003961a8c947c5e441f))
+* opt-in cookie consent, with PostHog-JS gated behind it ([#56](https://github.com/harshsandhu44/bandzen/issues/56)) ([cf8fc80](https://github.com/harshsandhu44/bandzen/commit/cf8fc8018c47a6581504fbcb02d260bd13a10d9f))
+
 # app [1.4.0](https://github.com/harshsandhu44/bandzen/compare/app@1.3.1...app@1.4.0) (2026-09-06)
 
 
