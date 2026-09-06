@@ -16,7 +16,7 @@ import { brand } from '@/content/sections';
  * The bottom edge is the favicon's device at another scale: the 0–9 band
  * ruler, with the chrome tick under the 9.
  *
- * Fonts are committed, subset ASCII-only copies (11KB the pair). next/font's
+ * Fonts are committed, subset ASCII-only copies of Geist. next/font's
  * downloads land in .next under hashed names and satori cannot read woff2, so
  * neither is reachable from here.
  */
@@ -36,9 +36,9 @@ const asset = (file: string) =>
   readFile(join(process.cwd(), 'src/assets', file));
 
 export default async function OpengraphImage() {
-  const [archivo, mono] = await Promise.all([
-    asset('Archivo-SemiBold-subset.ttf'),
-    asset('IBMPlexMono-Medium-subset.ttf'),
+  const [sans, mono] = await Promise.all([
+    asset('Geist-SemiBold-subset.ttf'),
+    asset('GeistMono-Medium-subset.ttf'),
   ]);
 
   return new ImageResponse(
@@ -51,7 +51,7 @@ export default async function OpengraphImage() {
         justifyContent: 'space-between',
         background: VOID,
         padding: 76,
-        fontFamily: 'Archivo',
+        fontFamily: 'Geist',
       }}
     >
       {/* Wordmark, with the tick sitting under "band" exactly as the
@@ -102,7 +102,7 @@ export default async function OpengraphImage() {
                 flex: 1,
                 display: 'flex',
                 justifyContent: 'center',
-                fontFamily: 'IBM Plex Mono',
+                fontFamily: 'Geist Mono',
                 fontSize: 26,
                 color: band === 9 ? PAPER : 'rgba(255,255,255,0.34)',
               }}
@@ -129,8 +129,8 @@ export default async function OpengraphImage() {
     {
       ...size,
       fonts: [
-        { name: 'Archivo', data: archivo, weight: 600, style: 'normal' },
-        { name: 'IBM Plex Mono', data: mono, weight: 500, style: 'normal' },
+        { name: 'Geist', data: sans, weight: 600, style: 'normal' },
+        { name: 'Geist Mono', data: mono, weight: 500, style: 'normal' },
       ],
     },
   );

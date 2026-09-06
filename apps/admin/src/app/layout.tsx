@@ -1,37 +1,8 @@
 import type { Metadata, Viewport } from 'next';
-import { Archivo, IBM_Plex_Mono, Inter } from 'next/font/google';
+import { fontClassName } from '@bandzen/ui/fonts';
 import { ClerkProvider } from '@clerk/nextjs';
 import { ThemeProvider } from 'next-themes';
 import './globals.css';
-
-/**
- * The same three families as apps/app, loaded the same way, because the CMS
- * uses the same primitives from @bandzen/ui and they are set in these faces.
- *
- * Archivo WITHOUT the `wdth` axis, deliberately. `.font-title` in the shared
- * stylesheet sets no font-variation-settings precisely because the product
- * apps load the static cut — pulling the variable-width payload here would
- * download bytes nothing renders.
- */
-const archivo = Archivo({
-  variable: '--font-archivo',
-  subsets: ['latin'],
-  display: 'swap',
-});
-
-const inter = Inter({
-  variable: '--font-inter',
-  subsets: ['latin'],
-  display: 'swap',
-});
-
-// Load-bearing, not decorative: every eyebrow, content count and timestamp.
-const plexMono = IBM_Plex_Mono({
-  variable: '--font-plex-mono',
-  subsets: ['latin'],
-  weight: ['400', '500', '600'],
-  display: 'swap',
-});
 
 export const viewport: Viewport = {
   themeColor: '#09090f',
@@ -58,7 +29,7 @@ export default function RootLayout({
       <html
         lang="en"
         suppressHydrationWarning
-        className={`${archivo.variable} ${inter.variable} ${plexMono.variable} h-full antialiased`}
+        className={`${fontClassName} h-full antialiased`}
       >
         <body className="min-h-full flex flex-col">
           <ThemeProvider attribute="class" defaultTheme="system" enableSystem>

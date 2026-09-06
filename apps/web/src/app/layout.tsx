@@ -1,31 +1,6 @@
 import type { Metadata, Viewport } from 'next';
-import { Archivo, IBM_Plex_Mono, Inter } from 'next/font/google';
+import { fontClassName } from '@bandzen/ui/fonts';
 import './globals.css';
-
-// Display. The width axis is what lets headlines go genuinely oversized
-// without the letterforms turning into stretched noise.
-const archivo = Archivo({
-  variable: '--font-archivo',
-  subsets: ['latin'],
-  display: 'swap',
-  axes: ['wdth'],
-});
-
-const inter = Inter({
-  variable: '--font-inter',
-  subsets: ['latin'],
-  display: 'swap',
-});
-
-// Load-bearing, not decorative: every band score, timer, criterion label and
-// section eyebrow is set in mono. It is what makes the product surfaces read
-// as instrumentation.
-const plexMono = IBM_Plex_Mono({
-  variable: '--font-plex-mono',
-  subsets: ['latin'],
-  weight: ['400', '500', '600'],
-  display: 'swap',
-});
 
 export const viewport: Viewport = {
   // Tints Android Chrome's address bar to the brand ground.
@@ -62,10 +37,7 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: LayoutProps<'/'>) {
   return (
-    <html
-      lang="en"
-      className={`${archivo.variable} ${inter.variable} ${plexMono.variable} h-full antialiased`}
-    >
+    <html lang="en" className={`${fontClassName} h-full antialiased`}>
       <body className="min-h-full flex flex-col">
         <a
           href="#main"

@@ -7,7 +7,7 @@ export default function AppNotFound() {
       <p className="font-mono text-[0.6875rem] tracking-[0.18em] text-muted-foreground uppercase">
         Not found
       </p>
-      <h1 className="font-title text-title-lg">There is nothing here</h1>
+      <h1 className="font-pixel text-title-lg text-balance">There is nothing here</h1>
       <p className="text-sm text-muted-foreground">
         This page does not exist, or it belongs to a different account.
       </p>

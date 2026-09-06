@@ -6,7 +6,7 @@ export default function CmsNotFound() {
   return (
     <div className="mx-auto max-w-md space-y-4 p-10">
       <Eyebrow>Not found</Eyebrow>
-      <h1 className="font-title text-title-lg">There is nothing here</h1>
+      <h1 className="font-pixel text-title-lg text-balance">There is nothing here</h1>
       <p className="text-sm text-muted-foreground">
         This page does not exist, or the item was deleted.
       </p>

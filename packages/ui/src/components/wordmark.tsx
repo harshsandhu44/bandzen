@@ -3,7 +3,7 @@ import { cn } from '@bandzen/ui/lib/utils';
 import { Mark } from '@bandzen/ui/components/mark';
 
 /**
- * The wordmark, set the way the marketing one is: Archivo, lowercase, tight,
+ * The wordmark, set the way the marketing one is: Geist Sans, lowercase, tight,
  * with the tick sitting where a target marker would land on the band scale.
  * Shared so the signed-in shells and the auth screens cannot drift.
  *

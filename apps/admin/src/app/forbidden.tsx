@@ -24,7 +24,7 @@ export default function Forbidden() {
 
         <div className="space-y-3">
           <Eyebrow>403 · No access</Eyebrow>
-          <h1 className="font-title text-title-lg">
+          <h1 className="font-pixel text-title-lg text-balance">
             This account cannot edit content
           </h1>
           <p className="text-sm text-muted-foreground text-pretty">

@@ -15,21 +15,12 @@
   --color-slate: var(--slate);
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(
-    --font-inter,
-    var(--font-geist-sans, ui-sans-serif, system-ui, sans-serif)
-  );
-  --font-mono: var(
-    --font-plex-mono,
-    var(--font-geist-mono, ui-monospace, monospace)
-  );
-  --font-heading: var(
-    --font-archivo,
-    var(
-      --font-inter,
-      var(--font-geist-sans, ui-sans-serif, system-ui, sans-serif)
-    )
-  );
+  --font-sans: var(--font-geist-sans, ui-sans-serif, system-ui, sans-serif);
+  --font-mono: var(--font-geist-mono, ui-monospace, monospace);
+  --font-heading: var(--font-geist-sans, ui-sans-serif, system-ui, sans-serif);
+  /* Geist Pixel (Circle) — the 0–9 band ruler and the error-page glyph.
+     Falls back to mono so a missing face degrades to tabular figures. */
+  --font-pixel: var(--font-geist-pixel-circle, var(--font-geist-mono, monospace));
   --color-sidebar-ring: var(--sidebar-ring);
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
@@ -198,13 +189,12 @@
     @apply font-sans;
   }
 
-  /* Archivo, for page and section titles.
-     No font-variation-settings: the product apps load the STATIC face, so
-     widening it would render nothing. That is why apps/web's .font-display
-     cannot simply be reused here, and why an app adopting .font-title must
-     load Archivo without the wdth axis. */
+  /* Geist Sans, for page and section titles. Weight carries the hierarchy —
+     apps/web's .font-display pushes it heavier and tighter still for the
+     billboard scale. */
   .font-title {
     font-family: var(--font-heading);
+    font-weight: 600;
     letter-spacing: -0.02em;
     line-height: 1.15;
     text-wrap: balance;

@@ -14,7 +14,9 @@ export default function NotFound() {
   return (
     <main className="mx-auto flex w-full max-w-lg flex-1 flex-col justify-center px-6 py-24">
       <Ruler className="mb-10" />
-      <h1 className="font-title text-title-lg">This page does not exist</h1>
+      <h1 className="font-pixel text-title-lg text-balance">
+        This page does not exist
+      </h1>
       <p className="mt-4 text-[0.9375rem] leading-7 text-pretty">
         The link may be out of date, or the page may have been renamed. The
         documentation index lists everything there is.
