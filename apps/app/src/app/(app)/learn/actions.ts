@@ -1,6 +1,8 @@
 'use server';
 
+import { after } from 'next/server';
 import { revalidatePath } from 'next/cache';
+import { capture } from '@/lib/analytics';
 import { requireUserId } from '@/lib/auth';
 import { checkAwards } from '@/lib/award-check';
 import { markLessonComplete } from '@/lib/db/queries';
@@ -18,6 +20,12 @@ export async function completeLesson(formData: FormData) {
 
   await markLessonComplete(userId, lessonId);
   await checkAwards(userId);
+  after(() =>
+    capture(userId, 'lesson_completed', {
+      module: lesson.module,
+      lesson_id: lessonId,
+    }),
+  );
   revalidatePath('/learn');
   revalidatePath(`/learn/${lesson.module}/${lessonId}`);
   // The award strip lives on the dashboard, so it has to be revalidated too.

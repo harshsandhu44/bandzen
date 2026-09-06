@@ -1,6 +1,8 @@
+import { after } from 'next/server';
 import { redirect } from 'next/navigation';
 import { PageHeader } from '@/components/app/primitives';
 import { PreparationForm } from '@/components/app/preparation-form';
+import { capture } from '@/lib/analytics';
 import { requireUserId } from '@/lib/auth';
 import { getProfile } from '@/lib/db/queries';
 import { saveOnboarding } from './actions';
@@ -13,6 +15,12 @@ export default async function OnboardingPage() {
 
   // Finished already? Nothing here to do. Settings is where this gets edited.
   if (profile?.onboardingCompletedAt) redirect('/');
+
+  // A null profile is a candidate who has never touched this form — the top of
+  // the activation funnel. It fires again if they leave and come back without
+  // submitting; funnel analysis is first-touch, so that only inflates raw
+  // counts. See analytics.ts.
+  if (!profile) after(() => capture(userId, 'onboarding_started'));
 
   return (
     <div className="max-w-xl space-y-8">

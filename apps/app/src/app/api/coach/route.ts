@@ -1,7 +1,9 @@
+import { after } from 'next/server';
 import { auth } from '@clerk/nextjs/server';
 import { z } from 'zod';
 import { openai } from '@/lib/ai/client';
 import { buildCoachContext, COACH_SYSTEM, MAX_TURNS } from '@/lib/ai/coach';
+import { capture } from '@/lib/analytics';
 import { coachAllowance, recordCoachMessage } from '@/lib/db/queries';
 import { GRADER_MODEL } from '@/lib/ai/models';
 
@@ -54,6 +56,7 @@ export async function POST(request: Request) {
   // allowance never moves — and a stream that dies at the first token has
   // still cost the call it was charged for.
   await recordCoachMessage(userId);
+  after(() => capture(userId, 'coach_message_sent'));
 
   // Assembled server-side from the caller's own rows -- the client cannot
   // supply or influence what the coach is told about the student.

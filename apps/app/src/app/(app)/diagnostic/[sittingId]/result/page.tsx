@@ -1,14 +1,14 @@
+import { after } from 'next/server';
 import { notFound } from 'next/navigation';
 import { ArrowRight } from 'lucide-react';
 import { Button } from '@bandzen/ui/components/button';
 import { ComingUp } from '@/components/dashboard/coming-up';
-import {
-  SittingResult,
-  sittingBands,
-} from '@/components/exam/sitting-result';
+import { SittingResult, sittingBands } from '@/components/exam/sitting-result';
+import { capture } from '@/lib/analytics';
 import { requireUserId } from '@/lib/auth';
 import { todayIso } from '@/lib/dates';
 import { getDiagnosticResult, getProfile } from '@/lib/db/queries';
+import { overallBand } from '@/lib/grading';
 import { buildPlan, nextAction } from '@/lib/study-plan';
 import { addDiagnosticSpeaking } from '../../actions';
 
@@ -35,6 +35,26 @@ export default async function DiagnosticResultPage({
   // `/diagnostic` into its Speaking section rather than landing here, so until
   // it closes we just let SittingResult show its "Not reached yet" line.
   const sittingClosed = data.mock.submittedAt != null;
+
+  if (sittingClosed) {
+    const { listening, reading, writing, speaking } = bands;
+    const overall =
+      listening != null &&
+      reading != null &&
+      writing != null &&
+      speaking != null
+        ? overallBand([listening, reading, writing, speaking])
+        : null;
+    after(() =>
+      capture(userId, 'diagnostic_completed', {
+        overall_band: overall,
+        listening_band: listening,
+        reading_band: reading,
+        writing_band: writing,
+        speaking_band: speaking,
+      }),
+    );
+  }
 
   const speakingSlot =
     data.speaking || !sittingClosed ? undefined : (

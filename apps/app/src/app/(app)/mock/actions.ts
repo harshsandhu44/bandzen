@@ -1,6 +1,8 @@
 'use server';
 
+import { after } from 'next/server';
 import { notFound, redirect } from 'next/navigation';
+import { capture } from '@/lib/analytics';
 import { requireUserId } from '@/lib/auth';
 import {
   createAttempt,
@@ -80,6 +82,8 @@ export async function startMock() {
     writingTask2PromptId: task2.id,
     speakingTestId: speakingTest.id,
   });
+
+  after(() => capture(userId, 'mock_started', { kind: mock.kind }));
 
   redirect(`/mock/${mock.id}/next?section=listening`);
 }
