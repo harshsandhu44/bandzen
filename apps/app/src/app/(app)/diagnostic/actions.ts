@@ -58,11 +58,7 @@ export async function startDiagnostic(formData: FormData) {
   if (open) {
     const siblings = await getMockSiblings(userId, open.id);
     redirect(
-      mockSectionUrl(
-        open.id,
-        mockPosition(siblings, { includeSpeaking: pro }),
-        'diagnostic',
-      ),
+      mockSectionUrl(open.id, mockPosition(siblings), 'diagnostic'),
     );
   }
 
@@ -105,18 +101,17 @@ export async function startDiagnostic(formData: FormData) {
 }
 
 /**
- * Add Speaking to a diagnostic that closed at Writing on Free, once the
- * candidate is Pro. Appends a speaking section to the same sitting — no full
- * retake — and its report/result redirect goes back to the diagnostic.
+ * Add Speaking to a diagnostic that closed without it — a legacy two-skill
+ * sitting, backfilled with `submittedAt` set. Appends a speaking section to
+ * the same sitting — no full retake — and its report/result redirect goes
+ * back to the diagnostic. (A sitting still open reaches Speaking through the
+ * normal sequencer instead.)
  */
 export async function addDiagnosticSpeaking(formData: FormData) {
   const sittingId = String(formData.get('sittingId') ?? '');
   if (!sittingId) throw new Error('Missing sitting');
 
   const userId = await requireUserId();
-  if (!(await isPro(userId))) {
-    redirect('/upgrade?from=diagnostic_speaking_wall');
-  }
 
   const sitting = await getMockAttempt(userId, sittingId);
   if (!sitting || sitting.kind !== 'diagnostic' || !sitting.speakingTestId) {

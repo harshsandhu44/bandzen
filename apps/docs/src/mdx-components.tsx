@@ -16,7 +16,7 @@ import { Ruler } from '@/components/ruler';
  * that actually appear in these pages is less code than overriding it.
  *
  * The two rules from `primitives.tsx` hold here as they do in the product:
- * headings are Archivo sentence case (`.font-title`), and mono is for
+ * headings are Geist Sans sentence case (`.font-title`), and mono is for
  * instrumentation — a figure, a slug, a column name — never for a heading.
  *
  * Components exposed on this map (`Callout`, `Ruler`) need no import inside an

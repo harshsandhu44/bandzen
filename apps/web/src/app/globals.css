@@ -12,11 +12,12 @@
 }
 
 @layer base {
-  /* Archivo's width axis. Set once so display type can be widened without
-     every headline repeating the font-variation-settings incantation. */
+  /* Geist Sans at billboard scale: weight and tight tracking carry it, since
+     Geist has no width axis to widen. Set once so headlines don't each repeat
+     the weight and letter-spacing. */
   .font-display {
     font-family: var(--font-heading);
-    font-variation-settings: 'wdth' 112;
+    font-weight: 680;
     letter-spacing: var(--tracking-display);
     line-height: 0.95;
     text-wrap: balance;

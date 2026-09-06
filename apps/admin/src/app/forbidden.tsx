@@ -1,7 +1,6 @@
 import Link from 'next/link';
 import { SignOutButton } from '@clerk/nextjs';
 import { Button } from '@bandzen/ui/components/button';
-import { Eyebrow } from '@bandzen/ui/components/primitives';
 import { Wordmark } from '@bandzen/ui/components/wordmark';
 
 /**
@@ -18,34 +17,41 @@ import { Wordmark } from '@bandzen/ui/components/wordmark';
  */
 export default function Forbidden() {
   return (
-    <main className="flex flex-1 flex-col items-center justify-center px-6 py-16">
-      <div className="w-full max-w-sm space-y-6">
-        <Wordmark href="/" tag="CMS" />
-
-        <div className="space-y-3">
-          <Eyebrow>403 · No access</Eyebrow>
-          <h1 className="font-title text-title-lg">
-            This account cannot edit content
-          </h1>
-          <p className="text-sm text-muted-foreground text-pretty">
-            You are signed in, but without a CMS role. If you are on the wrong
-            account — the student app shares this sign-in — sign out and use the
-            one that has access. Otherwise ask an admin for the teacher role.
-          </p>
-        </div>
-
-        <div className="flex items-center gap-2">
-          <SignOutButton>
-            <Button type="button">Sign out</Button>
-          </SignOutButton>
+    <main className="flex flex-1 flex-col items-center justify-center gap-8 px-6 py-24 text-center">
+      <Wordmark href="/" tag="CMS" />
+      <p className="font-mono text-[0.6875rem] tracking-[0.22em] text-muted-foreground uppercase">
+        Error 403 · No access
+      </p>
+      <p aria-hidden className="font-pixel text-7xl leading-none md:text-8xl">
+        403
+      </p>
+      <h1 className="font-title max-w-2xl text-4xl text-balance">
+        This account cannot edit content
+      </h1>
+      <p className="max-w-md text-sm text-muted-foreground text-balance">
+        You are signed in, but without a CMS role. If you are on the wrong
+        account — the student app shares this sign-in — sign out and use the one
+        that has access. Otherwise ask an admin for the teacher role.
+      </p>
+      <div className="flex items-center gap-2">
+        <SignOutButton>
           <Button
-            nativeButton={false}
-            variant="ghost"
-            render={<Link href="/" />}
+            type="button"
+            size="xl"
+            className="font-mono text-xs tracking-[0.14em] uppercase"
           >
-            Try again
+            Sign out
           </Button>
-        </div>
+        </SignOutButton>
+        <Button
+          nativeButton={false}
+          variant="ghost"
+          render={<Link href="/" />}
+          size="xl"
+          className="font-mono text-xs tracking-[0.14em] uppercase"
+        >
+          Try again
+        </Button>
       </div>
     </main>
   );

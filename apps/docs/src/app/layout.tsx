@@ -1,34 +1,7 @@
 import type { Metadata, Viewport } from 'next';
-import { Archivo, IBM_Plex_Mono, Inter } from 'next/font/google';
+import { fontClassName } from '@bandzen/ui/fonts';
 import { ThemeProvider } from 'next-themes';
 import './globals.css';
-
-// The same three families as apps/web, apps/app and apps/admin, and for the
-// same reason: `@bandzen/ui` sets its headings in `--font-archivo`, its
-// instrumentation in `--font-plex-mono`, and falls back to a system stack if an
-// app fails to load them. Docs used to load Geist and got the fallback on every
-// heading, which is why `Eyebrow` and `.font-title` looked identical here.
-//
-// Archivo WITHOUT the `wdth` axis. Only the marketing site's display type uses
-// the variable width; loading it here downloads a payload nothing reads.
-const archivo = Archivo({
-  variable: '--font-archivo',
-  subsets: ['latin'],
-  display: 'swap',
-});
-
-const inter = Inter({
-  variable: '--font-inter',
-  subsets: ['latin'],
-  display: 'swap',
-});
-
-const plexMono = IBM_Plex_Mono({
-  variable: '--font-plex-mono',
-  subsets: ['latin'],
-  weight: ['400', '500', '600'],
-  display: 'swap',
-});
 
 export const viewport: Viewport = {
   themeColor: '#09090f',
@@ -49,7 +22,7 @@ export default function RootLayout({ children }: LayoutProps<'/'>) {
     <html
       lang="en"
       suppressHydrationWarning
-      className={`${archivo.variable} ${inter.variable} ${plexMono.variable} h-full antialiased`}
+      className={`${fontClassName} h-full antialiased`}
     >
       <body className="flex min-h-full flex-col">
         <ThemeProvider attribute="class" defaultTheme="system" enableSystem>

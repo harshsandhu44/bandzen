@@ -2,7 +2,7 @@ import { notFound, redirect } from 'next/navigation';
 import { ArrowRight } from 'lucide-react';
 import { Button } from '@bandzen/ui/components/button';
 import { PageHeader, Panel } from '@/components/app/primitives';
-import { getMockAttempt, getMockSiblings, isPro } from '@/lib/db/queries';
+import { getMockAttempt, getMockSiblings } from '@/lib/db/queries';
 import type { Skill } from '@/lib/db/schema';
 import { mockPosition, mockSectionUrl, type MockChild } from '@/lib/mock';
 import { enterMockSection } from '@/app/(app)/mock/actions';
@@ -69,11 +69,11 @@ export async function SittingInterstitial({
     redirect(mockSectionUrl(sittingId, null, mock.kind));
   }
 
-  const [siblings, includeSpeaking] = await Promise.all([
-    getMockSiblings(userId, sittingId) as Promise<MockChild[]>,
-    mock.kind === 'mock' ? Promise.resolve(true) : isPro(userId),
-  ]);
-  const position = mockPosition(siblings, { includeSpeaking });
+  const siblings = (await getMockSiblings(
+    userId,
+    sittingId,
+  )) as MockChild[];
+  const position = mockPosition(siblings);
   if (!position) redirect(mockSectionUrl(sittingId, null, mock.kind));
 
   const copy = SECTION_COPY[mock.kind][position];

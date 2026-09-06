@@ -36,7 +36,6 @@ import {
   PLAN_HORIZON_DAYS,
   READING_BANDS,
   REFUND_DAYS,
-  TRIAL_DAYS,
 } from './facts.ts';
 
 const APP = join(import.meta.dirname, '../../../app/src');
@@ -71,7 +70,6 @@ test('free allowances match entitlements.ts', () => {
     entitlements,
     new RegExp(`FREE_PRACTICE_TESTS_PER_MODULE = ${FREE.practicePerModule}\\b`),
   );
-  assert.match(entitlements, new RegExp(`TRIAL_DAYS = ${TRIAL_DAYS}\\b`));
 });
 
 test('the free band trend depth matches the Progress page', () => {

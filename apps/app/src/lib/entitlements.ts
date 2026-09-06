@@ -16,9 +16,9 @@ const DAY_MS = 86_400_000;
  * Everything falls out of this one comparison. A cancellation keeps the period
  * already paid for, because cancelling does not move the date. A failed
  * renewal simply never extends it, so Razorpay's retry window becomes a grace
- * period at no cost. A comped account — the founding cohort, a trial — is a
- * row with a future date and no Razorpay id, so it needs no special case here
- * or anywhere else.
+ * period at no cost. A comped account — the founding cohort — is a row with a
+ * future date and no Razorpay id, so it needs no special case here or anywhere
+ * else.
  *
  * Razorpay's `status` is never consulted. It exists to render a banner
  * ("renewal failed — update payment"), not to decide access.
@@ -28,15 +28,6 @@ export function isProAt(
   now: Date = new Date(),
 ): boolean {
   return proUntil != null && proUntil > now;
-}
-
-/**
- * Whole days left until `until`, floored at zero and rounded up so the last
- * partial day still counts as one. For the trial countdown in the shell — the
- * `new Date()` default keeps the impurity out of the component that calls it.
- */
-export function daysLeft(until: Date, now: Date = new Date()): number {
-  return Math.max(0, Math.ceil((until.getTime() - now.getTime()) / DAY_MS));
 }
 
 /**
@@ -56,9 +47,6 @@ export const FREE_COACH_MESSAGES_PER_WINDOW = 10;
 
 /** Reading and Listening practice tests a Free candidate may start, ever. */
 export const FREE_PRACTICE_TESTS_PER_MODULE = 5;
-
-/** A new candidate's reverse trial. */
-export const TRIAL_DAYS = 7;
 
 const WINDOW_MS = QUOTA_WINDOW_DAYS * DAY_MS;
 
@@ -214,11 +202,6 @@ export function canStartMock(input: {
     limit: MOCK_TESTS_PER_WINDOW,
     now: input.now,
   });
-}
-
-/** When a grant of `days` should expire, measured from now. */
-export function grantEndsAt(days: number, now: Date = new Date()): Date {
-  return new Date(now.getTime() + days * DAY_MS);
 }
 
 // ---------------------------------------------------------------------------

@@ -1,4 +1,4 @@
-import { FREE, PRICING_URL, REFUND_DAYS, TRIAL_DAYS } from '@/content/facts';
+import { FREE, PRICING_URL, REFUND_DAYS } from '@/content/facts';
 
 export const metadata = {
   title: 'Plans and limits',
@@ -13,8 +13,8 @@ export const metadata = {
 Two things are metered on a rolling window — **marked essays** and **Coach
 messages** — because they cost a model call every time they run. **Reading**
 and **Listening** practice are capped a different way: a fixed number of tests
-to try each module on, then Pro, with no reset. **Speaking** is closed
-entirely on Free.
+to try each module on, then Pro, with no reset. **Speaking practice** is closed
+on Free — but you get one Speaking assessment inside the diagnostic.
 
 |                          | Free                                          |
 | ------------------------ | --------------------------------------------- |
@@ -22,11 +22,11 @@ entirely on Free.
 | Coach messages           | {FREE.coach} per {FREE.windowDays} days       |
 | Reading practice         | {FREE.practicePerModule} tests, ever          |
 | Listening practice       | {FREE.practicePerModule} tests, ever          |
-| Diagnostic               | {FREE.diagnostics}, ever                      |
+| Diagnostic               | {FREE.diagnostics}, ever — all four skills     |
 | Band history on Progress | Last {FREE.trendPoints} attempts              |
 | Lessons                  | Unlimited                                     |
 | Guides                   | Unlimited                                     |
-| Speaking                 | Not available                                 |
+| Speaking practice        | Not available — one assessment in the diagnostic |
 
 The Reading and Listening caps are a lifetime count, not a weekly ration —
 each test you start counts against the {FREE.practicePerModule}, and the
@@ -41,17 +41,11 @@ The {FREE.windowDays}-day window rolls; it is not a calendar week resetting on
 Mondays. Your meter always shows the exact day yours resets — "Thursday" while
 that is unambiguous, a date once it is not.
 
-## Your trial
-
-Finishing [setting up](/candidates/setting-up) grants **{TRIAL_DAYS} days of
-Pro**. It starts then rather than when you signed up, so the clock does not run
-while you have not opened the product.
-
 ## What Pro changes
 
 Unlimited essay marking, unlimited Coach, your full band history on Progress,
-retaking the diagnostic, and **Speaking** — the whole module, not a bigger
-meter on it.
+retaking the diagnostic, and **Speaking practice** — the whole module, not just
+the one assessment the diagnostic gives you.
 
 Prices change, so they are not written here. They are on the
 [pricing section of the Bandzen site]({PRICING_URL}), which is where they are
@@ -67,7 +61,7 @@ your test date if you gave one.
 
 After that: {FREE.essays} essay marks and {FREE.coach} Coach messages a week,
 your band history goes back to the last {FREE.trendPoints} attempts, Speaking
-closes, and Reading and Listening return to the Free cap of
+practice closes, and Reading and Listening return to the Free cap of
 {FREE.practicePerModule} tests each — counted across everything you have ever
 started, so if you were already past that on Free before upgrading, those
 modules are closed until you renew. Lessons and guides stay unlimited.

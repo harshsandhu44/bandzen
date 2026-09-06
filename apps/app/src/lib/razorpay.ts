@@ -123,8 +123,8 @@ export async function createSubscription(input: {
   userId: string;
   /**
    * When billing should begin. Passed when the candidate still has time left —
-   * a trial, or a founding grant — so buying early adds to what they have
-   * instead of paying twice for the same days.
+   * a founding grant — so buying early adds to what they have instead of
+   * paying twice for the same days.
    */
   startAt?: Date | null;
 }): Promise<RazorpaySubscription> {

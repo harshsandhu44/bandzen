@@ -7,9 +7,7 @@ import {
   allowance,
   canStartDiagnostic,
   canStartMock,
-  daysLeft,
   formatInr,
-  grantEndsAt,
   isFoundingActive,
   lifetimeAllowance,
   perMonth,
@@ -137,10 +135,6 @@ test('a Pro mock start that has aged out of the window frees up again', () => {
   assert.equal(a.allowed, true);
 });
 
-test('a grant expires the given number of days out', () => {
-  assert.deepEqual(grantEndsAt(7, NOW), new Date(NOW.getTime() + 7 * DAY));
-});
-
 test('a lifetime allowance counts down to a hard zero with no reset', () => {
   const two = lifetimeAllowance({ isPro: false, used: 3, limit: 5 });
   assert.equal(two.allowed, true);
@@ -159,12 +153,6 @@ test('a lifetime allowance counts down to a hard zero with no reset', () => {
     lifetimeAllowance({ isPro: true, used: 9, limit: 5 }).unlimited,
     true,
   );
-});
-
-test('days left rounds a partial day up and never goes below zero', () => {
-  assert.equal(daysLeft(new Date(NOW.getTime() + 7 * DAY), NOW), 7);
-  assert.equal(daysLeft(new Date(NOW.getTime() + 6 * DAY + 1000), NOW), 7);
-  assert.equal(daysLeft(new Date(NOW.getTime() - DAY), NOW), 0);
 });
 
 test('the founding window is closed when no date is set', () => {

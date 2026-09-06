@@ -16,7 +16,6 @@ import { requireUserId } from '@/lib/auth';
 import { essayAllowance, getProfile, getSubscription } from '@/lib/db/queries';
 import {
   PLANS,
-  daysLeft,
   formatInr,
   isFoundingActive,
   isProAt,
@@ -73,13 +72,6 @@ export default async function AppLayout({ children }: LayoutProps<'/'>) {
   const foundingEnds = foundingEndsAt();
   const founding = isFoundingActive(foundingEnds);
 
-  // Trial and paid Pro are the same `isProAt()` boolean everywhere else on
-  // purpose — entitlement doesn't care how the date got there. Only the shell
-  // needs to tell them apart, so a trialing candidate sees a countdown instead
-  // of the upsell going silent for a week and then cutting off with no warning.
-  const trialDaysLeft =
-    pro && subscription?.planId === 'trial' && until ? daysLeft(until) : null;
-
   // Read the sidebar's own cookie server-side so the first paint matches what
   // the candidate left it as, rather than flashing open then collapsing.
   const defaultOpen = cookieStore.get('sidebar_state')?.value !== 'false';
@@ -96,20 +88,7 @@ export default async function AppLayout({ children }: LayoutProps<'/'>) {
         </SidebarContent>
 
         <SidebarFooter className="p-4">
-          {trialDaysLeft != null ? (
-            <Link
-              href="/upgrade?from=sidebar"
-              className="block border border-chrome/40 px-3 py-2.5 transition-colors hover:border-chrome"
-            >
-              <p className="font-mono text-[0.625rem] tracking-[0.16em] text-chrome uppercase">
-                Trial · {trialDaysLeft} {trialDaysLeft === 1 ? 'day' : 'days'}{' '}
-                left
-              </p>
-              <p className="mt-1 text-xs text-muted-foreground text-pretty">
-                Keep unlimited marking and Coach after it ends.
-              </p>
-            </Link>
-          ) : pro ? null : (
+          {pro ? null : (
             <Link
               href="/upgrade?from=sidebar"
               className="block border border-chrome/40 px-3 py-2.5 transition-colors hover:border-chrome"
@@ -134,7 +113,6 @@ export default async function AppLayout({ children }: LayoutProps<'/'>) {
           email={user?.primaryEmailAddress?.emailAddress ?? null}
           testDays={testDays}
           essaysLeft={quota.unlimited ? null : quota.remaining}
-          trialDaysLeft={trialDaysLeft}
         />
 
         {/* `p-6 sm:p-10` is load-bearing: the exam screens cancel exactly these

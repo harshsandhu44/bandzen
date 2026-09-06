@@ -11,6 +11,9 @@ export default function NotFound() {
       <p className="font-mono text-[0.6875rem] tracking-[0.22em] uppercase opacity-60">
         Error 404
       </p>
+      <p aria-hidden className="font-pixel text-ink text-7xl leading-none md:text-8xl">
+        404
+      </p>
       <h1 className="font-display text-display-2 max-w-2xl">
         That page isn&rsquo;t here yet.
       </h1>

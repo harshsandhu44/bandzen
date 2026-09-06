@@ -50,9 +50,8 @@ export async function startCheckout(
 
   const founding = isFoundingActive(foundingEndsAt());
 
-  // Someone buying during a trial or a founding grant should not pay for days
-  // they already hold. Billing starts when what they have runs out, which is
-  // also why the trial is a conversion moment rather than a cliff.
+  // Someone buying while a founding grant still has time should not pay for
+  // days they already hold. Billing starts when that runs out.
   const until = await proUntil(userId);
   const startAt = isProAt(until) ? until : null;
 

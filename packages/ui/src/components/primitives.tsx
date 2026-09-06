@@ -18,7 +18,7 @@ function BackLink({ href, label }: { href: string; label: string }) {
  *
  * Two type roles, and the split between them is the whole system:
  *
- * - `SectionHeader` / `PageHeader` name a screen or a section. Archivo,
+ * - `SectionHeader` / `PageHeader` name a screen or a section. Geist Sans,
  *   sentence case, sized from `--text-title-*`. These are the headings someone
  *   scans to find their place.
  * - `Eyebrow` labels a piece of instrumentation — a band figure, a countdown, a
@@ -30,9 +30,8 @@ function BackLink({ href, label }: { href: string; label: string }) {
  *
  * `.font-title`, `.font-metric` and the `--text-title-*` / `--text-metric-*`
  * scales all live in ./../styles/globals.css alongside these, so a consuming
- * app gets the components and the type they are set in from one import. The
- * app must still load Archivo, Inter and a mono face — and Archivo as the
- * STATIC cut, see the note on `.font-title`.
+ * app gets the components and the type they are set in from one import. Every
+ * app loads the faces themselves from `@bandzen/ui/fonts`.
  */
 
 /** The mono uppercase label that belongs to a number. */
