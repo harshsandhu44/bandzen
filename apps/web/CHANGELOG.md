@@ -1,3 +1,10 @@
+# web [0.8.0](https://github.com/harshsandhu44/bandzen/compare/web@0.7.0...web@0.8.0) (2026-09-06)
+
+
+### Features
+
+* opt-in cookie consent, with PostHog-JS gated behind it ([#56](https://github.com/harshsandhu44/bandzen/issues/56)) ([cf8fc80](https://github.com/harshsandhu44/bandzen/commit/cf8fc8018c47a6581504fbcb02d260bd13a10d9f))
+
 # web [0.7.0](https://github.com/harshsandhu44/bandzen/compare/web@0.6.1...web@0.7.0) (2026-09-06)
 
 
