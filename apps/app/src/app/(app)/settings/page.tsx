@@ -82,9 +82,7 @@ export default async function SettingsPage() {
               <dd className="flex items-center gap-2 text-sm">
                 {pro ? <ProTag /> : 'Free'}
                 {granted ? (
-                  <span className="text-muted-foreground">
-                    {subscription?.planId === 'trial' ? 'Trial' : 'Founding'}
-                  </span>
+                  <span className="text-muted-foreground">Founding</span>
                 ) : null}
               </dd>
             </div>

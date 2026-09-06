@@ -3,8 +3,7 @@
 import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
 import { requireUserId } from '@/lib/auth';
-import { completeOnboarding, getProfile, grantPro } from '@/lib/db/queries';
-import { TRIAL_DAYS, grantEndsAt } from '@/lib/entitlements';
+import { completeOnboarding, getProfile } from '@/lib/db/queries';
 import { firstIssue, parseProfileForm } from '@/lib/profile';
 
 export type OnboardingState = { error: string | null };
@@ -27,19 +26,8 @@ export async function saveOnboarding(
 
   await completeOnboarding(userId, parsed.data);
 
-  // The reverse trial: Pro first, then a fall back to Free rather than to
-  // nothing. Hung off onboarding rather than sign-up so the model spend only
-  // ever goes on someone who has told us their target band and test date.
-  //
-  // `grantPro` is a no-op when a row already exists, which is what makes this
-  // safe to call from an action anyone can invoke directly — the trial is
-  // one-per-user by primary key, not by a check that could be raced.
-  await grantPro(userId, 'trial', grantEndsAt(TRIAL_DAYS));
-
-  // The shell above this action reads the profile and the subscription for the
-  // countdown and the Pro upsell, and a redirect alone does not re-render it.
-  // Without this the first screen of a new candidate's life shows the upsell to
-  // someone who was granted a trial one line ago, and no target band.
+  // The shell above this action reads the profile to head its screens with the
+  // candidate's target band, and a redirect alone does not re-render it.
   revalidatePath('/', 'layout');
 
   // Someone who cannot estimate their own level is sent to measure it; anyone

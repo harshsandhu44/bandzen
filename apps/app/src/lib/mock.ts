@@ -41,20 +41,11 @@ export const DIAGNOSTIC_TRACKS = 2;
  * inserted up front is that every section's `Timer` anchors on its own
  * `attempts.startedAt`.
  *
- * `includeSpeaking: false` drops Speaking from the sequence entirely — a Free
- * diagnostic ends at Writing, so once Writing is terminal this returns `null`
- * and the sitting is over. No speaking row is ever created for it.
+ * Every sitting — mock and diagnostic alike — runs all four skills; the
+ * diagnostic is only shorter in content, not in scope.
  */
-export function mockPosition(
-  children: readonly MockChild[],
-  opts?: { includeSpeaking?: boolean },
-): Skill | null {
-  const order =
-    opts?.includeSpeaking === false
-      ? MOCK_ORDER.filter((s) => s !== 'speaking')
-      : MOCK_ORDER;
-
-  for (const skill of order) {
+export function mockPosition(children: readonly MockChild[]): Skill | null {
+  for (const skill of MOCK_ORDER) {
     const rows = children.filter((c) => c.module === skill);
     if (rows.length === 0) return skill;
     if (rows.some((r) => r.status === 'in_progress')) return skill;

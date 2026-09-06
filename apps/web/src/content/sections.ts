@@ -404,7 +404,10 @@ export const pricing = {
       period: 'forever',
       features: [
         { label: '5 Reading and 5 Listening practice tests', planned: false },
-        { label: 'One diagnostic assessment', planned: false },
+        {
+          label: 'One four-skill diagnostic — Speaking included',
+          planned: false,
+        },
         { label: 'All lessons and study materials', planned: false },
         { label: '2 AI-marked essays a week', planned: false },
         { label: '10 Bandzen Coach messages a week', planned: false },
@@ -463,7 +466,7 @@ export const faq = {
     },
     {
       q: 'Can Bandzen analyse Speaking?',
-      a: 'Yes. You record a response, and Bandzen grades the audio against all four Speaking criteria, pronunciation included. Speaking analysis is a Pro feature.',
+      a: 'Yes. You record a response, and Bandzen grades the audio against all four Speaking criteria, pronunciation included. You get one Speaking assessment free in the diagnostic; unlimited Speaking practice is Pro.',
     },
     {
       q: 'Can I take complete mock tests?',

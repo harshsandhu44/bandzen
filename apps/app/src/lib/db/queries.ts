@@ -552,13 +552,12 @@ export async function markedEssayCount(userId: string): Promise<number> {
  * Diagnostic sittings that actually finished.
  *
  * A diagnostic is a `mock_attempts` row with `kind = 'diagnostic'`; it counts
- * once `submittedAt` is stamped — which happens when the last section for that
- * candidate submits (Speaking for Pro, Writing for Free). A sitting abandoned
- * part way has a null `submittedAt` and does not count, deliberately: the free
- * diagnostic is the demonstration the whole funnel points at, and a sitting
- * that broke must not be the thing that locks someone out of it forever.
- * Legacy 2-skill diagnostics are backfilled with `submittedAt` set, so they
- * still count here.
+ * once `submittedAt` is stamped — which happens when Speaking, the last
+ * section, submits. A sitting abandoned part way has a null `submittedAt` and
+ * does not count, deliberately: the free diagnostic is the demonstration the
+ * whole funnel points at, and a sitting that broke must not be the thing that
+ * locks someone out of it forever. Legacy 2-skill diagnostics are backfilled
+ * with `submittedAt` set, so they still count here.
  */
 export async function diagnosticCount(userId: string): Promise<number> {
   const [row] = await db
@@ -584,8 +583,8 @@ export async function diagnosticCount(userId: string): Promise<number> {
  * replayed after a cancellation would hand Pro back to a refunded account.
  *
  * `greatest` on the date is belt to that brace, and it also covers the grant
- * case: a candidate who buys mid-trial keeps whichever date is further out
- * rather than losing days they already had.
+ * case: a candidate who buys while a founding grant still has time keeps
+ * whichever date is further out rather than losing days they already had.
  *
  * `source` is kept from the first write — it records which prompt earned the
  * subscription, and a renewal did not earn it again.
@@ -620,17 +619,16 @@ export async function activateSubscription(values: {
 }
 
 /**
- * Comp someone — the founding cohort, or a new candidate's trial.
+ * Comp someone — the founding cohort. No code path calls this; it is the
+ * mechanism a founding grant is applied by hand (a one-off from a console).
  *
- * `onConflictDoNothing`, deliberately not the upsert above, and that is the
- * whole point. A server action is directly invocable, so hanging the trial off
- * "onboarding completed" would otherwise let someone re-run it for a fresh
- * week whenever they liked. One row per user means one trial per user,
- * enforced by the primary key rather than by a check that can race.
+ * `onConflictDoNothing`, deliberately not the upsert above: one row per user,
+ * enforced by the primary key, so a re-run is a no-op rather than a way to
+ * extend the grant.
  */
 export async function grantPro(
   userId: string,
-  planId: 'trial' | 'founding',
+  planId: 'founding',
   endsAt: Date,
 ) {
   await db

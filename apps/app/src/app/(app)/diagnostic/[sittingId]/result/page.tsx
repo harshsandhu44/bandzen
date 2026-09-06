@@ -1,7 +1,6 @@
 import { notFound } from 'next/navigation';
 import { ArrowRight } from 'lucide-react';
 import { Button } from '@bandzen/ui/components/button';
-import { ProLocked } from '@/components/billing/pro';
 import { ComingUp } from '@/components/dashboard/coming-up';
 import {
   SittingResult,
@@ -9,7 +8,7 @@ import {
 } from '@/components/exam/sitting-result';
 import { requireUserId } from '@/lib/auth';
 import { todayIso } from '@/lib/dates';
-import { getDiagnosticResult, getProfile, isPro } from '@/lib/db/queries';
+import { getDiagnosticResult, getProfile } from '@/lib/db/queries';
 import { buildPlan, nextAction } from '@/lib/study-plan';
 import { addDiagnosticSpeaking } from '../../actions';
 
@@ -21,46 +20,40 @@ export default async function DiagnosticResultPage({
   const { sittingId } = await params;
   const userId = await requireUserId();
 
-  const [data, profile, pro] = await Promise.all([
+  const [data, profile] = await Promise.all([
     getDiagnosticResult(userId, sittingId),
     getProfile(userId),
-    isPro(userId),
   ]);
   if (!data) notFound();
 
   const bands = sittingBands(data);
 
-  // The Speaking row. Only meaningful once the rest of the sitting has closed
-  // (a Free sitting ends at Writing; a Pro sitting that reached Speaking has a
-  // `data.speaking` row). Until then, let SittingResult show the default
-  // "Not reached yet" line.
+  // Every diagnostic now runs Speaking inline, so a sitting that reached the
+  // end has a `data.speaking` row. The one exception is a legacy two-skill
+  // diagnostic, backfilled with `submittedAt` set and no speaking row — it
+  // gets the "add it now" prompt. A sitting still open resumes through
+  // `/diagnostic` into its Speaking section rather than landing here, so until
+  // it closes we just let SittingResult show its "Not reached yet" line.
   const sittingClosed = data.mock.submittedAt != null;
 
-  // A real band once the row exists, a Pro lock for a Free candidate, or a
-  // "take it now" prompt once they upgrade.
-  const speakingSlot = data.speaking || !sittingClosed ? undefined : pro ? (
-    <div className="flex flex-wrap items-center justify-between gap-4 border border-border px-5 py-4">
-      <div className="space-y-1">
-        <p className="font-title text-sm">Speaking assessment</p>
-        <p className="max-w-prose text-sm text-muted-foreground text-pretty">
-          Record a full Parts 1–3 interview — about 5 minutes — and we&apos;ll
-          add the fourth band to this result.
-        </p>
+  const speakingSlot =
+    data.speaking || !sittingClosed ? undefined : (
+      <div className="flex flex-wrap items-center justify-between gap-4 border border-border px-5 py-4">
+        <div className="space-y-1">
+          <p className="font-title text-sm">Speaking assessment</p>
+          <p className="max-w-prose text-sm text-muted-foreground text-pretty">
+            Record a full Parts 1–3 interview — about 5 minutes — and we&apos;ll
+            add the fourth band to this result.
+          </p>
+        </div>
+        <form action={addDiagnosticSpeaking}>
+          <input type="hidden" name="sittingId" value={data.mock.id} />
+          <Button type="submit" size="sm">
+            Take your speaking assessment <ArrowRight />
+          </Button>
+        </form>
       </div>
-      <form action={addDiagnosticSpeaking}>
-        <input type="hidden" name="sittingId" value={data.mock.id} />
-        <Button type="submit" size="sm">
-          Take your speaking assessment <ArrowRight />
-        </Button>
-      </form>
-    </div>
-  ) : (
-    <ProLocked
-      title="Speaking assessment"
-      description="Your diagnostic measured Listening, Reading and Writing. Speaking is graded from your audio on Pro — unlock it to complete the picture."
-      source="diagnostic_speaking_wall"
-    />
-  );
+    );
 
   const planInput = {
     readingBand: bands.reading,

@@ -8,7 +8,6 @@ import {
   getMockAttempt,
   getMockSectionAttempts,
   getMockSiblings,
-  isPro,
   latestOpenMock,
   mockAllowance,
   mockContentExclusions,
@@ -111,18 +110,9 @@ export async function enterMockSection(formData: FormData) {
     redirect(mockSectionUrl(mockAttemptId, null, mock.kind));
   }
 
-  const [siblings, includeSpeaking] = await Promise.all([
-    getMockSiblings(userId, mockAttemptId),
-    mock.kind === 'mock' ? Promise.resolve(true) : isPro(userId),
-  ]);
-  const position = mockPosition(siblings, { includeSpeaking });
+  const siblings = await getMockSiblings(userId, mockAttemptId);
+  const position = mockPosition(siblings);
   if (!position) redirect(mockSectionUrl(mockAttemptId, null, mock.kind));
-
-  // Speaking on a diagnostic requires Pro. Unreachable via the sequencer for a
-  // Free candidate (position stops at writing), but guard the direct path too.
-  if (position === 'speaking' && !includeSpeaking) {
-    redirect('/upgrade?from=diagnostic_speaking_wall');
-  }
 
   const sectionKind = mock.kind;
   const existing = await getMockSectionAttempts(

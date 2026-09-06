@@ -49,8 +49,8 @@ export default function DocsHome() {
         Bandzen is an IELTS preparation product. All four modules — Reading,
         Listening, Writing and Speaking — have marking engines behind them;
         Reading and Listening are marked by a fixed function, Writing and
-        Speaking by a language model against the band descriptors. Speaking is
-        Pro only. These pages describe what is built, and nothing else.
+        Speaking by a language model against the band descriptors. Speaking
+        practice is Pro. These pages describe what is built, and nothing else.
       </p>
 
       <h2 className="font-title text-title mt-12">Start where you are</h2>

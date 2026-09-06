@@ -42,9 +42,6 @@ export const FREE = {
   trendPoints: 5,
 } as const;
 
-/** The reverse trial, granted when onboarding completes — not at sign-up. */
-export const TRIAL_DAYS = 7;
-
 /** Refund window. Source: `apps/web/src/content/sections.ts` (`legal.refundDays`). */
 export const REFUND_DAYS = 7;
 
