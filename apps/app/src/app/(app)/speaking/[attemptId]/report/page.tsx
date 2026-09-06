@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import { after } from 'next/server';
 import { notFound } from 'next/navigation';
 import {
   Accordion,
@@ -7,6 +8,7 @@ import {
   AccordionTrigger,
 } from '@bandzen/ui/components/accordion';
 import { Button } from '@bandzen/ui/components/button';
+import { capture } from '@/lib/analytics';
 import { requireUserId } from '@/lib/auth';
 import { getSpeakingReport } from '@/lib/db/queries';
 import { GradedReport } from '@/components/exam/graded-report';
@@ -31,6 +33,15 @@ export default async function SpeakingReportPage({
 
   const { attempt, report, responses } = data;
   if (attempt.status === 'complete' && !report) notFound();
+
+  if (attempt.status === 'complete' && report) {
+    after(() =>
+      capture(userId, 'report_viewed', {
+        module: 'speaking',
+        overall_band: attempt.band,
+      }),
+    );
+  }
 
   return (
     <GradedReport

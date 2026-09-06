@@ -1,6 +1,8 @@
 'use server';
 
+import { after } from 'next/server';
 import { redirect } from 'next/navigation';
+import { capture } from '@/lib/analytics';
 import { requireUserId } from '@/lib/auth';
 import { checkAwards } from '@/lib/award-check';
 import {
@@ -30,6 +32,7 @@ export async function startListeningAttempt(formData: FormData) {
   if (!quota.allowed) redirect('/upgrade?from=listening_wall');
 
   const attempt = await createAttempt({ userId, module: 'listening', trackId });
+  after(() => capture(userId, 'attempt_started', { module: 'listening' }));
   redirect(`/listening/${attempt.id}`);
 }
 
@@ -63,10 +66,31 @@ export async function submitListeningAttempt(formData: FormData) {
   const before = await getAttempt(userId, attemptId);
   if (!before) throw new Error('Attempt not found');
 
+  // Practice only — auto-scored, so submitted and graded are one instant.
+  if (!before.mockAttemptId) {
+    after(() =>
+      capture(userId, 'attempt_submitted', {
+        module: 'listening',
+        attempt_id: attemptId,
+      }),
+    );
+  }
+
   const graded = before.mockAttemptId
     ? await submitMockListening(userId, attemptId)
     : await submitListening(userId, attemptId);
   if (!graded) throw new Error('Attempt not found');
+
+  if (!before.mockAttemptId) {
+    after(() =>
+      capture(userId, 'attempt_graded', {
+        module: 'listening',
+        outcome: 'graded',
+        duration_ms: 0,
+        overall_band: graded.band,
+      }),
+    );
+  }
 
   await checkAwards(userId);
 

@@ -1,5 +1,7 @@
+import { after } from 'next/server';
 import { notFound, redirect } from 'next/navigation';
 import { ObjectiveReview } from '@/components/exam/objective-review';
+import { capture } from '@/lib/analytics';
 import { requireUserId } from '@/lib/auth';
 import {
   accuracyByQuestionKind,
@@ -18,6 +20,13 @@ export default async function ReadingReviewPage({
   const attempt = await getAttempt(userId, attemptId);
   if (!attempt) notFound();
   if (attempt.status !== 'complete') redirect(`/reading/${attemptId}`);
+
+  after(() =>
+    capture(userId, 'report_viewed', {
+      module: 'reading',
+      overall_band: attempt.band,
+    }),
+  );
 
   const [data, history] = await Promise.all([
     getReadingReview(userId, attemptId),
