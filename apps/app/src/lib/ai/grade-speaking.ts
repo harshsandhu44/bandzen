@@ -7,6 +7,7 @@ import {
   writeReport,
 } from '@/lib/db/queries';
 import { transcribeAudio } from '@bandzen/ai/speech';
+import { capture } from '@/lib/analytics';
 import { checkAwards } from '@/lib/award-check';
 import { speakingCoverageCeiling } from '@/lib/grading';
 import { openai } from './client';
@@ -64,6 +65,9 @@ const PART_LABEL: Record<number, string> = {
  * to give the review page the words to show alongside the playback.
  */
 export async function gradeSpeaking(attemptId: string) {
+  const startedAt = Date.now();
+  let gradedUserId: string | null = null;
+  let gradedBand: number | null = null;
   try {
     const work = await loadSpeakingForGrading(attemptId);
     if (!work || work.prompts.length === 0) {
@@ -77,7 +81,8 @@ export async function gradeSpeaking(attemptId: string) {
     // as a blank essay. The section still gets a band so a mock overall can
     // still be computed.
     if (answered.length === 0) {
-      const userId = await writeReport(attemptId, {
+      gradedBand = 1;
+      gradedUserId = await writeReport(attemptId, {
         band: 1,
         criteria: [
           'Fluency and Coherence',
@@ -91,10 +96,12 @@ export async function gradeSpeaking(attemptId: string) {
         })),
         annotations: [],
         strengths: [],
-        weaknesses: ['Nothing was recorded — record your answers to get an estimate.'],
+        weaknesses: [
+          'Nothing was recorded — record your answers to get an estimate.',
+        ],
         model: 'none',
       });
-      if (userId) await checkAwards(userId);
+      if (gradedUserId) await checkAwards(gradedUserId);
       return;
     }
 
@@ -187,8 +194,9 @@ export async function gradeSpeaking(attemptId: string) {
     // half-finished test never comes back as a mid band.
     const ceiling = speakingCoverageCeiling(answered.length, totalPrompts);
     const band = Math.min(toBand(parsed.band), ceiling);
+    gradedBand = band;
 
-    const userId = await writeReport(attemptId, {
+    gradedUserId = await writeReport(attemptId, {
       band,
       criteria: parsed.criteria.map((c) => ({
         ...c,
@@ -206,7 +214,7 @@ export async function gradeSpeaking(attemptId: string) {
       model: SPEAKING_GRADER_MODEL,
     });
 
-    if (userId) await checkAwards(userId);
+    if (gradedUserId) await checkAwards(gradedUserId);
 
     const usage = response.usage;
     console.log(
@@ -216,6 +224,15 @@ export async function gradeSpeaking(attemptId: string) {
     );
   } catch (error) {
     console.error(`[grade-speaking] ${attemptId} failed`, error);
-    await markGradingFailed(attemptId);
+    gradedUserId = await markGradingFailed(attemptId);
+  } finally {
+    if (gradedUserId) {
+      await capture(gradedUserId, 'attempt_graded', {
+        module: 'speaking',
+        outcome: gradedBand == null ? 'failed' : 'graded',
+        duration_ms: Date.now() - startedAt,
+        overall_band: gradedBand,
+      });
+    }
   }
 }

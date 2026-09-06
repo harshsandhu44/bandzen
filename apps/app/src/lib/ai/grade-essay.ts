@@ -5,6 +5,7 @@ import {
   markGradingFailed,
   writeReport,
 } from '@/lib/db/queries';
+import { capture } from '@/lib/analytics';
 import { checkAwards } from '@/lib/award-check';
 import { writingLengthCeiling } from '@/lib/grading';
 import { openai } from './client';
@@ -29,6 +30,9 @@ const toBand = (n: number) => Math.min(9, Math.max(0, Math.round(n * 2) / 2));
  * stuck on 'grading' is a report page that polls forever.
  */
 export async function gradeEssay(attemptId: string) {
+  const startedAt = Date.now();
+  let gradedUserId: string | null = null;
+  let gradedBand: number | null = null;
   try {
     const work = await loadForGrading(attemptId);
     if (!work) throw new Error('Attempt, essay or prompt missing');
@@ -40,7 +44,8 @@ export async function gradeEssay(attemptId: string) {
     // A blank response has nothing for the model to assess — write the floor
     // directly and skip the call.
     if (words === 0) {
-      const userId = await writeReport(attemptId, {
+      gradedBand = 1;
+      gradedUserId = await writeReport(attemptId, {
         band: 1,
         criteria: CRITERION_NAMES.map((name) => ({
           name,
@@ -52,7 +57,7 @@ export async function gradeEssay(attemptId: string) {
         weaknesses: ['Nothing was written for this task.'],
         model: 'none',
       });
-      if (userId) await checkAwards(userId);
+      if (gradedUserId) await checkAwards(gradedUserId);
       return;
     }
 
@@ -86,8 +91,9 @@ export async function gradeEssay(attemptId: string) {
     );
     // An under-length response is capped at Band 2 whatever the model said.
     const band = Math.min(toBand(parsed.band), ceiling);
+    gradedBand = band;
 
-    const userId = await writeReport(attemptId, {
+    gradedUserId = await writeReport(attemptId, {
       band,
       criteria: parsed.criteria.map((c) => ({
         ...c,
@@ -103,7 +109,7 @@ export async function gradeEssay(attemptId: string) {
 
     // An essay only becomes a study day here -- `submitEssay` leaves the row
     // on 'grading', which `studyDays` does not count.
-    if (userId) await checkAwards(userId);
+    if (gradedUserId) await checkAwards(gradedUserId);
 
     const usage = response.usage;
     console.log(
@@ -113,6 +119,15 @@ export async function gradeEssay(attemptId: string) {
     );
   } catch (error) {
     console.error(`[grade] ${attemptId} failed`, error);
-    await markGradingFailed(attemptId);
+    gradedUserId = await markGradingFailed(attemptId);
+  } finally {
+    if (gradedUserId) {
+      await capture(gradedUserId, 'attempt_graded', {
+        module: 'writing',
+        outcome: gradedBand == null ? 'failed' : 'graded',
+        duration_ms: Date.now() - startedAt,
+        overall_band: gradedBand,
+      });
+    }
   }
 }
