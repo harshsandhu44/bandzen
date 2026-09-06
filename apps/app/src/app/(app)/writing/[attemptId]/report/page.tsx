@@ -39,6 +39,7 @@ export default async function WritingReportPage({
     after(() =>
       capture(userId, 'report_viewed', {
         module: 'writing',
+        attempt_id: attemptId,
         overall_band: attempt.band,
       }),
     );

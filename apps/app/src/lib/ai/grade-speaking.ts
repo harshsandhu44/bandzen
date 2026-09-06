@@ -229,6 +229,7 @@ export async function gradeSpeaking(attemptId: string) {
     if (gradedUserId) {
       await capture(gradedUserId, 'attempt_graded', {
         module: 'speaking',
+        attempt_id: attemptId,
         outcome: gradedBand == null ? 'failed' : 'graded',
         duration_ms: Date.now() - startedAt,
         overall_band: gradedBand,

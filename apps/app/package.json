@@ -16,6 +16,7 @@
     "content:speaking:generate": "node --env-file=.env.local scripts/generate-speaking-content.mts generate",
     "content:speaking:audio": "node --env-file=.env.local scripts/synthesize-speaking-audio.mts",
     "content:speaking:sql": "node scripts/generate-speaking-content.mts sql",
+    "analytics:retention": "node --env-file=.env.local scripts/analytics-retention.mts",
     "test": "node --test \"src/**/*.test.ts\"",
     "db:generate": "drizzle-kit generate",
     "db:migrate": "drizzle-kit migrate",
