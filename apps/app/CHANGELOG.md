@@ -1,3 +1,10 @@
+# app [1.4.0](https://github.com/harshsandhu44/bandzen/compare/app@1.3.1...app@1.4.0) (2026-09-06)
+
+
+### Features
+
+* Geist type system across all apps; remove the reverse trial ([#55](https://github.com/harshsandhu44/bandzen/issues/55)) ([95284c4](https://github.com/harshsandhu44/bandzen/commit/95284c40b855ff7a19e59786a2dd274a7d327594))
+
 # app [1.3.0](https://github.com/harshsandhu44/bandzen/compare/app@1.2.0...app@1.3.0) (2026-09-05)
 
 
