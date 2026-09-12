@@ -1,3 +1,10 @@
+## web [0.8.1](https://github.com/harshsandhu44/bandzen/compare/web@0.8.0...web@0.8.1) (2026-09-12)
+
+
+### Bug Fixes
+
+* **web:** initialize PostHog on the marketing site ([#62](https://github.com/harshsandhu44/bandzen/issues/62)) ([e86b780](https://github.com/harshsandhu44/bandzen/commit/e86b78009a7a7328a4117564b56fea49a8e0260e))
+
 # web [0.8.0](https://github.com/harshsandhu44/bandzen/compare/web@0.7.0...web@0.8.0) (2026-09-06)
 
 
