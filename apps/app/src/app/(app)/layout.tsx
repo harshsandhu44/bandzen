@@ -23,7 +23,7 @@ import {
 } from '@/lib/entitlements';
 import { foundingEndsAt } from '@/lib/razorpay';
 import { daysUntil } from '@/lib/dates';
-import { PostHogAnalytics } from '@/components/analytics/posthog';
+import { PostHogAnalytics } from '@bandzen/ui/components/posthog';
 import { MobileNav } from './mobile-nav';
 import { Nav } from './nav';
 import { TopBar } from './top-bar';

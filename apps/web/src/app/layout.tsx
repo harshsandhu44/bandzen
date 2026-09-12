@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from 'next';
 import { fontClassName } from '@bandzen/ui/fonts';
 import { ConsentProvider, CookieConsent } from '@bandzen/ui/components/consent';
+import { PostHogAnalytics } from '@bandzen/ui/components/posthog';
 import './globals.css';
 
 export const viewport: Viewport = {
@@ -49,6 +50,7 @@ export default function RootLayout({ children }: LayoutProps<'/'>) {
         <ConsentProvider>
           {children}
           <CookieConsent />
+          <PostHogAnalytics />
         </ConsentProvider>
       </body>
     </html>
