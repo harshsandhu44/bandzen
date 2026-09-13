@@ -1,0 +1,22 @@
+{
+  "name": "@bandzen/pricing",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    "./currency": "./src/currency.ts",
+    "./plans": "./src/plans.ts"
+  },
+  "scripts": {
+    "lint": "eslint",
+    "typecheck": "tsc --noEmit",
+    "test": "node --test \"src/**/*.test.ts\""
+  },
+  "devDependencies": {
+    "@bandzen/eslint-config": "workspace:*",
+    "@bandzen/tsconfig": "workspace:*",
+    "@types/node": "^20",
+    "eslint": "^9",
+    "typescript": "^5"
+  }
+}
