@@ -33,16 +33,31 @@ export async function POST(request: Request) {
   }
 
   switch (event.type) {
-    // A cancellation is in this list on purpose: it does not shorten anything.
-    // The candidate keeps what they paid for, and `subscription.revoked` is
-    // what actually ends it.
+    // A cancellation is in this list on purpose: scheduling one does not
+    // shorten anything. The candidate keeps what they paid for, and `endedAt`
+    // is what says the access is actually over.
     case 'subscription.active':
     case 'subscription.updated':
     case 'subscription.uncanceled':
-    case 'subscription.canceled': {
+    case 'subscription.canceled':
+    case 'subscription.revoked': {
       const data = event.data;
       const userId = attribute(event.type, data.id, data.customer.externalId);
       if (!userId) break;
+
+      if (data.endedAt) {
+        // The one path that moves the date backwards, and it has to: a refund
+        // ends access now. `activateSubscription`'s `greatest` exists to stop a
+        // stale event doing this, so it cannot be the one that does it.
+        //
+        // Keyed on `endedAt` rather than on the event type because any later
+        // event carries it too — a `subscription.updated` landing after a
+        // revocation would otherwise pass the ordering guard with a newer
+        // `modified_at` and hand back the original period end through
+        // `greatest`, which is Pro restored to a refunded account.
+        await setSubscriptionEnd(userId, data.status, data.endedAt);
+        break;
+      }
 
       await activateSubscription({
         userId,
@@ -59,17 +74,6 @@ export async function POST(request: Request) {
         // it was written for.
         lastEventAt: data.modifiedAt ?? data.createdAt,
       });
-      break;
-    }
-
-    case 'subscription.revoked': {
-      const data = event.data;
-      const userId = attribute(event.type, data.id, data.customer.externalId);
-      if (!userId) break;
-
-      // The one path that legitimately moves the date backwards — access ends
-      // now, which is exactly what `activateSubscription`'s `greatest` forbids.
-      await setSubscriptionEnd(userId, 'revoked', new Date());
       break;
     }
 

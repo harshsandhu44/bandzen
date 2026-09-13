@@ -41,6 +41,10 @@ export default async function SettingsPage() {
   const pro = isProAt(subscription?.currentPeriodEnd);
   const paid = pro && subscription?.polarSubscriptionId != null;
   const granted = pro && subscription?.polarSubscriptionId == null;
+  // Anyone who has ever paid keeps a way to their invoices, including after
+  // the subscription ends. Gating the portal on `paid` would mean the people
+  // most likely to want a receipt are the ones who cannot get one.
+  const billed = subscription?.polarSubscriptionId != null;
 
   return (
     <div className="max-w-2xl space-y-6">
@@ -99,26 +103,41 @@ export default async function SettingsPage() {
               Polar is the Merchant of Record, so the receipt is legally theirs
               to issue — and cancelling the same way you signed up is a legal
               requirement in several of the places we now sell. */}
-          {paid && subscription ? (
-            <form action={manageBilling}>
-              <Button variant="outline" size="sm" type="submit">
-                Manage billing
+          <div className="flex flex-wrap items-center gap-2">
+            {billed ? (
+              <form action={manageBilling}>
+                <Button variant="outline" size="sm" type="submit">
+                  Manage billing
+                </Button>
+              </form>
+            ) : null}
+            {pro ? null : (
+              <Button
+                variant="outline"
+                size="sm"
+                nativeButton={false}
+                render={<Link href="/upgrade?from=settings" />}
+              >
+                See Pro
               </Button>
-              <p className="mt-2 text-xs text-muted-foreground text-pretty">
-                Invoices, payment method and cancellation. Cancelling keeps Pro
-                until {DATE.format(subscription.currentPeriodEnd)}.
-              </p>
-            </form>
-          ) : (
-            <Button
-              variant="outline"
-              size="sm"
-              nativeButton={false}
-              render={<Link href="/upgrade?from=settings" />}
-            >
-              {granted ? 'Continue after this ends' : 'See Pro'}
-            </Button>
-          )}
+            )}
+            {granted ? (
+              <Button
+                variant="outline"
+                size="sm"
+                nativeButton={false}
+                render={<Link href="/upgrade?from=settings" />}
+              >
+                Continue after this ends
+              </Button>
+            ) : null}
+          </div>
+          {paid && subscription ? (
+            <p className="text-xs text-muted-foreground text-pretty">
+              Invoices, payment method and cancellation. Cancelling keeps Pro
+              until {DATE.format(subscription.currentPeriodEnd)}.
+            </p>
+          ) : null}
         </TabsContent>
 
         <TabsContent value="account" className="space-y-3">

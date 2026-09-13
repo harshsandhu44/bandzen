@@ -198,8 +198,14 @@ export async function setCurrency(value: string): Promise<void> {
 export async function manageBilling(): Promise<void> {
   const userId = await requireUserId();
 
+  // Settings only renders the button when there is an id, so this is a guard
+  // against a hand-made request, not a state a candidate can reach. It throws
+  // rather than returning: a server action that silently does nothing leaves a
+  // button that looks broken.
   const subscription = await getSubscription(userId);
-  if (!subscription?.polarSubscriptionId) return;
+  if (!subscription?.polarSubscriptionId) {
+    throw new Error('No Polar subscription for this user');
+  }
 
   const session = await polar.customerSessions.create({
     externalCustomerId: userId,
