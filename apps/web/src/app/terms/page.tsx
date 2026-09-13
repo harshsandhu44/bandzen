@@ -7,6 +7,12 @@ import {
 } from '@/components/marketing/legal-page';
 import { brand, legal } from '@/content/sections';
 
+/**
+ * ponytail: the merchant-of-record clauses below are an unreviewed draft.
+ * Polar selling on our behalf changes who the customer's contract is with,
+ * which is a legal position and not a copy change. Have someone qualified read
+ * this before it goes live.
+ */
 export const metadata = {
   title: 'Terms of service',
   description: 'The terms you agree to when you use Bandzen.',
@@ -46,10 +52,18 @@ export default function TermsPage() {
 
       <Clause title="4. Subscriptions and payment">
         <p>
-          The Free plan is free. Bandzen Pro is a recurring subscription billed
-          in Indian Rupees through Razorpay, which processes the payment and
-          holds your payment details — we never see your card or UPI
-          credentials.
+          The Free plan is free. Bandzen Pro is a recurring subscription sold by
+          Polar Software Inc., which acts as the merchant of record: your
+          contract of sale for the subscription is with Polar, not with us, and
+          Polar&rsquo;s own terms apply to that sale alongside these. Polar
+          takes the payment, issues the invoice, and collects and remits any
+          sales tax or VAT due where you live. Prices are shown inclusive of
+          that tax. We never see or hold your card details.
+        </p>
+        <p>
+          Bandzen Pro is priced in your local currency where we support one
+          &mdash; Indian Rupees, US Dollars, Pounds Sterling or Euros &mdash;
+          and in US Dollars otherwise.
         </p>
         <p>
           A subscription renews automatically at the end of each period until it

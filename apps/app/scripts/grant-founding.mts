@@ -8,7 +8,7 @@
  * gates on entitlement. Those users have had unlimited everything through the
  * beta; if the gates land first they are all metered with no warning.
  *
- * A grant is a row with a future `current_period_end` and no Razorpay id, so
+ * A grant is a row with a future `current_period_end` and no Polar id, so
  * `isPro` needs no special case for it. `on conflict do nothing` makes this
  * safe to run twice and means it can never shorten a subscription someone has
  * actually paid for.

@@ -66,11 +66,20 @@ const ROWS: {
     retention: 'Up to 3 months (only when marketing is on)',
   },
   {
-    name: 'Razorpay checkout.js',
+    name: 'Polar checkout',
     category: 'Necessary',
-    setBy: 'Razorpay',
-    purpose: 'Runs the payment form. Loads only when you start a payment.',
+    setBy: 'Polar',
+    purpose:
+      'Runs the payment form, which opens in a frame on our page. Loads only when you start a payment.',
     retention: 'Session',
+  },
+  {
+    name: 'Stripe (__stripe_mid, __stripe_sid)',
+    category: 'Necessary',
+    setBy: 'Stripe, via Polar',
+    purpose:
+      'Fraud prevention on the payment form. Polar processes card payments through Stripe, so Stripe sets these inside the payment frame.',
+    retention: '__stripe_mid 1 year, __stripe_sid 30 minutes',
   },
 ];
 

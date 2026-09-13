@@ -1,0 +1,14 @@
+{
+  "$schema": "https://turbo.build/schema.json",
+  "extends": ["//"],
+  "tasks": {
+    "build": {
+      "env": [
+        "POLAR_READ_TOKEN",
+        "POLAR_SERVER",
+        "POLAR_PRODUCT_MONTHLY",
+        "POLAR_PRODUCT_QUARTERLY"
+      ]
+    }
+  }
+}

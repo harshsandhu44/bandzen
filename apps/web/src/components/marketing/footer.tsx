@@ -10,7 +10,12 @@ import { CookieSettingsButton } from '@bandzen/ui/components/consent';
 
 import pkg from '../../../package.json';
 
-export function Footer() {
+export async function Footer() {
+  // The copyright year reads the clock, which a prerender will not do without
+  // being told what it may cache. A year is exactly as stale as this footer is
+  // allowed to be.
+  'use cache';
+
   return (
     <footer className="bg-ink text-paper border-paper/10 border-t">
       <Container className="py-16 md:py-20">
