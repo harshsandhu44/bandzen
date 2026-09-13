@@ -1,6 +1,8 @@
 {
   "$schema": "https://turbo.build/schema.json",
-  "extends": ["//"],
+  "extends": [
+    "//"
+  ],
   "tasks": {
     "build": {
       "env": [
@@ -9,14 +11,11 @@
         "OPENAI_API_KEY",
         "OPENAI_CONTENT_MODEL",
         "OPENAI_GRADER_MODEL",
-        "RAZORPAY_KEY_ID",
-        "RAZORPAY_KEY_SECRET",
-        "RAZORPAY_WEBHOOK_SECRET",
-        "RAZORPAY_PLAN_FOUNDING_MONTHLY",
-        "RAZORPAY_PLAN_FOUNDING_QUARTERLY",
-        "RAZORPAY_PLAN_STANDARD_MONTHLY",
-        "RAZORPAY_PLAN_STANDARD_QUARTERLY",
-        "FOUNDING_ENDS_AT"
+        "POLAR_ACCESS_TOKEN",
+        "POLAR_WEBHOOK_SECRET",
+        "POLAR_SERVER",
+        "POLAR_PRODUCT_MONTHLY",
+        "POLAR_PRODUCT_QUARTERLY"
       ]
     }
   }

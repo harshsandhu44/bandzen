@@ -154,26 +154,26 @@ export const accessRequests = pgTable(
 );
 
 /**
- * What a candidate has paid for, mirrored from Razorpay.
+ * What a candidate has paid for, mirrored from Polar.
  *
- * Razorpay owns the truth; this is a local copy the webhook keeps current, so
+ * Polar owns the truth; this is a local copy the webhook keeps current, so
  * rendering a page never depends on their API being reachable. One row per
  * user — resubscribing reuses it.
  *
- * `status` is text rather than an enum on purpose: the values are Razorpay's,
- * and a state we have not seen before should not turn into a failed insert on
- * a webhook we cannot replay.
+ * `status` is text rather than an enum on purpose: the values are Polar's, and
+ * a state we have not seen before should not turn into a failed insert on a
+ * webhook we cannot replay.
  *
  * A grant — the founding cohort, or a new candidate's trial — is a row with a
- * future `current_period_end` and no `razorpay_subscription_id`. That is the
+ * future `current_period_end` and no `polar_subscription_id`. That is the
  * whole mechanism, and it is why entitlement is one date comparison rather
  * than a status matrix.
  */
 export const subscriptions = pgTable('subscriptions', {
   userId: text('user_id').primaryKey(),
-  /** Null for a grant; `sub_…` for anything Razorpay charged for. */
-  razorpaySubscriptionId: text('razorpay_subscription_id'),
-  /** A Razorpay plan id, or `trial` / `founding` for a grant. */
+  /** Null for a grant; a Polar subscription id for anything charged for. */
+  polarSubscriptionId: text('polar_subscription_id'),
+  /** A Polar product id, or `trial` / `founding` for a grant. */
   planId: text('plan_id').notNull(),
   status: text('status').notNull(),
   currentPeriodEnd: timestamp('current_period_end', {
@@ -182,11 +182,20 @@ export const subscriptions = pgTable('subscriptions', {
   /** Which prompt earned this, from `/upgrade?from=…`. The only attribution. */
   source: text('source'),
   /**
-   * When Razorpay created the event this row was last written from.
+   * What the candidate was charged, in minor units, and in what.
    *
-   * Razorpay delivers at-least-once and does not promise order, so a replay of
-   * an old `subscription.charged` could otherwise re-extend an account that
-   * has since been cancelled or refunded. An event older than this one is
+   * Null on a grant and on anything written before Polar. Polar is the
+   * Merchant of Record, so tax is its problem and not a column here — this is
+   * only what we need to read revenue back per currency.
+   */
+  currency: text('currency'),
+  amountMinor: integer('amount_minor'),
+  /**
+   * When Polar last modified the object this row was written from.
+   *
+   * Polar delivers at-least-once and does not promise order, so a delayed
+   * renewal event arriving after a revocation could otherwise restore an
+   * account that has just been refunded. An event older than this one is
    * dropped. Null on a grant, which no webhook races.
    */
   lastEventAt: timestamp('last_event_at', { withTimezone: true }),

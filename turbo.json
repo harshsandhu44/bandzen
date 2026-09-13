@@ -8,7 +8,7 @@
         "CLERK_SECRET_KEY",
         "ADMIN_EMAILS",
         "OPENAI_API_KEY",
-        "RAZORPAY_*",
+        "POLAR_*",
         "NEXT_PUBLIC_*"
       ],
       "outputs": ["dist/**", ".next/**", "!.next/cache/**", "!.next/dev/**"]

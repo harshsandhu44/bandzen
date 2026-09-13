@@ -113,6 +113,20 @@
       "when": 1789321975527,
       "tag": "0015_burly_wilson_fisk",
       "breakpoints": true
+    },
+    {
+      "idx": 16,
+      "version": "7",
+      "when": 1789322497230,
+      "tag": "0016_polar_columns",
+      "breakpoints": true
+    },
+    {
+      "idx": 17,
+      "version": "7",
+      "when": 1789322503710,
+      "tag": "0017_drop_razorpay_column",
+      "breakpoints": true
     }
   ]
 }

@@ -5,7 +5,8 @@
   "type": "module",
   "exports": {
     "./currency": "./src/currency.ts",
-    "./plans": "./src/plans.ts"
+    "./plans": "./src/plans.ts",
+    "./polar": "./src/polar.ts"
   },
   "scripts": {
     "lint": "eslint",

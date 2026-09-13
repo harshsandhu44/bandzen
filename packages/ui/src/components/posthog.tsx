@@ -17,7 +17,7 @@ import { campaignParams } from '@bandzen/ui/lib/campaign';
  *
  * This runs alongside the server-side `capture()` in apps/app's
  * `lib/analytics.ts`, which is cookieless and keeps firing the revenue events
- * that come from the Razorpay webhook. This half adds `$pageview` and
+ * that come from the Polar webhook. This half adds `$pageview` and
  * autocapture. Both use the Clerk user id as `distinct_id`, so they line up.
  *
  * No-op when the token is unset — same contract as the server side.

@@ -33,7 +33,7 @@ status column defaults to `'published'`. Read
 [`apps/app/README.md`](apps/app/README.md) and
 [`apps/admin/README.md`](apps/admin/README.md) before touching either.
 
-Pricing tiers, the access limits behind them, and the Razorpay build are
+Pricing tiers, the access limits behind them, and the Polar build are
 specified in [Pricing, tiers and access][pricing] in Notion. It lives there
 rather than in this repo because it spans both deployments — the tier copy
 lives in `apps/web`, everything it gates lives in `apps/app` — and because the

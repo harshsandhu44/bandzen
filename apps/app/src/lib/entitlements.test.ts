@@ -3,16 +3,10 @@ import { test } from 'node:test';
 import {
   FREE_COACH_MESSAGES_PER_WINDOW,
   FREE_ESSAYS_PER_WINDOW,
-  PLANS,
   allowance,
   canStartDiagnostic,
   canStartMock,
-  formatInr,
-  isFoundingActive,
   lifetimeAllowance,
-  perMonth,
-  planByKey,
-  savingsPercent,
 } from './entitlements.ts';
 
 const NOW = new Date('2026-09-08T12:00:00Z');
@@ -153,32 +147,4 @@ test('a lifetime allowance counts down to a hard zero with no reset', () => {
     lifetimeAllowance({ isPro: true, used: 9, limit: 5 }).unlimited,
     true,
   );
-});
-
-test('the founding window is closed when no date is set', () => {
-  assert.equal(isFoundingActive(null, NOW), false);
-  assert.equal(isFoundingActive(undefined, NOW), false);
-});
-
-test('the founding window closes on its date, not after it', () => {
-  assert.equal(isFoundingActive(new Date(NOW.getTime() + 1000), NOW), true);
-  assert.equal(isFoundingActive(NOW, NOW), false);
-});
-
-test('quarterly is cheaper per month than monthly, at both prices', () => {
-  const [monthly, quarterly] = PLANS;
-  assert.ok(perMonth(quarterly, true) < perMonth(monthly, true));
-  assert.ok(perMonth(quarterly, false) < perMonth(monthly, false));
-});
-
-test('the advertised saving matches the arithmetic', () => {
-  const quarterly = planByKey('quarterly')!;
-  // ₹2,999 against three months at ₹1,499 = ₹4,497.
-  assert.equal(savingsPercent(quarterly, false), 33);
-  assert.equal(savingsPercent(planByKey('monthly')!, false), 0);
-});
-
-test('prices render as whole rupees in Indian digit grouping', () => {
-  assert.equal(formatInr(79_900), '₹799');
-  assert.equal(formatInr(199_900), '₹1,999');
 });

@@ -574,28 +574,32 @@ export async function diagnosticCount(userId: string): Promise<number> {
 }
 
 /**
- * Write what Razorpay told us, from either the checkout return or the webhook.
+ * Write what Polar told us, from either the checkout read-back or the webhook.
  *
- * Two guards, because Razorpay delivers at-least-once and does not promise
- * order. Keyed on the user, so a replay is a no-op by construction; and gated
- * on `last_event_at`, so an event delayed behind a newer one is dropped rather
- * than applied. Without that second guard a stale `subscription.charged`
- * replayed after a cancellation would hand Pro back to a refunded account.
+ * Two guards, because Polar delivers at-least-once and does not promise order.
+ * Keyed on the user, so a replay is a no-op by construction; and gated on
+ * `last_event_at`, so an event delayed behind a newer one is dropped rather
+ * than applied. Without that second guard a renewal replayed after a
+ * revocation would hand Pro back to a refunded account.
  *
  * `greatest` on the date is belt to that brace, and it also covers the grant
  * case: a candidate who buys while a founding grant still has time keeps
  * whichever date is further out rather than losing days they already had.
  *
  * `source` is kept from the first write — it records which prompt earned the
- * subscription, and a renewal did not earn it again.
+ * subscription, and a renewal did not earn it again. `currency` and
+ * `amountMinor` coalesce the other way: a later event knows the money better
+ * than the first one did, and only a null should leave what is there alone.
  */
 export async function activateSubscription(values: {
   userId: string;
-  razorpaySubscriptionId: string | null;
+  polarSubscriptionId: string | null;
   planId: string;
   status: string;
   currentPeriodEnd: Date;
   source?: string | null;
+  currency?: string | null;
+  amountMinor?: number | null;
   lastEventAt?: Date | null;
 }) {
   await db
@@ -604,11 +608,13 @@ export async function activateSubscription(values: {
     .onConflictDoUpdate({
       target: subscriptions.userId,
       set: {
-        razorpaySubscriptionId: sql`excluded.razorpay_subscription_id`,
+        polarSubscriptionId: sql`excluded.polar_subscription_id`,
         planId: sql`excluded.plan_id`,
         status: sql`excluded.status`,
         currentPeriodEnd: sql`greatest(${subscriptions.currentPeriodEnd}, excluded.current_period_end)`,
         source: sql`coalesce(${subscriptions.source}, excluded.source)`,
+        currency: sql`coalesce(excluded.currency, ${subscriptions.currency})`,
+        amountMinor: sql`coalesce(excluded.amount_minor, ${subscriptions.amountMinor})`,
         lastEventAt: sql`excluded.last_event_at`,
         updatedAt: new Date(),
       },
@@ -635,7 +641,7 @@ export async function grantPro(
     .insert(subscriptions)
     .values({
       userId,
-      razorpaySubscriptionId: null,
+      polarSubscriptionId: null,
       planId,
       status: 'granted',
       currentPeriodEnd: endsAt,

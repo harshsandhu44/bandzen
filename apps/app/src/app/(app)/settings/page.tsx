@@ -16,13 +16,9 @@ import { PreparationForm } from '@/components/app/preparation-form';
 import { DOCS_URL } from '../nav-links';
 import { requireUserId } from '@/lib/auth';
 import { getProfile, getSubscription } from '@/lib/db/queries';
-import {
-  FREE_COACH_MESSAGES_PER_WINDOW,
-  FREE_ESSAYS_PER_WINDOW,
-  isProAt,
-} from '@/lib/entitlements';
+import { isProAt } from '@/lib/entitlements';
 import { ProTag } from '@/components/billing/pro';
-import { CancelPlan } from './cancel-plan';
+import { manageBilling } from '../upgrade/actions';
 import { saveSettings } from './actions';
 import pkg from '../../../../package.json';
 
@@ -43,8 +39,8 @@ export default async function SettingsPage() {
   ]);
 
   const pro = isProAt(subscription?.currentPeriodEnd);
-  const paid = pro && subscription?.razorpaySubscriptionId != null;
-  const granted = pro && subscription?.razorpaySubscriptionId == null;
+  const paid = pro && subscription?.polarSubscriptionId != null;
+  const granted = pro && subscription?.polarSubscriptionId == null;
 
   return (
     <div className="max-w-2xl space-y-6">
@@ -99,12 +95,20 @@ export default async function SettingsPage() {
             ) : null}
           </dl>
 
+          {/* Invoices, card changes and cancelling all live in Polar's portal.
+              Polar is the Merchant of Record, so the receipt is legally theirs
+              to issue — and cancelling the same way you signed up is a legal
+              requirement in several of the places we now sell. */}
           {paid && subscription ? (
-            <CancelPlan
-              until={DATE.format(subscription.currentPeriodEnd)}
-              essaysPerWeek={FREE_ESSAYS_PER_WINDOW}
-              coachPerWeek={FREE_COACH_MESSAGES_PER_WINDOW}
-            />
+            <form action={manageBilling}>
+              <Button variant="outline" size="sm" type="submit">
+                Manage billing
+              </Button>
+              <p className="mt-2 text-xs text-muted-foreground text-pretty">
+                Invoices, payment method and cancellation. Cancelling keeps Pro
+                until {DATE.format(subscription.currentPeriodEnd)}.
+              </p>
+            </form>
           ) : (
             <Button
               variant="outline"

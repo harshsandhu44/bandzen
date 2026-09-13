@@ -9,7 +9,7 @@ import 'server-only';
  * queue to drain.
  *
  * Server-side also means no client bundle, no cookie banner, and — the part
- * that matters — revenue events that come from the Razorpay webhook rather
+ * that matters — revenue events that come from the Polar webhook rather
  * than from a browser, so they cannot be spoofed or lost to an ad blocker.
  */
 
