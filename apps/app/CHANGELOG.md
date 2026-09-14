@@ -1,3 +1,10 @@
+## app [1.10.2](https://github.com/harshsandhu44/bandzen/compare/app@1.10.1...app@1.10.2) (2026-09-14)
+
+
+### Bug Fixes
+
+* **ai:** retry a speaking grade once when the model breaks the JSON contract ([#75](https://github.com/harshsandhu44/bandzen/issues/75)) ([328f98d](https://github.com/harshsandhu44/bandzen/commit/328f98dd8b3740df5faefcd59c0c755d28afff51)), closes [#74](https://github.com/harshsandhu44/bandzen/issues/74)
+
 ## app [1.10.1](https://github.com/harshsandhu44/bandzen/compare/app@1.10.0...app@1.10.1) (2026-09-14)
 
 
