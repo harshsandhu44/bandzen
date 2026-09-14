@@ -36,6 +36,13 @@ export async function gradeSpeaking(attemptId: string) {
   const startedAt = Date.now();
   let gradedUserId: string | null = null;
   let gradedBand: number | null = null;
+  // Hoisted for the catch: `response` and `clips` are scoped to the try, and
+  // the failure line is exactly where this is worth knowing. The audio total
+  // is the load-bearing one -- `gpt-audio-1.5` stops hearing our recordings
+  // past some length, so a failure without it cannot be told from any other.
+  let requestId = 'unknown';
+  let clipCount = 0;
+  let audioSeconds = 0;
   try {
     const work = await loadSpeakingForGrading(attemptId);
     if (!work || work.prompts.length === 0) {
@@ -84,6 +91,15 @@ export async function gradeSpeaking(attemptId: string) {
       }),
     );
 
+    clipCount = clips.length;
+    // Every recording is `lib/wav.ts` output: 16 kHz mono 16-bit after a
+    // 44-byte header, so the bytes give the duration without a second query.
+    // `speaking_responses.durationSeconds` is stored but read nowhere, and is
+    // wall clock rather than samples anyway.
+    audioSeconds = Math.round(
+      clips.reduce((n, c) => n + Math.max(0, c.bytes.length - 44) / 32_000, 0),
+    );
+
     // Transcripts are for the review page, and for checking the grader's
     // quotes below. A failure here must not fail the grade, which hears the
     // audio and does not depend on them.
@@ -105,6 +121,8 @@ export async function gradeSpeaking(attemptId: string) {
       modalities: ['text'],
       messages: buildSpeakingMessages(work.prompts, clips),
     });
+
+    requestId = response._request_id ?? 'unknown';
 
     const parsed = parseStructured(response, speakingEvaluationSchema);
 
@@ -146,16 +164,17 @@ export async function gradeSpeaking(attemptId: string) {
 
     const usage = response.usage;
     console.log(
-      `[grade-speaking] ${attemptId} band ${band} · model ${SPEAKING_GRADER_MODEL} · request ${
-        response._request_id ?? 'unknown'
-      } · clips ${clips.length} · cached_tokens ${
+      `[grade-speaking] ${attemptId} band ${band} · model ${SPEAKING_GRADER_MODEL} · request ${requestId} · clips ${clipCount} · audio ${audioSeconds}s · cached_tokens ${
         usage?.prompt_tokens_details?.cached_tokens ?? 0
       }/${usage?.prompt_tokens ?? 0} · completion_tokens ${
         usage?.completion_tokens ?? 0
       }`,
     );
   } catch (error) {
-    console.error(`[grade-speaking] ${attemptId} failed`, error);
+    console.error(
+      `[grade-speaking] ${attemptId} failed · model ${SPEAKING_GRADER_MODEL} · request ${requestId} · clips ${clipCount} · audio ${audioSeconds}s`,
+      error,
+    );
     gradedUserId = await markGradingFailed(attemptId);
   } finally {
     if (gradedUserId) {

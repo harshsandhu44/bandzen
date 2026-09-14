@@ -31,9 +31,35 @@ export const CONTENT_MODEL = process.env.OPENAI_CONTENT_MODEL ?? 'gpt-5.5';
  * override makes a correction a redeploy rather than a code change.
  *
  * DEPRECATED BY OPENAI — shutdown 2027-01-20, sole replacement `gpt-audio-1.5`.
- * That replacement costs 3.2x on audio tokens and 4.2x on text, and does not
- * document prompt caching, so the pinned rubric prefix may stop paying off.
- * Migrate on eval evidence before the shutdown date, not after it.
+ * Every Chat Completions audio model shuts down on that date with the same
+ * replacement, so there is no lateral move. Migrate before it, not after.
+ *
+ * Measured 2026-09-14 by `scripts/eval-speaking-audio.mts`, on synthesized
+ * fixtures (production has no speaking corpus):
+ *
+ * - Audio input is **10 tokens per second**, flat, on both models. A full test
+ *   as the catalogue shapes it — 10 prompts, ~4.5 minutes — is ~2,760 audio
+ *   tokens: **$0.031** here, **$0.099** on `gpt-audio-1.5`. The recording caps
+ *   allow up to ~10 minutes, so roughly double at the ceiling.
+ * - **Neither model has a cached-input price** — the pricing page shows a dash
+ *   for both, and every run reads 0% cache hit however many times the same
+ *   prefix is sent. The byte-identical `SPEAKING_RUBRIC` prefix has therefore
+ *   never paid off on this path and will not on the replacement. It stays
+ *   first because `buildSpeakingMessages` is shared, not because it caches.
+ * - `gpt-audio-1.5` was **not** the blocker #70 read it as. On a full test it
+ *   graded 17/17 against this model's 14/17, and on a partial one 14/14
+ *   against 11/14. What it refuses is a thin submission — one or two short
+ *   answers and no long turn — where it asks for the rest of the test instead
+ *   of grading. This model grades those without complaint.
+ * - This model's failures are **JSON-contract** failures, not hearing ones: a
+ *   truncated object, or an annotation `kind` outside the enum while the prose
+ *   schema asks for four to eight. Neither model accepts a `response_format`,
+ *   so `SPEAKING_RESPONSE_SHAPE` is the only thing holding the shape and
+ *   nothing enforces it.
+ *
+ * Fixtures were synthesized, because the replay corpus #70 used was dev data
+ * and the preview-branch reset took it. Nothing here has heard a real
+ * candidate, and a nervous one is not a TTS voice. See #72.
  */
 export const SPEAKING_GRADER_MODEL =
   process.env.OPENAI_SPEAKING_GRADER_MODEL ?? 'gpt-audio-mini';
