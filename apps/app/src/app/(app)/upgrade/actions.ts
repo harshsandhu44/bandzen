@@ -74,10 +74,25 @@ export async function startCheckout(
     customerName: user?.firstName ?? undefined,
     customerIpAddress: await clientIp(),
     discountId: discounted ? discount.id : undefined,
-    // The discount decision is ours and it is currency-gated. Left on, this
-    // defaults to true and a candidate anywhere can type any live code into
-    // the form — which is how a GBP checkout took 33% off a rupee-only offer.
-    allowDiscountCodes: false,
+    // Polar's own code field, not one of ours. It enforces every rule a
+    // discount carries — window, redemption cap, product scope — and rejects a
+    // fixed discount outright in a currency its `amounts` map has no entry
+    // for, which is the whole of the currency gating we would otherwise have
+    // written. `discounts.list` has no filter by code, so doing this here
+    // would mean listing all of them and re-deriving those rules by hand.
+    //
+    // What that buys us also has a cost worth naming: Polar's discount list
+    // becomes the boundary and this code has no veto over it. A discount
+    // created there with no end, no cap and no product restriction is
+    // redeemable by anyone who learns the string — and `foundingFrom` cannot
+    // even see it, because it skips discounts with no `ends_at`.
+    //
+    // The SDK documents `discount_id` as locked once set when this is on.
+    // It is not: a typed code replaces it, so a founding candidate can swap
+    // away the price this page promised them. Recoverable — the founding code
+    // still works if they retype it — and a code that does not exist is
+    // rejected without disturbing what is already applied.
+    allowDiscountCodes: true,
     ...(trialDays > 0
       ? { trialInterval: 'day' as const, trialIntervalCount: trialDays }
       : {}),

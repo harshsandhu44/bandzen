@@ -242,6 +242,13 @@ export default async function UpgradePage(props: PageProps<'/upgrade'>) {
             })}
           </div>
 
+          {/* Only useful to someone who already has a code, which is why it
+              says nothing about where one comes from: a coupon field
+              advertised to everyone is a reason to go looking for one. */}
+          <p className="text-xs text-muted-foreground">
+            Have a discount code? Add it at checkout.
+          </p>
+
           {hasTimeLeft && subscription ? (
             <p className="flex items-start gap-2 text-xs text-muted-foreground text-pretty">
               <Clock className="mt-0.5 size-3.5 shrink-0" aria-hidden />
