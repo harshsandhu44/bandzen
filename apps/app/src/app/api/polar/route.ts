@@ -2,6 +2,7 @@ import {
   validateEvent,
   WebhookVerificationError,
 } from '@polar-sh/sdk/webhooks';
+import * as Sentry from '@sentry/nextjs';
 import { activateSubscription, setSubscriptionEnd } from '@/lib/db/queries';
 import { capture } from '@/lib/analytics';
 
@@ -45,7 +46,11 @@ export async function POST(request: Request) {
     case 'subscription.canceled':
     case 'subscription.revoked': {
       const data = event.data;
-      const userId = attribute(event.type, data.id, data.customer.externalId);
+      const userId = await attribute(
+        event.type,
+        data.id,
+        data.customer.externalId,
+      );
       if (!userId) break;
 
       if (data.endedAt) {
@@ -82,7 +87,11 @@ export async function POST(request: Request) {
 
     case 'order.paid': {
       const data = event.data;
-      const userId = attribute(event.type, data.id, data.customer.externalId);
+      const userId = await attribute(
+        event.type,
+        data.id,
+        data.customer.externalId,
+      );
       if (!userId) break;
 
       await capture(
@@ -100,19 +109,50 @@ export async function POST(request: Request) {
     }
   }
 
-  // Everything reaching here is acknowledged, including events we ignore and
-  // events we cannot attribute. A retry fixes neither.
+  // Everything reaching here is acknowledged: events we ignore, and events we
+  // could not attribute — which have already raised a Sentry issue by now. A
+  // retry fixes neither, and a 5xx would have Polar redeliver forever.
   return new Response('OK', { status: 200 });
 }
 
-/** The Clerk id we set as `external_customer_id` when the checkout was made. */
-function attribute(
+/**
+ * The Clerk id we set as `external_customer_id` when the checkout was made.
+ *
+ * Every caller of this is a subscription or an order — nothing else in the
+ * switch reaches it — so there is no such thing as a miss here that does not
+ * matter. A miss is money with no entitlement behind it, or a refund that
+ * never took access away, and the only reason the first one went unnoticed is
+ * that it looked like a log line.
+ *
+ * `external_customer_id` is set per checkout session in `upgrade/actions.ts`.
+ * A checkout link made in the Polar dashboard has no session, so anything
+ * bought through one arrives here unattributable by construction. This finds
+ * out; it cannot prevent it.
+ */
+async function attribute(
   type: string,
   id: string,
   externalId: string | null | undefined,
-): string | null {
+): Promise<string | null> {
   if (externalId) return externalId;
+
   console.error('[polar] event without a user', type, id);
+
+  // Fingerprinted on the Polar object id so each dropped payment is its own
+  // issue. Grouped by message instead, only the first would ever alert — and
+  // the second would be silent again unless someone remembered to resolve the
+  // first, which is the failure this exists to end.
+  Sentry.captureException(new Error(`Polar ${type} without a user`), {
+    fingerprint: ['polar-unattributed', id],
+    tags: { polar_event: type, polar_id: id },
+  });
+
+  // The same footgun `analytics.ts` refuses to carry: the transport queues,
+  // the handler returns 200 immediately after this, and a frozen serverless
+  // function sends nothing. Only on the path that has already failed, so the
+  // happy path pays none of it.
+  await Sentry.flush(2000);
+
   return null;
 }
 
