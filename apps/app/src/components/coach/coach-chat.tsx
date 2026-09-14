@@ -2,7 +2,7 @@
 
 import { useRef, useState } from 'react';
 import Link from 'next/link';
-import { ArrowUp, Square } from 'lucide-react';
+import { ArrowRight, ArrowUp, Square } from 'lucide-react';
 import { Avatar, AvatarFallback } from '@bandzen/ui/components/avatar';
 import { Bubble, BubbleContent } from '@bandzen/ui/components/bubble';
 import { Button } from '@bandzen/ui/components/button';
@@ -25,7 +25,36 @@ import { QuotaMeter, resetLabel } from '@/components/billing/pro';
 import { Markdown } from '@/components/coach/markdown';
 import type { Allowance } from '@/lib/entitlements';
 
-type Message = { role: 'user' | 'assistant'; content: string };
+type TutorAction = {
+  kind: 'lesson' | 'reading' | 'writing' | 'listening';
+  id: string;
+  label: string;
+  href: string;
+};
+
+type Message = {
+  role: 'user' | 'assistant';
+  content: string;
+  /** Set only on a Tutor reply that looked something real up. */
+  action?: TutorAction;
+};
+
+/**
+ * The CTA the Tutor earned, if any.
+ *
+ * Base64 because header values are latin-1 and a lesson title is CMS text --
+ * an em-dash or a curly apostrophe in one would otherwise have thrown when the
+ * server built the response. Anything malformed is simply no button.
+ */
+function readAction(response: Response): TutorAction | undefined {
+  const raw = response.headers.get('X-Tutor-Action');
+  if (!raw) return undefined;
+  try {
+    return JSON.parse(atob(raw)) as TutorAction;
+  } catch {
+    return undefined;
+  }
+}
 
 /**
  * The Coach conversation.
@@ -92,6 +121,10 @@ export function CoachChat({
 
       setLeft((n) => Math.max(0, n - 1));
 
+      // Read before the body: the tools all resolved before the first token,
+      // which is the whole reason this fits in a header.
+      const action = readAction(response);
+
       const reader = response.body.getReader();
       const decoder = new TextDecoder();
       let answer = '';
@@ -102,7 +135,7 @@ export function CoachChat({
         answer += decoder.decode(value, { stream: true });
         // Replace the trailing assistant message as text arrives — the
         // scroller (autoScroll) keeps it in view on its own.
-        setMessages([...next, { role: 'assistant', content: answer }]);
+        setMessages([...next, { role: 'assistant', content: answer, action }]);
       }
 
       if (!answer) throw new Error('Coach returned nothing');
@@ -194,6 +227,17 @@ export function CoachChat({
                             )}
                           </BubbleContent>
                         </Bubble>
+                        {message.action ? (
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            nativeButton={false}
+                            render={<Link href={message.action.href} />}
+                          >
+                            {message.action.label}
+                            <ArrowRight />
+                          </Button>
+                        ) : null}
                       </MessageContent>
                     </Message>
                   </MessageScrollerItem>

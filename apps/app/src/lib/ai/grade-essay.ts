@@ -106,7 +106,9 @@ export async function gradeEssay(attemptId: string) {
 
     const usage = response.usage;
     console.log(
-      `[grade] ${attemptId} band ${band} · model ${GRADER_MODEL} · cached_tokens ${
+      `[grade] ${attemptId} band ${band} · model ${GRADER_MODEL} · request ${
+        response._request_id ?? 'unknown'
+      } · cached_tokens ${
         usage?.prompt_tokens_details?.cached_tokens ?? 0
       }/${usage?.prompt_tokens ?? 0} · completion_tokens ${
         usage?.completion_tokens ?? 0

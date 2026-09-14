@@ -5,8 +5,11 @@ import type { ChatCompletionChunk } from 'openai/resources/chat/completions';
 import { openai } from '@/lib/ai/client';
 import { buildCoachContext, COACH_SYSTEM, MAX_TURNS } from '@/lib/ai/coach';
 import { capture } from '@/lib/analytics';
-import { coachAllowance, recordCoachMessage } from '@/lib/db/queries';
+import { coachAllowance, proUntil, recordCoachMessage } from '@/lib/db/queries';
+import { isProAt } from '@/lib/entitlements';
 import { COACH_MODEL } from '@/lib/ai/models';
+import { runTutor } from '@/lib/ai/tutor';
+import type { TutorAction } from '@/lib/ai/tutor-tools';
 
 /**
  * One of the two route handlers in the application.
@@ -63,6 +66,21 @@ export async function POST(request: Request) {
   // supply or influence what the coach is told about the student.
   const context = await buildCoachContext(userId);
 
+  // Pro gets the Coach with tools. `proUntil` is cache()-wrapped, so reading it
+  // again after `coachAllowance` costs no second query. Deliberately not
+  // `quota.unlimited`, which is true for Pro today but would drift the moment
+  // a grant makes someone unlimited without making them Pro.
+  if (isProAt(await proUntil(userId))) {
+    try {
+      return await tutorResponse(userId, context, parsed.data.messages);
+    } catch (error) {
+      // The dangerous failure here is a silent downgrade: the candidate still
+      // gets an answer, so nothing looks broken, and the tools quietly stopped
+      // working. Say so.
+      console.error('[coach] tutor failed, falling back to plain coach', error);
+    }
+  }
+
   const stream = await openai().chat.completions.create({
     model: COACH_MODEL,
     stream: true,
@@ -118,4 +136,57 @@ export async function POST(request: Request) {
       },
     },
   );
+}
+
+/**
+ * The Tutor path: tool calls resolve first, so the CTA is known before the
+ * first token and rides out on a header rather than needing the text stream to
+ * grow a frame format.
+ *
+ * Base64, not raw JSON: header values are latin-1, lesson titles are
+ * CMS-editable, and one em-dash in a title would throw inside the `try` above
+ * and look exactly like a tutor failure.
+ */
+async function tutorResponse(
+  userId: string,
+  context: string,
+  messages: { role: 'user' | 'assistant'; content: string }[],
+) {
+  const { stream, action } = await runTutor(userId, context, messages);
+
+  const headers: Record<string, string> = {
+    'Content-Type': 'text/plain; charset=utf-8',
+    'Cache-Control': 'no-store',
+  };
+  if (action) headers['X-Tutor-Action'] = encodeAction(action);
+
+  const encoder = new TextEncoder();
+  return new Response(
+    new ReadableStream({
+      async start(controller) {
+        try {
+          for await (const text of stream) {
+            controller.enqueue(encoder.encode(text));
+          }
+        } catch (error) {
+          // Past the first token the reader has already seen text, so there is
+          // no falling back to the plain path -- finish visibly instead.
+          console.error('[coach] tutor stream failed', error);
+          controller.enqueue(
+            encoder.encode('\n\n[The answer was cut short. Please ask again.]'),
+          );
+        } finally {
+          console.log(
+            `[coach] model=${COACH_MODEL} tutor action=${action?.kind ?? 'none'}`,
+          );
+          controller.close();
+        }
+      },
+    }),
+    { headers },
+  );
+}
+
+export function encodeAction(action: TutorAction): string {
+  return Buffer.from(JSON.stringify(action), 'utf8').toString('base64');
 }

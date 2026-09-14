@@ -1858,8 +1858,16 @@ export async function activitySummary(userId: string) {
   };
 }
 
-/** The newest writing report, for the dashboard insight. */
-export async function latestReport(userId: string) {
+/**
+ * The newest report for this candidate, newest first.
+ *
+ * `module` is not optional in practice: `reports` holds Speaking rows too --
+ * `gradeSpeaking` writes through the same `writeReport` -- so omitting it
+ * returns whichever of the two graded most recently. Every caller here wants
+ * one module and says so; the parameter stays optional only for a caller that
+ * genuinely wants "the last thing graded, whatever it was".
+ */
+export async function latestReport(userId: string, module?: Skill) {
   return firstRow(
     await db
       .select({
@@ -1872,7 +1880,11 @@ export async function latestReport(userId: string) {
       })
       .from(reports)
       .innerJoin(attempts, eq(attempts.id, reports.attemptId))
-      .where(eq(attempts.userId, userId))
+      .where(
+        module
+          ? and(eq(attempts.userId, userId), eq(attempts.module, module))
+          : eq(attempts.userId, userId),
+      )
       .orderBy(desc(reports.createdAt))
       .limit(1),
   );

@@ -73,7 +73,7 @@ export async function loadPlanData(
     latestBand(userId, 'writing'),
     latestBand(userId, 'listening'),
     latestBand(userId, 'speaking'),
-    latestReport(userId),
+    latestReport(userId, 'writing'),
     accuracyByQuestionKind(userId, 'reading'),
     accuracyByQuestionKind(userId, 'listening'),
     attemptsSubmittedOn(userId, start, end),
