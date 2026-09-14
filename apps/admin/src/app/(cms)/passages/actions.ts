@@ -41,7 +41,6 @@ export async function createPassageAction(formData: FormData) {
   redirect(`/passages/${passage.id}`);
 }
 
-
 export async function publishPassageAction(
   _prev: ActionState,
   formData: FormData,
@@ -86,9 +85,6 @@ export async function deletePassageAction(
   revalidatePath('/passages');
   redirect('/passages');
 }
-
-
-
 
 /**
  * One Save for the whole passage editor: the passage fields plus its full
@@ -159,7 +155,11 @@ export async function bulkPublishPassagesAction(
   ids: string[],
 ): Promise<ActionResult> {
   const { userId } = await requireAdminOrTeacher();
-  const result = await runBulk(ids, (id) => publishPassage(id, userId), 'Published');
+  const result = await runBulk(
+    ids,
+    (id) => publishPassage(id, userId),
+    'Published',
+  );
   revalidatePath('/passages');
   return result;
 }
@@ -168,7 +168,11 @@ export async function bulkUnpublishPassagesAction(
   ids: string[],
 ): Promise<ActionResult> {
   const { userId } = await requireAdminOrTeacher();
-  const result = await runBulk(ids, (id) => unpublishPassage(id, userId), 'Unpublished');
+  const result = await runBulk(
+    ids,
+    (id) => unpublishPassage(id, userId),
+    'Unpublished',
+  );
   revalidatePath('/passages');
   return result;
 }

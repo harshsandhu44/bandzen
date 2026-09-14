@@ -25,7 +25,6 @@ import {
 
 export type ActionState = { error: string | null };
 
-
 export async function createTestAction(formData: FormData) {
   const { userId } = await requireAdminOrTeacher();
   const test = await createSpeakingTest({
@@ -39,8 +38,6 @@ export async function createTestAction(formData: FormData) {
   await recordContentEvent('speaking-test', test.id, userId, 'created');
   redirect(`/speaking/${test.id}`);
 }
-
-
 
 export async function publishTestAction(
   _prev: ActionState,
@@ -86,9 +83,6 @@ export async function deleteTestAction(
   revalidatePath('/speaking');
   redirect('/speaking');
 }
-
-
-
 
 /**
  * One Save for the speaking editor: the test fields plus its full prompt list.
@@ -161,7 +155,11 @@ export async function bulkPublishTestsAction(
   ids: string[],
 ): Promise<ActionResult> {
   const { userId } = await requireAdminOrTeacher();
-  const result = await runBulk(ids, (id) => publishSpeakingTest(id, userId), 'Published');
+  const result = await runBulk(
+    ids,
+    (id) => publishSpeakingTest(id, userId),
+    'Published',
+  );
   revalidatePath('/speaking');
   return result;
 }
@@ -170,7 +168,11 @@ export async function bulkUnpublishTestsAction(
   ids: string[],
 ): Promise<ActionResult> {
   const { userId } = await requireAdminOrTeacher();
-  const result = await runBulk(ids, (id) => unpublishSpeakingTest(id, userId), 'Unpublished');
+  const result = await runBulk(
+    ids,
+    (id) => unpublishSpeakingTest(id, userId),
+    'Unpublished',
+  );
   revalidatePath('/speaking');
   return result;
 }

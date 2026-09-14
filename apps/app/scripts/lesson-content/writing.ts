@@ -55,7 +55,8 @@ export const WRITING_LESSONS: LessonSeed[] = [
             kind: 'try',
             question:
               'You have 25 minutes left and have not started Task 2. What do you do?',
-            answer: 'Move to Task 2 immediately, even if Task 1 is not perfect.',
+            answer:
+              'Move to Task 2 immediately, even if Task 1 is not perfect.',
             why: 'Task 2 is worth more marks. A short, unfinished Task 1 costs less than a missing Task 2.',
           },
         ],
@@ -292,8 +293,10 @@ export const WRITING_LESSONS: LessonSeed[] = [
             kind: 'example',
             source:
               'Chart data: coffee sales rose from 10,000 units in 2015 to 45,000 units in 2020, while tea sales stayed flat at around 20,000 units.',
-            question: 'What is the single most important sentence to write first?',
-            answer: 'Coffee sales rose sharply while tea sales stayed roughly the same.',
+            question:
+              'What is the single most important sentence to write first?',
+            answer:
+              'Coffee sales rose sharply while tea sales stayed roughly the same.',
             why: 'This one sentence captures the overall pattern. Specific numbers can support it afterward, but the pattern comes first.',
           },
         ],
@@ -457,7 +460,8 @@ export const WRITING_LESSONS: LessonSeed[] = [
           {
             kind: 'example',
             source: '"Social media can harm mental health."',
-            question: 'How would you add a reason and an example to this point?',
+            question:
+              'How would you add a reason and an example to this point?',
             answer:
               '"Social media can harm mental health, because constant comparison to others can lower self-esteem. For example, studies link heavy Instagram use among teenagers to higher rates of anxiety."',
             why: 'The reason explains why the point is true. The example makes it concrete and believable, not just a general claim.',
@@ -543,7 +547,8 @@ export const WRITING_LESSONS: LessonSeed[] = [
             source:
               '"The plan will reduce traffic. Furthermore, additionally, it will also lower pollution levels too."',
             question: 'What is wrong with this sentence?',
-            answer: 'It uses three linking words with the same meaning in one sentence.',
+            answer:
+              'It uses three linking words with the same meaning in one sentence.',
             why: '"Furthermore", "additionally", and "also" all mean "in addition". Using all three is repetitive, not impressive.',
           },
         ],
@@ -626,7 +631,8 @@ export const WRITING_LESSONS: LessonSeed[] = [
             kind: 'example',
             source: '"The government should augment the budget for schools."',
             question: 'Is "augment" a natural word choice here?',
-            answer: 'It is a little unusual — "increase" is more natural and just as correct.',
+            answer:
+              'It is a little unusual — "increase" is more natural and just as correct.',
             why: '"Augment" is a real word but sounds formal in an odd way here. Natural, correct language scores better than forced, fancy language.',
           },
         ],

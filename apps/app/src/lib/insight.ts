@@ -58,7 +58,7 @@ export function buildInsight(
       ['writing', writingBand],
       ['listening', listeningBand],
     ] as const
-  ).filter((m): m is [typeof m[0], number] => m[1] != null);
+  ).filter((m): m is [(typeof m)[0], number] => m[1] != null);
   const weakest = measured.length
     ? measured.reduce((low, m) => (m[1] < low[1] ? m : low))[0]
     : null;

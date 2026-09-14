@@ -22,8 +22,7 @@ export default async function ListeningPage({
   const page = Math.max(1, Number(pageParam) || 1);
   const rows = await listTracksAdmin({
     q,
-    status:
-      status === 'draft' || status === 'published' ? status : undefined,
+    status: status === 'draft' || status === 'published' ? status : undefined,
     limit: ADMIN_PAGE_SIZE + 1,
     offset: (page - 1) * ADMIN_PAGE_SIZE,
   });
@@ -53,7 +52,10 @@ export default async function ListeningPage({
             >
               Import JSON
             </Button>
-            <Button nativeButton={false} render={<Link href="/listening/new" />}>
+            <Button
+              nativeButton={false}
+              render={<Link href="/listening/new" />}
+            >
               New track
             </Button>
           </div>

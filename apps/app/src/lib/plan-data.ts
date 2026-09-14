@@ -41,8 +41,9 @@ export const meanBand = (...bands: (number | null | undefined)[]) => {
   const measured = bands.filter((b): b is number => b != null);
   if (!measured.length) return null;
   return (
-    Math.round((measured.reduce((sum, b) => sum + b, 0) / measured.length) * 2) /
-    2
+    Math.round(
+      (measured.reduce((sum, b) => sum + b, 0) / measured.length) * 2,
+    ) / 2
   );
 };
 

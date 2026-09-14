@@ -1,8 +1,5 @@
 import { notFound } from 'next/navigation';
-import {
-  getTrackAdmin,
-  checkTrackCompleteness,
-} from '@bandzen/db/queries';
+import { getTrackAdmin, checkTrackCompleteness } from '@bandzen/db/queries';
 import { Button } from '@bandzen/ui/components/button';
 import {
   Card,
@@ -107,7 +104,8 @@ export default async function EditTrackPage({
               />
             ) : (
               <p className="text-xs text-muted-foreground">
-                Add a transcript or upload an MP3 — the other is generated from it.
+                Add a transcript or upload an MP3 — the other is generated from
+                it.
               </p>
             )}
 
@@ -118,7 +116,9 @@ export default async function EditTrackPage({
             >
               <input type="hidden" name="id" value={track.id} />
               <Field
-                label={track.audioUrl ? 'Replace audio (MP3)' : 'Upload audio (MP3)'}
+                label={
+                  track.audioUrl ? 'Replace audio (MP3)' : 'Upload audio (MP3)'
+                }
               >
                 <input
                   name="audio"

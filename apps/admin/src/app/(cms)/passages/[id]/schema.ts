@@ -68,10 +68,7 @@ const commas = (s: string) =>
     .map((x) => x.trim())
     .filter(Boolean);
 
-export function toSave(
-  id: string,
-  v: PassageFormValues,
-): SavePassagePayload {
+export function toSave(id: string, v: PassageFormValues): SavePassagePayload {
   return {
     id,
     title: v.title.trim(),

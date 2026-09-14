@@ -22,8 +22,7 @@ export default async function WritingPromptsPage({
   const page = Math.max(1, Number(pageParam) || 1);
   const rows = await listWritingPromptsAdmin({
     q,
-    status:
-      status === 'draft' || status === 'published' ? status : undefined,
+    status: status === 'draft' || status === 'published' ? status : undefined,
     limit: ADMIN_PAGE_SIZE + 1,
     offset: (page - 1) * ADMIN_PAGE_SIZE,
   });
@@ -53,7 +52,10 @@ export default async function WritingPromptsPage({
             >
               Import JSON
             </Button>
-            <Button nativeButton={false} render={<Link href="/writing-prompts/new" />}>
+            <Button
+              nativeButton={false}
+              render={<Link href="/writing-prompts/new" />}
+            >
               New prompt
             </Button>
           </div>
@@ -67,7 +69,10 @@ export default async function WritingPromptsPage({
         emptyTitle="No writing prompts yet"
         emptyDescription="Write one by hand, or import a reviewed JSON file."
         emptyAction={
-          <Button nativeButton={false} render={<Link href="/writing-prompts/new" />}>
+          <Button
+            nativeButton={false}
+            render={<Link href="/writing-prompts/new" />}
+          >
             New prompt
           </Button>
         }

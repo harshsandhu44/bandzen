@@ -15,10 +15,7 @@ import { ContentInUseError, PublishValidationError } from '@bandzen/db/errors';
 import { requireAdminOrTeacher } from '@/lib/auth';
 import { runBulk } from '@/lib/bulk';
 import { ok, fail, type ActionResult } from '@/lib/action-result';
-import {
-  saveLessonPayloadSchema,
-  type SaveLessonPayload,
-} from './[id]/schema';
+import { saveLessonPayloadSchema, type SaveLessonPayload } from './[id]/schema';
 
 export type ActionState = { error: string | null };
 
@@ -26,7 +23,6 @@ function orNull(value: FormDataEntryValue | null) {
   const s = String(value ?? '').trim();
   return s || null;
 }
-
 
 export async function createLessonAction(formData: FormData) {
   const { userId } = await requireAdminOrTeacher();
@@ -46,7 +42,6 @@ export async function createLessonAction(formData: FormData) {
   await recordContentEvent('lesson', lesson.id, userId, 'created');
   redirect(`/lessons/${lesson.id}`);
 }
-
 
 export async function publishLessonAction(
   _prev: ActionState,
@@ -93,13 +88,6 @@ export async function deleteLessonAction(
   redirect('/lessons');
 }
 
-
-
-
-
-
-
-
 /**
  * One Save for the lesson editor. The whole `stages` array is a single JSON
  * blob on the row, so there is no child-row diffing — the payload replaces it
@@ -142,7 +130,11 @@ export async function bulkPublishLessonsAction(
   ids: string[],
 ): Promise<ActionResult> {
   const { userId } = await requireAdminOrTeacher();
-  const result = await runBulk(ids, (id) => publishLesson(id, userId), 'Published');
+  const result = await runBulk(
+    ids,
+    (id) => publishLesson(id, userId),
+    'Published',
+  );
   revalidatePath('/lessons');
   return result;
 }
@@ -151,7 +143,11 @@ export async function bulkUnpublishLessonsAction(
   ids: string[],
 ): Promise<ActionResult> {
   const { userId } = await requireAdminOrTeacher();
-  const result = await runBulk(ids, (id) => unpublishLesson(id, userId), 'Unpublished');
+  const result = await runBulk(
+    ids,
+    (id) => unpublishLesson(id, userId),
+    'Unpublished',
+  );
   revalidatePath('/lessons');
   return result;
 }

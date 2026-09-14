@@ -47,8 +47,8 @@ export default function PrivacyPage() {
         <p>
           We do not collect payment card details, and we never see them. Polar
           is the merchant of record for every Bandzen purchase: it takes the
-          payment, issues the receipt and handles any sales tax or VAT due
-          where you live. Polar processes cards through Stripe.
+          payment, issues the receipt and handles any sales tax or VAT due where
+          you live. Polar processes cards through Stripe.
         </p>
       </Clause>
 

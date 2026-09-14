@@ -22,8 +22,7 @@ export default async function PassagesPage({
   const page = Math.max(1, Number(pageParam) || 1);
   const rows = await listPassagesAdmin({
     q,
-    status:
-      status === 'draft' || status === 'published' ? status : undefined,
+    status: status === 'draft' || status === 'published' ? status : undefined,
     limit: ADMIN_PAGE_SIZE + 1,
     offset: (page - 1) * ADMIN_PAGE_SIZE,
   });

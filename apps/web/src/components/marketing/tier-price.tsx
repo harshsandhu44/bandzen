@@ -41,7 +41,9 @@ export async function TierPrice({
   const muted = featured ? 'text-paper/60' : 'text-slate';
 
   if (plan === 'free') {
-    return <Amount value={formatMoney(0, currency)} period={period} muted={muted} />;
+    return (
+      <Amount value={formatMoney(0, currency)} period={period} muted={muted} />
+    );
   }
 
   const { prices, founding } = await polarPricing();
@@ -54,18 +56,34 @@ export async function TierPrice({
 
   return (
     <>
-      <Amount value={formatMoney(price, currency)} period={period} muted={muted} />
+      <Amount
+        value={formatMoney(price, currency)}
+        period={period}
+        muted={muted}
+      />
 
       {/* Struck through only where it is real — the founding price genuinely
           rises to this one. */}
       {discounted ? (
-        <p className={cn('mt-2 font-mono text-xs tracking-[0.14em] uppercase', muted)}>
-          <span className="line-through">{formatMoney(standard, currency)}</span>{' '}
+        <p
+          className={cn(
+            'mt-2 font-mono text-xs tracking-[0.14em] uppercase',
+            muted,
+          )}
+        >
+          <span className="line-through">
+            {formatMoney(standard, currency)}
+          </span>{' '}
           after the founding window
         </p>
       ) : null}
 
-      <p className={cn('mt-1 font-mono text-xs tracking-[0.14em] uppercase', muted)}>
+      <p
+        className={cn(
+          'mt-1 font-mono text-xs tracking-[0.14em] uppercase',
+          muted,
+        )}
+      >
         or{' '}
         {formatMoney(
           foundingPrice(
@@ -110,7 +128,9 @@ function Amount({
   return (
     <p className="font-display flex items-baseline gap-2 text-6xl tabular-nums">
       {value}
-      <span className={cn('font-mono text-xs tracking-[0.14em] uppercase', muted)}>
+      <span
+        className={cn('font-mono text-xs tracking-[0.14em] uppercase', muted)}
+      >
         {period}
       </span>
     </p>

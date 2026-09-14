@@ -72,7 +72,11 @@ describe('foundingFrom', () => {
 
   it('returns one discount per plan, with what it takes off', () => {
     const found = foundingFrom(live, now);
-    assert.deepEqual(found.monthly, { id: 'd_m', endsAt, off: { INR: 50_000 } });
+    assert.deepEqual(found.monthly, {
+      id: 'd_m',
+      endsAt,
+      off: { INR: 50_000 },
+    });
     assert.deepEqual(found.quarterly, {
       id: 'd_q',
       endsAt,

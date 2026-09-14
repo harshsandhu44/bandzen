@@ -28,9 +28,9 @@ export default function AboutPage() {
 
       <Clause title="What it does not do yet">
         <p>
-          There is no single mock test that runs all four modules back to
-          back — each module is timed and marked on its own. We would rather
-          show an honest gap than a feature that does not work.
+          There is no single mock test that runs all four modules back to back —
+          each module is timed and marked on its own. We would rather show an
+          honest gap than a feature that does not work.
         </p>
       </Clause>
 

@@ -78,7 +78,9 @@ let wrapped = 0;
 for (const row of wrappable) {
   const passageIds = row.passage_id ? [row.passage_id] : [];
   const submittedAt =
-    row.writing_submitted_at ?? row.reading_submitted_at ?? new Date().toISOString();
+    row.writing_submitted_at ??
+    row.reading_submitted_at ??
+    new Date().toISOString();
 
   const [created] = (await sql`
     INSERT INTO mock_attempts (

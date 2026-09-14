@@ -152,6 +152,7 @@ export function perDay(
   currency: Currency,
 ): string {
   const daily = priceOf(prices, plan, currency) / (plan.months * 30);
-  const rounded = daily >= 100 ? Math.ceil(daily / 100) * 100 : Math.ceil(daily);
+  const rounded =
+    daily >= 100 ? Math.ceil(daily / 100) * 100 : Math.ceil(daily);
   return PRECISE[currency].format(rounded / 100);
 }

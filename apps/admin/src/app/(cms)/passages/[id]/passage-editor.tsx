@@ -33,7 +33,9 @@ const KIND_LABEL: Record<(typeof QUESTION_KINDS)[number], string> = {
   sentence_completion: 'Sentence completion',
 };
 
-const blankQuestion = (idx: number): PassageFormValues['questions'][number] => ({
+const blankQuestion = (
+  idx: number,
+): PassageFormValues['questions'][number] => ({
   idx,
   kind: 'true_false_not_given',
   prompt: '',
@@ -75,7 +77,12 @@ export function PassageEditor({
   };
 
   return (
-    <form onSubmit={handleSubmit(onSubmit, () => toast.error("Some fields need fixing — check the form."))} className="space-y-6">
+    <form
+      onSubmit={handleSubmit(onSubmit, () =>
+        toast.error('Some fields need fixing — check the form.'),
+      )}
+      className="space-y-6"
+    >
       <Card>
         <CardHeader>
           <CardTitle>Passage</CardTitle>
@@ -100,7 +107,12 @@ export function PassageEditor({
               className="w-32"
               error={errors.difficulty?.message}
             >
-              <Input type="number" min={1} max={5} {...register('difficulty', { valueAsNumber: true })} />
+              <Input
+                type="number"
+                min={1}
+                max={5}
+                {...register('difficulty', { valueAsNumber: true })}
+              />
             </Field>
           </div>
           <Field label="Body" required error={errors.body?.message}>

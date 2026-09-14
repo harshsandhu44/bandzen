@@ -54,7 +54,9 @@ export function GeneratePanel({
         setResult(data as Result);
       }
     } catch {
-      setError('Generation failed — the request may have timed out. Try again.');
+      setError(
+        'Generation failed — the request may have timed out. Try again.',
+      );
     } finally {
       setBusy(false);
     }

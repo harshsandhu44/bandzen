@@ -81,7 +81,8 @@ export default async function UpgradePage(props: PageProps<'/upgrade'>) {
   // Every live founding discount shares a deadline, so any one of them dates
   // the offer.
   const endsAt =
-    Object.values(founding).find((d) => d.off[currency] != null)?.endsAt ?? null;
+    Object.values(founding).find((d) => d.off[currency] != null)?.endsAt ??
+    null;
 
   const hasTimeLeft = isProAt(subscription?.currentPeriodEnd);
   const paying = hasTimeLeft && subscription?.polarSubscriptionId != null;
@@ -189,7 +190,11 @@ export default async function UpgradePage(props: PageProps<'/upgrade'>) {
             {PLANS.map((plan) => {
               const saving = savingsPercent(prices, plan, currency);
               const standard = priceOf(prices, plan, currency);
-              const price = foundingPrice(standard, founding[plan.key], currency);
+              const price = foundingPrice(
+                standard,
+                founding[plan.key],
+                currency,
+              );
               const discounted = price !== standard;
               return (
                 <div

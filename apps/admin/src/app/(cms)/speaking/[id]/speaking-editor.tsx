@@ -25,9 +25,7 @@ import {
   type SpeakingFormValues,
 } from './schema';
 
-const blankPrompt = (
-  idx: number,
-): SpeakingFormValues['prompts'][number] => ({
+const blankPrompt = (idx: number): SpeakingFormValues['prompts'][number] => ({
   idx,
   part: 1,
   text: '',
@@ -67,7 +65,12 @@ export function SpeakingEditor({
   };
 
   return (
-    <form onSubmit={handleSubmit(onSubmit, () => toast.error("Some fields need fixing — check the form."))} className="space-y-6">
+    <form
+      onSubmit={handleSubmit(onSubmit, () =>
+        toast.error('Some fields need fixing — check the form.'),
+      )}
+      className="space-y-6"
+    >
       <Card>
         <CardHeader>
           <CardTitle>Test</CardTitle>
@@ -99,7 +102,9 @@ export function SpeakingEditor({
             type="button"
             size="sm"
             variant="outline"
-            onClick={() => prompts.append(blankPrompt(prompts.fields.length + 1))}
+            onClick={() =>
+              prompts.append(blankPrompt(prompts.fields.length + 1))
+            }
           >
             Add prompt
           </Button>
@@ -124,7 +129,9 @@ export function SpeakingEditor({
                   </Field>
                   <Field label="Part" className="min-w-52 flex-1">
                     <Select
-                      {...register(`prompts.${i}.part`, { valueAsNumber: true })}
+                      {...register(`prompts.${i}.part`, {
+                        valueAsNumber: true,
+                      })}
                     >
                       {[1, 2, 3].map((n) => (
                         <option key={n} value={n}>
@@ -149,18 +156,17 @@ export function SpeakingEditor({
                 >
                   <Textarea {...register(`prompts.${i}.text`)} />
                 </Field>
-                <Field label="Cue-card points" hint="One per line — Part 2 only.">
+                <Field
+                  label="Cue-card points"
+                  hint="One per line — Part 2 only."
+                >
                   <Textarea
                     className="min-h-20"
                     {...register(`prompts.${i}.cueCardPointsText`)}
                   />
                 </Field>
                 {audioUrl ? (
-                  <audio
-                    controls
-                    src={audioUrl}
-                    className="h-8"
-                  />
+                  <audio controls src={audioUrl} className="h-8" />
                 ) : savedId ? (
                   <p className="font-mono text-xs text-muted-foreground">
                     Examiner audio will generate after you save.

@@ -32,7 +32,6 @@ export async function createWritingPromptAction(formData: FormData) {
   redirect(`/writing-prompts/${prompt.id}`);
 }
 
-
 export async function publishWritingPromptAction(
   _prev: ActionState,
   formData: FormData,
@@ -101,7 +100,11 @@ export async function bulkPublishPromptsAction(
   ids: string[],
 ): Promise<ActionResult> {
   const { userId } = await requireAdminOrTeacher();
-  const result = await runBulk(ids, (id) => publishWritingPrompt(id, userId), 'Published');
+  const result = await runBulk(
+    ids,
+    (id) => publishWritingPrompt(id, userId),
+    'Published',
+  );
   revalidatePath('/writing-prompts');
   return result;
 }
@@ -110,7 +113,11 @@ export async function bulkUnpublishPromptsAction(
   ids: string[],
 ): Promise<ActionResult> {
   const { userId } = await requireAdminOrTeacher();
-  const result = await runBulk(ids, (id) => unpublishWritingPrompt(id, userId), 'Unpublished');
+  const result = await runBulk(
+    ids,
+    (id) => unpublishWritingPrompt(id, userId),
+    'Unpublished',
+  );
   revalidatePath('/writing-prompts');
   return result;
 }

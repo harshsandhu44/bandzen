@@ -170,9 +170,7 @@ export function buildPlan(input: PlanInput): PlanTask[] {
   const measured = measuredSkills(input);
   // The skills the rotation cycles, in a stable order. Falls back to the
   // original reading/writing pair when nothing has been measured yet.
-  const rotation: Skill[] = measured.length
-    ? measured
-    : ['reading', 'writing'];
+  const rotation: Skill[] = measured.length ? measured : ['reading', 'writing'];
   const others = weakest ? rotation.filter((s) => s !== weakest) : [];
   const tasks: PlanTask[] = [];
 
@@ -200,8 +198,7 @@ export function buildPlan(input: PlanInput): PlanTask[] {
     // cycling through the rest; otherwise an even rotation.
     let skill: Skill;
     if (weakest && others.length) {
-      skill =
-        day % 3 === 0 ? others[otherCursor++ % others.length]! : weakest;
+      skill = day % 3 === 0 ? others[otherCursor++ % others.length]! : weakest;
     } else if (weakest) {
       skill = weakest;
     } else {
@@ -281,8 +278,7 @@ export function nextAction(input: PlanInput): string {
     return 'Take the diagnostic to get your first estimate.';
   }
   const weakest = weakestSkill(input);
-  if (weakest)
-    return `${SKILL_LABEL[weakest]} is holding your band back.`;
+  if (weakest) return `${SKILL_LABEL[weakest]} is holding your band back.`;
   if (input.targetBand != null) {
     const best = Math.max(...measured.map((s) => bandOf(input, s)!));
     if (best >= input.targetBand)

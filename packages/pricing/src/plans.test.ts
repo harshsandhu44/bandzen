@@ -32,7 +32,10 @@ describe('isFoundingActive', () => {
   it('is open before the deadline and closed after', () => {
     const now = new Date('2026-09-13T00:00:00Z');
     assert.equal(isFoundingActive(new Date('2026-10-31T00:00:00Z'), now), true);
-    assert.equal(isFoundingActive(new Date('2026-08-31T00:00:00Z'), now), false);
+    assert.equal(
+      isFoundingActive(new Date('2026-08-31T00:00:00Z'), now),
+      false,
+    );
   });
 });
 
@@ -47,7 +50,11 @@ describe('FALLBACK_PRICE', () => {
         );
         // Every price is round in minor units, which is what lets
         // `maximumFractionDigits: 0` be honest.
-        assert.equal(price % 100, 0, `${plan.key}/${currency} has odd minor units`);
+        assert.equal(
+          price % 100,
+          0,
+          `${plan.key}/${currency} has odd minor units`,
+        );
       }
     }
   });

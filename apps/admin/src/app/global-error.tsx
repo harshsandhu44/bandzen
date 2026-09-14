@@ -32,7 +32,9 @@ export default function GlobalError({
         }}
       >
         <div style={{ maxWidth: 380, padding: 24 }}>
-          <h1 style={{ fontSize: 18, marginBottom: 8 }}>The CMS did not load</h1>
+          <h1 style={{ fontSize: 18, marginBottom: 8 }}>
+            The CMS did not load
+          </h1>
           <p style={{ fontSize: 14, color: '#555', marginBottom: 16 }}>
             Reload the page. If it keeps happening, the deploy may be broken.
             {error.digest ? ` Reference ${error.digest}.` : ''}

@@ -3,7 +3,8 @@ import test from 'node:test';
 import { parseTurns, peaksFromSamples } from './speech.ts';
 
 test('parseTurns splits a dialogue into per-speaker turns', () => {
-  const transcript = 'Maya: Good evening.\n\nLeo: Hi Maya, thanks for having me.';
+  const transcript =
+    'Maya: Good evening.\n\nLeo: Hi Maya, thanks for having me.';
   assert.deepEqual(parseTurns(transcript), [
     { speaker: 'Maya', text: 'Good evening.' },
     { speaker: 'Leo', text: 'Hi Maya, thanks for having me.' },
@@ -19,7 +20,8 @@ test('parseTurns folds a wrapped line into the previous turn', () => {
 });
 
 test('parseTurns on a monologue returns one turn with no speaker', () => {
-  const transcript = 'Cities often experience higher temperatures\nthan nearby rural areas.';
+  const transcript =
+    'Cities often experience higher temperatures\nthan nearby rural areas.';
   assert.deepEqual(parseTurns(transcript), [
     {
       speaker: null,

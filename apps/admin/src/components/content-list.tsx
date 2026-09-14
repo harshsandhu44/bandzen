@@ -150,7 +150,12 @@ export function ContentList({
           </Button>
           <ConfirmDialog
             trigger={
-              <Button type="button" size="sm" variant="destructive" disabled={pending}>
+              <Button
+                type="button"
+                size="sm"
+                variant="destructive"
+                disabled={pending}
+              >
                 Delete
               </Button>
             }
@@ -214,10 +219,7 @@ export function ContentList({
                 />
               ) : null}
               <div className="min-w-0 flex-1">
-                <Link
-                  href={item.href}
-                  className="text-sm hover:underline"
-                >
+                <Link href={item.href} className="text-sm hover:underline">
                   {item.title}
                 </Link>
                 <p className="truncate text-xs text-muted-foreground">
@@ -237,9 +239,7 @@ export function ContentList({
             size="sm"
             variant="outline"
             disabled={page <= 1}
-            onClick={() =>
-              setParam('page', page > 2 ? String(page - 1) : '')
-            }
+            onClick={() => setParam('page', page > 2 ? String(page - 1) : '')}
           >
             Previous
           </Button>

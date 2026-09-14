@@ -144,7 +144,9 @@ async function sectionB() {
            round(100.0 * count(*) filter (where returned_w2) / nullif(count(*), 0), 1) as pct
       from flagged
   `;
-  console.log(`Pooled: ${pooled.returned_w2}/${pooled.n} = ${pooled.pct}% returned in week 2`);
+  console.log(
+    `Pooled: ${pooled.returned_w2}/${pooled.n} = ${pooled.pct}% returned in week 2`,
+  );
 }
 
 async function sectionC() {

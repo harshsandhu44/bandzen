@@ -112,10 +112,7 @@ function BlockRow({
       )}
       {(kind === 'example' || kind === 'try') && (
         <>
-          <Field
-            label="Source"
-            hint={kind === 'try' ? 'Optional' : undefined}
-          >
+          <Field label="Source" hint={kind === 'try' ? 'Optional' : undefined}>
             <Input {...register(`${p}.source`)} />
           </Field>
           <Field label="Question">
@@ -245,7 +242,12 @@ export function LessonEditor({
   };
 
   return (
-    <form onSubmit={handleSubmit(onSubmit, () => toast.error("Some fields need fixing — check the form."))} className="space-y-6">
+    <form
+      onSubmit={handleSubmit(onSubmit, () =>
+        toast.error('Some fields need fixing — check the form.'),
+      )}
+      className="space-y-6"
+    >
       <Card>
         <CardHeader>
           <CardTitle>Details</CardTitle>

@@ -55,7 +55,12 @@ export function ResourceEditor({
   };
 
   return (
-    <form onSubmit={handleSubmit(onSubmit, () => toast.error("Some fields need fixing — check the form."))} className="space-y-6">
+    <form
+      onSubmit={handleSubmit(onSubmit, () =>
+        toast.error('Some fields need fixing — check the form.'),
+      )}
+      className="space-y-6"
+    >
       <Card>
         <CardHeader>
           <CardTitle>Details</CardTitle>
@@ -116,10 +121,7 @@ export function ResourceEditor({
               </Select>
             </Field>
           </div>
-          <Field
-            label="Body"
-            hint="One blank line between paragraphs."
-          >
+          <Field label="Body" hint="One blank line between paragraphs.">
             <Textarea className="min-h-64" {...register('bodyText')} />
           </Field>
         </CardContent>

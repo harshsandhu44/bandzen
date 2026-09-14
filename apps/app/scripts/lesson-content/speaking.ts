@@ -203,7 +203,8 @@ export const SPEAKING_LESSONS: LessonSeed[] = [
             source:
               '"I think that, well, because of my job, which is quite busy, sometimes, I don\'t always have time, to, um, do sports."',
             question: 'How could this be said more confidently?',
-            answer: '"My job is busy, so I don\'t always have time for sports."',
+            answer:
+              '"My job is busy, so I don\'t always have time for sports."',
             why: 'The shorter version says the same thing clearly, without hesitation words breaking up the sentence.',
           },
         ],
@@ -287,7 +288,8 @@ export const SPEAKING_LESSONS: LessonSeed[] = [
             source:
               'Card: "Describe a place you like to visit. Say where it is, why you go there, and how you feel when you are there."',
             question: 'How should you organise your two minutes?',
-            answer: 'Cover each point in order: where it is, why you go, how you feel — then add a short closing thought.',
+            answer:
+              'Cover each point in order: where it is, why you go, how you feel — then add a short closing thought.',
             why: 'Following the card in order is a simple, reliable structure that naturally fills the time without you needing to plan much.',
           },
         ],
@@ -299,7 +301,8 @@ export const SPEAKING_LESSONS: LessonSeed[] = [
             kind: 'try',
             question:
               'You finish talking about the topic after only forty seconds. What should you do?',
-            answer: 'Add more detail to points you already made, rather than stopping early.',
+            answer:
+              'Add more detail to points you already made, rather than stopping early.',
             why: 'Stopping early gives the examiner less to score. Going back to add examples or feelings extends your answer naturally.',
           },
         ],
@@ -370,7 +373,8 @@ export const SPEAKING_LESSONS: LessonSeed[] = [
             kind: 'example',
             source: 'Card: "Describe a skill you learned."',
             question: 'What should your one-minute notes look like?',
-            answer: '"Skill: cooking. When: last year. How: online videos. Feeling: proud, useful."',
+            answer:
+              '"Skill: cooking. When: last year. How: online videos. Feeling: proud, useful."',
             why: 'These are short memory triggers, not sentences. They remind you what to say without wasting prep time writing full answers.',
           },
         ],
@@ -382,7 +386,8 @@ export const SPEAKING_LESSONS: LessonSeed[] = [
             kind: 'try',
             question:
               'You spend your whole minute trying to write one perfect opening sentence. Is this a good use of time?',
-            answer: 'No — spread your time across all the bullet points instead.',
+            answer:
+              'No — spread your time across all the bullet points instead.',
             why: 'One polished sentence is far less useful than short notes covering the whole talk, since you need ideas for the full two minutes.',
           },
         ],
@@ -460,7 +465,8 @@ export const SPEAKING_LESSONS: LessonSeed[] = [
             kind: 'try',
             question:
               'You cannot remember a real detail for a question about your childhood home. What should you do?',
-            answer: 'Invent a believable detail rather than giving a vague answer.',
+            answer:
+              'Invent a believable detail rather than giving a vague answer.',
             why: 'The examiner scores your English, not the truth of your story. A specific invented detail is more useful than a vague true one.',
           },
         ],
@@ -529,7 +535,8 @@ export const SPEAKING_LESSONS: LessonSeed[] = [
         blocks: [
           {
             kind: 'example',
-            source: 'Question: "Do you think technology has made people less social?"',
+            source:
+              'Question: "Do you think technology has made people less social?"',
             question: 'What makes a strong answer here?',
             answer:
               '"In some ways, yes, because people often look at their phones instead of talking to those around them, especially in public places like buses or waiting rooms."',
@@ -615,8 +622,10 @@ export const SPEAKING_LESSONS: LessonSeed[] = [
             kind: 'example',
             source:
               '"I-I think, um, it\'s, uh, good, because, um, it helps, um, people."',
-            question: 'What is the real problem with this answer — speed or something else?',
-            answer: 'The frequent pauses and filler words, not the speed itself.',
+            question:
+              'What is the real problem with this answer — speed or something else?',
+            answer:
+              'The frequent pauses and filler words, not the speed itself.',
             why: 'The words come out slowly here, but the constant hesitation breaks the flow. Fluency is about smoothness, not pace.',
           },
         ],
@@ -628,7 +637,8 @@ export const SPEAKING_LESSONS: LessonSeed[] = [
             kind: 'try',
             question:
               'You feel tempted to speak faster to sound more confident. Is this the right instinct?',
-            answer: 'Not necessarily — a calm, steady pace often sounds more confident than rushed speech.',
+            answer:
+              'Not necessarily — a calm, steady pace often sounds more confident than rushed speech.',
             why: 'Confidence comes across through smoothness and control, not raw speed. Rushing can actually sound nervous.',
           },
         ],
@@ -695,9 +705,12 @@ export const SPEAKING_LESSONS: LessonSeed[] = [
         blocks: [
           {
             kind: 'example',
-            source: '"Are you going to the party?" (said with a flat, unchanging tone)',
-            question: 'What makes this sound unnatural, even if every word is correct?',
-            answer: 'The lack of rising tone at the end, which questions normally have in English.',
+            source:
+              '"Are you going to the party?" (said with a flat, unchanging tone)',
+            question:
+              'What makes this sound unnatural, even if every word is correct?',
+            answer:
+              'The lack of rising tone at the end, which questions normally have in English.',
             why: 'Yes/no questions usually rise in pitch at the end. A flat tone here can sound robotic, even with perfect grammar.',
           },
         ],
@@ -709,7 +722,8 @@ export const SPEAKING_LESSONS: LessonSeed[] = [
             kind: 'try',
             question:
               'You mispronounce one word in an otherwise clear, well-organised answer. Should you worry a lot about this?',
-            answer: 'No — one unclear word rarely matters if the rest of the answer is understandable.',
+            answer:
+              'No — one unclear word rarely matters if the rest of the answer is understandable.',
             why: 'Pronunciation is judged overall. A single slip in an otherwise clear answer has little effect on the total score.',
           },
         ],
@@ -778,9 +792,11 @@ export const SPEAKING_LESSONS: LessonSeed[] = [
         blocks: [
           {
             kind: 'example',
-            source: 'Examiner asks a long, complex question you only half hear.',
+            source:
+              'Examiner asks a long, complex question you only half hear.',
             question: 'What is a natural way to ask for it again?',
-            answer: '"Sorry, could you repeat that, please?" or "Do you mean whether people should...?"',
+            answer:
+              '"Sorry, could you repeat that, please?" or "Do you mean whether people should...?"',
             why: 'Both are polite, natural phrases used by fluent speakers every day. They show good communication skills, not weakness.',
           },
         ],

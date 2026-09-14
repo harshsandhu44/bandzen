@@ -22,8 +22,7 @@ export default async function ResourcesPage({
   const page = Math.max(1, Number(pageParam) || 1);
   const rows = await listResourcesAdmin({
     q,
-    status:
-      status === 'draft' || status === 'published' ? status : undefined,
+    status: status === 'draft' || status === 'published' ? status : undefined,
     limit: ADMIN_PAGE_SIZE + 1,
     offset: (page - 1) * ADMIN_PAGE_SIZE,
   });
@@ -53,7 +52,10 @@ export default async function ResourcesPage({
             >
               Import JSON
             </Button>
-            <Button nativeButton={false} render={<Link href="/resources/new" />}>
+            <Button
+              nativeButton={false}
+              render={<Link href="/resources/new" />}
+            >
               New resource
             </Button>
           </div>
