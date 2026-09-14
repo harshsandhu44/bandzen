@@ -74,6 +74,10 @@ export async function startCheckout(
     customerName: user?.firstName ?? undefined,
     customerIpAddress: await clientIp(),
     discountId: discounted ? discount.id : undefined,
+    // The discount decision is ours and it is currency-gated. Left on, this
+    // defaults to true and a candidate anywhere can type any live code into
+    // the form — which is how a GBP checkout took 33% off a rupee-only offer.
+    allowDiscountCodes: false,
     ...(trialDays > 0
       ? { trialInterval: 'day' as const, trialIntervalCount: trialDays }
       : {}),
@@ -115,7 +119,7 @@ export async function confirmCheckout(
     return { ok: false };
   }
 
-  if (checkout.status !== 'succeeded' || !checkout.subscriptionId) {
+  if (checkout.status !== 'succeeded') {
     console.error('[upgrade] checkout not paid', {
       checkoutId,
       status: checkout.status,
@@ -123,11 +127,28 @@ export async function confirmCheckout(
     return { ok: false };
   }
 
-  // Checkout carries no period end, so it is read off the subscription rather
-  // than assumed.
-  const subscription = await polar.subscriptions.get({
-    id: checkout.subscriptionId,
+  // Not `checkout.subscriptionId`: Polar fills that in after the checkout is
+  // already `succeeded`, so reading it here loses a race we would never see
+  // in the happy path and would always lose under load. The subscription is
+  // looked up by the same external id the checkout was created with, which is
+  // populated the moment it exists.
+  //
+  // Checkout carries no period end either, so that is read off the
+  // subscription rather than assumed.
+  const subscriptions = await polar.subscriptions.list({
+    externalCustomerId: userId,
+    active: true,
+    limit: 1,
+    sorting: ['-started_at'],
   });
+  const subscription = subscriptions.result.items[0];
+
+  if (!subscription) {
+    // Paid, but Polar has not finished creating the subscription. The webhook
+    // will land on it; this only means we cannot confirm it in this request.
+    console.error('[upgrade] no active subscription yet', { checkoutId });
+    return { ok: false };
+  }
 
   await activateSubscription({
     userId,
