@@ -1,5 +1,6 @@
 import type { ReactNode } from 'react';
 import { Button } from '@bandzen/ui/components/button';
+import { Eyebrow } from '@bandzen/ui/components/primitives';
 
 /**
  * The shape every content editor takes: the form on the left, a rail on the
@@ -56,9 +57,7 @@ export function SaveBar({
 export function CompletenessPanel({ issues }: { issues: string[] }) {
   return (
     <div className="space-y-2">
-      <p className="font-mono text-[0.6875rem] tracking-[0.18em] text-muted-foreground uppercase">
-        Before publishing
-      </p>
+      <Eyebrow>Before publishing</Eyebrow>
       {issues.length === 0 ? (
         <p className="text-xs text-muted-foreground">
           Nothing missing. Ready to publish.

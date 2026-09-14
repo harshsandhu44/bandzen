@@ -12,15 +12,10 @@ import {
 import { zodResolver } from '@hookform/resolvers/zod';
 import { STAGE_TITLE, questionKind } from '@bandzen/db/schema';
 import { Button } from '@bandzen/ui/components/button';
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from '@bandzen/ui/components/card';
 import { Checkbox } from '@bandzen/ui/components/checkbox';
 import { Field } from '@bandzen/ui/components/field';
 import { Input } from '@bandzen/ui/components/input';
+import { Panel } from '@bandzen/ui/components/primitives';
 import { Select } from '@bandzen/ui/components/select';
 import { Textarea } from '@bandzen/ui/components/textarea';
 import { SaveBar } from '@/components/editor-shell';
@@ -167,11 +162,9 @@ function StageSection({
   });
 
   return (
-    <Card>
-      <CardHeader className="flex-row items-center justify-between gap-2">
-        <CardTitle className="text-sm">
-          {STAGE_TITLE[stageId as keyof typeof STAGE_TITLE]}
-        </CardTitle>
+    <Panel
+      title={STAGE_TITLE[stageId as keyof typeof STAGE_TITLE]}
+      action={
         <label className="flex items-center gap-2 text-xs text-muted-foreground">
           <Controller
             control={control}
@@ -185,9 +178,10 @@ function StageSection({
           />
           Include this stage
         </label>
-      </CardHeader>
+      }
+    >
       {present ? (
-        <CardContent className="space-y-4">
+        <div className="space-y-4">
           {blocks.fields.map((field, i) => (
             <BlockRow
               key={field.id}
@@ -206,9 +200,9 @@ function StageSection({
           >
             Add block
           </Button>
-        </CardContent>
+        </div>
       ) : null}
-    </Card>
+    </Panel>
   );
 }
 
@@ -248,11 +242,8 @@ export function LessonEditor({
       )}
       className="space-y-6"
     >
-      <Card>
-        <CardHeader>
-          <CardTitle>Details</CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-4">
+      <Panel title="Details">
+        <div className="space-y-4">
           <Field label="Title" required error={errors.title?.message}>
             <Input {...register('title')} />
           </Field>
@@ -278,8 +269,8 @@ export function LessonEditor({
               </Select>
             </Field>
           </div>
-        </CardContent>
-      </Card>
+        </div>
+      </Panel>
 
       <div className="space-y-4">
         <h2 className="font-title text-title">Stages</h2>

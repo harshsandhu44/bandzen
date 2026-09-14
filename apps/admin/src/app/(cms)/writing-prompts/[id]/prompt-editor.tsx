@@ -3,13 +3,8 @@
 import { useTransition } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from '@bandzen/ui/components/card';
 import { Field } from '@bandzen/ui/components/field';
+import { Panel } from '@bandzen/ui/components/primitives';
 import { Select } from '@bandzen/ui/components/select';
 import { Textarea } from '@bandzen/ui/components/textarea';
 import { SaveBar } from '@/components/editor-shell';
@@ -52,11 +47,8 @@ export function PromptEditor({
       )}
       className="space-y-6"
     >
-      <Card>
-        <CardHeader>
-          <CardTitle>Prompt</CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-4">
+      <Panel title="Prompt">
+        <div className="space-y-4">
           <div className="flex flex-wrap gap-4">
             <Field label="Task" className="w-28">
               <Select {...register('task', { valueAsNumber: true })}>
@@ -78,8 +70,8 @@ export function PromptEditor({
           >
             <Textarea className="min-h-40" {...register('promptText')} />
           </Field>
-        </CardContent>
-      </Card>
+        </div>
+      </Panel>
       <SaveBar dirty={isDirty} saving={saving} />
     </form>
   );

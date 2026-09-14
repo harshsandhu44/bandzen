@@ -3,14 +3,9 @@
 import { useTransition } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from '@bandzen/ui/components/card';
 import { Field } from '@bandzen/ui/components/field';
 import { Input } from '@bandzen/ui/components/input';
+import { Panel } from '@bandzen/ui/components/primitives';
 import { Select } from '@bandzen/ui/components/select';
 import { Textarea } from '@bandzen/ui/components/textarea';
 import { SaveBar } from '@/components/editor-shell';
@@ -61,11 +56,8 @@ export function ResourceEditor({
       )}
       className="space-y-6"
     >
-      <Card>
-        <CardHeader>
-          <CardTitle>Details</CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-4">
+      <Panel title="Details">
+        <div className="space-y-4">
           <Field label="Title" required error={errors.title?.message}>
             <Input {...register('title')} />
           </Field>
@@ -124,8 +116,8 @@ export function ResourceEditor({
           <Field label="Body" hint="One blank line between paragraphs.">
             <Textarea className="min-h-64" {...register('bodyText')} />
           </Field>
-        </CardContent>
-      </Card>
+        </div>
+      </Panel>
       <SaveBar dirty={isDirty} saving={saving} />
     </form>
   );

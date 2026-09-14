@@ -3,14 +3,9 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import { Button } from '@bandzen/ui/components/button';
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from '@bandzen/ui/components/card';
 import { Field } from '@bandzen/ui/components/field';
 import { Input } from '@bandzen/ui/components/input';
+import { Panel } from '@bandzen/ui/components/primitives';
 import { Select } from '@bandzen/ui/components/select';
 
 type Result = { id: string; title: string; href: string; warnings: string[] };
@@ -63,11 +58,8 @@ export function GeneratePanel({
   }
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle>Generate with AI</CardTitle>
-      </CardHeader>
-      <CardContent className="space-y-4">
+    <Panel title="Generate with AI">
+      <div className="space-y-4">
         {result ? (
           <div className="space-y-3 text-sm">
             <p>
@@ -141,7 +133,7 @@ export function GeneratePanel({
             ) : null}
           </>
         )}
-      </CardContent>
-    </Card>
+      </div>
+    </Panel>
   );
 }

@@ -1,14 +1,8 @@
 import { notFound } from 'next/navigation';
 import { getTrackAdmin, checkTrackCompleteness } from '@bandzen/db/queries';
 import { Button } from '@bandzen/ui/components/button';
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from '@bandzen/ui/components/card';
 import { Field } from '@bandzen/ui/components/field';
-import { PageHeader } from '@bandzen/ui/components/primitives';
+import { PageHeader, Panel } from '@bandzen/ui/components/primitives';
 import { requireAdminOrTeacher } from '@/lib/auth';
 import { StatusBadge } from '@/components/status-badge';
 import { EditorRail } from '@/components/editor-rail';
@@ -88,11 +82,8 @@ export default async function EditTrackPage({
           />
         }
       >
-        <Card>
-          <CardHeader>
-            <CardTitle>Audio</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-3">
+        <Panel title="Audio">
+          <div className="space-y-3">
             {track.audioUrl ? (
               <audio controls src={track.audioUrl} className="w-full" />
             ) : track.transcript ? (
@@ -141,23 +132,18 @@ export default async function EditTrackPage({
                 </Button>
               </form>
             ) : null}
-          </CardContent>
-        </Card>
+          </div>
+        </Panel>
 
         {track.audioUrl && !track.transcript ? (
-          <Card>
-            <CardHeader>
-              <CardTitle>Transcript</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <GenerationStatus
-                trackId={track.id}
-                missing="transcript"
-                error={track.generationError}
-                timedOut={track.generationTimedOut}
-              />
-            </CardContent>
-          </Card>
+          <Panel title="Transcript">
+            <GenerationStatus
+              trackId={track.id}
+              missing="transcript"
+              error={track.generationError}
+              timedOut={track.generationTimedOut}
+            />
+          </Panel>
         ) : null}
 
         <TrackEditor id={track.id} defaults={defaults} />

@@ -117,7 +117,7 @@ export default async function CmsLayout({
           {children}
         </main>
       </SidebarInset>
-      <Toaster />
+      <Toaster position="bottom-right" />
     </SidebarProvider>
   );
 }

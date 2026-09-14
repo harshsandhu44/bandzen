@@ -4,14 +4,9 @@ import { useTransition } from 'react';
 import { useForm, useFieldArray } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Button } from '@bandzen/ui/components/button';
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from '@bandzen/ui/components/card';
 import { Field } from '@bandzen/ui/components/field';
 import { Input } from '@bandzen/ui/components/input';
+import { Panel } from '@bandzen/ui/components/primitives';
 import { Select } from '@bandzen/ui/components/select';
 import { Textarea } from '@bandzen/ui/components/textarea';
 import { SaveBar } from '@/components/editor-shell';
@@ -71,11 +66,8 @@ export function TrackEditor({
       )}
       className="space-y-6"
     >
-      <Card>
-        <CardHeader>
-          <CardTitle>Track</CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-4">
+      <Panel title="Track">
+        <div className="space-y-4">
           <Field label="Title" required error={errors.title?.message}>
             <Input {...register('title')} />
           </Field>
@@ -107,12 +99,12 @@ export function TrackEditor({
               {...register('matchingOptionsText')}
             />
           </Field>
-        </CardContent>
-      </Card>
+        </div>
+      </Panel>
 
-      <Card>
-        <CardHeader className="flex-row items-center justify-between gap-2">
-          <CardTitle>Questions ({questions.fields.length})</CardTitle>
+      <Panel
+        title={`Questions (${questions.fields.length})`}
+        action={
           <Button
             type="button"
             size="sm"
@@ -123,8 +115,9 @@ export function TrackEditor({
           >
             Add question
           </Button>
-        </CardHeader>
-        <CardContent className="space-y-6">
+        }
+      >
+        <div className="space-y-6">
           {questions.fields.map((field, i) => (
             <fieldset
               key={field.id}
@@ -186,8 +179,8 @@ export function TrackEditor({
               </Field>
             </fieldset>
           ))}
-        </CardContent>
-      </Card>
+        </div>
+      </Panel>
 
       <SaveBar dirty={isDirty} saving={saving} />
     </form>

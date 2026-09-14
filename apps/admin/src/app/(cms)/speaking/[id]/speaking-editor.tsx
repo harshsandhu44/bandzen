@@ -4,14 +4,9 @@ import { useTransition } from 'react';
 import { useForm, useFieldArray } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Button } from '@bandzen/ui/components/button';
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from '@bandzen/ui/components/card';
 import { Field } from '@bandzen/ui/components/field';
 import { Input } from '@bandzen/ui/components/input';
+import { Panel } from '@bandzen/ui/components/primitives';
 import { Select } from '@bandzen/ui/components/select';
 import { Textarea } from '@bandzen/ui/components/textarea';
 import { SaveBar } from '@/components/editor-shell';
@@ -71,11 +66,8 @@ export function SpeakingEditor({
       )}
       className="space-y-6"
     >
-      <Card>
-        <CardHeader>
-          <CardTitle>Test</CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-4">
+      <Panel title="Test">
+        <div className="space-y-4">
           <Field label="Title" required error={errors.title?.message}>
             <Input {...register('title')} />
           </Field>
@@ -92,12 +84,12 @@ export function SpeakingEditor({
               />
             </Field>
           </div>
-        </CardContent>
-      </Card>
+        </div>
+      </Panel>
 
-      <Card>
-        <CardHeader className="flex-row items-center justify-between gap-2">
-          <CardTitle>Prompts ({prompts.fields.length})</CardTitle>
+      <Panel
+        title={`Prompts (${prompts.fields.length})`}
+        action={
           <Button
             type="button"
             size="sm"
@@ -108,8 +100,9 @@ export function SpeakingEditor({
           >
             Add prompt
           </Button>
-        </CardHeader>
-        <CardContent className="space-y-6">
+        }
+      >
+        <div className="space-y-6">
           {prompts.fields.map((field, i) => {
             const savedId = defaults.prompts[i]?.id;
             const audioUrl = savedId ? audioByPromptId[savedId] : undefined;
@@ -175,8 +168,8 @@ export function SpeakingEditor({
               </fieldset>
             );
           })}
-        </CardContent>
-      </Card>
+        </div>
+      </Panel>
 
       <SaveBar dirty={isDirty} saving={saving} />
     </form>

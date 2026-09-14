@@ -4,14 +4,9 @@ import { useTransition } from 'react';
 import { useForm, useFieldArray } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Button } from '@bandzen/ui/components/button';
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from '@bandzen/ui/components/card';
 import { Field } from '@bandzen/ui/components/field';
 import { Input } from '@bandzen/ui/components/input';
+import { Panel } from '@bandzen/ui/components/primitives';
 import { Select } from '@bandzen/ui/components/select';
 import { Textarea } from '@bandzen/ui/components/textarea';
 import { SaveBar } from '@/components/editor-shell';
@@ -83,11 +78,8 @@ export function PassageEditor({
       )}
       className="space-y-6"
     >
-      <Card>
-        <CardHeader>
-          <CardTitle>Passage</CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-4">
+      <Panel title="Passage">
+        <div className="space-y-4">
           <Field label="Title" required error={errors.title?.message}>
             <Input {...register('title')} />
           </Field>
@@ -124,12 +116,12 @@ export function PassageEditor({
           >
             <Textarea className="min-h-24" {...register('headingsText')} />
           </Field>
-        </CardContent>
-      </Card>
+        </div>
+      </Panel>
 
-      <Card>
-        <CardHeader className="flex-row items-center justify-between gap-2">
-          <CardTitle>Questions ({questions.fields.length})</CardTitle>
+      <Panel
+        title={`Questions (${questions.fields.length})`}
+        action={
           <Button
             type="button"
             size="sm"
@@ -140,8 +132,9 @@ export function PassageEditor({
           >
             Add question
           </Button>
-        </CardHeader>
-        <CardContent className="space-y-6">
+        }
+      >
+        <div className="space-y-6">
           {questions.fields.length === 0 ? (
             <p className="text-xs text-muted-foreground">
               No questions yet. A passage needs at least one to publish.
@@ -212,8 +205,8 @@ export function PassageEditor({
               </Field>
             </fieldset>
           ))}
-        </CardContent>
-      </Card>
+        </div>
+      </Panel>
 
       <SaveBar dirty={isDirty} saving={saving} />
     </form>
