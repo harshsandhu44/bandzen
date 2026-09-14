@@ -257,6 +257,22 @@ async function main() {
     MODULE === 'writing' ? await writingCases() : await speakingCases();
   if (!cases.length) throw new Error(`No graded ${MODULE} attempts to replay.`);
 
+  // A stored band ABOVE the ceiling is impossible under today's grader, so
+  // that report was written before the ceiling landed. Band agreement against
+  // it measures how much the grading logic has changed since, not how good a
+  // model is -- and it does so identically for every model, which is exactly
+  // how it hides. Loud, because a quiet version of this produced three
+  // plausible-looking rows that all meant nothing.
+  const stale = cases.filter((c) => c.storedBand > c.ceiling);
+  if (stale.length) {
+    console.log(
+      `\n!! ${stale.length}/${cases.length} stored bands exceed today's ceiling, so they\n` +
+        `   predate it. Ignore the band and criterion columns for this run --\n` +
+        `   max spread, quotes dropped, latency, cache and cost are still valid.\n` +
+        `   Re-grade or exclude those attempts for a usable agreement number.\n`,
+    );
+  }
+
   const runs = cases.length * REPEAT;
   console.log(
     `${MODULE}: ${cases.length} attempt(s) x ${REPEAT} repeat(s) x ${MODELS.length} model(s) = ${runs * MODELS.length} calls` +
