@@ -24,7 +24,21 @@ jobs:
 
       - run: pnpm install --frozen-lockfile
 
+      # Every check runs even after an earlier one fails, so a PR gets its
+      # whole list of problems in one go rather than one per push.
+      # Cheapest first, so an obvious failure surfaces early.
+
       # Respects .prettierignore, which excludes the generated files whose
       # own writers (drizzle-kit, the content script, semantic-release)
       # produce different formatting on every run.
       - run: pnpm format:check
+        if: ${{ !cancelled() }}
+
+      - run: pnpm lint
+        if: ${{ !cancelled() }}
+
+      - run: pnpm typecheck
+        if: ${{ !cancelled() }}
+
+      - run: pnpm test
+        if: ${{ !cancelled() }}
