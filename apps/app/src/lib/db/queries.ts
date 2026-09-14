@@ -50,6 +50,7 @@ import {
   writingPrompts,
   type Annotation,
   type Criterion,
+  type ListeningPlayback,
   type Award,
   type Question,
   type Skill,
@@ -847,6 +848,30 @@ export async function saveAnswer(
 }
 
 /**
+ * Record what the practice listening player was used for. Guarded the same
+ * way `saveAnswer` is, plus `mock_attempt_id IS NULL`: without the
+ * `in_progress` check a candidate could rewrite their own counters after
+ * submitting and scrub the condition line off their review.
+ */
+export async function saveListeningPlayback(
+  userId: string,
+  attemptId: string,
+  playback: ListeningPlayback,
+) {
+  await db
+    .update(attempts)
+    .set({ playback })
+    .where(
+      and(
+        ownAttempt(userId, attemptId),
+        eq(attempts.status, 'in_progress'),
+        eq(attempts.module, 'listening'),
+        isNull(attempts.mockAttemptId),
+      ),
+    );
+}
+
+/**
  * Grade and close out a reading attempt.
  *
  * Idempotent without a transaction: the final UPDATE is guarded on
@@ -1301,6 +1326,7 @@ export async function getListeningReview(userId: string, attemptId: string) {
     .select({
       title: listeningTracks.title,
       transcript: listeningTracks.transcript,
+      durationSeconds: listeningTracks.durationSeconds,
     })
     .from(listeningTracks)
     .where(eq(listeningTracks.id, attempt.trackId));

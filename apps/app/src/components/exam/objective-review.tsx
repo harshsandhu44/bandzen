@@ -56,6 +56,7 @@ export function ObjectiveReview({
   rows,
   history,
   transcript,
+  conditions,
 }: {
   module: IELTSModule;
   title: string;
@@ -67,6 +68,8 @@ export function ObjectiveReview({
   /** `accuracyByQuestionKind(userId, module)` — for naming a recurring miss. */
   history: KindAccuracy[];
   transcript?: string | null;
+  /** Listening only: how the audio was played. Reading never passes it. */
+  conditions?: string;
 }) {
   const byKind = new Map(history.map((k) => [k.kind, k]));
   const noun = module === 'listening' ? 'track' : 'passage';
@@ -108,6 +111,11 @@ export function ObjectiveReview({
         <p className="font-mono text-[0.6875rem] tracking-[0.18em] text-muted-foreground uppercase">
           {rawScore}/{total} correct · estimate, not an official score
         </p>
+        {conditions ? (
+          <p className="font-mono text-[0.6875rem] tracking-[0.18em] text-muted-foreground uppercase">
+            {conditions}
+          </p>
+        ) : null}
       </header>
 
       <ol className="divide-y divide-border border-y border-border">

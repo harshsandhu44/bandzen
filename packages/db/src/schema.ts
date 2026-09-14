@@ -509,6 +509,15 @@ export const mockAttempts = pgTable(
 // Attempts
 // ---------------------------------------------------------------------------
 
+/** Counters written by the practice listening player. `listenedSeconds` is
+ * wall-clock time spent playing, so it exceeds the track duration exactly
+ * when something was replayed. */
+export type ListeningPlayback = {
+  pauses: number;
+  seeks: number;
+  listenedSeconds: number;
+};
+
 export const attempts = pgTable(
   'attempts',
   {
@@ -540,6 +549,13 @@ export const attempts = pgTable(
     }),
     rawScore: integer('raw_score'),
     total: integer('total'),
+    /**
+     * Practice-listening only: what the candidate did with the player. Null
+     * for every other module, for mock sittings (whose audio is still
+     * single-play), and for every attempt taken before the player existed.
+     * Display-only — nothing in grading reads it.
+     */
+    playback: jsonb('playback').$type<ListeningPlayback | null>(),
     band: numeric('band', { precision: 2, scale: 1, mode: 'number' }),
     startedAt: timestamp('started_at', { withTimezone: true })
       .notNull()

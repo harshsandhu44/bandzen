@@ -11,6 +11,7 @@ import {
   getAttempt,
   practiceAllowance,
   saveAnswer,
+  saveListeningPlayback as savePlayback,
   submitListening,
   submitMockListening,
 } from '@/lib/db/queries';
@@ -57,6 +58,26 @@ export async function saveListeningAnswer(input: {
   );
 }
 
+/**
+ * Practice audio can be paused, seeked and replayed; this records what was
+ * used so the review can say so. Flushed from the player on each transport
+ * event and every ~10s while playing — not at submit, which redirects away
+ * before a fire-and-forget call would land.
+ */
+export async function saveListeningPlayback(input: {
+  attemptId: string;
+  pauses: number;
+  seeks: number;
+  listenedSeconds: number;
+}) {
+  const userId = await requireUserId();
+  await savePlayback(userId, input.attemptId, {
+    pauses: input.pauses,
+    seeks: input.seeks,
+    listenedSeconds: input.listenedSeconds,
+  });
+}
+
 export async function submitListeningAttempt(formData: FormData) {
   const attemptId = String(formData.get('attemptId') ?? '');
   if (!attemptId) throw new Error('Missing attempt');
@@ -88,6 +109,8 @@ export async function submitListeningAttempt(formData: FormData) {
         attempt_id: attemptId,
         outcome: 'graded',
         overall_band: graded.band,
+        playback_pauses: graded.playback?.pauses ?? 0,
+        playback_seeks: graded.playback?.seeks ?? 0,
       }),
     );
   }
