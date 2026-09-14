@@ -104,7 +104,6 @@ type Case = {
   /** Text the grader's quotes must appear in, for the hallucination check. */
   source: string;
   messages: Awaited<ReturnType<typeof buildWritingMessages>>;
-  audioTokensHint: number;
 };
 
 async function writingCases(): Promise<Case[]> {
@@ -130,7 +129,6 @@ async function writingCases(): Promise<Case[]> {
       wordCount: Number(r.word_count),
       body: r.body,
     }),
-    audioTokensHint: 0,
   }));
 }
 
@@ -195,7 +193,6 @@ async function speakingCases(): Promise<Case[]> {
         })),
         clips,
       ),
-      audioTokensHint: clips.reduce((n, c) => n + c.bytes.length, 0),
     });
   }
 
@@ -288,6 +285,7 @@ async function main() {
     const criterionDeltas: number[] = [];
     let promptTok = 0,
       cachedTok = 0,
+      audioTok = 0,
       outTok = 0,
       reasoningTok = 0;
     let annotations = 0,
@@ -312,6 +310,7 @@ async function main() {
           const u = r.usage;
           promptTok += u?.prompt_tokens ?? 0;
           cachedTok += u?.prompt_tokens_details?.cached_tokens ?? 0;
+          audioTok += u?.prompt_tokens_details?.audio_tokens ?? 0;
           outTok += u?.completion_tokens ?? 0;
           reasoningTok += u?.completion_tokens_details?.reasoning_tokens ?? 0;
         } catch (e) {
@@ -322,9 +321,16 @@ async function main() {
     }
 
     const p = PRICES_USD_PER_MTOK[model];
-    const fresh = Math.max(0, promptTok - cachedTok);
+    // Audio input is inside `prompt_tokens` and costs 17x the text rate on
+    // gpt-audio-mini, 13x on gpt-audio-1.5 -- billing the whole prompt at
+    // `p.in` understated every Speaking run by roughly the audio share.
+    const fresh = Math.max(0, promptTok - cachedTok - audioTok);
     const cost = p
-      ? (fresh * p.in + cachedTok * p.cached + outTok * p.out) / 1e6
+      ? (fresh * p.in +
+          cachedTok * p.cached +
+          audioTok * (p.audioIn ?? p.in) +
+          outTok * p.out) /
+        1e6
       : NaN;
     const ok = deltas.length;
     const absMean = ok ? deltas.reduce((s, d) => s + Math.abs(d), 0) / ok : 0;
@@ -352,6 +358,9 @@ async function main() {
       'p95 ms': quantile(latencies, 0.95),
       'cache hit': pct(cachedTok, promptTok),
       'tok in/out': `${promptTok}/${outTok}`,
+      // Of which audio, at 17x (mini) / 13x (1.5) the text rate. Zero on a
+      // writing run; if it is zero on a speaking run, the model heard nothing.
+      'audio tok': audioTok,
       reasoning: reasoningTok,
       '$ / submission': ok ? `$${(cost / ok).toFixed(4)}` : '—',
     });

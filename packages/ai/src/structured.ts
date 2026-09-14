@@ -96,7 +96,14 @@ export function parseStructured<T>(
   try {
     json = JSON.parse(unfenced);
   } catch {
-    throw new ModelOutputError('Completion was not valid JSON');
+    // Carry what it actually said. A model that answers in prose instead of
+    // JSON is saying why it could not comply, and without this the caller logs
+    // only that parsing failed -- which is how a Speaking grader that had
+    // stopped hearing audio entirely looked identical to a bad JSON fence for
+    // a whole eval run. Truncated because the reply can echo a candidate back.
+    throw new ModelOutputError(
+      `Completion was not valid JSON: ${unfenced.slice(0, 300)}`,
+    );
   }
 
   const result = schema.safeParse(json);
