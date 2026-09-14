@@ -16,9 +16,14 @@ import { PreparationForm } from '@/components/app/preparation-form';
 import { DOCS_URL } from '../nav-links';
 import { requireUserId } from '@/lib/auth';
 import { getProfile, getSubscription } from '@/lib/db/queries';
-import { isProAt } from '@/lib/entitlements';
+import {
+  FREE_COACH_MESSAGES_PER_WINDOW,
+  FREE_ESSAYS_PER_WINDOW,
+  isProAt,
+} from '@/lib/entitlements';
 import { ProTag } from '@/components/billing/pro';
 import { manageBilling } from '../upgrade/actions';
+import { CancelPlan } from './cancel-plan';
 import { saveSettings } from './actions';
 import pkg from '../../../../package.json';
 
@@ -99,15 +104,24 @@ export default async function SettingsPage() {
             ) : null}
           </dl>
 
-          {/* Invoices, card changes and cancelling all live in Polar's portal.
-              Polar is the Merchant of Record, so the receipt is legally theirs
-              to issue — and cancelling the same way you signed up is a legal
-              requirement in several of the places we now sell. */}
+          {/* One row, three states. Cancelling is ours because the dialog is
+              where someone finds out what they actually lose; invoices are
+              Polar's because it is the Merchant of Record and the receipt is
+              legally its to issue. Both are buttons rather than a button and a
+              paragraph — this panel sits above the fold and prose here pushes
+              everything under it down. */}
           <div className="flex flex-wrap items-center gap-2">
+            {paid && subscription ? (
+              <CancelPlan
+                until={DATE.format(subscription.currentPeriodEnd)}
+                essaysPerWeek={FREE_ESSAYS_PER_WINDOW}
+                coachPerWeek={FREE_COACH_MESSAGES_PER_WINDOW}
+              />
+            ) : null}
             {billed ? (
               <form action={manageBilling}>
                 <Button variant="outline" size="sm" type="submit">
-                  Manage billing
+                  Invoices
                 </Button>
               </form>
             ) : null}
@@ -132,12 +146,6 @@ export default async function SettingsPage() {
               </Button>
             ) : null}
           </div>
-          {paid && subscription ? (
-            <p className="text-xs text-muted-foreground text-pretty">
-              Invoices, payment method and cancellation. Cancelling keeps Pro
-              until {DATE.format(subscription.currentPeriodEnd)}.
-            </p>
-          ) : null}
         </TabsContent>
 
         <TabsContent value="account" className="space-y-3">

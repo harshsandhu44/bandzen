@@ -215,6 +215,45 @@ export async function setCurrency(value: string): Promise<void> {
 }
 
 /**
+ * Cancel at the end of the period already paid for.
+ *
+ * `cancelAtPeriodEnd` rather than `revoke`: cancelling does not take away days
+ * someone has already bought, and the date is not moved here at all. Polar
+ * sends `subscription.canceled` now and `subscription.revoked` when the period
+ * actually runs out, and the webhook ends access off `endedAt` — so the one
+ * place that shortens access stays the one place that shortens access.
+ */
+export async function cancelPro(): Promise<{ ok: boolean }> {
+  const userId = await requireUserId();
+
+  const subscription = await getSubscription(userId);
+  if (!subscription?.polarSubscriptionId) return { ok: false };
+
+  const cancelled = await polar.subscriptions.update({
+    id: subscription.polarSubscriptionId,
+    subscriptionUpdate: { cancelAtPeriodEnd: true },
+  });
+
+  await activateSubscription({
+    userId,
+    polarSubscriptionId: cancelled.id,
+    planId: cancelled.productId,
+    status: cancelled.status,
+    currentPeriodEnd: cancelled.currentPeriodEnd,
+    currency: cancelled.currency.toUpperCase(),
+    amountMinor: cancelled.amount,
+    lastEventAt: cancelled.modifiedAt ?? cancelled.createdAt,
+  });
+
+  await capture(userId, 'subscription_cancelled', {
+    plan: subscription.planId,
+  });
+
+  revalidatePath('/', 'layout');
+  return { ok: true };
+}
+
+/**
  * Send a subscriber to Polar's portal to see invoices, change a card or
  * cancel.
  *
