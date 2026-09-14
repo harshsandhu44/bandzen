@@ -47,14 +47,16 @@ const MODEL_ID = 'eleven_flash_v2_5';
 async function synthesizeWithVoice(
   text: string,
   voiceId: string,
+  outputFormat?: string,
 ): Promise<Buffer> {
   if (text.length > MAX_TTS_CHARS) {
     throw new Error(
       `Text is ${text.length} characters; the ${MAX_TTS_CHARS} limit for one synthesis request would be exceeded.`,
     );
   }
+  const query = outputFormat ? `?output_format=${outputFormat}` : '';
   const res = await fetch(
-    `https://api.elevenlabs.io/v1/text-to-speech/${voiceId}`,
+    `https://api.elevenlabs.io/v1/text-to-speech/${voiceId}${query}`,
     {
       method: 'POST',
       headers: {
@@ -70,12 +72,24 @@ async function synthesizeWithVoice(
   return Buffer.from(await res.arrayBuffer());
 }
 
-/** Synthesizes a spoken transcript to an MP3, read by the one default voice. */
-export async function synthesizeSpeech(transcript: string): Promise<Buffer> {
+/**
+ * Synthesizes a spoken transcript, read by the one default voice.
+ *
+ * Defaults to ElevenLabs' own default container (MP3 44.1 kHz 128 kbps), which
+ * is what every content script wants. `outputFormat` exists for
+ * `scripts/eval-speaking-audio.mts`, which needs `wav_16000` — the exact format
+ * `lib/wav.ts` produces from a real microphone — so its fixtures go to the
+ * grader through the same path a candidate's recording does. Only 44.1 kHz
+ * PCM/WAV is tier-gated; 8/16 kHz and the low-bitrate MP3s are not.
+ */
+export async function synthesizeSpeech(
+  transcript: string,
+  outputFormat?: string,
+): Promise<Buffer> {
   const text = transcript.trim();
   if (!text)
     throw new Error('Nothing to synthesize — the transcript is empty.');
-  return synthesizeWithVoice(text, VOICE_ID);
+  return synthesizeWithVoice(text, VOICE_ID, outputFormat);
 }
 
 /** One speaker's line, parsed out of a "Name: text" transcript. */

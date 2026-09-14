@@ -95,6 +95,82 @@ export function encodeWav(
   return buffer;
 }
 
+/**
+ * Cut `seconds` of a PCM WAV, starting at `fromSeconds`, header rewritten to
+ * match.
+ *
+ * The inverse of `encodeWav`, and the reason it lives here: this file owns WAV
+ * framing. Used by `scripts/eval-speaking-audio.mts` to cut one synthesized
+ * answer into fixtures of known duration.
+ *
+ * It walks the chunk list rather than assuming `encodeWav`'s 44-byte header —
+ * ElevenLabs emits a `LIST` chunk between `fmt ` and `data`, so a fixed offset
+ * would slice metadata as if it were samples. Declared sizes are treated as
+ * hints and clamped to the bytes actually present: a streaming encoder may
+ * write 0 or 0xFFFFFFFF for a length it did not know yet.
+ *
+ * `fromSeconds` is how the sweep builds several distinct clips out of one
+ * synthesized answer, rather than sending the same audio three times.
+ *
+ * Returns the input unchanged when the cut would be the whole file.
+ */
+export function sliceWav(
+  wav: Uint8Array,
+  seconds: number,
+  fromSeconds = 0,
+): Uint8Array {
+  const view = new DataView(wav.buffer, wav.byteOffset, wav.byteLength);
+  const ascii = (at: number) =>
+    String.fromCharCode(...wav.subarray(at, at + 4));
+
+  if (wav.byteLength < 12 || ascii(0) !== 'RIFF' || ascii(8) !== 'WAVE') {
+    throw new Error('Not a RIFF/WAVE file.');
+  }
+
+  let blockAlign = 0;
+  let byteRate = 0;
+  let dataAt = -1;
+  let dataLength = 0;
+
+  // Chunks are id(4) + size(4) + payload, each padded to an even length.
+  for (let at = 12; at + 8 <= wav.byteLength;) {
+    const id = ascii(at);
+    const declared = view.getUint32(at + 4, true);
+    const body = at + 8;
+    const available = wav.byteLength - body;
+    const size = Math.min(declared, available);
+    if (id === 'fmt ' && size >= 16) {
+      byteRate = view.getUint32(body + 8, true);
+      blockAlign = view.getUint16(body + 12, true);
+    } else if (id === 'data') {
+      dataAt = body;
+      dataLength = size;
+      break;
+    }
+    at = body + size + (size % 2);
+  }
+
+  if (dataAt < 0) throw new Error('WAV has no data chunk.');
+  if (!byteRate || !blockAlign) throw new Error('WAV has no usable fmt chunk.');
+
+  // Whole frames only — half a sample is noise on the end of the clip.
+  const bytesFor = (t: number) =>
+    Math.floor(Math.round(t * byteRate) / blockAlign) * blockAlign;
+  const start = Math.min(Math.max(0, bytesFor(fromSeconds)), dataLength);
+  const want = Math.min(bytesFor(seconds), dataLength - start);
+  if (want <= 0)
+    throw new Error('That slice starts past the end of the audio.');
+  if (start === 0 && want >= dataLength) return wav;
+
+  const out = new Uint8Array(dataAt + want);
+  out.set(wav.subarray(0, dataAt));
+  out.set(wav.subarray(dataAt + start, dataAt + start + want), dataAt);
+  const outView = new DataView(out.buffer);
+  outView.setUint32(4, out.byteLength - 8, true);
+  outView.setUint32(dataAt - 4, want, true);
+  return out;
+}
+
 /** Captured mono PCM chunks at `sampleRate` → a 16 kHz mono WAV blob. */
 export function pcmChunksToWav(
   chunks: readonly Float32Array[],
