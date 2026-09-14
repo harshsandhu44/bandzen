@@ -19,11 +19,7 @@ export const metadata: Metadata = {
  * root `forbidden.tsx` can render without it: a nested layout cannot remove
  * its parent's UI, so chrome placed here would follow every route.
  */
-export default function RootLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
+export default function RootLayout({ children }: LayoutProps<'/'>) {
   return (
     <ClerkProvider>
       <html
