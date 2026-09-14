@@ -1,3 +1,10 @@
+# app [1.10.0](https://github.com/harshsandhu44/bandzen/compare/app@1.9.0...app@1.10.0) (2026-09-14)
+
+
+### Features
+
+* **app:** bounded read-only Tutor Agent for Pro Coach ([#71](https://github.com/harshsandhu44/bandzen/issues/71)) ([2bfaa42](https://github.com/harshsandhu44/bandzen/commit/2bfaa42caacd6ee010f3d9b0bd76f9a80c773946)), closes [#60](https://github.com/harshsandhu44/bandzen/issues/60) [#60](https://github.com/harshsandhu44/bandzen/issues/60)
+
 # app [1.9.0](https://github.com/harshsandhu44/bandzen/compare/app@1.8.1...app@1.9.0) (2026-09-14)
 
 
