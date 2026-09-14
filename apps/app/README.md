@@ -389,7 +389,12 @@ Conventions worth keeping:
   rather than spelling out a class string.
 - **`--chrome` is the brand accent and never a hover.** It marks target bands,
   flags, and the evidence rule on a review — things that mean something. Hover
-  uses `--secondary`.
+  uses `--secondary`. A candidate's Reading highlight is `bg-chrome/40`: their
+  marks rhyme with the evidence rule when they read the review.
+- **Exam answer choices are rows, not cards.** `AnswerChoices` borrows the
+  shadcn Questionnaire's choice row (radio dot, label, letter badge, letter key
+  scoped to the focused question) without its one-question-per-screen form —
+  the runner shows a whole question block at once.
 - **Status is never colour alone.** Correct/incorrect, needs-work/improving/
   strong and task states each pair a glyph and a word with their colour. On the
   screens that tell a candidate what they got wrong, this is not optional.
