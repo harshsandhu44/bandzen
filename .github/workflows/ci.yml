@@ -1,0 +1,30 @@
+# Checks that run on every pull request. The repo had none until now: the
+# `format:check` script existed but nothing invoked it, so unformatted code
+# landed on main and the next person to run `pnpm format` swept dozens of
+# unrelated files into their feature branch. Catching it here is what stops
+# that from recurring.
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - run: pnpm install --frozen-lockfile
+
+      # Respects .prettierignore, which excludes the generated files whose
+      # own writers (drizzle-kit, the content script, semantic-release)
+      # produce different formatting on every run.
+      - run: pnpm format:check
