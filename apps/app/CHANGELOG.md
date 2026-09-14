@@ -1,3 +1,10 @@
+## app [1.8.1](https://github.com/harshsandhu44/bandzen/compare/app@1.8.0...app@1.8.1) (2026-09-14)
+
+
+### Bug Fixes
+
+* **app:** alert on unattributable Polar events; allow discount codes at checkout ([#69](https://github.com/harshsandhu44/bandzen/issues/69)) ([01cd817](https://github.com/harshsandhu44/bandzen/commit/01cd817a8f72e52a2945509cd6d4a60e80d75e0b)), closes [#65](https://github.com/harshsandhu44/bandzen/issues/65)
+
 # app [1.8.0](https://github.com/harshsandhu44/bandzen/compare/app@1.7.0...app@1.8.0) (2026-09-14)
 
 
