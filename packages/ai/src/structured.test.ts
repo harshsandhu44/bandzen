@@ -2,6 +2,7 @@ import assert from 'node:assert/strict';
 import test from 'node:test';
 import { z } from 'zod';
 import {
+  createStructured,
   ModelOutputError,
   parseStructured,
   strictJsonSchema,
@@ -125,4 +126,44 @@ test('emits no $ref, which strict mode could not follow', () => {
   );
   assert.equal(json.includes('$ref'), false);
   assert.equal(json.includes('$defs'), false);
+});
+
+test('retries once when the model breaks the contract, then gives up', async () => {
+  const body = JSON.stringify({
+    band: 7,
+    criteria: [],
+    annotations: [],
+    strengths: [],
+    weaknesses: [],
+  });
+  const replies = (...contents: string[]) => {
+    let calls = 0;
+    return { create: async () => ok(contents[calls++]!), calls: () => calls };
+  };
+  let retries = 0;
+  const onRetry = () => retries++;
+
+  const once = replies('{ "band": 7, "criteria": [', body);
+  const { parsed, tries } = await createStructured(
+    once.create,
+    writingEvaluationSchema,
+    onRetry,
+  );
+  assert.equal(parsed.band, 7);
+  assert.equal(tries, 2);
+  assert.equal(retries, 1);
+
+  const twice = replies('not json', 'still not json', body);
+  await assert.rejects(
+    createStructured(twice.create, writingEvaluationSchema, onRetry),
+    ModelOutputError,
+  );
+  assert.equal(twice.calls(), 2);
+
+  const clean = replies(body);
+  assert.equal(
+    (await createStructured(clean.create, writingEvaluationSchema, onRetry))
+      .tries,
+    1,
+  );
 });

@@ -114,3 +114,34 @@ export function parseStructured<T>(
   }
   return result.data;
 }
+
+/**
+ * `parseStructured` with one more try when the model broke the contract.
+ *
+ * For models that accept no `response_format`, where the shape is prose asking
+ * nicely and compliance is not deterministic -- #74 measured 3 contract
+ * failures in 17 full Speaking tests. Only a parse failure retries: a failed
+ * request has already been retried by the SDK, and a second failure throws.
+ */
+export async function createStructured<T>(
+  create: () => Promise<ChatCompletion>,
+  schema: z.ZodType<T>,
+  onRetry: (error: unknown) => void,
+): Promise<{ response: ChatCompletion; parsed: T; tries: number }> {
+  const first = await create();
+  try {
+    return {
+      response: first,
+      parsed: parseStructured(first, schema),
+      tries: 1,
+    };
+  } catch (error) {
+    onRetry(error);
+  }
+  const second = await create();
+  return {
+    response: second,
+    parsed: parseStructured(second, schema),
+    tries: 2,
+  };
+}

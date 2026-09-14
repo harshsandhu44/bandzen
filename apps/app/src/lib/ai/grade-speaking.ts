@@ -14,7 +14,7 @@ import { openai } from './client';
 import { SPEAKING_GRADER_MODEL } from './models';
 import { buildSpeakingMessages } from './messages';
 import { speakingEvaluationSchema } from './schemas';
-import { parseStructured } from './structured';
+import { createStructured } from './structured';
 
 /** Half-band rounding, and never outside the scale whatever the model says. */
 const toBand = (n: number) => Math.min(9, Math.max(0, Math.round(n * 2) / 2));
@@ -37,9 +37,8 @@ export async function gradeSpeaking(attemptId: string) {
   let gradedUserId: string | null = null;
   let gradedBand: number | null = null;
   // Hoisted for the catch: `response` and `clips` are scoped to the try, and
-  // the failure line is exactly where this is worth knowing. The audio total
-  // is the load-bearing one -- `gpt-audio-1.5` stops hearing our recordings
-  // past some length, so a failure without it cannot be told from any other.
+  // the failure line is exactly where this is worth knowing. `requestId` is
+  // the latest try's, so a failure after the retry names the second request.
   let requestId = 'unknown';
   let clipCount = 0;
   let audioSeconds = 0;
@@ -116,15 +115,27 @@ export async function gradeSpeaking(attemptId: string) {
       }),
     );
 
-    const response = await openai().chat.completions.create({
-      model: SPEAKING_GRADER_MODEL,
-      modalities: ['text'],
-      messages: buildSpeakingMessages(work.prompts, clips),
-    });
-
-    requestId = response._request_id ?? 'unknown';
-
-    const parsed = parseStructured(response, speakingEvaluationSchema);
+    // `gpt-audio-mini` takes no `response_format`, so the JSON shape is only
+    // asked for in prose and it sometimes stops mid-object or strays outside
+    // the enum (#74). One retry, logged, rather than a failed attempt on a
+    // test the candidate completed.
+    const { response, parsed, tries } = await createStructured(
+      async () => {
+        const r = await openai().chat.completions.create({
+          model: SPEAKING_GRADER_MODEL,
+          modalities: ['text'],
+          messages: buildSpeakingMessages(work.prompts, clips),
+        });
+        requestId = r._request_id ?? 'unknown';
+        return r;
+      },
+      speakingEvaluationSchema,
+      (error) =>
+        console.warn(
+          `[grade-speaking] ${attemptId} broke the JSON contract, retrying · request ${requestId} · clips ${clipCount} · audio ${audioSeconds}s`,
+          error,
+        ),
+    );
 
     // Drop annotations the model did not actually lift from an answer -- a
     // quote the review page cannot find in a transcript is one it cannot show.
@@ -164,7 +175,7 @@ export async function gradeSpeaking(attemptId: string) {
 
     const usage = response.usage;
     console.log(
-      `[grade-speaking] ${attemptId} band ${band} · model ${SPEAKING_GRADER_MODEL} · request ${requestId} · clips ${clipCount} · audio ${audioSeconds}s · cached_tokens ${
+      `[grade-speaking] ${attemptId} band ${band} · model ${SPEAKING_GRADER_MODEL} · request ${requestId} · clips ${clipCount} · audio ${audioSeconds}s · tries ${tries} · cached_tokens ${
         usage?.prompt_tokens_details?.cached_tokens ?? 0
       }/${usage?.prompt_tokens ?? 0} · completion_tokens ${
         usage?.completion_tokens ?? 0
