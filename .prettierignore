@@ -1,1 +1,10 @@
 pnpm-lock.yaml
+
+# Generated files whose writers revert prettier's output on every run, so
+# formatting them is permanent churn rather than a one-time tidy.
+# drizzle-kit writes expanded JSON snapshots on every `db:generate`:
+apps/app/drizzle/
+# `generate-listening-content.mts` writes JSON.stringify(x, null, 2):
+apps/app/content/
+# semantic-release rewrites these on every release:
+**/CHANGELOG.md
