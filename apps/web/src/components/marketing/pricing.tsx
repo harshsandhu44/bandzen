@@ -108,7 +108,7 @@ export function Pricing() {
         </div>
 
         <p className="text-slate mt-8 font-mono text-[0.625rem] tracking-[0.16em] uppercase">
-          {pricing.note} Items marked planned do not work yet.
+          {pricing.note}
         </p>
       </Container>
     </section>

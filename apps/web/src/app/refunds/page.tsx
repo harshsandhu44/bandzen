@@ -30,8 +30,9 @@ export default function RefundsPage() {
       <Clause title="Cancelling">
         <p>
           You can cancel a Bandzen Pro subscription at any time from Settings
-          inside the app, which opens your billing portal at Polar. No email, no
-          form, no retention call.
+          inside the app, in one step. No email, no form, no retention call.
+          Your invoices are in your billing portal at Polar, linked from the
+          same page.
         </p>
         <p>
           Cancelling stops the next charge. It does not end your access
@@ -59,16 +60,6 @@ export default function RefundsPage() {
           After {legal.refundDays} days we do not refund a charge as a matter of
           course, but we would rather hear from you than not — if something has
           gone wrong at our end, write to us and we will put it right.
-        </p>
-      </Clause>
-
-      <Clause title="Features described as planned">
-        <p>
-          Some things on our pricing page are marked <strong>planned</strong>.
-          They do not work yet, and we do not claim otherwise anywhere in the
-          product. If you subscribed partly because of one of them and it has
-          not arrived, that is exactly the kind of situation the{' '}
-          {legal.refundDays}-day refund exists for.
         </p>
       </Clause>
 

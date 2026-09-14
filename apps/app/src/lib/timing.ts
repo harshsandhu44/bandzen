@@ -35,8 +35,12 @@ export const SEEDED_QUESTIONS_PER_PASSAGE = 13;
  */
 export const DIAGNOSTIC_SECTION_MINUTES = { reading: 40, writing: 40 } as const;
 
-/** The diagnostic's length, for prose. Listening's real length depends on the 2 tracks picked. */
-export const DIAGNOSTIC_DURATION_LABEL = 'About 1 hr 15 min';
+/**
+ * The diagnostic's length, for prose: Listening ~5 (two ~2-minute tracks),
+ * Reading 40, Writing 40, Speaking ~10 (Part 1–3 answer caps plus Part 2
+ * prep). Listening's real length depends on the 2 tracks picked.
+ */
+export const DIAGNOSTIC_DURATION_LABEL = 'About 1 hr 35 min';
 
 /** A single reading section's allowance, for prose. */
 export const READING_SECTION_DURATION_LABEL = `${minutesFor(

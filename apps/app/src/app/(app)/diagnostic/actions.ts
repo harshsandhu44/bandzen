@@ -32,9 +32,9 @@ import {
  * engine as `/mock`: a `mock_attempts` row with `kind = 'diagnostic'`, its
  * section `attempts` created lazily as the candidate reaches each one.
  *
- * Two passages, two tracks, one Task 2 essay, and — for Pro — a full speaking
- * interview. On Free the sitting closes after Writing and Speaking is a locked
- * card on the result. Resuming is always free.
+ * Two passages, two tracks, one Task 2 essay, and a full speaking interview —
+ * on every plan, since every sitting runs all four skills (see `mockPosition`).
+ * Resuming is always free.
  */
 export async function startDiagnostic(formData: FormData) {
   const targetBand = Number(String(formData.get('targetBand') ?? ''));
