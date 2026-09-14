@@ -27,6 +27,13 @@ import { sliceWav } from '../src/lib/wav.ts';
  *   A  one clip, 10s -> 120s .................. where the cliff is at all
  *   B  60s total as 1 / 3 / 8 clips ........... per-clip vs per-request
  *   C  60s as wav_16000 / wav_8000 / mp3 ...... payload size vs duration
+ *   D  a whole test, every prompt answered .... what production actually sends
+ *
+ * Arm D exists because the first three all send a *partial* test, and that
+ * turned out to be the variable rather than a control: `gpt-audio-1.5` answers
+ * a lone Part 2 with "please provide the rest of the test" whether or not it
+ * heard anything, while `gpt-audio-mini` grades whatever it is handed. Only D
+ * answers the question the migration turns on.
  *
  * Arm B decides whether chunking the interview is even on the table: production
  * already sends one `input_audio` part per prompt, so a per-clip limit is
@@ -55,16 +62,22 @@ const PRICES_USD_PER_MTOK: Record<
   { in: number; audioIn: number; out: number }
 > = {
   'gpt-audio-mini': { in: 0.6, audioIn: 10, out: 2.4 },
-  'gpt-audio': { in: 2.5, audioIn: 40, out: 10 },
+  'gpt-audio': { in: 2.5, audioIn: 32, out: 10 },
   'gpt-audio-1.5': { in: 2.5, audioIn: 32, out: 10 },
 };
 
 /**
- * The #70 signature. Only a reply matching this is evidence about the cliff —
- * anything else that fails to parse is the fixture misbehaving, not the model
- * going deaf, and the two must not be summed into one number.
+ * The #70 signature — *"I don't have the candidate's spoken answers"*.
+ *
+ * It is flagged on a declined reply rather than counted as its own verdict.
+ * The first run of this sweep scored it as "the model heard nothing", and the
+ * replies said otherwise: `gpt-audio-1.5` phrases *"please provide the audio
+ * for the rest of the test"* identically whether it heard nothing or heard a
+ * fragment and wants the whole test. Two verdicts and the replies printed in
+ * full is the honest reporting; a third bucket just moved the guess into the
+ * table where it looked like a measurement.
  */
-const DEAF =
+const NO_AUDIO =
   /don'?t (have|hear)|did not (receive|hear)|no audio|unable to (hear|listen)|provide .{0,30}(audio|spoken|recording)/i;
 
 function arg(name: string, fallback?: string) {
@@ -103,6 +116,23 @@ I went with two friends from university. We've known each other for about eight 
 What made it enjoyable was a combination of things. The obvious one is the scenery. When you come over the last section of the ridge the valley opens up completely and you can see three or four lakes at once, and on a clear day you can apparently see the coast, although we couldn't quite make that out. We sat up there for nearly an hour eating sandwiches and nobody really said very much, which I think says something.
 But the other part, and maybe the more important part, is that it was a full day with no phones and no work. I'd been going through quite a stressful period at my job at the time, working long hours, and the walk forced me to just switch off for eight hours straight. By the time we got back down to the car park I felt genuinely different, much calmer, in a way that a weekend at home never achieves.
 I'd say the physical challenge added to it as well. It wasn't dangerous, but it was hard enough that finishing it felt like an achievement. There's a satisfaction in being tired for a good reason. Since then we've tried to do something similar every few months, though we haven't managed a route quite as good as that one yet.`;
+
+/**
+ * One complete answer per prompt, for arm D. Short, but each ends on a full
+ * stop rather than mid-word: arms A-C slice a long monologue at an arbitrary
+ * offset, and a model can tell.
+ */
+const ANSWERS: Record<number, string> = {
+  1: "Probably not as much as I'd like, honestly. On a normal working week maybe an hour a day, mostly just walking to and from the station. At weekends it's better, I'll usually try to get out for a few hours on the Saturday if the weather holds.",
+  2: "Cycling is very popular here, partly because the council put in a proper network of bike lanes about five years ago. Running as well, and there's a big park just north of the centre where people play football on Sunday mornings. Swimming outdoors has become quite fashionable recently too.",
+  3: "I prefer it cool and dry, to be honest. Anything above about twenty-five degrees and I find it uncomfortable to do anything active. Overcast but mild is ideal for me. I don't mind a bit of rain either, as long as there's no wind with it.",
+  4: 'Yes, much more than now. We lived near the countryside and my parents more or less pushed us out of the house at weekends. I spent most of my childhood summers on a bicycle. Looking back I think it was good for me, although at the time I complained about it constantly.',
+  6: 'I think a lot of it comes down to what you grew up with. If your family took you outdoors as a child it feels natural later on. There are practical reasons too, though — indoor activities are more reliable, you can plan them, and they do not depend on the weather or on daylight.',
+  7: "The obvious benefit is physical health, but I'd say the social side matters just as much. Parks are one of the few places where people from different backgrounds actually share a space. There's an environmental argument as well, since green space helps with air quality and with cooling the city in summer.",
+  8: "Time is the biggest one, I think. People work long hours and the commute eats whatever is left. Distance matters too — if the nearest real green space is forty minutes away, it stops being something you do casually. And for some people it's a question of cost, because getting out of the city is not free.",
+  9: "That's a difficult balance. My view is that access should be the default, but with limits in the most fragile areas — permits, seasonal closures, that kind of thing. The risk of restricting too much is that people stop feeling any connection to these places, and then there's no public support for protecting them at all.",
+  10: "I suspect we'll see much more use of smaller spaces — rooftops, canals, disused railway lines converted into paths. There will probably be more pressure on the bigger parks, which may mean booking systems for certain activities. I'd also expect more people travelling out of the city at weekends, which brings its own problems.",
+};
 
 /** The 60s script for arm C — one text, three containers. */
 const SHORT_ANSWER = ANSWER.split('\n').slice(0, 3).join('\n');
@@ -232,12 +262,79 @@ async function conditions(): Promise<Condition[]> {
     }
   }
 
+  if (ARMS.includes('D')) {
+    // Production's shape: every prompt in the test answered, Part 2 by the
+    // full monologue, and nothing truncated. 10 clips, one model call.
+    const clips: Array<{ promptId: string; bytes: Uint8Array }> = [];
+    let seconds = 0;
+    for (const p of PROMPTS) {
+      const idx = Number(p.promptId.slice(1));
+      const bytes =
+        p.part === 2 ? master : await fixture(ANSWERS[idx]!, 'wav_16000');
+      clips.push({ promptId: p.promptId, bytes });
+      seconds += wavSeconds(bytes);
+    }
+    out.push({
+      arm: 'D',
+      name: 'full-test',
+      clips,
+      prompts: PROMPTS,
+      format: 'wav',
+      seconds,
+    });
+
+    // Partial coverage in production's shape: every prompt still listed, so
+    // `buildSpeakingMessages` emits `[No response recorded for this prompt.]`
+    // for the gaps and appends its coverage warning. This is what #70 replayed
+    // -- real attempts are mostly half-finished -- and the one case that would
+    // still break the migration.
+    const answered = new Set(['p1', 'p5', 'p6']);
+    out.push({
+      arm: 'D',
+      name: 'partial-3of10',
+      clips: clips.filter((c) => answered.has(c.promptId)),
+      prompts: PROMPTS,
+      format: 'wav',
+      seconds: clips
+        .filter((c) => answered.has(c.promptId))
+        .reduce((n, c) => n + wavSeconds(c.bytes), 0),
+    });
+
+    // #70's actual failing shape: a few short answers and no Part 2 long turn,
+    // every prompt still listed. `partial-3of10` above carries the 123s
+    // monologue, which may be the whole reason it passes.
+    const thin = new Set(['p1', 'p6']);
+    out.push({
+      arm: 'D',
+      name: 'partial-short',
+      clips: clips.filter((c) => thin.has(c.promptId)),
+      prompts: PROMPTS,
+      format: 'wav',
+      seconds: clips
+        .filter((c) => thin.has(c.promptId))
+        .reduce((n, c) => n + wavSeconds(c.bytes), 0),
+    });
+
+    // The control for it: one Part 1 prompt, one complete answer. Separates
+    // "the utterance was a fragment" from "the test was incomplete".
+    const solo = PROMPTS[0]!;
+    const bytes = await fixture(ANSWERS[1]!, 'wav_16000');
+    out.push({
+      arm: 'D',
+      name: '1-complete',
+      clips: [{ promptId: solo.promptId, bytes }],
+      prompts: [solo],
+      format: 'wav',
+      seconds: wavSeconds(bytes),
+    });
+  }
+
   return out;
 }
 
 // --- The run ----------------------------------------------------------------
 
-type Verdict = 'heard' | 'deaf' | 'other' | 'error';
+type Verdict = 'heard' | 'declined' | 'error';
 
 async function runOne(model: string, c: Condition) {
   const messages = buildSpeakingMessages(c.prompts, c.clips);
@@ -265,13 +362,26 @@ async function runOne(model: string, c: Condition) {
   const reply = response.choices[0]?.message?.content ?? '';
 
   let verdict: Verdict;
+  let why = '';
   try {
     parseStructured(response, speakingEvaluationSchema);
     verdict = 'heard';
-  } catch {
-    verdict = DEAF.test(reply) ? 'deaf' : 'other';
+  } catch (e) {
+    verdict = 'declined';
+    // Which of `parseStructured`'s six refusals it was. A model answering in
+    // prose and a model emitting JSON that fails the schema are different
+    // problems, and the reply text alone does not separate them.
+    why = (e as Error).message;
   }
-  return { verdict, reply, latencyMs, usage: response.usage };
+  return {
+    verdict,
+    why,
+    reply,
+    noAudio: NO_AUDIO.test(reply),
+    finish: response.choices[0]?.finish_reason ?? '?',
+    latencyMs,
+    usage: response.usage,
+  };
 }
 
 const cases = await conditions();
@@ -282,8 +392,7 @@ for (const model of MODELS) {
   for (const c of cases) {
     const counts: Record<Verdict, number> = {
       heard: 0,
-      deaf: 0,
-      other: 0,
+      declined: 0,
       error: 0,
     };
     const latencies: number[] = [];
@@ -303,7 +412,7 @@ for (const model of MODELS) {
         outTok += r.usage?.completion_tokens ?? 0;
         if (r.verdict !== 'heard') {
           unexplained.push(
-            `${model} ${c.arm}/${c.name} ${r.verdict}: ${r.reply.slice(0, 200).replace(/\s+/g, ' ')}`,
+            `${model} ${c.arm}/${c.name} [finish=${r.finish}]${r.noAudio ? ' [#70 wording]' : ''}\n      ${r.why.slice(0, 220).replace(/\s+/g, ' ')}`,
           );
         }
       } catch (e) {
@@ -331,8 +440,7 @@ for (const model of MODELS) {
       audio: `${c.seconds.toFixed(1)}s`,
       KB: Math.round(c.clips.reduce((n, x) => n + x.bytes.length, 0) / 1024),
       heard: counts.heard,
-      deaf: counts.deaf,
-      other: counts.other,
+      declined: counts.declined,
       err: counts.error,
       'p50 ms': latencies.length
         ? [...latencies].sort((a, b) => a - b)[latencies.length >> 1]!
@@ -346,7 +454,7 @@ for (const model of MODELS) {
     });
     const last = summary.at(-1)!;
     console.log(
-      `  ${model} ${c.arm}/${c.name}: ${counts.heard} heard, ${counts.deaf} deaf, ${counts.other} other, ${counts.error} err · ${last['$ / call']}`,
+      `  ${model} ${c.arm}/${c.name}: ${counts.heard} heard, ${counts.declined} declined, ${counts.error} err · ${last['$ / call']}`,
     );
   }
 }
@@ -359,10 +467,10 @@ if (unexplained.length) {
 }
 
 console.log(
-  '\nOnly `deaf` is evidence about the cliff. `other` means the model answered\n' +
-    'something else entirely — re-read the replies above before concluding\n' +
-    'anything from it, because a fixture the model finds ungradeable looks the\n' +
-    'same in a count as a model that heard nothing.\n' +
+  '\nA `declined` count is not a measurement on its own — read the replies.\n' +
+    'A model that heard nothing and a model that heard a fragment and wants the\n' +
+    'rest of the test word them almost identically, and only arm D sends the\n' +
+    'shape production actually sends.\n' +
     '\n' +
     'The incumbent (gpt-audio-mini) is the floor: it should be `heard` on every\n' +
     'row. Anything else means the fixture is the variable, not the model.\n' +
