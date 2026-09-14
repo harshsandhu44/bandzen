@@ -5,6 +5,7 @@ import {
   type RunnerQuestion,
   type RunnerSaved,
 } from '@/components/exam/objective-runner';
+import { Passage } from '@/components/exam/passage';
 import { saveReadingAnswer, submitReadingAttempt } from '../actions';
 
 export const TFNG = ['TRUE', 'FALSE', 'NOT GIVEN'];
@@ -32,7 +33,7 @@ type Props = {
   minutes: number;
   /** Diagnostic and mock attempts auto-submit at 0:00; practice only warns. */
   autoSubmit: boolean;
-  passage: { title: string; body: string };
+  passage: { id: string; title: string; body: string };
   headings: string[] | null;
   questions: RunnerQuestion[];
   saved: RunnerSaved[];
@@ -63,11 +64,7 @@ export function ReadingTest({
       left={
         <>
           <h1 className="mb-6 font-title text-title">{passage.title}</h1>
-          {passage.body.split(/\n\s*\n/).map((para, i) => (
-            <p key={i} className="mb-4 text-sm leading-7 whitespace-pre-line">
-              {para}
-            </p>
-          ))}
+          <Passage id={passage.id} body={passage.body} />
         </>
       }
       questions={questions}
@@ -87,6 +84,7 @@ export function ReadingTest({
         q.kind === 'matching_headings' ? headingOptions : null
       }
       timer={{ startedAt, minutes, autoSubmit }}
+      highlightKey={`reading-highlights-${attemptId}`}
     />
   );
 }

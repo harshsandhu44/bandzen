@@ -765,6 +765,7 @@ export async function getReadingTest(userId: string, attemptId: string) {
 
   const [passage] = await db
     .select({
+      id: passages.id,
       title: passages.title,
       body: passages.body,
       headings: passages.headings,
