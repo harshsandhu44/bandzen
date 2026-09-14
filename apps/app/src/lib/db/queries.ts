@@ -1028,7 +1028,7 @@ export async function getReadingReview(userId: string, attemptId: string) {
   if (!attempt?.passageId || attempt.status !== 'complete') return null;
 
   const [passage] = await db
-    .select({ title: passages.title })
+    .select({ id: passages.id, title: passages.title, body: passages.body })
     .from(passages)
     .where(eq(passages.id, attempt.passageId));
   if (!passage) return null;
