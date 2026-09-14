@@ -1,5 +1,4 @@
 import Link from 'next/link';
-import { currentUser } from '@clerk/nextjs/server';
 import { Check, Clock } from 'lucide-react';
 import { Badge } from '@bandzen/ui/components/badge';
 import { Button } from '@bandzen/ui/components/button';
@@ -18,17 +17,23 @@ import {
   FREE_COACH_MESSAGES_PER_WINDOW,
   FREE_ESSAYS_PER_WINDOW,
   FREE_PRACTICE_TESTS_PER_MODULE,
-  PLANS,
-  formatInr,
-  isFoundingActive,
   isProAt,
+} from '@/lib/entitlements';
+import { resolveCurrency } from '@/lib/currency';
+import { polarPricing } from '@/lib/polar';
+import { asCurrency, overridesFor } from '@bandzen/pricing/currency';
+import {
+  PLANS,
+  formatMoney,
   perDay,
   perMonth,
   priceOf,
   savingsPercent,
-} from '@/lib/entitlements';
-import { foundingEndsAt } from '@/lib/razorpay';
+} from '@bandzen/pricing/plans';
+import { foundingPrice } from '@bandzen/pricing/polar';
+import { startCheckout } from './actions';
 import { CheckoutButton } from './checkout-button';
+import { CurrencyPicker } from './currency-picker';
 
 export const metadata = { title: 'Bandzen Pro' };
 
@@ -54,9 +59,8 @@ export default async function UpgradePage(props: PageProps<'/upgrade'>) {
   const source =
     typeof searchParams.from === 'string' ? searchParams.from : 'direct';
 
-  const [user, profile, subscription, reading, writing, listening, speaking] =
+  const [profile, subscription, reading, writing, listening, speaking] =
     await Promise.all([
-      currentUser(),
       getProfile(userId),
       getSubscription(userId),
       latestBand(userId, 'reading'),
@@ -67,10 +71,20 @@ export default async function UpgradePage(props: PageProps<'/upgrade'>) {
 
   await capture(userId, 'upgrade_viewed', { source });
 
-  const founding = isFoundingActive(foundingEndsAt());
-  const endsAt = foundingEndsAt();
+  // What they already pay in wins over where they are — a subscriber abroad is
+  // still billed in the currency they signed up in, and has nothing to pick.
+  const { currency: geoCurrency, geo } = await resolveCurrency();
+  const locked = asCurrency(subscription?.currency);
+  const currency = locked ?? geoCurrency;
+
+  const { prices, founding } = await polarPricing();
+  // Every live founding discount shares a deadline, so any one of them dates
+  // the offer.
+  const endsAt =
+    Object.values(founding).find((d) => d.off[currency] != null)?.endsAt ?? null;
+
   const hasTimeLeft = isProAt(subscription?.currentPeriodEnd);
-  const paying = hasTimeLeft && subscription?.razorpaySubscriptionId != null;
+  const paying = hasTimeLeft && subscription?.polarSubscriptionId != null;
 
   const days = profile?.testDate
     ? daysUntil(profile.testDate, profile.timezone)
@@ -153,16 +167,30 @@ export default async function UpgradePage(props: PageProps<'/upgrade'>) {
             <SectionHeader as="h2">
               <span id="plans">Choose a plan</span>
             </SectionHeader>
-            {founding && endsAt ? (
-              <Eyebrow className="text-chrome">
-                Founding price until {DATE.format(endsAt)}
-              </Eyebrow>
-            ) : null}
+            <div className="flex items-center gap-3">
+              {endsAt ? (
+                <Eyebrow className="text-chrome">
+                  Founding price until {DATE.format(endsAt)}
+                </Eyebrow>
+              ) : null}
+              {/* Nothing to choose once a subscription fixed the currency:
+                  `startCheckout` prefers the stored one, so a picker here
+                  would look like it worked and change nothing. */}
+              {locked ? null : (
+                <CurrencyPicker
+                  current={currency}
+                  options={overridesFor(geo)}
+                />
+              )}
+            </div>
           </div>
 
           <div className="grid gap-3 sm:grid-cols-2">
             {PLANS.map((plan) => {
-              const saving = savingsPercent(plan, founding);
+              const saving = savingsPercent(prices, plan, currency);
+              const standard = priceOf(prices, plan, currency);
+              const price = foundingPrice(standard, founding[plan.key], currency);
+              const discounted = price !== standard;
               return (
                 <div
                   key={plan.key}
@@ -180,31 +208,30 @@ export default async function UpgradePage(props: PageProps<'/upgrade'>) {
                     </div>
 
                     <p className="font-metric text-metric">
-                      {formatInr(priceOf(plan, founding))}
+                      {formatMoney(price, currency)}
                     </p>
 
                     <p className="text-xs text-muted-foreground tabular-nums">
                       {plan.months === 1
-                        ? `${perDay(plan, founding)} a day`
-                        : `${formatInr(perMonth(plan, founding))} a month · billed once`}
+                        ? `${perDay(prices, plan, currency)} a day`
+                        : `${formatMoney(perMonth(prices, plan, currency), currency)} a month · billed once`}
                     </p>
 
-                    {founding ? (
+                    {discounted ? (
                       <p className="text-xs text-muted-foreground">
-                        Rises to {formatInr(plan.standard)} after the founding
-                        window. You keep this price while you stay subscribed.
+                        Rises to {formatMoney(standard, currency)} after the
+                        founding window. You keep this price while you stay
+                        subscribed.
                       </p>
                     ) : null}
                   </div>
 
-                  <CheckoutButton
-                    planKey={plan.key}
-                    source={source}
-                    label={`Choose ${plan.label.toLowerCase()}`}
-                    variant={plan.featured ? 'default' : 'outline'}
-                    email={user?.primaryEmailAddress?.emailAddress}
-                    name={user?.firstName}
-                  />
+                  <form action={startCheckout.bind(null, plan.key, source)}>
+                    <CheckoutButton
+                      label={`Choose ${plan.label.toLowerCase()}`}
+                      variant={plan.featured ? 'default' : 'outline'}
+                    />
+                  </form>
                 </div>
               );
             })}

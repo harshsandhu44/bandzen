@@ -1,10 +1,19 @@
+import { Suspense } from 'react';
+
 import {
   Clause,
   LegalPage,
   RegisteredDetails,
 } from '@/components/marketing/legal-page';
-import { legal, pricing } from '@/content/sections';
+import { ProPriceSentence } from '@/components/marketing/tier-price';
+import { legal } from '@/content/sections';
 
+/**
+ * ponytail: the merchant-of-record clauses below are an unreviewed draft.
+ * Polar selling on our behalf changes who the customer's contract is with,
+ * which is a legal position and not a copy change. Have someone qualified read
+ * this before it goes live.
+ */
 export const metadata = {
   title: 'Refunds and cancellation',
   description:
@@ -21,7 +30,8 @@ export default function RefundsPage() {
       <Clause title="Cancelling">
         <p>
           You can cancel a Bandzen Pro subscription at any time from Settings
-          inside the app. No email, no form, no retention call.
+          inside the app, which opens your billing portal at Polar. No email, no
+          form, no retention call.
         </p>
         <p>
           Cancelling stops the next charge. It does not end your access
@@ -39,10 +49,11 @@ export default function RefundsPage() {
           {legal.email} is enough.
         </p>
         <p>
-          Refunds are issued to the original payment method through Razorpay.
-          Once we approve one, Razorpay typically returns the money to your bank
-          or card within 5–7 working days; the exact timing is your
-          bank&rsquo;s, not ours.
+          Refunds are issued to the original payment method through Polar, our
+          merchant of record. Once we approve one, the money typically reaches
+          your bank or card within 5&ndash;10 working days; the exact timing is
+          your bank&rsquo;s, not ours. A refund returns the tax you paid along
+          with the price.
         </p>
         <p>
           After {legal.refundDays} days we do not refund a charge as a matter of
@@ -63,10 +74,9 @@ export default function RefundsPage() {
 
       <Clause title="What you are paying for">
         <p>
-          Bandzen Pro is currently {pricing.tiers[1].price}{' '}
-          {pricing.tiers[1].period}, {pricing.tiers[1].alt}. Prices are in
-          Indian Rupees and include any applicable taxes unless stated otherwise
-          at checkout.
+          <Suspense fallback="Bandzen Pro is a paid subscription.">
+            <ProPriceSentence />
+          </Suspense>
         </p>
         <p>
           Band scores produced by Bandzen are estimates generated for practice.

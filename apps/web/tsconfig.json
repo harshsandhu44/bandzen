@@ -3,7 +3,10 @@
   "compilerOptions": {
     "paths": {
       "@/*": ["./src/*"]
-    }
+    },
+    // `@bandzen/pricing` is consumed as source and imports its own modules
+    // with explicit extensions, which is what lets `node --test` type-strip it.
+    "allowImportingTsExtensions": true
   },
   "include": [
     "next-env.d.ts",

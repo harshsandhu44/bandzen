@@ -7,6 +7,12 @@ import {
 } from '@/components/marketing/legal-page';
 import { legal } from '@/content/sections';
 
+/**
+ * ponytail: the merchant-of-record clauses below are an unreviewed draft.
+ * Polar selling on our behalf changes who the customer's contract is with,
+ * which is a legal position and not a copy change. Have someone qualified read
+ * this before it goes live.
+ */
 export const metadata = {
   title: 'Privacy policy',
   description:
@@ -39,8 +45,10 @@ export default function PrivacyPage() {
           account id so we can tell whether the product works.
         </p>
         <p>
-          We do not collect payment card details. Razorpay does, and we never
-          see them.
+          We do not collect payment card details, and we never see them. Polar
+          is the merchant of record for every Bandzen purchase: it takes the
+          payment, issues the receipt and handles any sales tax or VAT due
+          where you live. Polar processes cards through Stripe.
         </p>
       </Clause>
 
@@ -56,10 +64,11 @@ export default function PrivacyPage() {
       <Clause title="Who processes it">
         <p>
           A small set of providers, each doing one job: authentication, database
-          hosting, application hosting, product analytics, payment processing
-          (Razorpay), and the AI models that generate marking and coaching. Your
-          essays are sent to a model provider in order to be marked; they are
-          not used to train anyone&rsquo;s models.
+          hosting, application hosting, product analytics, payments (Polar, as
+          merchant of record, and Stripe as its card processor), and the AI
+          models that generate marking and coaching. Your essays are sent to a
+          model provider in order to be marked; they are not used to train
+          anyone&rsquo;s models.
         </p>
       </Clause>
 

@@ -51,14 +51,14 @@ export const cta = {
  *
  * `entity` and `address` are null until the business is registered. Null rather
  * than a placeholder because these render on five public pages, and one saying
- * "[REGISTERED ADDRESS]" is worse to a customer — and to Razorpay's activation
- * reviewer — than one saying nothing. Every page that uses them already handles
+ * "[REGISTERED ADDRESS]" is worse to a customer — and to a payout reviewer —
+ * than one saying nothing. Every page that uses them already handles
  * the absence, so filling them in here is the only step: the registered-details
  * blocks and the two prose mentions come back on their own.
  *
- * TODO: fill both the moment registration completes. Razorpay's review checks
- * they are real and that the address matches the registration, and they are the
- * last thing blocking it.
+ * TODO: fill both the moment registration completes. Polar's payout onboarding
+ * checks they are real and that the address matches the registration, and they
+ * are the last thing blocking it.
  */
 export const legal = {
   entity: null as string | null,
@@ -396,11 +396,11 @@ export const testimonials = {
 export const pricing = {
   eyebrow: 'Pricing',
   headline: 'Start free. Upgrade when practice turns serious.',
-  note: 'Founding price until 31 October 2026. Cancel any time; refund within 7 days.',
+  note: 'Cancel any time; refund within 7 days.',
   tiers: [
     {
       name: 'Free',
-      price: '₹0',
+      plan: 'free',
       period: 'forever',
       features: [
         { label: '5 Reading and 5 Listening practice tests', planned: false },
@@ -417,10 +417,8 @@ export const pricing = {
     },
     {
       name: 'Pro',
-      price: '₹999',
-      was: '₹1,499',
+      plan: 'pro',
       period: 'per month',
-      alt: 'or ₹1,999 for 3 months',
       features: [
         { label: 'Unlimited AI Writing analysis', planned: false },
         { label: 'Unlimited Bandzen Coach', planned: false },

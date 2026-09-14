@@ -22,6 +22,7 @@ import {
   isProAt,
 } from '@/lib/entitlements';
 import { ProTag } from '@/components/billing/pro';
+import { manageBilling } from '../upgrade/actions';
 import { CancelPlan } from './cancel-plan';
 import { saveSettings } from './actions';
 import pkg from '../../../../package.json';
@@ -43,8 +44,12 @@ export default async function SettingsPage() {
   ]);
 
   const pro = isProAt(subscription?.currentPeriodEnd);
-  const paid = pro && subscription?.razorpaySubscriptionId != null;
-  const granted = pro && subscription?.razorpaySubscriptionId == null;
+  const paid = pro && subscription?.polarSubscriptionId != null;
+  const granted = pro && subscription?.polarSubscriptionId == null;
+  // Anyone who has ever paid keeps a way to their invoices, including after
+  // the subscription ends. Gating the portal on `paid` would mean the people
+  // most likely to want a receipt are the ones who cannot get one.
+  const billed = subscription?.polarSubscriptionId != null;
 
   return (
     <div className="max-w-2xl space-y-6">
@@ -99,22 +104,48 @@ export default async function SettingsPage() {
             ) : null}
           </dl>
 
-          {paid && subscription ? (
-            <CancelPlan
-              until={DATE.format(subscription.currentPeriodEnd)}
-              essaysPerWeek={FREE_ESSAYS_PER_WINDOW}
-              coachPerWeek={FREE_COACH_MESSAGES_PER_WINDOW}
-            />
-          ) : (
-            <Button
-              variant="outline"
-              size="sm"
-              nativeButton={false}
-              render={<Link href="/upgrade?from=settings" />}
-            >
-              {granted ? 'Continue after this ends' : 'See Pro'}
-            </Button>
-          )}
+          {/* One row, three states. Cancelling is ours because the dialog is
+              where someone finds out what they actually lose; invoices are
+              Polar's because it is the Merchant of Record and the receipt is
+              legally its to issue. Both are buttons rather than a button and a
+              paragraph — this panel sits above the fold and prose here pushes
+              everything under it down. */}
+          <div className="flex flex-wrap items-center gap-2">
+            {paid && subscription ? (
+              <CancelPlan
+                until={DATE.format(subscription.currentPeriodEnd)}
+                essaysPerWeek={FREE_ESSAYS_PER_WINDOW}
+                coachPerWeek={FREE_COACH_MESSAGES_PER_WINDOW}
+              />
+            ) : null}
+            {billed ? (
+              <form action={manageBilling}>
+                <Button variant="outline" size="sm" type="submit">
+                  Invoices
+                </Button>
+              </form>
+            ) : null}
+            {pro ? null : (
+              <Button
+                variant="outline"
+                size="sm"
+                nativeButton={false}
+                render={<Link href="/upgrade?from=settings" />}
+              >
+                See Pro
+              </Button>
+            )}
+            {granted ? (
+              <Button
+                variant="outline"
+                size="sm"
+                nativeButton={false}
+                render={<Link href="/upgrade?from=settings" />}
+              >
+                Continue after this ends
+              </Button>
+            ) : null}
+          </div>
         </TabsContent>
 
         <TabsContent value="account" className="space-y-3">

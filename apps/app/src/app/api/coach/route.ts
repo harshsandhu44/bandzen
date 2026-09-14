@@ -13,7 +13,7 @@ import { GRADER_MODEL } from '@/lib/ai/models';
  * Everything else is a server action, deliberately. Streaming is the exception
  * that genuinely needs a handler: a server action resolves to a value, and a
  * chat that sits silent for eight seconds and then appears at once reads as
- * broken. The other exception is `/api/razorpay`, where the caller is Razorpay
+ * broken. The other exception is `/api/polar`, where the caller is Polar
  * rather than a signed-in person and the raw body has to be verified before it
  * is parsed. Neither is a precedent for moving other writes off actions.
  *

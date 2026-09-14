@@ -66,13 +66,24 @@ const ROWS: {
     retention: 'Up to 3 months (only when marketing is on)',
   },
   {
-    name: 'Razorpay checkout.js',
+    name: 'bz_currency',
     category: 'Necessary',
-    setBy: 'Razorpay',
-    purpose: 'Runs the payment form. Loads only when you start a payment.',
-    retention: 'Session',
+    setBy: 'Bandzen',
+    purpose:
+      'Remembers which currency you asked to be shown prices in, so the choice follows you between this site and the app.',
+    retention: '1 year',
   },
 ];
+
+/**
+ * Paying happens on Polar's own site, not here.
+ *
+ * Nothing payment-related is set on bandzen.com — no checkout script, no
+ * Stripe fraud cookie — because the card form is never on our domain. Polar
+ * and Stripe set their own cookies under their own domains, governed by their
+ * policies, which is worth saying plainly rather than listing cookies we do
+ * not set.
+ */
 
 export default function CookiesPage() {
   return (

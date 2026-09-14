@@ -29,11 +29,16 @@ vars, prod schema, error monitoring, a live payment) is done; see #46.
 4. `pnpm db:migrate` to create the schema.
 5. `pnpm content:generate` → review the JSON in `content/passages/` by hand →
    `pnpm content:sql` → `pnpm db:seed`.
-6. In Razorpay: create four plans (founding and standard × monthly and
-   quarterly — a plan's amount is fixed at creation, so a price change is a new
-   plan), then add a webhook pointing at `/api/razorpay` subscribed to
-   `subscription.activated`, `.charged`, `.pending`, `.halted`, `.cancelled`
-   and `.completed`. Put the ids and both secrets in `.env.local`.
+6. In Polar: create two products (Monthly, and 3 months as a monthly interval
+   with a count of 3), each priced in INR, USD, GBP and EUR; set the
+   organisation's tax behaviour to **Inclusive** so the advertised price is the
+   charged price. Add two fixed-amount discounts coded `FOUNDINGMONTHLY` and
+   `FOUNDINGQUARTERLY` — matched as exact strings, so a typo silently means
+   no founding price rather than an error — INR only, each restricted to its
+   product and both sharing one `ends_at`. Then add a webhook pointing at `/api/polar`
+   subscribed to `subscription.active`, `.updated`, `.uncanceled`, `.canceled`,
+   `.revoked` and `order.paid`. Put the product ids, the access token and the
+   webhook secret in `.env.local`.
 7. `pnpm dev` from the repo root.
 
 | Command                   | What it does                                      |
@@ -55,11 +60,11 @@ Sign-up is open in Clerk — anyone can create an account. What they get once in
 is decided by `subscriptions`: **`isPro` is `current_period_end > now()`**, one
 date comparison, and everything falls out of it. A cancellation keeps the period
 already paid for because cancelling does not move the date; a failed renewal
-simply never extends it, so Razorpay's retry window is a grace period at no
+simply never extends it, so Polar's retry window is a grace period at no
 cost; and a comped account — the founding cohort, a new candidate's seven-day
-trial — is a row with a future date and no Razorpay id, needing no special case
-anywhere. Razorpay's `status` is stored but never consulted for access; it is
-there to render a banner.
+trial — is a row with a future date and no Polar subscription id, needing no
+special case anywhere. Polar's `status` is stored but never consulted for
+access; it is there to render a banner.
 
 Free is metered on the two things that cost money to serve: **2 marked essays
 and 10 Coach messages per rolling seven days**, plus one diagnostic. Reading,
@@ -85,8 +90,9 @@ numbers is what it is.
 Clerk dropped `createRouteMatcher` because middleware protection relies on path
 matching, which can diverge from how Next actually routes a request and leave a
 protected resource reachable. So the gate is at each resource instead: every
-page calls `requireUserId()`, `/api/coach` calls `auth()`, and `/api/razorpay`
-verifies an HMAC because its caller is Razorpay rather than a person.
+page calls `requireUserId()`, `/api/coach` calls `auth()`, and `/api/polar`
+verifies a Standard Webhooks signature because its caller is Polar rather than
+a person.
 
 `(app)/layout.tsx` calls `requireUserId()` too, but that is a data read — it
 needs the profile for the target and countdown in the sidebar — not a second
@@ -168,7 +174,7 @@ records something the attempts genuinely do not capture.
 
 Three tables clear that bar, and it is worth saying why:
 
-- **`subscriptions`** mirrors state that belongs to Razorpay. There is no
+- **`subscriptions`** mirrors state that belongs to Polar. There is no
   attempt behind it and nothing to derive it from.
 - **`awards`** records what a candidate has earned. The rule is derived and
   pure — `src/lib/awards.ts` is a function of `attempts` and `lesson_progress`
@@ -278,16 +284,18 @@ exception rather than a precedent:
 - **`POST /api/coach`**, because streaming genuinely needs one — a server action
   resolves to a value, so a chat built on one sits silent and then appears all
   at once.
-- **`POST /api/razorpay`**, because the caller is Razorpay rather than a
-  signed-in person. There is no session to read, and the webhook signature is
-  over the raw request body, which a server action never receives. It
-  authenticates by HMAC and resolves the user from `notes.userId` — a value we
-  set ourselves when the subscription was created, never one the payload is
+- **`POST /api/polar`**, because the caller is Polar rather than a signed-in
+  person. There is no session to read, and the webhook signature is over the
+  raw request body, which a server action never receives. It authenticates with
+  `validateEvent` and resolves the user from `customer.external_id` — the Clerk
+  id we set ourselves when the checkout was created, never one the payload is
   trusted to assert.
 
-Checkout deliberately did **not** add a third. Razorpay's subscription API has
-no `callback_url`, so the payment happens in Checkout's modal and its `handler`
-passes the result to a server action.
+Checkout deliberately did **not** add a third. Paying happens on Polar's hosted
+page; they come back to `/upgrade/complete`, which is an ordinary page with the
+ordinary `requireUserId()` gate, and it reads the checkout back from Polar
+before granting anything. A route handler could not have read the Clerk session
+that guard depends on without duplicating the whole gate.
 
 It is not a precedent. It authenticates itself with `auth()` like every page
 does, and it assembles what the model is told about the candidate server-side

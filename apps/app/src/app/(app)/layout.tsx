@@ -14,14 +14,12 @@ import { Wordmark } from '@bandzen/ui/components/wordmark';
 import { Toaster } from '@bandzen/ui/components/sonner';
 import { requireUserId } from '@/lib/auth';
 import { essayAllowance, getProfile, getSubscription } from '@/lib/db/queries';
-import {
-  PLANS,
-  formatInr,
-  isFoundingActive,
-  isProAt,
-  priceOf,
-} from '@/lib/entitlements';
-import { foundingEndsAt } from '@/lib/razorpay';
+import { isProAt } from '@/lib/entitlements';
+import { resolveCurrency } from '@/lib/currency';
+import { polarPricing } from '@/lib/polar';
+import { asCurrency } from '@bandzen/pricing/currency';
+import { PLANS, formatMoney, priceOf } from '@bandzen/pricing/plans';
+import { foundingPrice } from '@bandzen/pricing/polar';
 import { daysUntil } from '@/lib/dates';
 import { PostHogAnalytics } from '@bandzen/ui/components/posthog';
 import { MobileNav } from './mobile-nav';
@@ -70,8 +68,17 @@ export default async function AppLayout({ children }: LayoutProps<'/'>) {
 
   const until = subscription?.currentPeriodEnd ?? null;
   const pro = isProAt(until);
-  const foundingEnds = foundingEndsAt();
-  const founding = isFoundingActive(foundingEnds);
+
+  // Same precedence as `/upgrade`: what they already pay in beats where they
+  // are, so the upsell never quotes a currency the checkout would not use.
+  const currency =
+    asCurrency(subscription?.currency) ?? (await resolveCurrency()).currency;
+  const { prices, founding } = await polarPricing();
+  const monthly = PLANS[0];
+  const standard = priceOf(prices, monthly, currency);
+  const offer = founding[monthly.key];
+  const price = foundingPrice(standard, offer, currency);
+  const foundingEnds = price !== standard ? offer!.endsAt : null;
 
   // Read the sidebar's own cookie server-side so the first paint matches what
   // the candidate left it as, rather than flashing open then collapsing.
@@ -95,11 +102,11 @@ export default async function AppLayout({ children }: LayoutProps<'/'>) {
               className="block border border-chrome/40 px-3 py-2.5 transition-colors hover:border-chrome"
             >
               <p className="font-mono text-[0.625rem] tracking-[0.16em] text-chrome uppercase">
-                {founding ? 'Founding price' : 'Bandzen Pro'}
+                {foundingEnds ? 'Founding price' : 'Bandzen Pro'}
               </p>
               <p className="mt-1 text-xs text-muted-foreground text-pretty">
-                {founding && foundingEnds
-                  ? `${formatInr(priceOf(PLANS[0], true))} a month until ${FOUNDING_DATE.format(foundingEnds)}. Unlimited marking and Coach.`
+                {foundingEnds
+                  ? `${formatMoney(price, currency)} a month until ${FOUNDING_DATE.format(foundingEnds)}. Unlimited marking and Coach.`
                   : 'Unlimited essay marking and Coach.'}
               </p>
             </Link>

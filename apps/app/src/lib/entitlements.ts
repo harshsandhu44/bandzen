@@ -15,12 +15,12 @@ const DAY_MS = 86_400_000;
  *
  * Everything falls out of this one comparison. A cancellation keeps the period
  * already paid for, because cancelling does not move the date. A failed
- * renewal simply never extends it, so Razorpay's retry window becomes a grace
+ * renewal simply never extends it, so Polar's retry window becomes a grace
  * period at no cost. A comped account — the founding cohort — is a row with a
- * future date and no Razorpay id, so it needs no special case here or anywhere
- * else.
+ * future date and no Polar subscription id, so it needs no special case here
+ * or anywhere else.
  *
- * Razorpay's `status` is never consulted. It exists to render a banner
+ * Polar's `status` is never consulted. It exists to render a banner
  * ("renewal failed — update payment"), not to decide access.
  */
 export function isProAt(
@@ -202,93 +202,4 @@ export function canStartMock(input: {
     limit: MOCK_TESTS_PER_WINDOW,
     now: input.now,
   });
-}
-
-// ---------------------------------------------------------------------------
-// The plan catalogue
-// ---------------------------------------------------------------------------
-
-/**
- * Amounts are in paise, which is what Razorpay charges in. Plan ids are not
- * here: they are Razorpay's, they differ between test and live mode, and they
- * belong with the rest of the credentials in `razorpay.ts`.
- *
- * Two plans, not one and not three. A lone price has nothing to be compared
- * against; an annual plan would be a decoy, since nobody prepares for IELTS
- * for twelve months.
- */
-export const PLANS = [
-  {
-    key: 'monthly',
-    label: 'Monthly',
-    months: 1,
-    founding: 99_900,
-    standard: 149_900,
-    featured: false,
-  },
-  {
-    key: 'quarterly',
-    label: '3 months',
-    months: 3,
-    founding: 199_900,
-    standard: 299_900,
-    featured: true,
-  },
-] as const;
-
-export type Plan = (typeof PLANS)[number];
-export type PlanKey = Plan['key'];
-
-export function planByKey(key: string): Plan | null {
-  return PLANS.find((p) => p.key === key) ?? null;
-}
-
-/**
- * Whether the founding price still stands.
- *
- * An unset date means the window is closed, not open: charging the standard
- * price by mistake is recoverable, and a deadline that never arrives is the
- * fake-urgency pattern this product does not use.
- */
-export function isFoundingActive(
-  endsAt: Date | null | undefined,
-  now: Date = new Date(),
-): boolean {
-  return endsAt != null && now < endsAt;
-}
-
-export function priceOf(plan: Plan, founding: boolean): number {
-  return founding ? plan.founding : plan.standard;
-}
-
-/** What one month of a plan works out at, for the per-month comparison. */
-export function perMonth(plan: Plan, founding: boolean): number {
-  return Math.round(priceOf(plan, founding) / plan.months);
-}
-
-/** What the longer plan saves against paying monthly, as whole percent. */
-export function savingsPercent(plan: Plan, founding: boolean): number {
-  const monthly = PLANS[0];
-  if (plan.months === 1) return 0;
-  const full = priceOf(monthly, founding) * plan.months;
-  return Math.round((1 - priceOf(plan, founding) / full) * 100);
-}
-
-const INR = new Intl.NumberFormat('en-IN', {
-  style: 'currency',
-  currency: 'INR',
-  maximumFractionDigits: 0,
-});
-
-/** Paise to "₹599". Rupees only — nothing here is ever priced in paise. */
-export function formatInr(paise: number): string {
-  return INR.format(paise / 100);
-}
-
-/**
- * The daily reframing that sits beside the real monthly figure, never instead
- * of it. Rounded up, so it is never flattering by accident.
- */
-export function perDay(plan: Plan, founding: boolean): string {
-  return formatInr(Math.ceil(perMonth(plan, founding) / 30));
 }

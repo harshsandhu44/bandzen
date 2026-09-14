@@ -2,7 +2,15 @@ import { Check, Lock } from 'lucide-react';
 import Link from 'next/link';
 
 import { Button } from '@bandzen/ui/components/button';
+import { Suspense } from 'react';
+
 import { cn } from '@bandzen/ui/lib/utils';
+
+import {
+  TierPrice,
+  TierPriceFallback,
+  priceBlockHeight,
+} from './tier-price';
 
 import { cta, pricing } from '@/content/sections';
 
@@ -38,42 +46,22 @@ export function Pricing() {
                 {tier.name}
               </h3>
 
-              <p className="font-display mt-10 flex items-baseline gap-2 text-6xl tabular-nums">
-                {tier.price}
-                <span
-                  className={cn(
-                    'font-mono text-xs tracking-[0.14em] uppercase',
-                    tier.featured ? 'text-paper/60' : 'text-slate',
-                  )}
+              <div className={cn('mt-10', priceBlockHeight[tier.plan])}>
+                <Suspense
+                  fallback={
+                    <TierPriceFallback
+                      period={tier.period}
+                      featured={tier.featured}
+                    />
+                  }
                 >
-                  {tier.period}
-                </span>
-              </p>
-
-              {/* The standard price, struck through, only where it is real —
-                  the founding price genuinely rises to this. */}
-              {'was' in tier && tier.was ? (
-                <p
-                  className={cn(
-                    'mt-2 font-mono text-xs tracking-[0.14em] uppercase',
-                    tier.featured ? 'text-paper/60' : 'text-slate',
-                  )}
-                >
-                  <span className="line-through">{tier.was}</span> after the
-                  founding window
-                </p>
-              ) : null}
-
-              {'alt' in tier && tier.alt ? (
-                <p
-                  className={cn(
-                    'mt-1 font-mono text-xs tracking-[0.14em] uppercase',
-                    tier.featured ? 'text-paper/60' : 'text-slate',
-                  )}
-                >
-                  {tier.alt}
-                </p>
-              ) : null}
+                  <TierPrice
+                    plan={tier.plan}
+                    period={tier.period}
+                    featured={tier.featured}
+                  />
+                </Suspense>
+              </div>
 
               <ul className="mt-10 flex flex-1 flex-col gap-3">
                 {tier.features.map((f) => (
