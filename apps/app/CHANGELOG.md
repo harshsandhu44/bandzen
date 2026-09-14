@@ -1,3 +1,10 @@
+# app [1.8.0](https://github.com/harshsandhu44/bandzen/compare/app@1.7.0...app@1.8.0) (2026-09-14)
+
+
+### Features
+
+* **app:** pause, seek and replay in practice listening ([#67](https://github.com/harshsandhu44/bandzen/issues/67)) ([104184b](https://github.com/harshsandhu44/bandzen/commit/104184bcb9429fb09d683d70bf40f2f730ad0cde)), closes [#66](https://github.com/harshsandhu44/bandzen/issues/66)
+
 # app [1.7.0](https://github.com/harshsandhu44/bandzen/compare/app@1.6.1...app@1.7.0) (2026-09-14)
 
 
