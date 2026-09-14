@@ -12,44 +12,12 @@ import { checkAwards } from '@/lib/award-check';
 import { speakingCoverageCeiling } from '@/lib/grading';
 import { openai } from './client';
 import { SPEAKING_GRADER_MODEL } from './models';
-import { SPEAKING_RUBRIC } from './speaking-rubric';
+import { buildSpeakingMessages } from './messages';
 import { speakingEvaluationSchema } from './schemas';
 import { parseStructured } from './structured';
 
-/**
- * The audio models accept no `response_format` at all — not strict Structured
- * Outputs, not JSON mode — so the shape is spelled out here instead and
- * `parseStructured` validates what comes back against
- * `speakingEvaluationSchema`. This message comes after the cacheable rubric so
- * it does not break the prefix cache.
- */
-const RESPONSE_SHAPE = `Reply with ONE JSON object and nothing else — no prose, no code fence. Shape:
-
-{
-  "band": <number, 0-9, whole or half>,
-  "criteria": [
-    { "name": "Fluency and Coherence", "band": <number>, "comment": <string> },
-    { "name": "Lexical Resource", "band": <number>, "comment": <string> },
-    { "name": "Grammatical Range and Accuracy", "band": <number>, "comment": <string> },
-    { "name": "Pronunciation", "band": <number>, "comment": <string> }
-  ],
-  "annotations": [
-    { "quote": <verbatim words the candidate said>, "kind": "good" | "grammar" | "vocabulary" | "fluency", "comment": <string> }
-  ],
-  "strengths": [<string>, <string>, <string>],
-  "weaknesses": [<string>, <string>, <string>]
-}
-
-All four criteria, in that order. Four to eight annotations.`;
-
 /** Half-band rounding, and never outside the scale whatever the model says. */
 const toBand = (n: number) => Math.min(9, Math.max(0, Math.round(n * 2) / 2));
-
-const PART_LABEL: Record<number, string> = {
-  1: 'Part 1',
-  2: 'Part 2 (long turn)',
-  3: 'Part 3 (discussion)',
-};
 
 /**
  * Grade one submitted Speaking test and write its report.
@@ -132,50 +100,10 @@ export async function gradeSpeaking(attemptId: string) {
       }),
     );
 
-    const content: Array<
-      | { type: 'text'; text: string }
-      | { type: 'input_audio'; input_audio: { data: string; format: 'wav' } }
-    > = [];
-    const clipByPrompt = new Map(clips.map((c) => [c.promptId, c]));
-    // Walk every prompt in order — answered ones carry their audio, unanswered
-    // ones are shown as gaps so the grader knows the test was not completed.
-    for (const p of work.prompts) {
-      content.push({
-        type: 'text',
-        text: `${PART_LABEL[p.part] ?? `Part ${p.part}`} — examiner: ${p.text}`,
-      });
-      const clip = clipByPrompt.get(p.promptId);
-      if (clip) {
-        content.push({
-          type: 'input_audio',
-          input_audio: {
-            data: Buffer.from(clip.bytes).toString('base64'),
-            format: 'wav',
-          },
-        });
-      } else {
-        content.push({
-          type: 'text',
-          text: '[No response recorded for this prompt.]',
-        });
-      }
-    }
-    if (missing > 0) {
-      content.push({
-        type: 'text',
-        text: `The candidate answered ${answered.length} of ${totalPrompts} prompts and left ${missing} with no response at all. A Speaking band rewards sustained production across the whole interview; unanswered prompts must pull Fluency and Coherence and the overall band down sharply.`,
-      });
-    }
-
     const response = await openai().chat.completions.create({
       model: SPEAKING_GRADER_MODEL,
       modalities: ['text'],
-      messages: [
-        // The rubric MUST come first and byte-identical -- see speaking-rubric.ts.
-        { role: 'system', content: SPEAKING_RUBRIC },
-        { role: 'system', content: RESPONSE_SHAPE },
-        { role: 'user', content },
-      ],
+      messages: buildSpeakingMessages(work.prompts, clips),
     });
 
     const parsed = parseStructured(response, speakingEvaluationSchema);
