@@ -1,3 +1,10 @@
+## app [1.10.3](https://github.com/harshsandhu44/bandzen/compare/app@1.10.2...app@1.10.3) (2026-09-14)
+
+
+### Bug Fixes
+
+* **app:** start listening at 0:00, advance recordings by hand, page reading by question block ([#76](https://github.com/harshsandhu44/bandzen/issues/76)) ([e48510c](https://github.com/harshsandhu44/bandzen/commit/e48510cf3326bd8ab7259399698386b532aa4abd))
+
 ## app [1.10.2](https://github.com/harshsandhu44/bandzen/compare/app@1.10.1...app@1.10.2) (2026-09-14)
 
 
