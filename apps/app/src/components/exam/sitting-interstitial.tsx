@@ -21,7 +21,7 @@ const SECTION_COPY: Record<
   mock: {
     listening: {
       title: 'Listening starts now',
-      body: '4 recordings, each played once. No pausing, no rewinding — write your answers as you listen.',
+      body: '4 recordings, each played once — no rewinding. Answer as you listen; when a recording ends, check your answers and move on when you are ready.',
     },
     reading: {
       title: 'Reading starts now',
@@ -39,7 +39,7 @@ const SECTION_COPY: Record<
   diagnostic: {
     listening: {
       title: 'Listening',
-      body: '2 recordings, each played once. No pausing, no rewinding — answer as you listen.',
+      body: '2 recordings. Answer as you listen; when a recording ends, replay it if you need to, then move on when you are ready.',
     },
     reading: {
       title: 'Reading',

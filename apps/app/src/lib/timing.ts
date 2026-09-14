@@ -65,8 +65,5 @@ export const sittingSectionMinutes = (
     section
   ];
 
-/** Silent pause between mock Listening tracks, while the next section's questions can be read ahead. */
-export const LISTENING_TRACK_PAUSE_SECONDS = 30;
-
 /** The mock's length, for prose. An estimate — Listening's real length depends on the 4 tracks picked. */
 export const MOCK_DURATION_LABEL = 'About 2 hr 45 min';

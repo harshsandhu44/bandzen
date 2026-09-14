@@ -58,6 +58,8 @@ export function ReadingTest({
     <ObjectiveRunner
       attemptId={attemptId}
       splitId="reading"
+      module="reading"
+      pageBy="group"
       left={
         <>
           <h1 className="mb-6 font-title text-title">{passage.title}</h1>
@@ -67,23 +69,6 @@ export function ReadingTest({
             </p>
           ))}
         </>
-      }
-      optionsList={
-        headings?.length ? (
-          <section className="mb-8 border border-border p-4">
-            <h2 className="mb-3 font-title text-title">List of headings</h2>
-            <ol className="space-y-1.5">
-              {headings.map((h, i) => (
-                <li key={h} className="flex gap-3 text-sm">
-                  <span className="w-6 shrink-0 font-mono text-xs text-muted-foreground">
-                    {ROMAN[i] ?? i + 1}
-                  </span>
-                  <span>{h}</span>
-                </li>
-              ))}
-            </ol>
-          </section>
-        ) : undefined
       }
       questions={questions}
       saved={saved}

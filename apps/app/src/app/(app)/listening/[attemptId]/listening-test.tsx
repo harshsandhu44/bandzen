@@ -9,16 +9,12 @@ import {
   type RunnerQuestion,
   type RunnerSaved,
 } from '@/components/exam/objective-runner';
+import { clock } from '@/lib/playback';
 import {
   saveListeningAnswer,
   saveListeningPlayback,
   submitListeningAttempt,
 } from '../actions';
-
-const clock = (seconds: number) => {
-  const whole = Math.floor(seconds) || 0;
-  return `${Math.floor(whole / 60)}:${String(whole % 60).padStart(2, '0')}`;
-};
 
 type Props = {
   attemptId: string;
@@ -213,6 +209,8 @@ export function ListeningTest({ attemptId, track, questions, saved }: Props) {
     <ObjectiveRunner
       attemptId={attemptId}
       splitId="listening"
+      module="listening"
+      pageBy="section"
       left={
         <>
           <h1 className="mb-6 font-title text-title">{track.title}</h1>
@@ -222,23 +220,6 @@ export function ListeningTest({ attemptId, track, questions, saved }: Props) {
             peaks={track.peaks}
           />
         </>
-      }
-      optionsList={
-        track.matchingOptions?.length ? (
-          <section className="mb-8 border border-border p-4">
-            <h2 className="mb-3 font-title text-title">List of options</h2>
-            <ol className="space-y-1.5">
-              {track.matchingOptions.map((option, i) => (
-                <li key={option} className="flex gap-3 text-sm">
-                  <span className="w-6 shrink-0 font-mono text-xs text-muted-foreground">
-                    {optionLabel(i)}
-                  </span>
-                  <span>{option}</span>
-                </li>
-              ))}
-            </ol>
-          </section>
-        ) : undefined
       }
       questions={questions}
       saved={saved}

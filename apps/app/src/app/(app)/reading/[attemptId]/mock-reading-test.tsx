@@ -26,10 +26,10 @@ type Props = {
 };
 
 /**
- * The mock's Reading section: 3 passages stacked in one left pane, one
- * 60-minute clock for all of them, free navigation between them via the same
- * `ExamNavigator` `ObjectiveRunner` already renders — it never needed to know
- * a question came from more than one passage.
+ * The mock's Reading section: one 60-minute clock for every passage. The
+ * runner pages through question blocks; the left pane shows whichever passage
+ * the current block belongs to, and the `ExamNavigator` jumps freely across
+ * all of them.
  */
 export function MockReadingTest({
   attemptId,
@@ -55,51 +55,31 @@ export function MockReadingTest({
       <ObjectiveRunner
         attemptId={attemptId}
         splitId="mock-reading"
-        left={
-          <div className="space-y-12">
-            {passages.map((p, i) => (
-              <section key={p.id}>
-                <p className="mb-1 font-mono text-[0.6875rem] tracking-[0.18em] text-muted-foreground uppercase">
-                  Passage {i + 1}
+        module="reading"
+        pageBy="group"
+        left={(sectionId) => {
+          const i = Math.max(
+            0,
+            passages.findIndex((p) => p.id === sectionId),
+          );
+          const p = passages[i];
+          return (
+            <section>
+              <p className="mb-1 font-mono text-[0.6875rem] tracking-[0.18em] text-muted-foreground uppercase">
+                Passage {i + 1} of {passages.length}
+              </p>
+              <h1 className="mb-6 font-title text-title">{p.title}</h1>
+              {p.body.split(/\n\s*\n/).map((para, j) => (
+                <p
+                  key={j}
+                  className="mb-4 text-sm leading-7 whitespace-pre-line"
+                >
+                  {para}
                 </p>
-                <h1 className="mb-6 font-title text-title">{p.title}</h1>
-                {p.body.split(/\n\s*\n/).map((para, j) => (
-                  <p
-                    key={j}
-                    className="mb-4 text-sm leading-7 whitespace-pre-line"
-                  >
-                    {para}
-                  </p>
-                ))}
-              </section>
-            ))}
-          </div>
-        }
-        optionsList={
-          passages.some((p) => p.headings?.length) ? (
-            <div className="mb-8 space-y-4">
-              {passages.map((p, i) =>
-                p.headings?.length ? (
-                  <section key={p.id} className="border border-border p-4">
-                    <h2 className="mb-3 font-title text-title">
-                      Passage {i + 1} — list of headings
-                    </h2>
-                    <ol className="space-y-1.5">
-                      {p.headings.map((h, j) => (
-                        <li key={h} className="flex gap-3 text-sm">
-                          <span className="w-6 shrink-0 font-mono text-xs text-muted-foreground">
-                            {ROMAN[j] ?? j + 1}
-                          </span>
-                          <span>{h}</span>
-                        </li>
-                      ))}
-                    </ol>
-                  </section>
-                ) : null,
-              )}
-            </div>
-          ) : undefined
-        }
+              ))}
+            </section>
+          );
+        }}
         questions={questions}
         saved={saved}
         saveAction={saveReadingAnswer}
