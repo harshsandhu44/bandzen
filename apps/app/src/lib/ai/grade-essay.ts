@@ -115,7 +115,9 @@ export async function gradeEssay(attemptId: string) {
     console.log(
       `[grade] ${attemptId} band ${band} · model ${GRADER_MODEL} · cached_tokens ${
         usage?.prompt_tokens_details?.cached_tokens ?? 0
-      }/${usage?.prompt_tokens ?? 0}`,
+      }/${usage?.prompt_tokens ?? 0} · completion_tokens ${
+        usage?.completion_tokens ?? 0
+      }`,
     );
   } catch (error) {
     console.error(`[grade] ${attemptId} failed`, error);
