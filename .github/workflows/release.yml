@@ -43,6 +43,24 @@ jobs:
 
       - run: pnpm install --frozen-lockfile
 
+      # Vercel builds the app but never touches the database, so until this
+      # step existed a migration reached production only if someone remembered
+      # to run it by hand. On 2026-09-14 nobody did: app@1.7.0 shipped the
+      # Polar code without 0016_polar_columns, and every signed-in route 500'd
+      # on a column that did not exist.
+      #
+      # This runs BEFORE `pnpm release` on purpose, and the order is the whole
+      # point. That push is the deploy gesture, so migrating first means the
+      # schema is in place before the code expecting it serves traffic — and if
+      # the migration fails, the release never happens and nothing ships
+      # against a database it cannot read. Fail-closed, in that order.
+      #
+      # `drizzle-kit migrate` is a no-op when nothing is pending, so this is
+      # safe on every push to main. apps/app owns the only drizzle.config.ts.
+      - run: pnpm --filter app db:migrate
+        env:
+          DATABASE_URL: ${{ secrets.PRODUCTION_DATABASE_URL }}
+
       - run: pnpm release
         env:
           GITHUB_TOKEN: ${{ secrets.RELEASE_TOKEN }}
