@@ -69,7 +69,8 @@ export function tutorTools(userId: string) {
     parameters: getTodayPlanSchema,
     async execute() {
       const profile = await getProfile(userId);
-      if (!profile) return { tasks: [], note: 'This candidate has no profile.' };
+      if (!profile)
+        return { tasks: [], note: 'This candidate has no profile.' };
 
       // `today` has to be resolved in the candidate's own timezone --
       // `dayBounds` inside `loadPlanData` uses it, and a UTC date returns

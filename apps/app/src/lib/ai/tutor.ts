@@ -148,7 +148,10 @@ export async function runTutor(
 
 /** The one event shape that carries answer text; everything else is tool traffic. */
 function textDelta(event: unknown): string | null {
-  const e = event as { type?: string; data?: { type?: string; delta?: string } };
+  const e = event as {
+    type?: string;
+    data?: { type?: string; delta?: string };
+  };
   if (e?.type !== 'raw_model_stream_event') return null;
   if (e.data?.type !== 'output_text_delta') return null;
   return e.data.delta || null;
