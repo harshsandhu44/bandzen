@@ -1,3 +1,10 @@
+# web [0.9.0](https://github.com/harshsandhu44/bandzen/compare/web@0.8.1...web@0.9.0) (2026-09-14)
+
+
+### Features
+
+* migrate payments from Razorpay to Polar ([#63](https://github.com/harshsandhu44/bandzen/issues/63)) ([de9cdee](https://github.com/harshsandhu44/bandzen/commit/de9cdee778f0f9830fc8f32e818d9682a54ceb28)), closes [#54](https://github.com/harshsandhu44/bandzen/issues/54) [#54](https://github.com/harshsandhu44/bandzen/issues/54) [#54](https://github.com/harshsandhu44/bandzen/issues/54)
+
 ## web [0.8.1](https://github.com/harshsandhu44/bandzen/compare/web@0.8.0...web@0.8.1) (2026-09-12)
 
 
