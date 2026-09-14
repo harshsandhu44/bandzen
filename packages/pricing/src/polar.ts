@@ -74,9 +74,14 @@ function positive(value: number | null | undefined): number | null {
     : null;
 }
 
-/** The discount code carrying the founding offer for a plan. */
+/**
+ * The discount code carrying the founding offer for a plan.
+ *
+ * No separator: Polar rejects a discount code that is not alphanumeric, so
+ * `FOUNDING_MONTHLY` cannot be created and would silently match nothing.
+ */
 export function foundingCode(key: PlanKey): string {
-  return `FOUNDING_${key.toUpperCase()}`;
+  return `FOUNDING${key.toUpperCase()}`;
 }
 
 /**

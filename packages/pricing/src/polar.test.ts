@@ -3,6 +3,7 @@ import { describe, it } from 'node:test';
 
 import { FALLBACK_PRICE } from './plans.ts';
 import {
+  foundingCode,
   foundingFrom,
   foundingPrice,
   toPriceTable,
@@ -60,10 +61,10 @@ describe('foundingFrom', () => {
   const now = new Date('2026-09-13T00:00:00Z');
   const endsAt = new Date('2026-10-31T00:00:00Z');
   const live = [
-    { id: 'd_m', code: 'FOUNDING_MONTHLY', endsAt, amounts: { inr: 50_000 } },
+    { id: 'd_m', code: 'FOUNDINGMONTHLY', endsAt, amounts: { inr: 50_000 } },
     {
       id: 'd_q',
-      code: 'FOUNDING_QUARTERLY',
+      code: 'FOUNDINGQUARTERLY',
       endsAt,
       amounts: { inr: 100_000 },
     },
@@ -89,9 +90,14 @@ describe('foundingFrom', () => {
 
   it('ignores one with no deadline — an offer is defined by having an end', () => {
     assert.deepEqual(
-      foundingFrom([{ id: 'd', code: 'FOUNDING_MONTHLY' }], now),
+      foundingFrom([{ id: 'd', code: 'FOUNDINGMONTHLY' }], now),
       {},
     );
+  });
+
+  it('builds a code Polar will accept — alphanumeric, no separator', () => {
+    assert.equal(foundingCode('monthly'), 'FOUNDINGMONTHLY');
+    assert.match(foundingCode('quarterly'), /^[A-Z0-9]+$/);
   });
 
   it('ignores every other discount, and an empty list', () => {
@@ -106,7 +112,7 @@ describe('foundingFrom', () => {
     const messy = [
       {
         id: 'd_m',
-        code: 'FOUNDING_MONTHLY',
+        code: 'FOUNDINGMONTHLY',
         endsAt,
         amounts: { inr: 50_000, jpy: 500, gbp: 0 },
       },

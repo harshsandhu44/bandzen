@@ -32,8 +32,8 @@ vars, prod schema, error monitoring, a live payment) is done; see #46.
 6. In Polar: create two products (Monthly, and 3 months as a monthly interval
    with a count of 3), each priced in INR, USD, GBP and EUR; set the
    organisation's tax behaviour to **Inclusive** so the advertised price is the
-   charged price. Add two fixed-amount discounts coded `FOUNDING_MONTHLY` and
-   `FOUNDING_QUARTERLY` — matched as exact strings, so a typo silently means
+   charged price. Add two fixed-amount discounts coded `FOUNDINGMONTHLY` and
+   `FOUNDINGQUARTERLY` — matched as exact strings, so a typo silently means
    no founding price rather than an error — INR only, each restricted to its
    product and both sharing one `ends_at`. Then add a webhook pointing at `/api/polar`
    subscribed to `subscription.active`, `.updated`, `.uncanceled`, `.canceled`,
