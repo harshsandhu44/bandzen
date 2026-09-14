@@ -66,22 +66,24 @@ const ROWS: {
     retention: 'Up to 3 months (only when marketing is on)',
   },
   {
-    name: 'Polar checkout',
+    name: 'bz_currency',
     category: 'Necessary',
-    setBy: 'Polar',
+    setBy: 'Bandzen',
     purpose:
-      'Runs the payment form, which opens in a frame on our page. Loads only when you start a payment.',
-    retention: 'Session',
-  },
-  {
-    name: 'Stripe (__stripe_mid, __stripe_sid)',
-    category: 'Necessary',
-    setBy: 'Stripe, via Polar',
-    purpose:
-      'Fraud prevention on the payment form. Polar processes card payments through Stripe, so Stripe sets these inside the payment frame.',
-    retention: '__stripe_mid 1 year, __stripe_sid 30 minutes',
+      'Remembers which currency you asked to be shown prices in, so the choice follows you between this site and the app.',
+    retention: '1 year',
   },
 ];
+
+/**
+ * Paying happens on Polar's own site, not here.
+ *
+ * Nothing payment-related is set on bandzen.com — no checkout script, no
+ * Stripe fraud cookie — because the card form is never on our domain. Polar
+ * and Stripe set their own cookies under their own domains, governed by their
+ * policies, which is worth saying plainly rather than listing cookies we do
+ * not set.
+ */
 
 export default function CookiesPage() {
   return (

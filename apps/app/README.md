@@ -291,10 +291,11 @@ exception rather than a precedent:
   id we set ourselves when the checkout was created, never one the payload is
   trusted to assert.
 
-Checkout deliberately did **not** add a third. Polar's embedded checkout runs in
-an iframe on our own page, and its `success` event only prompts a server action
-to go and read the checkout back from Polar — the browser is a signal, never
-evidence.
+Checkout deliberately did **not** add a third. Paying happens on Polar's hosted
+page; they come back to `/upgrade/complete`, which is an ordinary page with the
+ordinary `requireUserId()` gate, and it reads the checkout back from Polar
+before granting anything. A route handler could not have read the Clerk session
+that guard depends on without duplicating the whole gate.
 
 It is not a precedent. It authenticates itself with `auth()` like every page
 does, and it assembles what the model is told about the candidate server-side

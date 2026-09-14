@@ -31,6 +31,7 @@ import {
   savingsPercent,
 } from '@bandzen/pricing/plans';
 import { foundingPrice } from '@bandzen/pricing/polar';
+import { startCheckout } from './actions';
 import { CheckoutButton } from './checkout-button';
 import { CurrencyPicker } from './currency-picker';
 
@@ -225,12 +226,12 @@ export default async function UpgradePage(props: PageProps<'/upgrade'>) {
                     ) : null}
                   </div>
 
-                  <CheckoutButton
-                    planKey={plan.key}
-                    source={source}
-                    label={`Choose ${plan.label.toLowerCase()}`}
-                    variant={plan.featured ? 'default' : 'outline'}
-                  />
+                  <form action={startCheckout.bind(null, plan.key, source)}>
+                    <CheckoutButton
+                      label={`Choose ${plan.label.toLowerCase()}`}
+                      variant={plan.featured ? 'default' : 'outline'}
+                    />
+                  </form>
                 </div>
               );
             })}

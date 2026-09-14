@@ -56,13 +56,13 @@ export async function currencyCookieOptions(): Promise<{
 }
 
 /**
- * Where to send Polar's embedded checkout back to.
+ * This deployment's own origin.
  *
- * Polar refuses to render the iframe unless `embed_origin` matches the page
- * hosting it, so this has to follow the request rather than be configured —
- * localhost, every preview URL and production all need to work.
+ * Built from the request rather than configured, because localhost, every
+ * preview URL and production all have to send the candidate back to
+ * themselves and not to each other.
  */
-export async function embedOrigin(): Promise<string> {
+export async function appOrigin(): Promise<string> {
   const headerList = await headers();
   const host = headerList.get('host') ?? '';
   const protocol = host.startsWith('localhost') ? 'http' : 'https';

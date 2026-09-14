@@ -10,9 +10,9 @@ import { activateSubscription, getSubscription } from '@/lib/db/queries';
 import { isProAt } from '@/lib/entitlements';
 import {
   CURRENCY_COOKIE,
+  appOrigin,
   clientIp,
   currencyCookieOptions,
-  embedOrigin,
   resolveCurrency,
 } from '@/lib/currency';
 import { polar, polarPricing, productId } from '@/lib/polar';
@@ -20,7 +20,7 @@ import { asCurrency } from '@bandzen/pricing/currency';
 import { planByKey, type PlanKey } from '@bandzen/pricing/plans';
 
 /**
- * Open a Polar checkout for this plan.
+ * Send the candidate to Polar's checkout for this plan.
  *
  * The currency is decided here and pinned onto the session. Polar would
  * geolocate one itself, but it would do so from this server's IP and long
@@ -33,7 +33,7 @@ import { planByKey, type PlanKey } from '@bandzen/pricing/plans';
 export async function startCheckout(
   planKey: PlanKey,
   source: string,
-): Promise<{ id: string; url: string }> {
+): Promise<void> {
   const userId = await requireUserId();
 
   const plan = planByKey(planKey);
@@ -81,7 +81,10 @@ export async function startCheckout(
     ...(trialDays > 0
       ? { trialInterval: 'day' as const, trialIntervalCount: trialDays }
       : {}),
-    embedOrigin: await embedOrigin(),
+    // `{CHECKOUT_ID}` is interpolated by Polar. The id is the only thing that
+    // comes back through the browser, and it is not trusted: `/upgrade/complete`
+    // reads the checkout from Polar and checks whose it is.
+    successUrl: `${await appOrigin()}/upgrade/complete?checkout_id={CHECKOUT_ID}`,
     metadata: { source },
   });
 
@@ -93,7 +96,7 @@ export async function startCheckout(
     deferred: trialDays > 0,
   });
 
-  return { id: checkout.id, url: checkout.url };
+  redirect(checkout.url);
 }
 
 /**
@@ -108,7 +111,6 @@ export async function startCheckout(
  */
 export async function confirmCheckout(
   checkoutId: string,
-  source: string,
 ): Promise<{ ok: boolean }> {
   const userId = await requireUserId();
 
@@ -149,6 +151,13 @@ export async function confirmCheckout(
     console.error('[upgrade] no active subscription yet', { checkoutId });
     return { ok: false };
   }
+
+  // Read back off the checkout rather than the query string: which prompt
+  // earned this is attribution, and attribution nobody can edit is worth more.
+  const source =
+    typeof checkout.metadata?.source === 'string'
+      ? checkout.metadata.source
+      : 'direct';
 
   await activateSubscription({
     userId,
