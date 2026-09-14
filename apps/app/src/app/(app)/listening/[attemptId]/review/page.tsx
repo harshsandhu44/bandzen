@@ -2,6 +2,7 @@ import { after } from 'next/server';
 import { notFound, redirect } from 'next/navigation';
 import { ObjectiveReview } from '@/components/exam/objective-review';
 import { capture } from '@/lib/analytics';
+import { describePlayback } from '@/lib/playback';
 import { requireUserId } from '@/lib/auth';
 import {
   accuracyByQuestionKind,
@@ -45,6 +46,10 @@ export default async function ListeningReviewPage({
       rows={data.rows}
       history={history}
       transcript={data.track.transcript}
+      conditions={describePlayback(
+        attempt.playback,
+        data.track.durationSeconds,
+      )}
     />
   );
 }

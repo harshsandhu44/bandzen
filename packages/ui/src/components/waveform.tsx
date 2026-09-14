@@ -9,10 +9,11 @@ import { cn } from '@bandzen/ui/lib/utils';
  * (ui.elevenlabs.io) and restyled to bandzen tokens. Renders `data` (0-1
  * peaks) as bars; `progress` (0-1) splits them into a played/unplayed color.
  *
- * Non-interactive by design — no `onBarClick`/seek handling. The listening
- * runner's audio is deliberately single-play with no scrub bar ("exam
- * realism, deliberate" — see `listening-test.tsx`), and this waveform must
- * not undermine that.
+ * Non-interactive by design — no click/seek handling, so the mock runner and
+ * the marketing pages get a pure visual. Where seeking *is* wanted (practice
+ * listening), the caller layers a transparent `<input type="range">` over
+ * this rather than teaching the canvas about pointers — see
+ * `listening-test.tsx`.
  */
 export type WaveformProps = HTMLAttributes<HTMLDivElement> & {
   /** Amplitude peaks, 0-1. Falls back to a flat placeholder pattern if empty. */
