@@ -1,8 +1,11 @@
 import { z } from 'zod';
-import { questionKind } from '@bandzen/db/schema';
+import { LISTENING_QUESTION_KINDS } from '@bandzen/ai/schemas';
 
-/** Listening allows every question kind. */
-export const QUESTION_KINDS = questionKind.enumValues;
+/**
+ * Only the kinds real Listening uses — the same list the generator and
+ * apps/app's filter use. T/F/NG and matching headings are Reading-only.
+ */
+export const QUESTION_KINDS = LISTENING_QUESTION_KINDS;
 
 const questionForm = z.object({
   id: z.string().optional(),

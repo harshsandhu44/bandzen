@@ -43,7 +43,12 @@ export default async function EditTrackPage({
     questions: track.questions.map((q) => ({
       id: q.id,
       idx: q.idx,
-      kind: q.kind,
+      // The column holds every question kind; a track may only use the three
+      // Listening ones. A row saved before that was enforced renders with an
+      // empty Kind select and fails validation on save, which is the point —
+      // silently rewriting someone's question to a kind it is not would be
+      // worse than making them pick.
+      kind: q.kind as TrackFormValues['questions'][number]['kind'],
       prompt: q.prompt,
       optionsText: (q.options ?? []).join('\n'),
       answerText: (q.answer ?? []).join(', '),
