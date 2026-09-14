@@ -53,39 +53,6 @@ export function mockPosition(children: readonly MockChild[]): Skill | null {
   return null;
 }
 
-/**
- * Which of the mock's Listening tracks should be playing at `elapsedSeconds`
- * since the section started, derived rather than stored — the same
- * wall-clock-anchoring `Timer` already uses for Reading/Writing, extended to
- * a sequence of clips instead of one countdown. `inPause` covers the review
- * gap between tracks, where nothing should be playing yet.
- */
-export function trackIndexAtElapsed(
-  elapsedSeconds: number,
-  trackDurations: readonly number[],
-  pauseSeconds: number,
-): { index: number; offsetSeconds: number; inPause: boolean; done: boolean } {
-  let t = Math.max(0, elapsedSeconds);
-  for (let i = 0; i < trackDurations.length; i += 1) {
-    if (t < trackDurations[i]) {
-      return { index: i, offsetSeconds: t, inPause: false, done: false };
-    }
-    t -= trackDurations[i];
-    if (i < trackDurations.length - 1) {
-      if (t < pauseSeconds) {
-        return { index: i + 1, offsetSeconds: 0, inPause: true, done: false };
-      }
-      t -= pauseSeconds;
-    }
-  }
-  return {
-    index: Math.max(0, trackDurations.length - 1),
-    offsetSeconds: 0,
-    inPause: false,
-    done: true,
-  };
-}
-
 /** The Listening section's total wall-clock length — every track plus the pause between each. */
 export function listeningSectionSeconds(
   trackDurations: readonly number[],

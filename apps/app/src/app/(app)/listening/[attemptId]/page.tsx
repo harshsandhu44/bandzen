@@ -30,7 +30,7 @@ export default async function ListeningAttemptPage({
     return (
       <MockListeningTest
         attemptId={attempt.id}
-        startedAt={attempt.startedAt.toISOString()}
+        replayable={attempt.kind === 'diagnostic'}
         tracks={data.tracks}
         questions={data.questions}
         matchingOptionsByQuestion={Object.fromEntries(

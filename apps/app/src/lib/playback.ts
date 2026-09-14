@@ -3,8 +3,9 @@ import type { ListeningPlayback } from '@bandzen/db/schema';
 /** Sub-second wobble in wall-clock accumulation shouldn't read as a replay. */
 const REPLAY_FLOOR_SECONDS = 2;
 
-const clock = (seconds: number) => {
-  const whole = Math.round(seconds);
+/** `m:ss`, whole seconds rounded down — a playhead never reads ahead of itself. */
+export const clock = (seconds: number) => {
+  const whole = Math.floor(seconds) || 0;
   return `${Math.floor(whole / 60)}:${String(whole % 60).padStart(2, '0')}`;
 };
 
@@ -30,7 +31,9 @@ export function describePlayback(
   const parts = [
     playback?.pauses ? `paused ${playback.pauses}×` : null,
     playback?.seeks ? `seeked ${playback.seeks}×` : null,
-    replayed >= REPLAY_FLOOR_SECONDS ? `replayed ${clock(replayed)}` : null,
+    replayed >= REPLAY_FLOOR_SECONDS
+      ? `replayed ${clock(Math.round(replayed))}`
+      : null,
   ].filter((p) => p !== null);
 
   return parts.length
