@@ -1,3 +1,10 @@
+# app [1.9.0](https://github.com/harshsandhu44/bandzen/compare/app@1.8.1...app@1.9.0) (2026-09-14)
+
+
+### Features
+
+* **ai:** split COACH_MODEL, add grader model eval harness ([#70](https://github.com/harshsandhu44/bandzen/issues/70)) ([34265b7](https://github.com/harshsandhu44/bandzen/commit/34265b7a38124a316908fc7b2165a6a4a09d9fa3)), closes [#60](https://github.com/harshsandhu44/bandzen/issues/60) [#60](https://github.com/harshsandhu44/bandzen/issues/60) [#54](https://github.com/harshsandhu44/bandzen/issues/54)
+
 ## app [1.8.1](https://github.com/harshsandhu44/bandzen/compare/app@1.8.0...app@1.8.1) (2026-09-14)
 
 
