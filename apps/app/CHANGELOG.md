@@ -1,3 +1,10 @@
+## app [1.10.1](https://github.com/harshsandhu44/bandzen/compare/app@1.10.0...app@1.10.1) (2026-09-14)
+
+
+### Bug Fixes
+
+* **ai:** diagnose the speaking grader migration, and say why a grade failed ([#73](https://github.com/harshsandhu44/bandzen/issues/73)) ([9d82bb5](https://github.com/harshsandhu44/bandzen/commit/9d82bb5922ea0858313e7525e68679109d1389d4)), closes [#70](https://github.com/harshsandhu44/bandzen/issues/70) [#70](https://github.com/harshsandhu44/bandzen/issues/70) [#70](https://github.com/harshsandhu44/bandzen/issues/70)
+
 # app [1.10.0](https://github.com/harshsandhu44/bandzen/compare/app@1.9.0...app@1.10.0) (2026-09-14)
 
 
