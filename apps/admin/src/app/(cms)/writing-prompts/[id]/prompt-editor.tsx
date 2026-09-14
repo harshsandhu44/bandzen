@@ -46,7 +46,12 @@ export function PromptEditor({
   };
 
   return (
-    <form onSubmit={handleSubmit(onSubmit, () => toast.error("Some fields need fixing — check the form."))} className="space-y-6">
+    <form
+      onSubmit={handleSubmit(onSubmit, () =>
+        toast.error('Some fields need fixing — check the form.'),
+      )}
+      className="space-y-6"
+    >
       <Card>
         <CardHeader>
           <CardTitle>Prompt</CardTitle>

@@ -1,7 +1,11 @@
 import 'server-only';
 
 import { Polar } from '@polar-sh/sdk';
-import { foundingFrom, toPriceTable, type Founding } from '@bandzen/pricing/polar';
+import {
+  foundingFrom,
+  toPriceTable,
+  type Founding,
+} from '@bandzen/pricing/polar';
 import {
   FALLBACK_PRICE,
   type PlanKey,

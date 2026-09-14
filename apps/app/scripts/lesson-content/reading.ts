@@ -139,7 +139,8 @@ export const READING_LESSONS: LessonSeed[] = [
             kind: 'try',
             source:
               'The study followed 4,200 workers over twelve years, starting in 2003.',
-            question: 'You need the year the study started. What do you scan for?',
+            question:
+              'You need the year the study started. What do you scan for?',
             answer: 'A number that looks like a year, near the word "started".',
             why: 'Scanning for numbers and dates is much faster than reading the whole sentence for meaning.',
           },
@@ -223,7 +224,8 @@ export const READING_LESSONS: LessonSeed[] = [
             kind: 'try',
             question:
               'You read a question fast and answer it in 10 seconds. Is that safe?',
-            answer: 'No. Read the question twice before you search the passage.',
+            answer:
+              'No. Read the question twice before you search the passage.',
             why: 'A ten-second read misses small words. A ten-second mistake costs the same one point as a hard question you get wrong.',
           },
         ],
@@ -292,14 +294,16 @@ export const READING_LESSONS: LessonSeed[] = [
         blocks: [
           {
             kind: 'example',
-            source: 'The bridge was completed in 1932, two years behind schedule.',
+            source:
+              'The bridge was completed in 1932, two years behind schedule.',
             question: 'Statement: "The bridge was finished on time."',
             answer: 'False.',
             why: 'The passage says it was two years late. This is the opposite of "on time", so it is False, not Not Given.',
           },
           {
             kind: 'example',
-            source: 'The bridge was completed in 1932, two years behind schedule.',
+            source:
+              'The bridge was completed in 1932, two years behind schedule.',
             question: 'Statement: "The bridge cost more than planned."',
             answer: 'Not Given.',
             why: 'The passage never mentions cost. We cannot say True or False about something the text does not talk about.',
@@ -383,7 +387,8 @@ export const READING_LESSONS: LessonSeed[] = [
             kind: 'example',
             source:
               'Critics claim the policy will fail, but the evidence so far suggests otherwise.',
-            question: 'Statement: "The writer believes the policy will succeed."',
+            question:
+              'Statement: "The writer believes the policy will succeed."',
             answer: 'Yes.',
             why: 'The writer disagrees with the critics ("otherwise" means the opposite of failing), so the writer leans toward success.',
           },
@@ -481,7 +486,8 @@ export const READING_LESSONS: LessonSeed[] = [
         blocks: [
           {
             kind: 'try',
-            source: 'Sales rose in every region except the north, where they were flat.',
+            source:
+              'Sales rose in every region except the north, where they were flat.',
             question:
               'Which is true? A) Sales rose everywhere. B) Sales fell in the north. C) Sales stayed the same in the north.',
             answer: 'C.',
@@ -639,7 +645,8 @@ export const READING_LESSONS: LessonSeed[] = [
         blocks: [
           {
             kind: 'example',
-            source: 'The bridge was built using a new type of reinforced concrete.',
+            source:
+              'The bridge was built using a new type of reinforced concrete.',
             question:
               'Complete: "The bridge used a new form of ___ (no more than two words)."',
             answer: 'reinforced concrete',
@@ -652,7 +659,8 @@ export const READING_LESSONS: LessonSeed[] = [
         blocks: [
           {
             kind: 'try',
-            source: 'Applicants must submit their forms by Friday at the latest.',
+            source:
+              'Applicants must submit their forms by Friday at the latest.',
             question:
               'Complete: "Forms must be sent no later than ___" — what goes in the gap?',
             answer: 'Friday',
@@ -722,8 +730,10 @@ export const READING_LESSONS: LessonSeed[] = [
         blocks: [
           {
             kind: 'example',
-            source: 'The number of visitors declined sharply after the new fee was introduced.',
-            question: 'Question wording: "Visitor numbers fell quickly once charges began."',
+            source:
+              'The number of visitors declined sharply after the new fee was introduced.',
+            question:
+              'Question wording: "Visitor numbers fell quickly once charges began."',
             answer: 'These are the same fact, in different words.',
             why: '"Declined sharply" = "fell quickly". "New fee" = "charges began". Same meaning, no shared words.',
           },

@@ -123,7 +123,8 @@ export const LISTENING_LESSONS: LessonSeed[] = [
         blocks: [
           {
             kind: 'example',
-            source: 'Question: "The delivery will arrive on ___ (day of the week)."',
+            source:
+              'Question: "The delivery will arrive on ___ (day of the week)."',
             question: 'What should you think before the audio plays?',
             answer: 'I need to listen for a day of the week, nothing else.',
             why: 'Knowing exactly what kind of word is missing lets you ignore other details and focus only on the day mentioned.',
@@ -137,7 +138,8 @@ export const LISTENING_LESSONS: LessonSeed[] = [
             kind: 'try',
             question:
               'You have 20 seconds before a section starts. What is the best use of that time?',
-            answer: 'Read every question and predict what type of answer each one needs.',
+            answer:
+              'Read every question and predict what type of answer each one needs.',
             why: 'This short preview turns listening from a passive activity into an active, focused search for specific information.',
           },
         ],
@@ -208,7 +210,8 @@ export const LISTENING_LESSONS: LessonSeed[] = [
             kind: 'example',
             source: 'Speaker: "That\'s spelled T-H-O-M-P-S-O-N, Thompson."',
             question: 'What is the safest way to answer this question?',
-            answer: 'Write the letters as they are spelled out, not as you think the name sounds.',
+            answer:
+              'Write the letters as they are spelled out, not as you think the name sounds.',
             why: 'Many names have unusual spelling. Trusting the spelled-out letters avoids common surname mistakes.',
           },
         ],
@@ -387,7 +390,8 @@ export const LISTENING_LESSONS: LessonSeed[] = [
             kind: 'try',
             question:
               'You have already used option B for one item. Can you use option B again for a different item?',
-            answer: 'It depends on the instructions, but usually each option is used only once unless stated otherwise.',
+            answer:
+              'It depends on the instructions, but usually each option is used only once unless stated otherwise.',
             why: 'Read the instructions carefully — most matching tasks use each option once, but a few allow repeats.',
           },
         ],
@@ -472,7 +476,8 @@ export const LISTENING_LESSONS: LessonSeed[] = [
             kind: 'try',
             question:
               'You lose track of where you are on the map for a few seconds. What should you do?',
-            answer: 'Find the next clear landmark mentioned and use it to relocate yourself.',
+            answer:
+              'Find the next clear landmark mentioned and use it to relocate yourself.',
             why: 'Speakers usually mention a fixed point again soon. Waiting for that anchor is faster than trying to reconstruct the whole path.',
           },
         ],
@@ -638,7 +643,8 @@ export const LISTENING_LESSONS: LessonSeed[] = [
             kind: 'try',
             question:
               'You already wrote down the first number you heard for an answer. The speaker then says "actually". What should you do?',
-            answer: 'Cross it out and replace it with whatever comes after "actually".',
+            answer:
+              'Cross it out and replace it with whatever comes after "actually".',
             why: 'This word is one of the clearest signals in Listening that the previous piece of information was a distractor, not the final answer.',
           },
         ],
@@ -804,7 +810,8 @@ export const LISTENING_LESSONS: LessonSeed[] = [
             kind: 'try',
             question:
               'You realise you have not been paying attention for the last two questions. What is the best next step?',
-            answer: 'Immediately locate the current question number and refocus, without trying to recall the missed answers.',
+            answer:
+              'Immediately locate the current question number and refocus, without trying to recall the missed answers.',
             why: 'Trying to recall missed audio wastes more attention. The fastest recovery is to fully commit to the present question.',
           },
         ],

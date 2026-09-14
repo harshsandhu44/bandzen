@@ -1,11 +1,11 @@
 import Link from 'next/link';
-import {
-  listContentEvents,
-  type ContentType,
-} from '@bandzen/db/queries';
+import { listContentEvents, type ContentType } from '@bandzen/db/queries';
 import type { ContentStatus } from '@bandzen/db/schema';
 import { Eyebrow } from '@bandzen/ui/components/primitives';
-import { PublishControls, type ActionState } from '@/components/publish-controls';
+import {
+  PublishControls,
+  type ActionState,
+} from '@/components/publish-controls';
 import { CompletenessPanel } from '@/components/editor-shell';
 import { resolveEditorEmails } from '@/lib/editor-email';
 
@@ -51,10 +51,7 @@ export async function EditorRail({
     formData: FormData,
   ) => Promise<ActionState>;
   unpublishAction: (formData: FormData) => void | Promise<void>;
-  deleteAction: (
-    prev: ActionState,
-    formData: FormData,
-  ) => Promise<ActionState>;
+  deleteAction: (prev: ActionState, formData: FormData) => Promise<ActionState>;
 }) {
   const events = await listContentEvents(type, id, 12);
   const emails = await resolveEditorEmails(events.map((e) => e.actorId));
@@ -98,10 +95,8 @@ export async function EditorRail({
             {events.map((e) => (
               <li key={e.id} className="tabular-nums">
                 {ACTION_VERB[e.action] ?? e.action} ·{' '}
-                {e.actorId
-                  ? (emails.get(e.actorId) ?? e.actorId)
-                  : 'unknown'}{' '}
-                · {ago(e.createdAt)}
+                {e.actorId ? (emails.get(e.actorId) ?? e.actorId) : 'unknown'} ·{' '}
+                {ago(e.createdAt)}
               </li>
             ))}
           </ul>

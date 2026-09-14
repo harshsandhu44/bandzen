@@ -21,7 +21,12 @@ export function CheckoutButton({
   const { pending } = useFormStatus();
 
   return (
-    <Button type="submit" variant={variant} className="w-full" disabled={pending}>
+    <Button
+      type="submit"
+      variant={variant}
+      className="w-full"
+      disabled={pending}
+    >
       {pending ? 'Opening…' : label}
       {pending ? null : <ArrowRight />}
     </Button>

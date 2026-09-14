@@ -1,5 +1,10 @@
 import { CURRENCIES, asCurrency, type Currency } from './currency.ts';
-import { FALLBACK_PRICE, PLANS, type PlanKey, type PriceTable } from './plans.ts';
+import {
+  FALLBACK_PRICE,
+  PLANS,
+  type PlanKey,
+  type PriceTable,
+} from './plans.ts';
 
 /**
  * Turning what Polar returns into what the pages render.
@@ -109,7 +114,11 @@ export function foundingFrom(
       (discount) => discount.code === foundingCode(plan.key),
     );
     if (!match?.endsAt || match.endsAt <= now) continue;
-    found[plan.key] = { id: match.id, endsAt: match.endsAt, off: offsOf(match) };
+    found[plan.key] = {
+      id: match.id,
+      endsAt: match.endsAt,
+      off: offsOf(match),
+    };
   }
   return found;
 }

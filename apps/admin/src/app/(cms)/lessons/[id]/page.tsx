@@ -1,8 +1,5 @@
 import { notFound } from 'next/navigation';
-import {
-  getLessonById,
-  checkLessonCompleteness,
-} from '@bandzen/db/queries';
+import { getLessonById, checkLessonCompleteness } from '@bandzen/db/queries';
 import { LESSON_STAGES } from '@bandzen/db/schema';
 import { PageHeader } from '@bandzen/ui/components/primitives';
 import { requireAdminOrTeacher } from '@/lib/auth';
@@ -16,7 +13,11 @@ import {
   deleteLessonAction,
 } from '../actions';
 import { LessonEditor } from './lesson-editor';
-import { blankBlock, type LessonFormValues, type BlockFormValues } from './schema';
+import {
+  blankBlock,
+  type LessonFormValues,
+  type BlockFormValues,
+} from './schema';
 
 export default async function EditLessonPage({
   params,

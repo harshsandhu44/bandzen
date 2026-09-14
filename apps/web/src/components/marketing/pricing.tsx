@@ -6,11 +6,7 @@ import { Suspense } from 'react';
 
 import { cn } from '@bandzen/ui/lib/utils';
 
-import {
-  TierPrice,
-  TierPriceFallback,
-  priceBlockHeight,
-} from './tier-price';
+import { TierPrice, TierPriceFallback, priceBlockHeight } from './tier-price';
 
 import { cta, pricing } from '@/content/sections';
 

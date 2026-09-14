@@ -65,7 +65,12 @@ export function TrackEditor({
   };
 
   return (
-    <form onSubmit={handleSubmit(onSubmit, () => toast.error("Some fields need fixing — check the form."))} className="space-y-6">
+    <form
+      onSubmit={handleSubmit(onSubmit, () =>
+        toast.error('Some fields need fixing — check the form.'),
+      )}
+      className="space-y-6"
+    >
       <Card>
         <CardHeader>
           <CardTitle>Track</CardTitle>
@@ -159,7 +164,10 @@ export function TrackEditor({
               >
                 <Textarea {...register(`questions.${i}.prompt`)} />
               </Field>
-              <Field label="Options" hint="One per line — multiple choice only.">
+              <Field
+                label="Options"
+                hint="One per line — multiple choice only."
+              >
                 <Textarea
                   className="min-h-16"
                   {...register(`questions.${i}.optionsText`)}

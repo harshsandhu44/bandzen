@@ -18,13 +18,7 @@ const LINKS = [
   { href: '/resources', label: 'Guides' },
 ] as const;
 
-function Row({
-  href,
-  children,
-}: {
-  href: string;
-  children: React.ReactNode;
-}) {
+function Row({ href, children }: { href: string; children: React.ReactNode }) {
   return (
     <li>
       <Link

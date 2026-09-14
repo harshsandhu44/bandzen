@@ -1,8 +1,5 @@
 import { notFound } from 'next/navigation';
-import {
-  getPassageAdmin,
-  checkPassageCompleteness,
-} from '@bandzen/db/queries';
+import { getPassageAdmin, checkPassageCompleteness } from '@bandzen/db/queries';
 import { PageHeader } from '@bandzen/ui/components/primitives';
 import { requireAdminOrTeacher } from '@/lib/auth';
 import { StatusBadge } from '@/components/status-badge';

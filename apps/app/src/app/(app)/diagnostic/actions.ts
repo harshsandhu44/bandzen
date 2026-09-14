@@ -57,9 +57,7 @@ export async function startDiagnostic(formData: FormData) {
 
   if (open) {
     const siblings = await getMockSiblings(userId, open.id);
-    redirect(
-      mockSectionUrl(open.id, mockPosition(siblings), 'diagnostic'),
-    );
+    redirect(mockSectionUrl(open.id, mockPosition(siblings), 'diagnostic'));
   }
 
   // The gate — unchanged rule: first diagnostic free, retakes are Pro. A spent
@@ -83,7 +81,8 @@ export async function startDiagnostic(formData: FormData) {
     throw new Error('Not enough passages seeded for a diagnostic');
   if (tracks.length < DIAGNOSTIC_TRACKS)
     throw new Error('Not enough listening tracks seeded for a diagnostic');
-  if (!task2) throw new Error('No Task 2 prompt seeded — see apps/app/README.md');
+  if (!task2)
+    throw new Error('No Task 2 prompt seeded — see apps/app/README.md');
   if (!speakingTest)
     throw new Error('No speaking test seeded — see apps/app/README.md');
 

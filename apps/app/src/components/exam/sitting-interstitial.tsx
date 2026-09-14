@@ -69,10 +69,7 @@ export async function SittingInterstitial({
     redirect(mockSectionUrl(sittingId, null, mock.kind));
   }
 
-  const siblings = (await getMockSiblings(
-    userId,
-    sittingId,
-  )) as MockChild[];
+  const siblings = (await getMockSiblings(userId, sittingId)) as MockChild[];
   const position = mockPosition(siblings);
   if (!position) redirect(mockSectionUrl(sittingId, null, mock.kind));
 
@@ -81,7 +78,11 @@ export async function SittingInterstitial({
 
   return (
     <div className="mx-auto max-w-xl space-y-6 py-12">
-      <PageHeader eyebrow={eyebrow} title={copy.title} description={copy.body} />
+      <PageHeader
+        eyebrow={eyebrow}
+        title={copy.title}
+        description={copy.body}
+      />
       <Panel title="Ready?">
         <p className="text-sm text-muted-foreground text-pretty">
           Once you continue, the section&apos;s clock starts. Sections you have

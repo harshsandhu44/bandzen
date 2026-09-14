@@ -158,10 +158,7 @@ function Player({
       </div>
 
       {state === 'idle' ? (
-        <Button
-          type="button"
-          onClick={() => void ref.current?.play()}
-        >
+        <Button type="button" onClick={() => void ref.current?.play()}>
           Start listening
         </Button>
       ) : (

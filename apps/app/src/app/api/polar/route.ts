@@ -1,4 +1,7 @@
-import { validateEvent, WebhookVerificationError } from '@polar-sh/sdk/webhooks';
+import {
+  validateEvent,
+  WebhookVerificationError,
+} from '@polar-sh/sdk/webhooks';
 import { activateSubscription, setSubscriptionEnd } from '@/lib/db/queries';
 import { capture } from '@/lib/analytics';
 

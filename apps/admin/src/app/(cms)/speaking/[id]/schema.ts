@@ -44,10 +44,7 @@ export type SaveSpeakingPayload = {
   }>;
 };
 
-export function toSave(
-  id: string,
-  v: SpeakingFormValues,
-): SaveSpeakingPayload {
+export function toSave(id: string, v: SpeakingFormValues): SaveSpeakingPayload {
   return {
     id,
     title: v.title.trim(),

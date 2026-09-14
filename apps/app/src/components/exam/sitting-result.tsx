@@ -132,7 +132,9 @@ export function SittingResult({
       band: bands.speaking,
       pending: pendingNote(sections.speaking?.status),
       detail: null,
-      href: sections.speaking ? `/speaking/${sections.speaking.id}/report` : null,
+      href: sections.speaking
+        ? `/speaking/${sections.speaking.id}/report`
+        : null,
     },
   ];
 
@@ -185,7 +187,10 @@ export function SittingResult({
                   {r.detail}
                   {r.detail && r.href ? ' · ' : ''}
                   {r.href ? (
-                    <Link href={r.href} className="underline underline-offset-4">
+                    <Link
+                      href={r.href}
+                      className="underline underline-offset-4"
+                    >
                       read the full report
                     </Link>
                   ) : null}

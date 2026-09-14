@@ -23,8 +23,6 @@ import { saveTrackPayloadSchema, type SaveTrackPayload } from './[id]/schema';
 
 export type ActionState = { error: string | null };
 
-
-
 /**
  * Uploads the posted MP3 to R2 and returns its public URL, or null when no
  * file was attached. A fresh UUID key every time, so replacing a track's audio
@@ -62,7 +60,6 @@ export async function createTrackAction(formData: FormData) {
   await recordContentEvent('listening-track', track.id, userId, 'created');
   redirect(`/listening/${track.id}`);
 }
-
 
 export async function replaceAudioAction(formData: FormData) {
   const { userId } = await requireAdminOrTeacher();
@@ -134,9 +131,6 @@ export async function deleteTrackAction(
   redirect('/listening');
 }
 
-
-
-
 /**
  * One Save for the listening editor: track fields plus its full question list.
  * Questions are diffed against what is stored (shared question queries, keyed
@@ -205,7 +199,11 @@ export async function bulkPublishTracksAction(
   ids: string[],
 ): Promise<ActionResult> {
   const { userId } = await requireAdminOrTeacher();
-  const result = await runBulk(ids, (id) => publishTrack(id, userId), 'Published');
+  const result = await runBulk(
+    ids,
+    (id) => publishTrack(id, userId),
+    'Published',
+  );
   revalidatePath('/listening');
   return result;
 }
@@ -214,7 +212,11 @@ export async function bulkUnpublishTracksAction(
   ids: string[],
 ): Promise<ActionResult> {
   const { userId } = await requireAdminOrTeacher();
-  const result = await runBulk(ids, (id) => unpublishTrack(id, userId), 'Unpublished');
+  const result = await runBulk(
+    ids,
+    (id) => unpublishTrack(id, userId),
+    'Unpublished',
+  );
   revalidatePath('/listening');
   return result;
 }

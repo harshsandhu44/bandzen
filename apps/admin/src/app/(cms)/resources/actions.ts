@@ -22,7 +22,6 @@ import {
 
 export type ActionState = { error: string | null };
 
-
 function orNull(value: FormDataEntryValue | null) {
   const s = String(value ?? '').trim();
   return s || null;
@@ -47,7 +46,6 @@ export async function createResourceAction(formData: FormData) {
   await recordContentEvent('resource', resource.id, userId, 'created');
   redirect(`/resources/${resource.id}`);
 }
-
 
 export async function publishResourceAction(
   _prev: ActionState,
@@ -117,7 +115,11 @@ export async function bulkPublishResourcesAction(
   ids: string[],
 ): Promise<ActionResult> {
   const { userId } = await requireAdminOrTeacher();
-  const result = await runBulk(ids, (id) => publishResource(id, userId), 'Published');
+  const result = await runBulk(
+    ids,
+    (id) => publishResource(id, userId),
+    'Published',
+  );
   revalidatePath('/resources');
   return result;
 }
@@ -126,7 +128,11 @@ export async function bulkUnpublishResourcesAction(
   ids: string[],
 ): Promise<ActionResult> {
   const { userId } = await requireAdminOrTeacher();
-  const result = await runBulk(ids, (id) => unpublishResource(id, userId), 'Unpublished');
+  const result = await runBulk(
+    ids,
+    (id) => unpublishResource(id, userId),
+    'Unpublished',
+  );
   revalidatePath('/resources');
   return result;
 }

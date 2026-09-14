@@ -19,7 +19,11 @@ import {
   type GeneratedPassage,
   type GeneratedListeningTrack,
 } from './schemas.ts';
-import { PASSAGE_SYSTEM, LISTENING_SYSTEM, SPEAKING_SYSTEM } from './prompts.ts';
+import {
+  PASSAGE_SYSTEM,
+  LISTENING_SYSTEM,
+  SPEAKING_SYSTEM,
+} from './prompts.ts';
 
 export type GenResult<T> = { data: T; warnings: string[] };
 export type GenOptions = {
@@ -82,7 +86,9 @@ export function validatePassage(p: GeneratedPassage): string[] {
     if (new Set(p.headings).size !== p.headings.length)
       problems.push('duplicate headings in the shared list');
   } else if (p.headings?.length) {
-    problems.push('headings supplied but no matching_headings question uses them');
+    problems.push(
+      'headings supplied but no matching_headings question uses them',
+    );
   }
 
   for (const q of p.questions) {
@@ -91,11 +97,14 @@ export function validatePassage(p: GeneratedPassage): string[] {
       problems.push(`q${q.idx} evidence not found verbatim in body`);
     if (q.kind === 'matching_headings') {
       if (q.options?.length)
-        problems.push(`q${q.idx} matching_headings must not carry its own options`);
+        problems.push(
+          `q${q.idx} matching_headings must not carry its own options`,
+        );
       const answer = q.answer[0]!;
       if (!p.headings.includes(answer))
         problems.push(`q${q.idx} answer is not in the shared headings list`);
-      if (used.has(answer)) problems.push(`q${q.idx} reuses an already-used heading`);
+      if (used.has(answer))
+        problems.push(`q${q.idx} reuses an already-used heading`);
       used.add(answer);
       continue;
     }
@@ -111,7 +120,10 @@ export async function generatePassage(
   const data = await call(
     generatedPassageSchema,
     PASSAGE_SYSTEM,
-    userLine('Write one IELTS Academic Reading passage with 13 questions.', opts),
+    userLine(
+      'Write one IELTS Academic Reading passage with 13 questions.',
+      opts,
+    ),
   );
   return { data, warnings: validatePassage(data) };
 }
@@ -135,7 +147,9 @@ export function validateListeningTrack(t: GeneratedListeningTrack): string[] {
     else if (new Set(t.matchingOptions).size !== t.matchingOptions.length)
       problems.push('duplicate matching options in the shared list');
   } else if (t.matchingOptions?.length) {
-    problems.push('matchingOptions supplied but no matching question uses them');
+    problems.push(
+      'matchingOptions supplied but no matching question uses them',
+    );
   }
 
   for (const q of t.questions) {
@@ -147,8 +161,11 @@ export function validateListeningTrack(t: GeneratedListeningTrack): string[] {
         problems.push(`q${q.idx} matching must not carry its own options`);
       const answer = q.answer[0]!;
       if (!t.matchingOptions?.includes(answer))
-        problems.push(`q${q.idx} answer is not in the shared matchingOptions list`);
-      if (used.has(answer)) problems.push(`q${q.idx} reuses an already-used option`);
+        problems.push(
+          `q${q.idx} answer is not in the shared matchingOptions list`,
+        );
+      if (used.has(answer))
+        problems.push(`q${q.idx} reuses an already-used option`);
       used.add(answer);
       continue;
     }
@@ -178,7 +195,13 @@ export function flattenSpeakingTest(
   const prompts: SpeakingTestFile['prompts'] = [];
   let idx = 1;
   for (const q of t.part1)
-    prompts.push({ idx: idx++, part: 1, text: q.text, cueCardPoints: null, prepSeconds: 0 });
+    prompts.push({
+      idx: idx++,
+      part: 1,
+      text: q.text,
+      cueCardPoints: null,
+      prepSeconds: 0,
+    });
   prompts.push({
     idx: idx++,
     part: 2,
@@ -187,7 +210,13 @@ export function flattenSpeakingTest(
     prepSeconds: 60,
   });
   for (const q of t.part3)
-    prompts.push({ idx: idx++, part: 3, text: q.text, cueCardPoints: null, prepSeconds: 0 });
+    prompts.push({
+      idx: idx++,
+      part: 3,
+      text: q.text,
+      cueCardPoints: null,
+      prepSeconds: 0,
+    });
   return {
     slug: t.slug,
     title: t.title,

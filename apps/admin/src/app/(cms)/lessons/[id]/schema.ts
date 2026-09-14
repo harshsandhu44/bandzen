@@ -109,10 +109,7 @@ export type SaveLessonPayload = {
   stages: Array<{ id: (typeof LESSON_STAGES)[number]; blocks: LessonBlock[] }>;
 };
 
-export function toSave(
-  id: string,
-  v: LessonFormValues,
-): SaveLessonPayload {
+export function toSave(id: string, v: LessonFormValues): SaveLessonPayload {
   return {
     id,
     title: v.title.trim(),

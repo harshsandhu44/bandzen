@@ -6,7 +6,11 @@ import { FilterBar } from '@/components/app/filter-bar';
 import { LockedPracticeRow, QuotaMeter } from '@/components/billing/pro';
 import { capture } from '@/lib/analytics';
 import { requireUserId } from '@/lib/auth';
-import { DIFFICULTY_RANGE, listTracks, practiceAllowance } from '@/lib/db/queries';
+import {
+  DIFFICULTY_RANGE,
+  listTracks,
+  practiceAllowance,
+} from '@/lib/db/queries';
 import { QUESTION_KIND_LABEL } from '@/lib/modules';
 import { startListeningAttempt } from './actions';
 

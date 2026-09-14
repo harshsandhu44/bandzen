@@ -48,7 +48,10 @@ async function run(force: boolean) {
     }
 
     console.log(`  … synthesizing ${track.slug}`);
-    const audio = await synthesizeConversation(track.transcript, track.speakers);
+    const audio = await synthesizeConversation(
+      track.transcript,
+      track.speakers,
+    );
 
     track.audioUrl = await uploadObject({
       key: `listening/${track.slug}.mp3`,
