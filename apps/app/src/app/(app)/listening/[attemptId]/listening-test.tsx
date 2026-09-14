@@ -53,6 +53,7 @@ function Player({
   peaks: number[] | null;
 }) {
   const ref = useRef<HTMLAudioElement>(null);
+  const seekRef = useRef<HTMLInputElement>(null);
   const [state, setState] = useState<'idle' | 'playing' | 'paused' | 'ended'>(
     'idle',
   );
@@ -90,6 +91,21 @@ function Player({
     return () => clearInterval(id);
   }, [state, flush]);
 
+  // React aliases an input's `onChange` to the native *input* event, which
+  // fires on every pointermove of a drag and every arrow keypress. The native
+  // `change` — once, on release — is what a seek actually is, so it is
+  // attached by hand rather than counted in the React handler.
+  useEffect(() => {
+    const input = seekRef.current;
+    if (!input) return;
+    const onSeeked = () => {
+      counts.current.seeks += 1;
+      flush();
+    };
+    input.addEventListener('change', onSeeked);
+    return () => input.removeEventListener('change', onSeeked);
+  }, [flush]);
+
   const seekTo = (seconds: number) => {
     const audio = ref.current;
     if (!audio) return;
@@ -106,6 +122,18 @@ function Player({
         ref={ref}
         src={audioUrl}
         onLoadedMetadata={(e) => setDuration(e.currentTarget.duration)}
+        onPlay={() => setState('playing')}
+        // Driven by the element, not the button: unplugging headphones or
+        // hitting an OS media key pauses the audio too, and a `state` left on
+        // 'playing' would keep the wall clock accumulating against silence.
+        onPause={() => {
+          // Some browsers fire `pause` alongside the end of playback; the
+          // `ended` attribute is already set by then. Not a candidate pause.
+          if (ref.current?.ended) return;
+          counts.current.pauses += 1;
+          setState('paused');
+          flush();
+        }}
         onEnded={() => {
           setState('ended');
           flush();
@@ -123,13 +151,8 @@ function Player({
           value={currentTime}
           disabled={state === 'idle'}
           aria-label="Seek"
-          // Continuous while dragging or held; `onChange` below is what counts
-          // the seek, so one drag is one seek rather than forty.
-          onInput={(e) => seekTo(Number(e.currentTarget.value))}
-          onChange={() => {
-            counts.current.seeks += 1;
-            flush();
-          }}
+          ref={seekRef}
+          onChange={(e) => seekTo(Number(e.currentTarget.value))}
           className="absolute inset-0 h-full w-full cursor-pointer appearance-none bg-transparent opacity-0 focus-visible:opacity-100 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring disabled:cursor-default"
         />
       </div>
@@ -137,10 +160,7 @@ function Player({
       {state === 'idle' ? (
         <Button
           type="button"
-          onClick={() => {
-            void ref.current?.play();
-            setState('playing');
-          }}
+          onClick={() => void ref.current?.play()}
         >
           Start listening
         </Button>
@@ -155,14 +175,10 @@ function Player({
               if (!audio) return;
               if (state === 'playing') {
                 audio.pause();
-                counts.current.pauses += 1;
-                setState('paused');
-                flush();
                 return;
               }
               if (state === 'ended') audio.currentTime = 0;
               void audio.play();
-              setState('playing');
             }}
           >
             {state === 'playing' ? (
