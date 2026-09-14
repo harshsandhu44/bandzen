@@ -10,7 +10,7 @@ import { checkAwards } from '@/lib/award-check';
 import { writingLengthCeiling } from '@/lib/grading';
 import { openai } from './client';
 import { GRADER_MODEL } from './models';
-import { WRITING_RUBRIC } from './rubric';
+import { buildWritingMessages } from './messages';
 import { CRITERION_NAMES, writingEvaluationSchema } from './schemas';
 import { parseStructured, strictJsonSchema } from './structured';
 
@@ -63,14 +63,7 @@ export async function gradeEssay(attemptId: string) {
 
     const response = await openai().chat.completions.create({
       model: GRADER_MODEL,
-      messages: [
-        // The rubric MUST come first and byte-identical -- see rubric.ts.
-        { role: 'system', content: WRITING_RUBRIC },
-        {
-          role: 'user',
-          content: `Task ${work.task}.\n\nPROMPT\n${work.promptText}\n\nCANDIDATE RESPONSE (${work.wordCount} words)\n${work.body}`,
-        },
-      ],
+      messages: buildWritingMessages(work),
       response_format: {
         type: 'json_schema',
         json_schema: {
@@ -115,7 +108,9 @@ export async function gradeEssay(attemptId: string) {
     console.log(
       `[grade] ${attemptId} band ${band} · model ${GRADER_MODEL} · cached_tokens ${
         usage?.prompt_tokens_details?.cached_tokens ?? 0
-      }/${usage?.prompt_tokens ?? 0}`,
+      }/${usage?.prompt_tokens ?? 0} · completion_tokens ${
+        usage?.completion_tokens ?? 0
+      }`,
     );
   } catch (error) {
     console.error(`[grade] ${attemptId} failed`, error);

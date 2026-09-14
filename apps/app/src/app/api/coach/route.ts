@@ -1,11 +1,12 @@
 import { after } from 'next/server';
 import { auth } from '@clerk/nextjs/server';
 import { z } from 'zod';
+import type { ChatCompletionChunk } from 'openai/resources/chat/completions';
 import { openai } from '@/lib/ai/client';
 import { buildCoachContext, COACH_SYSTEM, MAX_TURNS } from '@/lib/ai/coach';
 import { capture } from '@/lib/analytics';
 import { coachAllowance, recordCoachMessage } from '@/lib/db/queries';
-import { GRADER_MODEL } from '@/lib/ai/models';
+import { COACH_MODEL } from '@/lib/ai/models';
 
 /**
  * One of the two route handlers in the application.
@@ -63,8 +64,12 @@ export async function POST(request: Request) {
   const context = await buildCoachContext(userId);
 
   const stream = await openai().chat.completions.create({
-    model: GRADER_MODEL,
+    model: COACH_MODEL,
     stream: true,
+    // The usage chunk arrives last and carries no delta, so it costs nothing
+    // to ask for. Without it the Coach is the one recurring model call whose
+    // spend cannot be measured at all -- see the log in `finally` below.
+    stream_options: { include_usage: true },
     messages: [
       // First and byte-identical, so prompt caching applies -- see coach.ts.
       { role: 'system', content: COACH_SYSTEM },
@@ -78,8 +83,11 @@ export async function POST(request: Request) {
   return new Response(
     new ReadableStream({
       async start(controller) {
+        // Set by the final chunk, which carries usage and no choices.
+        let usage: ChatCompletionChunk['usage'];
         try {
           for await (const chunk of stream) {
+            if (chunk.usage) usage = chunk.usage;
             const text = chunk.choices[0]?.delta?.content;
             if (text) controller.enqueue(encoder.encode(text));
           }
@@ -91,6 +99,14 @@ export async function POST(request: Request) {
             encoder.encode('\n\n[The answer was cut short. Please ask again.]'),
           );
         } finally {
+          // Same shape as the grader logs, so all three are greppable together.
+          // A stream the reader aborted never yields the usage chunk; that is
+          // a real spend we cannot see, not a bug to work around here.
+          if (usage) {
+            console.log(
+              `[coach] model=${COACH_MODEL} cached_tokens ${usage.prompt_tokens_details?.cached_tokens ?? 0}/${usage.prompt_tokens} completion_tokens ${usage.completion_tokens}`,
+            );
+          }
           controller.close();
         }
       },

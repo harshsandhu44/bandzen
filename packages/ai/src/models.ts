@@ -29,6 +29,19 @@ export const CONTENT_MODEL = process.env.OPENAI_CONTENT_MODEL ?? 'gpt-5.5';
  * `parseStructured` validates the reply. Re-check against this account's
  * /v1/models when changing it — a wrong id 404s at call time, and the env
  * override makes a correction a redeploy rather than a code change.
+ *
+ * DEPRECATED BY OPENAI — shutdown 2027-01-20, sole replacement `gpt-audio-1.5`.
+ * That replacement costs 3.2x on audio tokens and 4.2x on text, and does not
+ * document prompt caching, so the pinned rubric prefix may stop paying off.
+ * Migrate on eval evidence before the shutdown date, not after it.
  */
 export const SPEAKING_GRADER_MODEL =
   process.env.OPENAI_SPEAKING_GRADER_MODEL ?? 'gpt-audio-mini';
+
+/**
+ * Answers Coach chat. Split from GRADER_MODEL deliberately: grading optimises
+ * for agreement with a rubric, tutoring for usefulness in conversation, and
+ * one eval cannot promote a model for both. Starts on the same id the Coach
+ * has always used, so splitting it changed no behaviour.
+ */
+export const COACH_MODEL = process.env.OPENAI_COACH_MODEL ?? 'gpt-5.4-mini';
