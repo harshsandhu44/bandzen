@@ -17,6 +17,7 @@ export const TOEFL_IBT = {
   source: 'https://www.ets.org/toefl/test-takers/ibt/about/content.html',
   variants: [],
   scoreScale: { label: 'Band', min: 1, max: 6, step: 0.5 },
+  targetRange: { min: 3, max: 6, step: 0.5 },
   sections: [
     { key: 'reading', label: 'Reading', skills: ['reading'], minutes: null },
     {
