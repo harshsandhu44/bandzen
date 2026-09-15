@@ -54,6 +54,8 @@ export function preparationWrites(values: PreparationValues) {
       selfAssessedScore,
       testDate,
     },
-    profile: { ...profile, activeExamKey: examKey, ...legacy },
+    // Only a save that names its exam moves the active one — the diagnostic's
+    // target-and-date save must not switch a PTE candidate back to IELTS.
+    profile: { ...profile, ...legacy, activeExamKey: values.examKey },
   };
 }

@@ -4,10 +4,16 @@ import { PageHeader } from '@/components/app/primitives';
 import { PreparationForm } from '@/components/app/preparation-form';
 import { capture } from '@/lib/analytics';
 import { requireUserId } from '@/lib/auth';
-import { getProfile } from '@/lib/db/queries';
+import { EXAM_KEYS } from '@bandzen/exams/registry';
+import { examHasContent, getProfile } from '@/lib/db/queries';
 import { saveOnboarding } from './actions';
 
 export const metadata = { title: 'Set up your preparation' };
+
+async function examsWithContent() {
+  const has = await Promise.all(EXAM_KEYS.map((k) => examHasContent(k)));
+  return EXAM_KEYS.filter((_, i) => has[i]);
+}
 
 export default async function OnboardingPage() {
   const userId = await requireUserId();
@@ -34,7 +40,9 @@ export default async function OnboardingPage() {
         mode="onboarding"
         action={saveOnboarding}
         submitLabel="Build my plan"
+        withContent={await examsWithContent()}
         defaults={{
+          examKey: profile?.examKey ?? null,
           examVariant: profile?.examVariant ?? null,
           targetScore: profile?.targetScore ?? null,
           testDate: profile?.testDate ?? null,

@@ -4,6 +4,7 @@ import { preparationWrites } from './enrollment.ts';
 
 test('an IELTS save writes the enrollment and mirrors the legacy profile columns', () => {
   const { enrollment, profile } = preparationWrites({
+    examKey: 'ielts',
     examVariant: 'general',
     targetScore: 7.5,
     selfAssessedScore: null,
@@ -37,6 +38,7 @@ test('a partial save leaves the fields it does not mention undefined', () => {
   assert.equal(enrollment.examVariant, undefined);
   assert.equal(enrollment.selfAssessedScore, undefined);
   assert.equal(profile.examType, undefined);
+  assert.equal(profile.activeExamKey, undefined);
   assert.equal(profile.targetBand, 6.5);
   assert.equal('onboardingCompletedAt' in profile, false);
 });
