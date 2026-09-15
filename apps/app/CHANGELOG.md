@@ -1,3 +1,10 @@
+# app [1.18.0](https://github.com/harshsandhu44/bandzen/compare/app@1.17.0...app@1.18.0) (2026-09-15)
+
+
+### Features
+
+* **admin:** exam- and task-aware content pipeline ([#108](https://github.com/harshsandhu44/bandzen/issues/108)) ([e4d136a](https://github.com/harshsandhu44/bandzen/commit/e4d136a8412702875c261f905b1be50b7ee417bb))
+
 # app [1.17.0](https://github.com/harshsandhu44/bandzen/compare/app@1.16.0...app@1.17.0) (2026-09-15)
 
 
