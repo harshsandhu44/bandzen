@@ -1,3 +1,10 @@
+# admin [0.14.0](https://github.com/harshsandhu44/bandzen/compare/admin@0.13.0...admin@0.14.0) (2026-09-15)
+
+
+### Features
+
+* **admin:** exam- and task-aware content pipeline ([#108](https://github.com/harshsandhu44/bandzen/issues/108)) ([e4d136a](https://github.com/harshsandhu44/bandzen/commit/e4d136a8412702875c261f905b1be50b7ee417bb))
+
 # admin [0.13.0](https://github.com/harshsandhu44/bandzen/compare/admin@0.12.0...admin@0.13.0) (2026-09-15)
 
 
