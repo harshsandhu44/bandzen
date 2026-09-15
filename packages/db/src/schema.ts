@@ -16,6 +16,7 @@ import {
   type AnyPgColumn,
 } from 'drizzle-orm/pg-core';
 import { CURRENT_EXAM_VERSION, EXAM_KEYS } from '@bandzen/exams/registry';
+import type { AssessmentResult } from '@bandzen/exams/scoring';
 
 /**
  * The source of truth for both the schema and every TypeScript type derived
@@ -672,6 +673,12 @@ export const attempts = pgTable(
     band: numeric('band', { precision: 2, scale: 1, mode: 'number' }),
     /** The result on the attempt's own exam scale. */
     score: numeric('score', { precision: 5, scale: 1, mode: 'number' }),
+    /**
+     * The normalised result every grader produces, deterministic or model:
+     * score, named dimensions, the skills it counts towards, feedback. Null
+     * until marked, and on attempts marked before it existed.
+     */
+    assessment: jsonb('assessment').$type<AssessmentResult | null>(),
     startedAt: timestamp('started_at', { withTimezone: true })
       .notNull()
       .defaultNow(),
