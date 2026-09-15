@@ -40,7 +40,7 @@ export default async function WritingReportPage({
       capture(userId, 'report_viewed', {
         module: 'writing',
         attempt_id: attemptId,
-        overall_band: attempt.band,
+        overall_band: attempt.score,
       }),
     );
   }

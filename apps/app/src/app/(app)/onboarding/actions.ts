@@ -45,16 +45,17 @@ export async function saveOnboarding(
         days_to_test: profile?.testDate
           ? daysUntil(profile.testDate, profile.timezone)
           : null,
-        self_assessed: parsed.data.selfAssessedBand != null,
+        self_assessed: parsed.data.selfAssessedScore != null,
         study_minutes: parsed.data.studyMinutes,
       },
       {
-        exam_type: parsed.data.examType,
-        target_band: parsed.data.targetBand,
+        exam_key: 'ielts',
+        exam_type: parsed.data.examVariant,
+        target_band: parsed.data.targetScore,
         plan: 'free',
       },
     ),
   );
 
-  redirect(profile?.selfAssessedBand == null ? '/diagnostic' : '/');
+  redirect(profile?.selfAssessedScore == null ? '/diagnostic' : '/');
 }

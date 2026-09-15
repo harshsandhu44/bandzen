@@ -94,7 +94,7 @@ export default async function DashboardPage() {
           />
           <DashboardStats
             estimated={null}
-            target={profile.targetBand}
+            target={profile.targetScore}
             daysUntilTest={days}
             streak={streak}
             longestStreak={bestStreak}
@@ -121,7 +121,7 @@ export default async function DashboardPage() {
         firstName={user?.firstName ?? null}
         timezone={profile.timezone}
         estimated={estimated}
-        target={profile.targetBand}
+        target={profile.targetScore}
         daysUntilTest={days}
         streak={streak}
         longestStreak={bestStreak}
@@ -143,7 +143,7 @@ export default async function DashboardPage() {
               writing: data.writingBand,
               listening: data.listeningBand,
             }}
-            target={profile.targetBand}
+            target={profile.targetScore}
           />
         </div>
 

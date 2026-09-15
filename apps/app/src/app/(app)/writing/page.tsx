@@ -48,7 +48,7 @@ export default async function WritingPage({
     essayAllowance(userId),
   ]);
 
-  const examType = profile?.examType ?? 'academic';
+  const examVariant = profile?.examVariant ?? 'academic';
 
   if (!quota.unlimited && quota.remaining === 0) {
     await capture(userId, 'quota_exhausted', { surface: 'writing' });
@@ -83,7 +83,7 @@ export default async function WritingPage({
       {/* Task 1 differs by exam, and we know which exam they are sitting. */}
       {task === 1 || !task ? (
         <p className="text-xs text-muted-foreground">
-          {TASK_ONE_LABEL[examType]}. Task 2 is the same essay for both exams
+          {TASK_ONE_LABEL[examVariant]}. Task 2 is the same essay for both exams
           and carries twice the marks.
         </p>
       ) : null}

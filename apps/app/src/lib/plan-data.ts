@@ -12,7 +12,7 @@ import {
   listTracks,
   listWritingPrompts,
 } from '@/lib/db/queries';
-import type { Profile } from '@/lib/db/schema';
+import type { Profile } from '@/lib/db/queries';
 import {
   buildPlan,
   derivePlanState,
@@ -90,7 +90,7 @@ export async function loadPlanData(
     readingBand,
     writingBand,
     listeningBand,
-    targetBand: profile.targetBand,
+    targetBand: profile.targetScore,
     testDate: profile.testDate,
     weaknesses: report?.weaknesses ?? undefined,
     weakKinds: [...kindAccuracy]

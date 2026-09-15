@@ -23,8 +23,8 @@ const blankToNull = <T extends z.ZodType>(schema: T) =>
   z.preprocess((v) => (v === '' || v == null ? null : v), schema.nullable());
 
 export const profileSchema = z.object({
-  examType: z.enum(['academic', 'general']),
-  targetBand: band,
+  examVariant: z.enum(['academic', 'general']),
+  targetScore: band,
   testDate: blankToNull(
     z
       .string()
@@ -32,7 +32,7 @@ export const profileSchema = z.object({
   ),
   // "I don't know" is a real answer and the reason the diagnostic exists, so
   // it is stored as null rather than guessed at.
-  selfAssessedBand: blankToNull(band),
+  selfAssessedScore: blankToNull(band),
   studyMinutes: z.coerce
     .number()
     .int()
@@ -45,10 +45,10 @@ export type ProfileInput = z.infer<typeof profileSchema>;
 
 export function parseProfileForm(formData: FormData) {
   return profileSchema.safeParse({
-    examType: formData.get('examType'),
-    targetBand: formData.get('targetBand'),
+    examVariant: formData.get('examVariant'),
+    targetScore: formData.get('targetScore'),
     testDate: formData.get('testDate'),
-    selfAssessedBand: formData.get('selfAssessedBand'),
+    selfAssessedScore: formData.get('selfAssessedScore'),
     studyMinutes: formData.get('studyMinutes'),
     timezone: formData.get('timezone'),
   });

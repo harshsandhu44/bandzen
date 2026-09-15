@@ -108,7 +108,7 @@ export async function submitListeningAttempt(formData: FormData) {
         module: 'listening',
         attempt_id: attemptId,
         outcome: 'graded',
-        overall_band: graded.band,
+        overall_band: graded.score,
         playback_pauses: graded.playback?.pauses ?? 0,
         playback_seeks: graded.playback?.seeks ?? 0,
       }),

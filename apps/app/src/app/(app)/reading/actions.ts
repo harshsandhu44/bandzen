@@ -94,7 +94,7 @@ export async function submitReadingAttempt(formData: FormData) {
         module: 'reading',
         attempt_id: attemptId,
         outcome: 'graded',
-        overall_band: graded.band,
+        overall_band: graded.score,
       }),
     );
   }

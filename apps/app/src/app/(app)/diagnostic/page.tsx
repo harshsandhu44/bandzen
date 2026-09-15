@@ -86,15 +86,15 @@ export default async function DiagnosticPage() {
 
       <form action={startDiagnostic} className="space-y-4">
         <div className="space-y-2">
-          <Label htmlFor="targetBand">Target band</Label>
+          <Label htmlFor="targetScore">Target band</Label>
           <Input
-            id="targetBand"
-            name="targetBand"
+            id="targetScore"
+            name="targetScore"
             type="number"
             min={4}
             max={9}
             step={0.5}
-            defaultValue={profile?.targetBand ?? 7}
+            defaultValue={profile?.targetScore ?? 7}
             required
             className="font-mono"
           />

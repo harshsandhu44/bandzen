@@ -59,11 +59,11 @@ export async function buildCoachContext(userId: string): Promise<string> {
   const lines: string[] = ['THIS CANDIDATE'];
 
   lines.push(
-    `Exam: IELTS ${profile?.examType === 'general' ? 'General Training' : 'Academic'}.`,
+    `Exam: IELTS ${profile?.examVariant === 'general' ? 'General Training' : 'Academic'}.`,
   );
   lines.push(
-    profile?.targetBand != null
-      ? `Target band: ${profile.targetBand.toFixed(1)}.`
+    profile?.targetScore != null
+      ? `Target band: ${profile.targetScore.toFixed(1)}.`
       : 'Target band: not set.',
   );
   lines.push(

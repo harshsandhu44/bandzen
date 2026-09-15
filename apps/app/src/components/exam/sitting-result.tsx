@@ -31,17 +31,17 @@ function pendingNote(...statuses: (string | undefined)[]): string {
 }
 
 export function sittingBands(s: SittingSections) {
-  const listening = s.listening?.band ?? null;
-  const reading = s.reading?.band ?? null;
+  const listening = s.listening?.score ?? null;
+  const reading = s.reading?.score ?? null;
   // A diagnostic has Task 2 only — its band is the writing band. A mock
   // weights the two tasks.
   const writing =
-    s.task1?.band != null && s.task2?.band != null
-      ? writingSectionBand(s.task1.band, s.task2.band)
+    s.task1?.score != null && s.task2?.score != null
+      ? writingSectionBand(s.task1.score, s.task2.score)
       : s.task1 == null
-        ? (s.task2?.band ?? null)
+        ? (s.task2?.score ?? null)
         : null;
-  const speaking = s.speaking?.band ?? null;
+  const speaking = s.speaking?.score ?? null;
   return { listening, reading, writing, speaking };
 }
 

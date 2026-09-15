@@ -26,6 +26,7 @@ import {
   windowStart,
 } from '@/lib/entitlements';
 import { isAnswerCorrect, readingBand } from '@/lib/grading';
+import { preparationWrites, type PreparationValues } from '@/lib/enrollment';
 import { union } from 'drizzle-orm/pg-core';
 import { db } from './index';
 import {
@@ -35,6 +36,7 @@ import {
   awards,
   coachMessages,
   essays,
+  examEnrollments,
   lessonProgress,
   listeningTracks,
   mockAttempts,
@@ -100,27 +102,62 @@ export {
  */
 export const getProfile = cache(async function getProfile(userId: string) {
   const [row] = await db
-    .select()
+    .select({
+      userId: profiles.userId,
+      studyMinutes: profiles.studyMinutes,
+      timezone: profiles.timezone,
+      onboardingCompletedAt: profiles.onboardingCompletedAt,
+      createdAt: profiles.createdAt,
+      // The active enrollment's half. Null throughout until they pick an exam.
+      examKey: examEnrollments.examKey,
+      examVariant: examEnrollments.examVariant,
+      examVersion: examEnrollments.examVersion,
+      targetScore: examEnrollments.targetScore,
+      selfAssessedScore: examEnrollments.selfAssessedScore,
+      testDate: examEnrollments.testDate,
+    })
     .from(profiles)
+    .leftJoin(
+      examEnrollments,
+      and(
+        eq(examEnrollments.userId, profiles.userId),
+        eq(examEnrollments.examKey, profiles.activeExamKey),
+      ),
+    )
     .where(eq(profiles.userId, userId));
   return row ?? null;
 });
 
-type ProfileValues = {
-  examType?: 'academic' | 'general' | null;
-  targetBand?: number | null;
-  testDate?: string | null;
-  selfAssessedBand?: number | null;
-  studyMinutes?: number | null;
-  timezone?: string | null;
-  onboardingCompletedAt?: Date | null;
-};
+/** A profile as the app sees it: the user's settings plus their active exam. */
+export type Profile = NonNullable<Awaited<ReturnType<typeof getProfile>>>;
 
-export async function upsertProfile(userId: string, values: ProfileValues) {
+/**
+ * Two writes, no transaction (neon-http has none). The enrollment goes first so
+ * `active_exam_key` never points at a row that does not exist yet.
+ */
+export async function upsertProfile(userId: string, values: PreparationValues) {
+  const { enrollment, profile } = preparationWrites(values);
+
+  await db
+    .insert(examEnrollments)
+    .values({ userId, ...enrollment })
+    .onConflictDoUpdate({
+      target: [examEnrollments.userId, examEnrollments.examKey],
+      // Not the version: that is the format they enrolled under, and editing a
+      // target does not move them onto a newer one.
+      set: {
+        examVariant: enrollment.examVariant,
+        targetScore: enrollment.targetScore,
+        selfAssessedScore: enrollment.selfAssessedScore,
+        testDate: enrollment.testDate,
+        updatedAt: new Date(),
+      },
+    });
+
   await db
     .insert(profiles)
-    .values({ userId, ...values })
-    .onConflictDoUpdate({ target: profiles.userId, set: values });
+    .values({ userId, ...profile })
+    .onConflictDoUpdate({ target: profiles.userId, set: profile });
 }
 
 /**
@@ -130,7 +167,7 @@ export async function upsertProfile(userId: string, values: ProfileValues) {
  */
 export async function completeOnboarding(
   userId: string,
-  values: Omit<ProfileValues, 'onboardingCompletedAt'>,
+  values: Omit<PreparationValues, 'onboardingCompletedAt'>,
 ) {
   await upsertProfile(userId, { ...values, onboardingCompletedAt: new Date() });
 }
@@ -373,7 +410,14 @@ export async function createMockAttempt(values: {
   writingTask2PromptId: string;
   speakingTestId: string;
 }) {
-  const [row] = await db.insert(mockAttempts).values(values).returning();
+  const [row] = await db
+    .insert(mockAttempts)
+    .values({
+      ...values,
+      // A sitting is the variant its reading passages were picked for.
+      examVariant: sql`(select format::text from passages where id = ${values.readingPassageIds[0] ?? null})`,
+    })
+    .returning();
   if (!row) throw new Error('Could not create mock attempt');
   return row;
 }
@@ -679,7 +723,7 @@ export async function listCompletedAttempts(userId: string, limit = 20) {
       id: attempts.id,
       module: attempts.module,
       kind: attempts.kind,
-      band: attempts.band,
+      band: attempts.score,
       submittedAt: attempts.submittedAt,
     })
     .from(attempts)
@@ -690,14 +734,14 @@ export async function listCompletedAttempts(userId: string, limit = 20) {
 
 export async function latestBand(userId: string, module: Skill) {
   const [row] = await db
-    .select({ band: attempts.band })
+    .select({ band: attempts.score })
     .from(attempts)
     .where(
       and(
         eq(attempts.userId, userId),
         eq(attempts.module, module),
         eq(attempts.status, 'complete'),
-        isNotNull(attempts.band),
+        isNotNull(attempts.score),
       ),
     )
     .orderBy(desc(attempts.submittedAt))
@@ -733,6 +777,29 @@ export async function findInProgress(
   );
 }
 
+/**
+ * Only IELTS Reading and Writing differ between Academic and General Training,
+ * so only they carry a variant: their passage's or prompt's, or failing that
+ * (a mock section spans several passages) the sitting's.
+ */
+function attemptVariant(values: {
+  module: Skill;
+  passageId?: string;
+  promptId?: string;
+  mockAttemptId?: string;
+}) {
+  if (values.module !== 'reading' && values.module !== 'writing') return null;
+  return sql<string | null>`coalesce(
+    (select format::text from passages where id = ${values.passageId ?? null}),
+    (select format::text from writing_prompts where id = ${values.promptId ?? null}),
+    (select exam_variant from mock_attempts where id = ${values.mockAttemptId ?? null})
+  )`;
+}
+
+// ponytail: `band` is dual-written beside `score` so a rollback reads current
+// data. Inline `score` and delete this with the column in the drop follow-up.
+const scored = (band: number) => ({ band, score: band });
+
 export async function createAttempt(values: {
   userId: string;
   module: Skill;
@@ -746,7 +813,16 @@ export async function createAttempt(values: {
 }) {
   const [row] = await db
     .insert(attempts)
-    .values(values)
+    .values({
+      ...values,
+      examVariant: attemptVariant(values),
+      taskType: {
+        reading: values.passageId ? 'reading_passage' : 'reading_section',
+        listening: values.trackId ? 'listening_track' : 'listening_section',
+        writing: sql`(select 'writing_task_' || task from writing_prompts where id = ${values.promptId ?? null})`,
+        speaking: 'speaking_test',
+      }[values.module],
+    })
     .returning({ id: attempts.id });
   if (!row) throw new Error('Could not create attempt');
   if (values.module === 'writing') {
@@ -884,7 +960,7 @@ export async function submitReading(userId: string, attemptId: string) {
       status: 'complete',
       rawScore: correct,
       total,
-      band: readingBand(correct, total),
+      ...scored(readingBand(correct, total)),
       submittedAt: new Date(),
     })
     .where(
@@ -1012,7 +1088,7 @@ export async function submitMockReading(userId: string, attemptId: string) {
       status: 'complete',
       rawScore: correct,
       total,
-      band: readingBand(correct, total),
+      ...scored(readingBand(correct, total)),
       submittedAt: new Date(),
     })
     .where(
@@ -1148,7 +1224,7 @@ export async function submitListening(userId: string, attemptId: string) {
       status: 'complete',
       rawScore: correct,
       total,
-      band: readingBand(correct, total),
+      ...scored(readingBand(correct, total)),
       submittedAt: new Date(),
     })
     .where(
@@ -1283,7 +1359,7 @@ export async function submitMockListening(userId: string, attemptId: string) {
       status: 'complete',
       rawScore: correct,
       total,
-      band: readingBand(correct, total),
+      ...scored(readingBand(correct, total)),
       submittedAt: new Date(),
     })
     .where(
@@ -1790,7 +1866,7 @@ export async function bandHistory(userId: string, module?: Skill) {
   return db
     .select({
       module: attempts.module,
-      band: attempts.band,
+      band: attempts.score,
       submittedAt: attempts.submittedAt,
     })
     .from(attempts)
@@ -1798,7 +1874,7 @@ export async function bandHistory(userId: string, module?: Skill) {
       and(
         eq(attempts.userId, userId),
         eq(attempts.status, 'complete'),
-        isNotNull(attempts.band),
+        isNotNull(attempts.score),
         isNotNull(attempts.submittedAt),
         ...(module ? [eq(attempts.module, module)] : []),
       ),
@@ -1897,17 +1973,22 @@ export async function writeReport(
     model: string;
   },
 ) {
+  const report = { ...values, score: values.band };
   await db
     .insert(reports)
-    .values({ attemptId, ...values })
-    .onConflictDoUpdate({ target: reports.attemptId, set: values });
+    .values({ attemptId, ...report })
+    .onConflictDoUpdate({ target: reports.attemptId, set: report });
 
   // Returns the owner because this is where a writing attempt becomes a study
   // day -- `submitEssay` leaves it on 'grading' -- and the caller has no userId
   // of its own to check awards with.
   const [row] = await db
     .update(attempts)
-    .set({ status: 'complete', band: values.band, submittedAt: new Date() })
+    .set({
+      status: 'complete',
+      ...scored(values.band),
+      submittedAt: new Date(),
+    })
     .where(eq(attempts.id, attemptId))
     .returning({ userId: attempts.userId });
   return row?.userId ?? null;

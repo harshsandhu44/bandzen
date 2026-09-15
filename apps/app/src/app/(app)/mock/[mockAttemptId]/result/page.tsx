@@ -21,7 +21,7 @@ export default async function MockResultPage({
     <div className="max-w-2xl space-y-10">
       <SittingResult
         sections={data}
-        target={profile?.targetBand ?? null}
+        target={profile?.targetScore ?? null}
         eyebrow="Mock test result"
       />
     </div>

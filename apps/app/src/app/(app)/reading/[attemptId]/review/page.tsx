@@ -25,7 +25,7 @@ export default async function ReadingReviewPage({
     capture(userId, 'report_viewed', {
       module: 'reading',
       attempt_id: attemptId,
-      overall_band: attempt.band,
+      overall_band: attempt.score,
     }),
   );
 
@@ -39,7 +39,7 @@ export default async function ReadingReviewPage({
     <ObjectiveReview
       module="reading"
       title={data.passage.title}
-      band={attempt.band}
+      band={attempt.score}
       rawScore={attempt.rawScore}
       total={attempt.total}
       rows={data.rows}

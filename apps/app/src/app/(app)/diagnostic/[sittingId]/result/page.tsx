@@ -79,7 +79,7 @@ export default async function DiagnosticResultPage({
     readingBand: bands.reading,
     writingBand: bands.writing,
     listeningBand: bands.listening,
-    targetBand: profile?.targetBand ?? null,
+    targetBand: profile?.targetScore ?? null,
     testDate: profile?.testDate ?? null,
     weaknesses: data.weaknesses,
   };
@@ -88,7 +88,7 @@ export default async function DiagnosticResultPage({
     <div className="max-w-2xl space-y-10">
       <SittingResult
         sections={data}
-        target={profile?.targetBand ?? null}
+        target={profile?.targetScore ?? null}
         eyebrow="Diagnostic result"
         overallLabel={
           data.speaking

@@ -92,8 +92,8 @@ export default async function UpgradePage(props: PageProps<'/upgrade'>) {
     : null;
   const measured = meanBand(reading, writing, listening, speaking);
   const gap =
-    profile?.targetBand != null && measured != null
-      ? profile.targetBand - measured
+    profile?.targetScore != null && measured != null
+      ? profile.targetScore - measured
       : null;
 
   return (
@@ -133,7 +133,7 @@ export default async function UpgradePage(props: PageProps<'/upgrade'>) {
               <div className="flex flex-wrap justify-between gap-2">
                 <dt className="text-muted-foreground">To your target</dt>
                 <dd className="tabular-nums">
-                  {measured!.toFixed(1)} → {profile!.targetBand!.toFixed(1)} ·{' '}
+                  {measured!.toFixed(1)} → {profile!.targetScore!.toFixed(1)} ·{' '}
                   {gap.toFixed(1)} of a band
                 </dd>
               </div>
