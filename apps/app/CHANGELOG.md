@@ -1,3 +1,10 @@
+# app [1.11.0](https://github.com/harshsandhu44/bandzen/compare/app@1.10.3...app@1.11.0) (2026-09-15)
+
+
+### Features
+
+* **app:** highlight reading texts, questionnaire-style answer choices ([#77](https://github.com/harshsandhu44/bandzen/issues/77)) ([7c41c1e](https://github.com/harshsandhu44/bandzen/commit/7c41c1e7e03745dfcbc1dc76a26cbf7a892b7925))
+
 ## app [1.10.3](https://github.com/harshsandhu44/bandzen/compare/app@1.10.2...app@1.10.3) (2026-09-14)
 
 
