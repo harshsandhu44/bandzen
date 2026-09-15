@@ -1,6 +1,6 @@
 import type { ChatCompletionMessageParam } from 'openai/resources/chat/completions';
-import { WRITING_RUBRIC } from './rubric.ts';
-import { SPEAKING_RUBRIC } from './speaking-rubric.ts';
+import type { ExamKey } from '@bandzen/exams/registry';
+import { rubricFor } from './rubrics.ts';
 
 /**
  * The exact messages each grader sends, and nothing else.
@@ -45,13 +45,15 @@ const PART_LABEL: Record<number, string> = {
 };
 
 export function buildWritingMessages(work: {
+  /** Whose rubric grades it. Absent means IELTS, as every graded essay so far is. */
+  examKey?: ExamKey;
   task: number;
   promptText: string;
   wordCount: number;
   body: string;
 }): ChatCompletionMessageParam[] {
   return [
-    { role: 'system', content: WRITING_RUBRIC },
+    { role: 'system', content: rubricFor(work.examKey ?? 'ielts', 'writing') },
     {
       role: 'user',
       content: `Task ${work.task}.\n\nPROMPT\n${work.promptText}\n\nCANDIDATE RESPONSE (${work.wordCount} words)\n${work.body}`,
@@ -68,6 +70,8 @@ export function buildWritingMessages(work: {
 export function buildSpeakingMessages(
   prompts: Array<{ promptId: string; part: number; text: string }>,
   clips: Array<{ promptId: string; bytes: Uint8Array }>,
+  /** Whose rubric grades it. Every Speaking test so far is IELTS. */
+  exam: ExamKey = 'ielts',
 ): ChatCompletionMessageParam[] {
   const content: Array<
     | { type: 'text'; text: string }
@@ -106,7 +110,7 @@ export function buildSpeakingMessages(
   }
 
   return [
-    { role: 'system', content: SPEAKING_RUBRIC },
+    { role: 'system', content: rubricFor(exam, 'speaking') },
     { role: 'system', content: SPEAKING_RESPONSE_SHAPE },
     { role: 'user', content },
   ];
