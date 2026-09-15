@@ -42,9 +42,12 @@ export function Timer({
   const ss = String(total % 60).padStart(2, '0');
 
   return (
+    // The server renders the clock a moment before the browser hydrates it, so
+    // the seconds can differ by one; that is expected, not a mismatch to fix.
     <p
       role="timer"
       aria-live="off"
+      suppressHydrationWarning
       className={cn(
         'font-metric text-metric-sm tabular-nums',
         expired ? 'text-destructive' : total < 300 && 'text-chrome',

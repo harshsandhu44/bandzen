@@ -3,7 +3,7 @@
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { cn } from '@bandzen/ui/lib/utils';
-import { EXAM_RUNNER } from './exam-route';
+import { isExamRunner } from './exam-route';
 import { isActive, NAV_LINKS } from './nav-links';
 
 /**
@@ -36,7 +36,7 @@ const ITEM =
 export function MobileNav() {
   const pathname = usePathname();
 
-  if (EXAM_RUNNER.test(pathname)) return null;
+  if (isExamRunner(pathname)) return null;
 
   return (
     <nav

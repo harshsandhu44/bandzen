@@ -120,6 +120,9 @@ importers:
       '@bandzen/db':
         specifier: workspace:*
         version: link:../../packages/db
+      '@bandzen/exams':
+        specifier: workspace:*
+        version: link:../../packages/exams
       '@bandzen/pricing':
         specifier: workspace:*
         version: link:../../packages/pricing
@@ -382,6 +385,9 @@ importers:
 
   packages/db:
     dependencies:
+      '@bandzen/exams':
+        specifier: workspace:*
+        version: link:../exams
       '@neondatabase/serverless':
         specifier: ^1.1.0
         version: 1.1.0
@@ -428,6 +434,24 @@ importers:
       typescript-eslint:
         specifier: ^8.68.0
         version: 8.68.0(eslint@9.39.5(jiti@2.7.0)(supports-color@8.1.1))(supports-color@8.1.1)(typescript@5.9.3)
+
+  packages/exams:
+    devDependencies:
+      '@bandzen/eslint-config':
+        specifier: workspace:*
+        version: link:../eslint-config
+      '@bandzen/tsconfig':
+        specifier: workspace:*
+        version: link:../tsconfig
+      '@types/node':
+        specifier: ^20
+        version: 20.19.43
+      eslint:
+        specifier: ^9
+        version: 9.39.5(jiti@2.7.0)(supports-color@8.1.1)
+      typescript:
+        specifier: ^5
+        version: 5.9.3
 
   packages/pricing:
     devDependencies:

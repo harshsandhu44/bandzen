@@ -37,6 +37,7 @@
   "dependencies": {
     "@bandzen/ai": "workspace:*",
     "@bandzen/db": "workspace:*",
+    "@bandzen/exams": "workspace:*",
     "@bandzen/pricing": "workspace:*",
     "@bandzen/storage": "workspace:*",
     "@bandzen/ui": "workspace:*",

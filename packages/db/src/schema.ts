@@ -15,6 +15,7 @@ import {
   uuid,
   type AnyPgColumn,
 } from 'drizzle-orm/pg-core';
+import { CURRENT_EXAM_VERSION, EXAM_KEYS } from '@bandzen/exams/registry';
 
 /**
  * The source of truth for both the schema and every TypeScript type derived
@@ -35,30 +36,12 @@ export const testFormat = pgEnum('test_format', ['academic', 'general']);
 /**
  * Which exam a row belongs to. An enum, unlike task types and versions, because
  * adding an exam is rare and deliberate — a migration is the right amount of
- * ceremony for it.
+ * ceremony for it. The keys and each exam's current format version come from
+ * the exam definitions in `@bandzen/exams`.
  */
-export const examKey = pgEnum('exam_key', [
-  'ielts',
-  'pte_academic',
-  'toefl_ibt',
-  'det',
-]);
+export const examKey = pgEnum('exam_key', EXAM_KEYS);
 
 export type ExamKey = (typeof examKey.enumValues)[number];
-
-/**
- * The format version new rows are stamped with. Plain text, so a format change
- * (TOEFL's on 2026-01-21, PTE's on 2025-08-07) is a new value rather than a
- * migration, and old attempts keep saying which format they were sat under.
- * IELTS and DET have no single cut-over date, so theirs is the year the format
- * was captured.
- */
-export const CURRENT_EXAM_VERSION = {
-  ielts: '2026',
-  pte_academic: '2025-08-07',
-  toefl_ibt: '2026-01-21',
-  det: '2026',
-} as const satisfies Record<ExamKey, string>;
 
 /**
  * Exam ownership for content rows. A function, not a shared object: Drizzle

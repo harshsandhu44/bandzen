@@ -14,7 +14,7 @@ import {
 } from '@bandzen/ui/components/dropdown-menu';
 import { ThemeToggle } from '@bandzen/ui/components/theme-toggle';
 import { cn } from '@bandzen/ui/lib/utils';
-import { EXAM_RUNNER } from './exam-route';
+import { isExamRunner } from './exam-route';
 import { DOCS_URL } from './nav-links';
 
 /**
@@ -98,7 +98,7 @@ export function TopBar({
   const router = useRouter();
   const { signOut } = useClerk();
 
-  if (EXAM_RUNNER.test(pathname)) return null;
+  if (isExamRunner(pathname)) return null;
 
   const crumbs = crumbsFor(pathname);
 

@@ -2,10 +2,9 @@
   "extends": "@bandzen/tsconfig/base.json",
   "compilerOptions": {
     "paths": {
-      "@bandzen/db/*": ["./src/*"]
+      "@bandzen/exams/*": ["./src/*"]
     },
-    "allowImportingTsExtensions": true,
-    "noEmit": true
+    "allowImportingTsExtensions": true
   },
   "include": ["src/**/*.ts"],
   "exclude": ["node_modules"]

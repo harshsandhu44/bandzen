@@ -1,4 +1,4 @@
-import { CURRENT_EXAM_VERSION, type ExamKey } from '@bandzen/db/schema';
+import { CURRENT_EXAM_VERSION, type ExamKey } from '@bandzen/exams/registry';
 
 /**
  * Everything a candidate tells us about their preparation, in exam-neutral

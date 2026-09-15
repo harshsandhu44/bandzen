@@ -172,6 +172,21 @@ export async function completeOnboarding(
   await upsertProfile(userId, { ...values, onboardingCompletedAt: new Date() });
 }
 
+/** Any published track's audio, for the staff task lab's audio stimuli. */
+export async function sampleAudioUrl() {
+  const [row] = await db
+    .select({ url: listeningTracks.audioUrl })
+    .from(listeningTracks)
+    .where(
+      and(
+        eq(listeningTracks.status, 'published'),
+        isNotNull(listeningTracks.audioUrl),
+      ),
+    )
+    .limit(1);
+  return row?.url ?? null;
+}
+
 export async function recordAccessRequest(email: string) {
   // A repeat request is not an error, and telling the sender it is a duplicate
   // would confirm the address is already on file.
