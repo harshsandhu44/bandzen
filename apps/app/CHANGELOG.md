@@ -1,3 +1,10 @@
+# app [1.16.0](https://github.com/harshsandhu44/bandzen/compare/app@1.15.0...app@1.16.0) (2026-09-15)
+
+
+### Features
+
+* **exams:** exam-aware scoring, AI evaluation and result reporting ([#106](https://github.com/harshsandhu44/bandzen/issues/106)) ([02fb36b](https://github.com/harshsandhu44/bandzen/commit/02fb36b10e02a0cbeb791ff62f5ee3c2cbdbcf53))
+
 # app [1.15.0](https://github.com/harshsandhu44/bandzen/compare/app@1.14.0...app@1.15.0) (2026-09-15)
 
 
