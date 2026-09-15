@@ -1,3 +1,10 @@
+## app [1.11.1](https://github.com/harshsandhu44/bandzen/compare/app@1.11.0...app@1.11.1) (2026-09-15)
+
+
+### Bug Fixes
+
+* align web, docs and app copy with what the app does ([#80](https://github.com/harshsandhu44/bandzen/issues/80)) ([a05d03c](https://github.com/harshsandhu44/bandzen/commit/a05d03c5b45b685458c580d3a8a57faf2615d66c))
+
 # app [1.11.0](https://github.com/harshsandhu44/bandzen/compare/app@1.10.3...app@1.11.0) (2026-09-15)
 
 
