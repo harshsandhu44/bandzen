@@ -38,7 +38,7 @@ export async function FirstRun({
         headingId="start-here"
         eyebrow="Start here"
         title="Take the diagnostic"
-        meta={`Listening, Reading and Writing, timed like the real exam · ${DIAGNOSTIC_DURATION_LABEL}`}
+        meta={`All four skills, timed like the real exam · ${DIAGNOSTIC_DURATION_LABEL}`}
         action={
           <Button
             size="xl"

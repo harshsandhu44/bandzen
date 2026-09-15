@@ -62,8 +62,8 @@ export default async function DiagnosticResultPage({
         <div className="space-y-1">
           <p className="font-title text-sm">Speaking assessment</p>
           <p className="max-w-prose text-sm text-muted-foreground text-pretty">
-            Record a full Parts 1–3 interview — about 5 minutes — and we&apos;ll
-            add the fourth band to this result.
+            Record a full Parts 1–3 interview — about 10 minutes — and
+            we&apos;ll add the fourth band to this result.
           </p>
         </div>
         <form action={addDiagnosticSpeaking}>

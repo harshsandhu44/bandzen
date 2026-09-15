@@ -37,7 +37,8 @@ export default function PrivacyPage() {
         </p>
         <p>
           <strong>Your work</strong> — the answers you select, the essays you
-          write, and the reports generated from them.
+          write, the recordings of your spoken Speaking answers, and the reports
+          generated from them.
         </p>
         <p>
           <strong>Usage</strong> — a small number of product events, such as
@@ -64,11 +65,12 @@ export default function PrivacyPage() {
       <Clause title="Who processes it">
         <p>
           A small set of providers, each doing one job: authentication, database
-          hosting, application hosting, product analytics, payments (Polar, as
+          hosting, file storage (including Speaking recordings), application
+          hosting, product analytics, error monitoring, payments (Polar, as
           merchant of record, and Stripe as its card processor), and the AI
-          models that generate marking and coaching. Your essays are sent to a
-          model provider in order to be marked; they are not used to train
-          anyone&rsquo;s models.
+          models that generate marking and coaching. Your essays and Speaking
+          recordings are sent to a model provider in order to be marked; they
+          are not used to train anyone&rsquo;s models.
         </p>
       </Clause>
 

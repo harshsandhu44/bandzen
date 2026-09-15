@@ -29,7 +29,10 @@ export default function RootLayout({ children }: LayoutProps<'/'>) {
           <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
             <ConsentProvider>
               {children}
-              <CookieConsent />
+              {/* The cookie policy lives on the marketing site, not here. */}
+              <CookieConsent
+                policyHref={`${process.env.NEXT_PUBLIC_SITE_URL ?? 'https://bandzen.com'}/cookies`}
+              />
             </ConsentProvider>
           </ThemeProvider>
         </body>

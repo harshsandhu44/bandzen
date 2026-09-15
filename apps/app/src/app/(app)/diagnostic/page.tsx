@@ -77,13 +77,10 @@ export default async function DiagnosticPage() {
           Find out where you actually are
         </h1>
         <p className="mt-3 text-sm leading-6 text-muted-foreground">
-          A full exam sitting — Listening, Reading and Writing
-          {pro ? ', then Speaking' : ''}, each section timed and taken in order.
-          You get an estimated band per skill, an overall, your weakest skill,
-          and a study plan built from the result.
-          {pro
-            ? ''
-            : ' Speaking is unlocked on Pro; the sitting closes after Writing.'}
+          A full exam sitting — Listening, Reading, Writing, then Speaking, each
+          section timed and taken in order. You get an estimated band per skill,
+          an overall, your weakest skill, and a study plan built from the
+          result.
         </p>
       </header>
 

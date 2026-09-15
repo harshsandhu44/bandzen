@@ -83,8 +83,8 @@ export default async function ListeningPage({
         title="Practice tracks"
         description={
           kind
-            ? `Tracks containing ${QUESTION_KIND_LABEL[kind]} questions. Audio plays once, exactly as it does in the exam.`
-            : 'Each track plays once, exactly as it does in the exam, with a batch of questions to answer as you listen.'
+            ? `Tracks containing ${QUESTION_KIND_LABEL[kind]} questions. Practice audio can be paused and replayed; only a mock test plays it once, as the exam does.`
+            : 'Each track comes with a batch of questions to answer as you listen. Practice audio can be paused and replayed; only a mock test plays it once, as the exam does.'
         }
       />
 
