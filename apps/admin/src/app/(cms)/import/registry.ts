@@ -14,7 +14,11 @@ import {
   listWritingPromptsAdmin,
   listLessonsAdmin,
   listResourcesAdmin,
+  createExamTask,
+  listExamTasksAdmin,
+  type ContentType,
 } from '@bandzen/db/queries';
+import { getTask } from '@bandzen/exams/registry';
 import type { z } from 'zod';
 import {
   parseItems,
@@ -24,6 +28,8 @@ import {
   writingPromptSchema,
   lessonSchema,
   resourceSchema,
+  examTaskSchema,
+  toTaskContent,
 } from './schemas';
 import { TEMPLATES, type TemplateOption } from './templates';
 
@@ -52,6 +58,8 @@ type Prepared =
 export type ImportEntry = {
   /** Singular, lower case: "Imported 3 lesson drafts." */
   noun: string;
+  /** What the audit trail files an imported row under. */
+  contentType: ContentType;
   /** General first, then the variants. See ./templates.ts. */
   templates: TemplateOption[];
   listSlugs: () => Promise<string[]>;
@@ -65,6 +73,7 @@ export type ImportEntry = {
  */
 function entry<T extends { slug: string }>(config: {
   noun: string;
+  contentType: ContentType;
   templates: TemplateOption[];
   schema: z.ZodType<T>;
   listSlugs: () => Promise<string[]>;
@@ -72,6 +81,7 @@ function entry<T extends { slug: string }>(config: {
 }): ImportEntry {
   return {
     noun: config.noun,
+    contentType: config.contentType,
     templates: config.templates,
     listSlugs: config.listSlugs,
     prepare(json) {
@@ -88,6 +98,7 @@ function entry<T extends { slug: string }>(config: {
 export const REGISTRY = {
   passages: entry({
     noun: 'passage',
+    contentType: 'passage',
     templates: TEMPLATES.passages,
     schema: passageSchema,
     listSlugs: async () => (await listPassagesAdmin()).map((p) => p.slug),
@@ -128,6 +139,7 @@ export const REGISTRY = {
 
   listening: entry({
     noun: 'listening track',
+    contentType: 'listening-track',
     templates: TEMPLATES.listening,
     schema: listeningTrackSchema,
     listSlugs: async () => (await listTracksAdmin()).map((t) => t.slug),
@@ -165,6 +177,7 @@ export const REGISTRY = {
 
   speaking: entry({
     noun: 'speaking test',
+    contentType: 'speaking-test',
     templates: TEMPLATES.speaking,
     schema: speakingTestSchema,
     listSlugs: async () => (await listSpeakingTestsAdmin()).map((t) => t.slug),
@@ -199,6 +212,7 @@ export const REGISTRY = {
 
   'writing-prompts': entry({
     noun: 'writing prompt',
+    contentType: 'writing-prompt',
     templates: TEMPLATES['writing-prompts'],
     schema: writingPromptSchema,
     listSlugs: async () => (await listWritingPromptsAdmin()).map((p) => p.slug),
@@ -218,6 +232,7 @@ export const REGISTRY = {
 
   lessons: entry({
     noun: 'lesson',
+    contentType: 'lesson',
     templates: TEMPLATES.lessons,
     schema: lessonSchema,
     listSlugs: async () => (await listLessonsAdmin()).map((l) => l.slug),
@@ -241,6 +256,7 @@ export const REGISTRY = {
 
   resources: entry({
     noun: 'resource',
+    contentType: 'resource',
     templates: TEMPLATES.resources,
     schema: resourceSchema,
     listSlugs: async () => (await listResourcesAdmin()).map((r) => r.slug),
@@ -260,6 +276,33 @@ export const REGISTRY = {
       });
       if (!resource) throw new Error('the resource row was not created');
       return { id: resource.id, slug: resource.slug, label: resource.title };
+    },
+  }),
+
+  tasks: entry({
+    noun: 'exam task',
+    contentType: 'exam-task',
+    templates: TEMPLATES.tasks,
+    schema: examTaskSchema,
+    listSlugs: async () => (await listExamTasksAdmin()).map((t) => t.slug),
+    insert: async (item, userId) => {
+      // The schema has already refused a task type the exam does not declare.
+      const definition = getTask(item.examKey, item.taskType)!;
+      const task = await createExamTask(
+        {
+          slug: item.slug,
+          title: item.title,
+          examKey: item.examKey,
+          examVersion: item.examVersion,
+          section: definition.section,
+          taskType: item.taskType,
+          content: toTaskContent(item),
+          updatedBy: userId,
+        },
+        { answer: item.answer ?? null, transcript: item.transcript ?? null },
+      );
+      if (!task) throw new Error('the exam task row was not created');
+      return { id: task.id, slug: task.slug, label: task.title };
     },
   }),
 } satisfies Record<string, ImportEntry>;

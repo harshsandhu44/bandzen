@@ -1,6 +1,7 @@
 'use server';
 
 import { revalidatePath } from 'next/cache';
+import { recordContentEvent } from '@bandzen/db/queries';
 import { requireAdminOrTeacher } from '@/lib/auth';
 import { REGISTRY, type Created, type ImportEntity } from './registry';
 import { findSlugClashes } from './schemas';
@@ -64,7 +65,10 @@ export async function importAction(
   const created: Created[] = [];
   for (const [index, slug] of prepared.slugs.entries()) {
     try {
-      created.push(await prepared.insertAt(index, userId));
+      const made = await prepared.insertAt(index, userId);
+      created.push(made);
+      // Imports were the one way to create content without an audit row.
+      await recordContentEvent(config.contentType, made.id, userId, 'created');
     } catch (e) {
       revalidatePath(`/${entity}`);
       return {

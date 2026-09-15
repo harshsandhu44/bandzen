@@ -4,6 +4,7 @@ import {
   GraduationCap,
   Headphones,
   LayoutDashboard,
+  ListChecks,
   Library,
   Mic,
   Users,
@@ -40,6 +41,7 @@ export const NAV_LINKS: readonly NavLink[] = [
   { href: '/writing-prompts', label: 'Writing prompts', Icon: FileText },
   { href: '/lessons', label: 'Lessons', Icon: GraduationCap },
   { href: '/resources', label: 'Resources', Icon: Library },
+  { href: '/tasks', label: 'Exam tasks', Icon: ListChecks },
 ];
 
 /**

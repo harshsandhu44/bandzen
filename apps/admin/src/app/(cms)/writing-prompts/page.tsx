@@ -4,6 +4,7 @@ import { Button } from '@bandzen/ui/components/button';
 import { PageHeader } from '@bandzen/ui/components/primitives';
 import { requireAdminOrTeacher } from '@/lib/auth';
 import { ContentList } from '@/components/content-list';
+import { EXAM_FILTER, asExam, taskFilter } from '@/lib/exam-filters';
 import {
   bulkPublishPromptsAction,
   bulkUnpublishPromptsAction,
@@ -15,13 +16,21 @@ export const metadata = { title: 'Writing prompts' };
 export default async function WritingPromptsPage({
   searchParams,
 }: {
-  searchParams: Promise<{ q?: string; status?: string; page?: string }>;
+  searchParams: Promise<{
+    q?: string;
+    status?: string;
+    page?: string;
+    exam?: string;
+    task?: string;
+  }>;
 }) {
   await requireAdminOrTeacher();
-  const { q, status, page: pageParam } = await searchParams;
+  const { q, status, page: pageParam, exam, task } = await searchParams;
   const page = Math.max(1, Number(pageParam) || 1);
   const rows = await listWritingPromptsAdmin({
     q,
+    exam: asExam(exam),
+    task,
     status: status === 'draft' || status === 'published' ? status : undefined,
     limit: ADMIN_PAGE_SIZE + 1,
     offset: (page - 1) * ADMIN_PAGE_SIZE,
@@ -64,6 +73,7 @@ export default async function WritingPromptsPage({
 
       <ContentList
         items={items}
+        filters={[EXAM_FILTER, taskFilter('ielts', ['writing'])]}
         page={page}
         hasMore={hasMore}
         emptyTitle="No writing prompts yet"

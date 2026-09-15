@@ -1,6 +1,8 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
+import { getTask } from '@bandzen/exams/registry';
 import {
+  examTaskSchema,
   lessonSchema,
   listeningTrackSchema,
   speakingTestSchema,
@@ -16,6 +18,7 @@ import {
   SPEAKING_TEMPLATES,
   PASSAGE_TEMPLATES,
   RESOURCE_TEMPLATES,
+  TASK_TEMPLATES,
   TEMPLATES,
   WRITING_PROMPT_TEMPLATES,
 } from './templates.ts';
@@ -292,3 +295,50 @@ for (const option of RESOURCE_TEMPLATES) {
     }
   });
 }
+
+for (const option of TASK_TEMPLATES) {
+  test(`tasks/${option.key}: the example is a valid exam task`, () => {
+    const [task] = items(
+      parseItems(examTaskSchema, exampleFrom(option.template)),
+    );
+    assert.ok(getTask(task.examKey, task.taskType), task.taskType);
+  });
+}
+
+test('the exam task examples cover what the CMS says it can represent', () => {
+  const stimuli = new Set<string>();
+  const renderers = new Set<string>();
+  for (const option of TASK_TEMPLATES) {
+    const [task] = items(
+      parseItems(examTaskSchema, exampleFrom(option.template)),
+    );
+    const definition = getTask(task.examKey, task.taskType)!;
+    stimuli.add(definition.stimulus);
+    renderers.add(definition.renderer);
+  }
+  for (const s of ['text', 'audio', 'image']) assert.ok(stimuli.has(s), s);
+  for (const r of [
+    'choice_cards',
+    'fill_blank',
+    'reorder',
+    'text_input',
+    'essay',
+    'recording',
+    'conversation',
+  ]) {
+    assert.ok(renderers.has(r), r);
+  }
+});
+
+test('a task type its exam does not declare is refused', () => {
+  const result = parseItems(examTaskSchema, {
+    slug: 'x',
+    title: 'x',
+    examKey: 'toefl_ibt',
+    examVersion: '2026-01-21',
+    taskType: 'reorder_paragraphs',
+    prompt: 'x',
+  });
+  assert.ok('error' in result);
+  assert.match(result.error, /TOEFL iBT has no task type "reorder_paragraphs"/);
+});

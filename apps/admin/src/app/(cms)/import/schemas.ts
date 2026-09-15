@@ -16,6 +16,8 @@ export {
   lessonSchema,
   lessonBlockSchema,
   resourceSchema,
+  examTaskSchema,
+  toTaskContent,
   parseItems,
   findSlugClashes,
   type ParseResult,
