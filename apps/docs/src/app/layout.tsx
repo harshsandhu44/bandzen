@@ -4,7 +4,7 @@ import { ThemeProvider } from 'next-themes';
 import './globals.css';
 
 export const viewport: Viewport = {
-  themeColor: '#09090f',
+  themeColor: '#ffffff',
 };
 
 export const metadata: Metadata = {
@@ -25,7 +25,7 @@ export default function RootLayout({ children }: LayoutProps<'/'>) {
       className={`${fontClassName} h-full antialiased`}
     >
       <body className="flex min-h-full flex-col">
-        <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
+        <ThemeProvider attribute="class" defaultTheme="light" enableSystem>
           {children}
         </ThemeProvider>
       </body>

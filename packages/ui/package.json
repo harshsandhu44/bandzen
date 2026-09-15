@@ -38,6 +38,8 @@
   "devDependencies": {
     "@bandzen/eslint-config": "workspace:*",
     "@bandzen/tsconfig": "workspace:*",
+    "@clerk/nextjs": "^7.8.3",
+    "@clerk/themes": "^2.4.57",
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
@@ -47,8 +49,18 @@
     "typescript": "^5"
   },
   "peerDependencies": {
+    "@clerk/nextjs": "^7",
+    "@clerk/themes": "^2",
     "next": "^16",
     "react": "^19",
     "react-dom": "^19"
+  },
+  "peerDependenciesMeta": {
+    "@clerk/nextjs": {
+      "optional": true
+    },
+    "@clerk/themes": {
+      "optional": true
+    }
   }
 }
