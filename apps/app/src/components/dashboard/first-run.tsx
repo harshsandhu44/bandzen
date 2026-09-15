@@ -8,7 +8,7 @@ import {
 } from '@/components/app/primitives';
 import { firstWrittenLesson } from '@/content/lessons';
 import { DIAGNOSTIC_DURATION_LABEL } from '@/lib/timing';
-import type { Profile } from '@/lib/db/schema';
+import type { Profile } from '@/lib/db/queries';
 
 /**
  * The dashboard before anything has been measured.
@@ -64,8 +64,8 @@ export async function FirstRun({
 
         <dl className="divide-y divide-border border-y border-border">
           <Row label="Target">
-            {profile.targetBand != null
-              ? `Band ${profile.targetBand.toFixed(1)}`
+            {profile.targetScore != null
+              ? `Band ${profile.targetScore.toFixed(1)}`
               : 'Not set'}
           </Row>
           <Row label="Test date">

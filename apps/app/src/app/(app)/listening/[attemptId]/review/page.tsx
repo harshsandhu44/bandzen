@@ -26,7 +26,7 @@ export default async function ListeningReviewPage({
     capture(userId, 'report_viewed', {
       module: 'listening',
       attempt_id: attemptId,
-      overall_band: attempt.band,
+      overall_band: attempt.score,
     }),
   );
 
@@ -40,7 +40,7 @@ export default async function ListeningReviewPage({
     <ObjectiveReview
       module="listening"
       title={data.track.title}
-      band={attempt.band}
+      band={attempt.score}
       rawScore={attempt.rawScore}
       total={attempt.total}
       rows={data.rows}

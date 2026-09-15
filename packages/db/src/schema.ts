@@ -25,7 +25,52 @@ import {
  * is no users table here for them to reference. Clerk owns identity.
  */
 
+/**
+ * IELTS's Academic/General Training split. A *variant* of one exam, not an
+ * exam: `exam_key` is the identity, this only means anything when it is
+ * `ielts`. Content and legacy profile columns still use the enum.
+ */
 export const testFormat = pgEnum('test_format', ['academic', 'general']);
+
+/**
+ * Which exam a row belongs to. An enum, unlike task types and versions, because
+ * adding an exam is rare and deliberate — a migration is the right amount of
+ * ceremony for it.
+ */
+export const examKey = pgEnum('exam_key', [
+  'ielts',
+  'pte_academic',
+  'toefl_ibt',
+  'det',
+]);
+
+export type ExamKey = (typeof examKey.enumValues)[number];
+
+/**
+ * The format version new rows are stamped with. Plain text, so a format change
+ * (TOEFL's on 2026-01-21, PTE's on 2025-08-07) is a new value rather than a
+ * migration, and old attempts keep saying which format they were sat under.
+ * IELTS and DET have no single cut-over date, so theirs is the year the format
+ * was captured.
+ */
+export const CURRENT_EXAM_VERSION = {
+  ielts: '2026',
+  pte_academic: '2025-08-07',
+  toefl_ibt: '2026-01-21',
+  det: '2026',
+} as const satisfies Record<ExamKey, string>;
+
+/**
+ * Exam ownership for content rows. A function, not a shared object: Drizzle
+ * column builders belong to one table each. Defaults to IELTS because every
+ * existing row, and every writer that predates other exams, is IELTS.
+ */
+const examOwnership = () => ({
+  examKey: examKey('exam_key').notNull().default('ielts'),
+  examVersion: text('exam_version')
+    .notNull()
+    .default(CURRENT_EXAM_VERSION.ielts),
+});
 
 export const questionKind = pgEnum('question_kind', [
   'true_false_not_given',
@@ -122,7 +167,16 @@ export const aiStatus = pgEnum('ai_status', ['ok', 'failed']);
  */
 export const profiles = pgTable('profiles', {
   userId: text('user_id').primaryKey(),
-  /** Which exam they are sitting. Reuses the enum the content tables already use. */
+  /**
+   * Which `exam_enrollments` row is the one they are studying for now. Null
+   * until they tell us. The enrollment holds the target, date and variant.
+   */
+  activeExamKey: examKey('active_exam_key'),
+  /**
+   * @deprecated Legacy IELTS-only fields, superseded by `exam_enrollments`.
+   * Still dual-written for IELTS so a rollback reads current data; nothing
+   * reads them. Dropped in a follow-up once the enrollment model has shipped.
+   */
   examType: testFormat('exam_type'),
   targetBand: numeric('target_band', {
     precision: 2,
@@ -152,6 +206,48 @@ export const profiles = pgTable('profiles', {
     .notNull()
     .defaultNow(),
 });
+
+/**
+ * One exam a user is (or was) preparing for. A user can hold several — switching
+ * exam changes `profiles.active_exam_key` and never deletes the old row, so
+ * history under a previous exam keeps its target and date.
+ *
+ * Scores are generic `numeric(5,1)`: wide enough for PTE's 10–90 and DET's
+ * 10–160, fine-grained enough for IELTS and TOEFL half-steps. Which values are
+ * valid is the exam definition's business, not the column's.
+ */
+export const examEnrollments = pgTable(
+  'exam_enrollments',
+  {
+    id: uuid('id').primaryKey().defaultRandom(),
+    userId: text('user_id').notNull(),
+    examKey: examKey('exam_key').notNull(),
+    /** IELTS `academic`/`general`; null for exams without variants. */
+    examVariant: text('exam_variant'),
+    examVersion: text('exam_version').notNull(),
+    targetScore: numeric('target_score', {
+      precision: 5,
+      scale: 1,
+      mode: 'number',
+    }),
+    /** Null is "I don't know" — a real answer, as it was for the band. */
+    selfAssessedScore: numeric('self_assessed_score', {
+      precision: 5,
+      scale: 1,
+      mode: 'number',
+    }),
+    testDate: date('test_date'),
+    createdAt: timestamp('created_at', { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+    updatedAt: timestamp('updated_at', { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+  },
+  (t) => [
+    uniqueIndex('exam_enrollments_user_exam_key').on(t.userId, t.examKey),
+  ],
+);
 
 /**
  * The landing page's "no invite code?" path. Clerk owns the actual gate
@@ -266,6 +362,8 @@ export const passages = pgTable('passages', {
    * the passage, not to an individual question.
    */
   headings: jsonb('headings').$type<string[] | null>(),
+  ...examOwnership(),
+  /** The IELTS variant. */
   format: testFormat('format').notNull().default('academic'),
   difficulty: integer('difficulty').notNull().default(3),
   /** New rows default to 'published' — draft is set explicitly by the CMS on create. */
@@ -356,6 +454,8 @@ export const writingPrompts = pgTable('writing_prompts', {
   id: uuid('id').primaryKey().defaultRandom(),
   slug: text('slug').notNull().unique(),
   task: integer('task').notNull(),
+  ...examOwnership(),
+  /** The IELTS variant. */
   format: testFormat('format').notNull().default('academic'),
   promptText: text('prompt_text').notNull(),
   /** Task 1 only; null for Task 2. */
@@ -387,6 +487,7 @@ export const writingPrompts = pgTable('writing_prompts', {
 export const listeningTracks = pgTable('listening_tracks', {
   id: uuid('id').primaryKey().defaultRandom(),
   slug: text('slug').notNull().unique(),
+  ...examOwnership(),
   title: text('title').notNull(),
   topic: text('topic'),
   transcript: text('transcript'),
@@ -427,6 +528,7 @@ export const listeningTracks = pgTable('listening_tracks', {
 export const speakingTests = pgTable('speaking_tests', {
   id: uuid('id').primaryKey().defaultRandom(),
   slug: text('slug').notNull().unique(),
+  ...examOwnership(),
   title: text('title').notNull(),
   topic: text('topic'),
   /** Last CMS examiner-audio generation failure. Null once it succeeds. */
@@ -500,6 +602,9 @@ export const mockAttempts = pgTable(
     id: uuid('id').primaryKey().defaultRandom(),
     userId: text('user_id').notNull(),
     kind: sittingKind('kind').notNull().default('mock'),
+    ...examOwnership(),
+    /** The IELTS variant the sitting's content was picked for. */
+    examVariant: text('exam_variant'),
     readingPassageIds: jsonb('reading_passage_ids').$type<string[]>().notNull(),
     listeningTrackIds: jsonb('listening_track_ids').$type<string[]>().notNull(),
     /** Null for a diagnostic — it sits Task 2 only. */
@@ -542,6 +647,14 @@ export const attempts = pgTable(
     module: attemptModule('module').notNull(),
     kind: attemptKind('kind').notNull().default('practice'),
     status: attemptStatus('status').notNull().default('in_progress'),
+    /**
+     * Exam, version, variant and task type together say exactly what was sat:
+     * `module` is the skill, `kind` + `mock_attempt_id` the sitting. Task
+     * types are text so a new exam's tasks need no migration.
+     */
+    ...examOwnership(),
+    examVariant: text('exam_variant'),
+    taskType: text('task_type'),
     passageId: uuid('passage_id').references(() => passages.id, {
       onDelete: 'set null',
     }),
@@ -572,7 +685,10 @@ export const attempts = pgTable(
      * Display-only — nothing in grading reads it.
      */
     playback: jsonb('playback').$type<ListeningPlayback | null>(),
+    /** @deprecated IELTS-only; dual-written, read `score`. */
     band: numeric('band', { precision: 2, scale: 1, mode: 'number' }),
+    /** The result on the attempt's own exam scale. */
+    score: numeric('score', { precision: 5, scale: 1, mode: 'number' }),
     startedAt: timestamp('started_at', { withTimezone: true })
       .notNull()
       .defaultNow(),
@@ -636,7 +752,9 @@ export const reports = pgTable('reports', {
   attemptId: uuid('attempt_id')
     .primaryKey()
     .references(() => attempts.id, { onDelete: 'cascade' }),
+  /** @deprecated IELTS-only; dual-written, read `score`. */
   band: numeric('band', { precision: 2, scale: 1, mode: 'number' }).notNull(),
+  score: numeric('score', { precision: 5, scale: 1, mode: 'number' }),
   criteria: jsonb('criteria').$type<Criterion[]>().notNull().default([]),
   annotations: jsonb('annotations').$type<Annotation[]>().notNull().default([]),
   strengths: jsonb('strengths').$type<string[]>().notNull().default([]),
@@ -761,6 +879,7 @@ export const lessons = pgTable(
   {
     id: uuid('id').primaryKey().defaultRandom(),
     slug: text('slug').notNull().unique(),
+    ...examOwnership(),
     module: attemptModule('module').notNull(),
     group: lessonGroup('group').notNull(),
     title: text('title').notNull(),
@@ -789,6 +908,7 @@ export const lessons = pgTable(
 export const resources = pgTable('resources', {
   id: uuid('id').primaryKey().defaultRandom(),
   slug: text('slug').notNull().unique(),
+  ...examOwnership(),
   title: text('title').notNull(),
   summary: text('summary').notNull(),
   category: resourceCategory('category').notNull(),
@@ -957,6 +1077,7 @@ export type MockAttempt = typeof mockAttempts.$inferSelect;
 export type AttemptAnswer = typeof attemptAnswers.$inferSelect;
 export type Report = typeof reports.$inferSelect;
 export type Profile = typeof profiles.$inferSelect;
+export type ExamEnrollment = typeof examEnrollments.$inferSelect;
 export type LessonProgress = typeof lessonProgress.$inferSelect;
 export type Award = typeof awards.$inferSelect;
 export type Subscription = typeof subscriptions.$inferSelect;

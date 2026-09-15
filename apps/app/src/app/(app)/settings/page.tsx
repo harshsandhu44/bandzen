@@ -72,10 +72,10 @@ export default async function SettingsPage() {
             action={saveSettings}
             submitLabel="Save changes"
             defaults={{
-              examType: profile?.examType ?? null,
-              targetBand: profile?.targetBand ?? null,
+              examVariant: profile?.examVariant ?? null,
+              targetScore: profile?.targetScore ?? null,
               testDate: profile?.testDate ?? null,
-              selfAssessedBand: profile?.selfAssessedBand ?? null,
+              selfAssessedScore: profile?.selfAssessedScore ?? null,
               studyMinutes: profile?.studyMinutes ?? null,
             }}
           />

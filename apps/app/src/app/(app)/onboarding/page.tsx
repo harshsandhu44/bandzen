@@ -35,10 +35,10 @@ export default async function OnboardingPage() {
         action={saveOnboarding}
         submitLabel="Build my plan"
         defaults={{
-          examType: profile?.examType ?? null,
-          targetBand: profile?.targetBand ?? null,
+          examVariant: profile?.examVariant ?? null,
+          targetScore: profile?.targetScore ?? null,
           testDate: profile?.testDate ?? null,
-          selfAssessedBand: profile?.selfAssessedBand ?? null,
+          selfAssessedScore: profile?.selfAssessedScore ?? null,
           studyMinutes: profile?.studyMinutes ?? null,
         }}
       />

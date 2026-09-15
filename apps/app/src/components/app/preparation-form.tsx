@@ -40,10 +40,10 @@ function useTimezone() {
 }
 
 export type PreparationDefaults = {
-  examType: 'academic' | 'general' | null;
-  targetBand: number | null;
+  examVariant: string | null;
+  targetScore: number | null;
   testDate: string | null;
-  selfAssessedBand: number | null;
+  selfAssessedScore: number | null;
   studyMinutes: number | null;
 };
 
@@ -75,20 +75,20 @@ export function PreparationForm({
   }, [state.saved]);
 
   const [examType, setExamType] = useState<string>(
-    defaults.examType ?? 'academic',
+    defaults.examVariant ?? 'academic',
   );
   const [targetBand, setTargetBand] = useState(
-    defaults.targetBand?.toFixed(1) ?? '',
+    defaults.targetScore?.toFixed(1) ?? '',
   );
   const [level, setLevel] = useState(
-    defaults.selfAssessedBand?.toFixed(1) ?? '',
+    defaults.selfAssessedScore?.toFixed(1) ?? '',
   );
   const [minutes, setMinutes] = useState(String(defaults.studyMinutes ?? 45));
   const [testDate, setTestDate] = useState(defaults.testDate ?? '');
 
   const examField = (
     <RadioCardGroup
-      name="examType"
+      name="examVariant"
       legend={mode === 'settings' ? 'Exam' : 'Which test are you taking?'}
       value={examType}
       onValueChange={setExamType}
@@ -132,7 +132,7 @@ export function PreparationForm({
 
   const targetField = (
     <RadioCardGroup
-      name="targetBand"
+      name="targetScore"
       legend={mode === 'settings' ? 'Target band' : 'What band do you need?'}
       value={targetBand}
       onValueChange={setTargetBand}
@@ -144,7 +144,7 @@ export function PreparationForm({
 
   const levelField = (
     <RadioCardGroup
-      name="selfAssessedBand"
+      name="selfAssessedScore"
       legend={mode === 'settings' ? 'Your own estimate' : 'Where are you now?'}
       description={
         mode === 'settings'

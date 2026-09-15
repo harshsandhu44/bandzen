@@ -142,14 +142,14 @@ export default async function ProgressPage() {
             label="Estimated band"
             value={overall != null ? overall.toFixed(1) : '—'}
             hint={
-              profile?.targetBand != null
-                ? `Target ${profile.targetBand.toFixed(1)}`
+              profile?.targetScore != null
+                ? `Target ${profile.targetScore.toFixed(1)}`
                 : undefined
             }
           />
         }
       >
-        <BandChart points={points} target={profile?.targetBand ?? undefined} />
+        <BandChart points={points} target={profile?.targetScore ?? undefined} />
         <p className="mt-2 font-mono text-[0.625rem] tracking-[0.16em] text-muted-foreground uppercase">
           {hidden
             ? `Your last ${FREE_TREND_POINTS} attempts, oldest first`
@@ -209,13 +209,13 @@ export default async function ProgressPage() {
                   <div key={module} className="space-y-3">
                     <BandScale
                       value={modulePoints.at(-1)!.value}
-                      target={profile?.targetBand ?? undefined}
+                      target={profile?.targetScore ?? undefined}
                       label={MODULE_LABEL[module]}
                     />
                     {modulePoints.length > 1 ? (
                       <BandTrend
                         points={modulePoints}
-                        target={profile?.targetBand ?? undefined}
+                        target={profile?.targetScore ?? undefined}
                         caption={`${MODULE_LABEL[module]} attempts`}
                       />
                     ) : null}

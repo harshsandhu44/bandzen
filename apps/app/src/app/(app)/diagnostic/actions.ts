@@ -37,8 +37,8 @@ import {
  * Resuming is always free.
  */
 export async function startDiagnostic(formData: FormData) {
-  const targetBand = Number(String(formData.get('targetBand') ?? ''));
-  if (!Number.isFinite(targetBand) || targetBand < 4 || targetBand > 9) {
+  const targetScore = Number(String(formData.get('targetScore') ?? ''));
+  if (!Number.isFinite(targetScore) || targetScore < 4 || targetScore > 9) {
     throw new Error('Target band must be between 4 and 9');
   }
 
@@ -48,7 +48,7 @@ export async function startDiagnostic(formData: FormData) {
   }
 
   const userId = await requireUserId();
-  await upsertProfile(userId, { targetBand, testDate: rawDate || null });
+  await upsertProfile(userId, { targetScore, testDate: rawDate || null });
 
   const [open, pro] = await Promise.all([
     latestOpenDiagnostic(userId),
