@@ -45,7 +45,12 @@ const read = (p: string) => readFileSync(join(APP, p), 'utf8');
 
 const entitlements = read('lib/entitlements.ts');
 const awards = read('lib/awards.ts');
-const grading = read('lib/grading.ts');
+// IELTS's scoring rules moved into the exams package's IELTS adapter; the
+// app's lib/grading.ts only re-exports them now.
+const grading = readFileSync(
+  join(import.meta.dirname, '../../../../packages/exams/src/ielts-scoring.ts'),
+  'utf8',
+);
 const insight = read('lib/insight.ts');
 const studyPlan = read('lib/study-plan.ts');
 const coach = read('lib/ai/coach.ts');
