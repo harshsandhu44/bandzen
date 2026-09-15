@@ -1,5 +1,7 @@
 import Link from 'next/link';
 import { ArrowRight, Check, Repeat, X } from 'lucide-react';
+import type { ScoreScale } from '@bandzen/exams/registry';
+import { ESTIMATE_NOTE } from '@bandzen/exams/scoring';
 import { Button } from '@bandzen/ui/components/button';
 import { cn } from '@bandzen/ui/lib/utils';
 import {
@@ -7,7 +9,7 @@ import {
   SectionHeader,
   Watermark,
 } from '@/components/app/primitives';
-import { BandReveal } from '@/components/exam/band-reveal';
+import { ScoreReveal } from '@/components/exam/score-reveal';
 import { HighlightProvider, HighlightText } from '@/components/exam/highlights';
 import { Passage } from '@/components/exam/passage';
 import { isAnswerCorrect } from '@/lib/db/queries';
@@ -51,7 +53,8 @@ const label = (kind: string) =>
 export function ObjectiveReview({
   module,
   title,
-  band,
+  score,
+  scale,
   target,
   rawScore,
   total,
@@ -64,7 +67,8 @@ export function ObjectiveReview({
 }: {
   module: IELTSModule;
   title: string;
-  band: number | null;
+  score: number | null;
+  scale: ScoreScale;
   target?: number;
   rawScore: number | null;
   total: number | null;
@@ -107,17 +111,18 @@ export function ObjectiveReview({
         <p className="font-mono text-[0.6875rem] tracking-[0.18em] text-muted-foreground uppercase">
           Review · {title}
         </p>
-        {band != null ? (
-          <BandReveal
-            value={band}
+        {score != null ? (
+          <ScoreReveal
+            value={score}
             target={target}
             label={MODULE_LABEL[module]}
+            scale={scale}
           />
         ) : (
           <p className="font-metric text-metric-lg">—</p>
         )}
         <p className="font-mono text-[0.6875rem] tracking-[0.18em] text-muted-foreground uppercase">
-          {rawScore}/{total} correct · estimate, not an official score
+          {rawScore}/{total} correct · {ESTIMATE_NOTE}
         </p>
         {conditions ? (
           <p className="font-mono text-[0.6875rem] tracking-[0.18em] text-muted-foreground uppercase">

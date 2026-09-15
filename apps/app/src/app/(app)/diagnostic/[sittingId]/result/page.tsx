@@ -1,3 +1,5 @@
+import { scoreScaleFor } from '@bandzen/exams/registry';
+import { ESTIMATE_NOTE } from '@bandzen/exams/scoring';
 import { after } from 'next/server';
 import { notFound } from 'next/navigation';
 import { ArrowRight } from 'lucide-react';
@@ -89,11 +91,12 @@ export default async function DiagnosticResultPage({
       <SittingResult
         sections={data}
         target={profile?.targetScore ?? null}
+        scale={scoreScaleFor(data.mock.examKey)}
         eyebrow="Diagnostic result"
         overallLabel={
           data.speaking
-            ? 'Estimate, not an official score'
-            : 'Estimate across three skills — not an official score'
+            ? ESTIMATE_NOTE
+            : 'Bandzen estimate across three skills, not an official score'
         }
         speakingSlot={speakingSlot}
       />

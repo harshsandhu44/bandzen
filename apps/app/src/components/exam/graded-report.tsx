@@ -1,11 +1,13 @@
 import type { ReactNode } from 'react';
+import type { ScoreScale } from '@bandzen/exams/registry';
+import { ESTIMATE_NOTE, formatScore } from '@bandzen/exams/scoring';
 import { BandScale } from '@bandzen/ui/components/band-scale';
 import { Button } from '@bandzen/ui/components/button';
 import { Progress } from '@bandzen/ui/components/progress';
 import { cn } from '@bandzen/ui/lib/utils';
 import { GradingWatch } from '@/components/app/grading-watch';
 import { InsightBar, Watermark } from '@/components/app/primitives';
-import { BandReveal } from '@/components/exam/band-reveal';
+import { ScoreReveal } from '@/components/exam/score-reveal';
 import type { Annotation } from '@/lib/db/schema';
 
 /**
@@ -33,7 +35,7 @@ const ANNOTATION_LABEL: Record<Annotation['kind'], string> = {
 };
 
 export type GradedReportData = {
-  band: number;
+  score: number | null;
   criteria: { name: string; band: number; comment: string }[];
   strengths: string[];
   weaknesses: string[];
@@ -47,6 +49,7 @@ export function GradedReport({
   retryAction,
   grading,
   report,
+  scale,
   annotationScope,
   children,
 }: {
@@ -58,6 +61,8 @@ export function GradedReport({
   grading: { title: string; note: string };
   /** The complete report, or null for the grading / failed states. */
   report: GradedReportData | null;
+  /** The attempt's exam scale. */
+  scale: ScoreScale;
   /** "In your response" (writing) or "In your answers" (speaking). */
   annotationScope: string;
   /** The module-specific tail: essay disclosure, per-answer audio, footer. */
@@ -116,14 +121,16 @@ export function GradedReport({
         <p className="font-mono text-[0.6875rem] tracking-[0.18em] text-muted-foreground uppercase">
           {moduleLabel} report
         </p>
-        <BandReveal value={report.band} label={moduleLabel} />
+        {report.score != null ? (
+          <ScoreReveal value={report.score} label={moduleLabel} scale={scale} />
+        ) : null}
         <p className="font-mono text-[0.6875rem] tracking-[0.18em] text-muted-foreground uppercase">
-          Estimate, not an official score
+          {ESTIMATE_NOTE}
         </p>
         {worst ? (
           <InsightBar>
             {worst.name} is the criterion holding this response at{' '}
-            {worst.band.toFixed(1)}.
+            {formatScore(scale, worst.band)}.
           </InsightBar>
         ) : null}
       </header>
@@ -132,7 +139,7 @@ export function GradedReport({
         <h2 className="font-title text-title">By criterion</h2>
         {report.criteria.map((c) => (
           <div key={c.name} className="space-y-2">
-            <BandScale value={c.band} label={c.name} />
+            <BandScale value={c.band} label={c.name} scale={scale} />
             <p className="text-sm leading-6 text-muted-foreground">
               {c.comment}
             </p>

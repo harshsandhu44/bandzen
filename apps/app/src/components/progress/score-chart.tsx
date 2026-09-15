@@ -14,35 +14,43 @@ import {
   ChartTooltipContent,
   type ChartConfig,
 } from '@bandzen/ui/components/chart';
-
-const config = {
-  band: { label: 'Estimated band', color: 'var(--chart-1)' },
-} satisfies ChartConfig;
+import type { ScaleSpec } from '@bandzen/ui/components/band-scale';
 
 /**
- * Estimated band across every completed attempt, oldest first. Replaces the
- * hand-drawn `BandTrend` on the Progress hero with the shadcn `chart`
- * (Recharts) — themed off `--chart-1` so it follows the `.dark` swap.
+ * Estimated score across every completed attempt, oldest first, on one exam's
+ * scale — never a mix of scales. Replaces the hand-drawn `BandTrend` on the
+ * Progress hero with the shadcn `chart` (Recharts) — themed off `--chart-1` so
+ * it follows the `.dark` swap.
  */
-export function BandChart({
+export function ScoreChart({
   points,
   target,
+  scale,
 }: {
   points: { label: string; value: number }[];
   target?: number;
+  scale: ScaleSpec;
 }) {
+  const config = {
+    score: {
+      label: `Estimated ${scale.label.toLowerCase()}`,
+      color: 'var(--chart-1)',
+    },
+  } satisfies ChartConfig;
+  const fmt = (v: number) => v.toFixed(Number.isInteger(scale.step) ? 0 : 1);
   const data = points.map((p, i) => ({
     i: i + 1,
-    band: p.value,
+    score: p.value,
     label: p.label,
   }));
+  // Two steps of headroom either side, inside the scale.
   const lo = Math.max(
-    0,
-    Math.floor(Math.min(...points.map((p) => p.value)) - 1),
+    scale.min,
+    Math.floor(Math.min(...points.map((p) => p.value)) - scale.step * 2),
   );
   const hi = Math.min(
-    9,
-    Math.ceil(Math.max(...points.map((p) => p.value)) + 1),
+    scale.max,
+    Math.ceil(Math.max(...points.map((p) => p.value)) + scale.step * 2),
   );
 
   return (
@@ -66,7 +74,7 @@ export function BandChart({
             stroke="var(--chart-2)"
             strokeDasharray="4 3"
             label={{
-              value: `Target ${target.toFixed(1)}`,
+              value: `Target ${fmt(target)}`,
               position: 'insideTopRight',
               fontSize: 10,
               fill: 'var(--muted-foreground)',
@@ -84,8 +92,8 @@ export function BandChart({
         />
         <Line
           type="monotone"
-          dataKey="band"
-          stroke="var(--color-band)"
+          dataKey="score"
+          stroke="var(--color-score)"
           strokeWidth={2.5}
           dot={{ r: 3, fill: 'var(--background)', strokeWidth: 2 }}
           activeDot={{ r: 4 }}

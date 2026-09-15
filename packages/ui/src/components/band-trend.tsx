@@ -1,7 +1,5 @@
+import { IELTS_SCALE, type ScaleSpec } from '@bandzen/ui/components/band-scale';
 import { cn } from '@bandzen/ui/lib/utils';
-
-const MIN = 0;
-const MAX = 9;
 
 export type BandPoint = {
   /** Band achieved, 0–9. */
@@ -12,8 +10,10 @@ export type BandPoint = {
 
 type BandTrendProps = {
   points: readonly BandPoint[];
-  /** Target band, marked in the brand accent, as on BandScale. */
+  /** Target, marked in the brand accent, as on BandScale. */
   target?: number;
+  /** The exam's ruler. IELTS's 0–9 when omitted. */
+  scale?: ScaleSpec;
   /** Names what is being tracked, for the accessible table. */
   caption: string;
   /**
@@ -40,6 +40,7 @@ type BandTrendProps = {
 function BandTrend({
   points,
   target,
+  scale = IELTS_SCALE,
   caption,
   delta: showDelta = true,
   className,
@@ -57,8 +58,17 @@ function BandTrend({
       ? width / 2
       : pad + (i / (points.length - 1)) * (width - pad * 2);
 
-  const y = (band: number) =>
-    height - pad - ((band - MIN) / (MAX - MIN)) * (height - pad * 2);
+  const y = (v: number) =>
+    height -
+    pad -
+    ((v - scale.min) / (scale.max - scale.min)) * (height - pad * 2);
+  const fmt = (v: number) => v.toFixed(Number.isInteger(scale.step) ? 0 : 1);
+  // IELTS draws 5–8, the range every candidate lives in; another scale gets
+  // its quarter marks.
+  const gridlines =
+    scale === IELTS_SCALE
+      ? [5, 6, 7, 8]
+      : [1, 2, 3].map((q) => scale.min + ((scale.max - scale.min) * q) / 4);
 
   const path = points.map((p, i) => `${x(i)},${y(p.value)}`).join(' ');
   const first = points[0]!;
@@ -75,13 +85,13 @@ function BandTrend({
         className="h-32 w-full"
       >
         {/* Band gridlines at 5, 6, 7, 8 -- the range every candidate lives in. */}
-        {[5, 6, 7, 8].map((band) => (
+        {gridlines.map((g) => (
           <line
-            key={band}
+            key={g}
             x1={0}
             x2={width}
-            y1={y(band)}
-            y2={y(band)}
+            y1={y(g)}
+            y2={y(g)}
             stroke="var(--border)"
             strokeWidth={0.25}
             vectorEffect="non-scaling-stroke"
@@ -152,12 +162,12 @@ function BandTrend({
         </span>
         {showDelta ? (
           <span className="font-mono text-[0.625rem] tracking-[0.2em] uppercase tabular-nums">
-            {first.value.toFixed(1)} → {last.value.toFixed(1)}
+            {fmt(first.value)} → {fmt(last.value)}
             {delta !== 0 ? (
               <span className="text-muted-foreground">
                 {' '}
                 ({delta > 0 ? '+' : ''}
-                {delta.toFixed(1)})
+                {fmt(delta)})
               </span>
             ) : null}
           </span>
@@ -177,7 +187,7 @@ function BandTrend({
           {points.map((p, i) => (
             <tr key={i}>
               <th scope="row">{p.label}</th>
-              <td>{p.value.toFixed(1)}</td>
+              <td>{fmt(p.value)}</td>
             </tr>
           ))}
         </tbody>

@@ -1,3 +1,5 @@
+import type { ScoreScale } from '@bandzen/exams/registry';
+import { formatScore } from '@bandzen/exams/scoring';
 import { BandScale } from '@bandzen/ui/components/band-scale';
 import { Metric, StatCard } from '@/components/app/primitives';
 
@@ -57,11 +59,13 @@ export function GreetingRow({
 export function DashboardStats({
   estimated,
   target,
+  scale,
   daysUntilTest,
   streak,
   longestStreak,
 }: {
   estimated: number | null;
+  scale: ScoreScale;
   target: number | null;
   daysUntilTest: number | null;
   streak: number;
@@ -81,8 +85,8 @@ export function DashboardStats({
       <StatCard>
         {/* "Estimated" is load-bearing: Bandzen scores are ours, not IELTS's. */}
         <Metric
-          label="Estimated band"
-          value={estimated != null ? estimated.toFixed(1) : '—'}
+          label={`Estimated ${scale.label.toLowerCase()}`}
+          value={estimated != null ? formatScore(scale, estimated) : '—'}
           size="lg"
           hint={estimated == null ? 'Take the diagnostic' : undefined}
         />
@@ -91,7 +95,7 @@ export function DashboardStats({
       <StatCard>
         <Metric
           label="Target"
-          value={target != null ? target.toFixed(1) : '—'}
+          value={target != null ? formatScore(scale, target) : '—'}
           hint={target == null ? 'Set one in Settings' : undefined}
         />
       </StatCard>
@@ -122,6 +126,8 @@ export function DashboardStats({
 export function DashboardHeader({
   firstName,
   timezone,
+  examName,
+  scale,
   estimated,
   target,
   daysUntilTest,
@@ -130,6 +136,8 @@ export function DashboardHeader({
 }: {
   firstName: string | null;
   timezone: string | null;
+  examName: string;
+  scale: ScoreScale;
   estimated: number | null;
   target: number | null;
   daysUntilTest: number | null;
@@ -144,6 +152,7 @@ export function DashboardHeader({
       <DashboardStats
         estimated={estimated}
         target={target}
+        scale={scale}
         daysUntilTest={daysUntilTest}
         streak={streak}
         longestStreak={longestStreak}
@@ -153,12 +162,13 @@ export function DashboardHeader({
         <BandScale
           value={estimated}
           target={target ?? undefined}
+          scale={scale}
           variant="axis"
         />
       ) : null}
 
       <p className="text-xs text-muted-foreground">
-        An estimate produced by Bandzen, not an official IELTS score.
+        A Bandzen estimate, not an official {examName} score.
       </p>
     </header>
   );

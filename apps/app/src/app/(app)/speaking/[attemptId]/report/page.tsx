@@ -1,3 +1,4 @@
+import { scoreScaleFor } from '@bandzen/exams/registry';
 import Link from 'next/link';
 import { after } from 'next/server';
 import { notFound } from 'next/navigation';
@@ -55,6 +56,7 @@ export default async function SpeakingReportPage({
         note: 'This takes a minute or two — the examiner listens to every answer. You can close this tab; the report will be here when you come back.',
       }}
       report={report}
+      scale={scoreScaleFor(attempt.examKey)}
       annotationScope="In your answers"
     >
       <section className="space-y-3" hidden={!responses?.length}>

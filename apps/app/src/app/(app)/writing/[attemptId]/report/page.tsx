@@ -1,3 +1,4 @@
+import { scoreScaleFor } from '@bandzen/exams/registry';
 import { after } from 'next/server';
 import { notFound } from 'next/navigation';
 import {
@@ -86,6 +87,7 @@ export default async function WritingReportPage({
         note: 'This takes up to a minute. You can close this tab — the report will be here when you come back.',
       }}
       report={report}
+      scale={scoreScaleFor(attempt.examKey)}
       annotationScope="In your response"
     >
       {prompt ? (
