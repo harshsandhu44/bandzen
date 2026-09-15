@@ -41,6 +41,9 @@ importers:
       '@bandzen/db':
         specifier: workspace:*
         version: link:../../packages/db
+      '@bandzen/exams':
+        specifier: workspace:*
+        version: link:../../packages/exams
       '@bandzen/storage':
         specifier: workspace:*
         version: link:../../packages/storage
@@ -357,6 +360,9 @@ importers:
       '@bandzen/db':
         specifier: workspace:*
         version: link:../db
+      '@bandzen/exams':
+        specifier: workspace:*
+        version: link:../exams
       mpg123-decoder:
         specifier: ^1.0.3
         version: 1.0.3

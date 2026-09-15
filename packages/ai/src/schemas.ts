@@ -1,4 +1,11 @@
 import { z } from 'zod';
+import {
+  CURRENT_EXAM_VERSION,
+  EXAM_KEYS,
+  getExam,
+  getTask,
+} from '@bandzen/exams/registry';
+import { taskContentIssues, type TaskContent } from '@bandzen/exams/content';
 
 /**
  * Every contract we hold a model to, defined once.
@@ -310,10 +317,22 @@ const ALL_QUESTION_KINDS = [
 
 const slug = z.string().min(1);
 
+/**
+ * The IELTS importers may say which exam and format a file is for, and
+ * nothing but IELTS's current one is accepted: a PTE item pasted into the
+ * passage importer is refused rather than filed as IELTS. Absent means IELTS,
+ * which is what every existing file is.
+ */
+const ieltsOwnership = {
+  examKey: z.literal('ielts').optional(),
+  examVersion: z.literal(CURRENT_EXAM_VERSION.ielts).optional(),
+};
+
 /** Passages: the generator's shape plus the optional `format` the table carries. */
 export const passageSchema = generatedPassageSchema.extend({
   slug,
   format: z.enum(FORMATS).optional(),
+  ...ieltsOwnership,
 });
 
 /**
@@ -324,6 +343,7 @@ export const passageSchema = generatedPassageSchema.extend({
 export const listeningTrackSchema = generatedListeningTrackSchema
   .extend({
     slug,
+    ...ieltsOwnership,
     transcript: z.string().optional(),
     audioUrl: z.string().min(1).optional(),
     matchingOptions: z.array(z.string()).nullish(),
@@ -337,6 +357,7 @@ export const listeningTrackSchema = generatedListeningTrackSchema
 /** Speaking: the three parts flattened to one ordered `prompts` array. */
 export const speakingTestSchema = z.object({
   slug,
+  ...ieltsOwnership,
   title: z.string(),
   topic: z.string(),
   difficulty: z.number().int().min(1).max(5),
@@ -398,6 +419,7 @@ const writingChartDataSchema = z.union([
 
 export const writingPromptSchema = z.object({
   slug,
+  ...ieltsOwnership,
   task: z.number().int().min(1).max(2),
   format: z.enum(FORMATS).optional(),
   promptText: z.string(),
@@ -437,6 +459,7 @@ export const lessonBlockSchema = z.discriminatedUnion('kind', [
 
 export const lessonSchema = z.object({
   slug,
+  ...ieltsOwnership,
   module: z.enum(LESSON_MODULES),
   group: z.enum(LESSON_GROUPS),
   title: z.string(),
@@ -456,6 +479,7 @@ export const lessonSchema = z.object({
 
 export const resourceSchema = z.object({
   slug,
+  ...ieltsOwnership,
   title: z.string(),
   summary: z.string(),
   category: z.enum(RESOURCE_CATEGORIES),
@@ -466,6 +490,110 @@ export const resourceSchema = z.object({
   orderIndex: z.number().int().optional(),
   body: z.array(z.string()).nullish(),
 });
+
+/**
+ * One exam task item for any exam, as a file declares it. The shape is the
+ * task-content contract plus its key; what is *valid* comes from the exam
+ * definition — the task type must exist for that exam, the version must be
+ * the format it currently models, and the content must suit the task's
+ * renderer and evaluator (see `taskContentIssues`).
+ */
+export const examTaskSchema = z
+  .object({
+    slug,
+    title: z.string().min(1),
+    examKey: z.enum(EXAM_KEYS),
+    examVersion: z.string().min(1),
+    taskType: z.string().min(1),
+    prompt: z.string().min(1),
+    stimulus: z
+      .object({
+        text: z.string().nullish(),
+        audioUrl: z.string().min(1).nullish(),
+        imageUrl: z.string().min(1).nullish(),
+        imageAlt: z.string().nullish(),
+      })
+      .default({}),
+    options: z.array(z.string().min(1)).nullish(),
+    gapped: z.string().nullish(),
+    tokens: z.array(z.string().min(1)).nullish(),
+    turns: z.array(z.string().min(1)).nullish(),
+    timing: z
+      .object({
+        prepSeconds: z.int().min(0),
+        responseSeconds: z.int().min(1),
+      })
+      .nullish(),
+    difficulty: z.int().min(1).max(5).default(3),
+    /** Accepted answers in the task's evaluator format; absent for graded tasks. */
+    answer: z.array(z.string()).nullish(),
+    /** What any audio says. Stored apart from the content. */
+    transcript: z.string().nullish(),
+  })
+  .superRefine((t, ctx) => {
+    const exam = getExam(t.examKey)!;
+    const task = getTask(t.examKey, t.taskType);
+    if (!task) {
+      ctx.addIssue({
+        code: 'custom',
+        path: ['taskType'],
+        message: `${exam.name} has no task type "${t.taskType}"`,
+      });
+      return;
+    }
+    if (t.examVersion !== exam.version) {
+      ctx.addIssue({
+        code: 'custom',
+        path: ['examVersion'],
+        message: `${exam.name} content must be for format ${exam.version}`,
+      });
+    }
+    const issues = taskContentIssues(
+      exam,
+      task,
+      toTaskContent(t),
+      { answer: t.answer ?? null, transcript: t.transcript ?? null },
+      'import',
+    );
+    for (const issue of issues) {
+      ctx.addIssue({ code: 'custom', message: `${t.taskType} needs ${issue}` });
+    }
+  });
+
+export type ExamTaskFile = z.infer<typeof examTaskSchema>;
+
+/** The stored content of an imported item: the file minus identity and key. */
+export function toTaskContent(t: {
+  prompt: string;
+  stimulus?: {
+    text?: string | null;
+    audioUrl?: string | null;
+    imageUrl?: string | null;
+    imageAlt?: string | null;
+  };
+  options?: string[] | null;
+  gapped?: string | null;
+  tokens?: string[] | null;
+  turns?: string[] | null;
+  timing?: { prepSeconds: number; responseSeconds: number } | null;
+  difficulty?: number;
+}): TaskContent {
+  return {
+    prompt: t.prompt,
+    stimulus: {
+      text: t.stimulus?.text ?? null,
+      audioUrl: t.stimulus?.audioUrl ?? null,
+      imageUrl: t.stimulus?.imageUrl ?? null,
+      imageAlt: t.stimulus?.imageAlt ?? null,
+    },
+    options: t.options ?? null,
+    gapped: t.gapped ?? null,
+    tokens: t.tokens ?? null,
+    turns: t.turns ?? null,
+    timing: t.timing ?? null,
+    difficulty: t.difficulty ?? 3,
+  };
+}
 
 export type ParseResult<T> = { error: string } | { items: T[] };
 
