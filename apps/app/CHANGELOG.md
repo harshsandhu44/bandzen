@@ -1,3 +1,10 @@
+# app [1.17.0](https://github.com/harshsandhu44/bandzen/compare/app@1.16.0...app@1.17.0) (2026-09-15)
+
+
+### Features
+
+* **app:** exam-aware onboarding, dashboard, progress and study plans ([#107](https://github.com/harshsandhu44/bandzen/issues/107)) ([ae4fdd1](https://github.com/harshsandhu44/bandzen/commit/ae4fdd1d4d585c9f425f063e6b8329625829820b))
+
 # app [1.16.0](https://github.com/harshsandhu44/bandzen/compare/app@1.15.0...app@1.16.0) (2026-09-15)
 
 
