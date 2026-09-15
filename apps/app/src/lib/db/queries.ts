@@ -63,6 +63,7 @@ import {
 
 export {
   DIFFICULTY_RANGE,
+  getPublishedExamTask,
   listLessonProgress,
   listPassages,
   listSpeakingTests,

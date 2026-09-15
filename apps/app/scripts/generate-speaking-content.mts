@@ -17,6 +17,14 @@ import {
   generateSpeakingTest,
   type SpeakingTestFile as TestFile,
 } from '@bandzen/ai/generate';
+import { speakingTestSchema } from '@bandzen/ai/schemas';
+import { CURRENT_EXAM_VERSION } from '@bandzen/exams/registry';
+
+/** Every file states its exam and format, and passes the CMS import schema. */
+const OWNERSHIP = {
+  examKey: 'ielts',
+  examVersion: CURRENT_EXAM_VERSION.ielts,
+} as const;
 
 const SEED_DIR = join(import.meta.dirname, '..', 'content', 'speaking');
 const SQL_OUT = join(import.meta.dirname, '..', 'content', 'speaking-seed.sql');
@@ -37,9 +45,11 @@ async function generate(count: number) {
     if (warnings.length)
       console.warn(`  ⚠ ${test.slug}: ${warnings.join('; ')}`);
 
+    const file = { ...test, ...OWNERSHIP };
+    speakingTestSchema.parse(file);
     writeFileSync(
       join(SEED_DIR, `${test.slug}.json`),
-      `${JSON.stringify(test, null, 2)}\n`,
+      `${JSON.stringify(file, null, 2)}\n`,
     );
     existing.add(test.slug);
     console.log(`  ✓ ${test.slug} — ${test.title}`);
@@ -73,6 +83,7 @@ function toSql() {
       readFileSync(join(SEED_DIR, file), 'utf8'),
     ) as TestFile;
 
+    speakingTestSchema.parse(t);
     if (t.prompts.some((p) => !p.audioUrl)) {
       missingAudio += 1;
       console.warn(
@@ -83,10 +94,11 @@ function toSql() {
 
     out.push(
       `-- ${t.title}`,
-      `insert into public.speaking_tests (slug, title, topic, difficulty)`,
-      `values (${quote(t.slug)}, ${quote(t.title)}, ${quote(t.topic)}, ${t.difficulty})`,
+      `insert into public.speaking_tests (slug, title, topic, difficulty, exam_key, exam_version)`,
+      `values (${quote(t.slug)}, ${quote(t.title)}, ${quote(t.topic)}, ${t.difficulty}, 'ielts'::public.exam_key, ${quote(OWNERSHIP.examVersion)})`,
       `on conflict (slug) do update set`,
-      `  title = excluded.title, topic = excluded.topic, difficulty = excluded.difficulty;`,
+      `  title = excluded.title, topic = excluded.topic, difficulty = excluded.difficulty,`,
+      `  exam_key = excluded.exam_key, exam_version = excluded.exam_version;`,
       '',
     );
 

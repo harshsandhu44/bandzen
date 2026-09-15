@@ -1,3 +1,6 @@
+import type { TaskContent } from '@bandzen/exams/content';
+import type { TaskDefinition } from '@bandzen/exams/registry';
+
 /**
  * What a task renderer is handed: the stimulus to show and the item to answer.
  * Deliberately loose — each renderer reads the fields its task type needs and
@@ -27,3 +30,37 @@ export type StimulusData = {
   imageUrl?: string;
   imageAlt?: string;
 };
+
+/**
+ * A stored exam task, as the renderers take it. The answer key never enters:
+ * `TaskContent` does not carry one.
+ */
+export function itemFromContent(
+  task: TaskDefinition,
+  content: TaskContent,
+): { stimulus: StimulusData; item: TaskItem } {
+  const window =
+    content.timing ??
+    (task.timing.scope === 'task'
+      ? {
+          prepSeconds: task.timing.prepSeconds,
+          responseSeconds: task.timing.responseSeconds,
+        }
+      : null);
+  return {
+    stimulus: {
+      text: content.stimulus.text ?? undefined,
+      audioUrl: content.stimulus.audioUrl,
+      imageUrl: content.stimulus.imageUrl ?? undefined,
+      imageAlt: content.stimulus.imageAlt ?? undefined,
+    },
+    item: {
+      prompt: content.prompt,
+      options: content.options?.map((o) => ({ value: o, label: o })),
+      gapped: content.gapped ?? undefined,
+      tokens: content.tokens ?? undefined,
+      turns: content.turns ?? undefined,
+      ...(window ?? {}),
+    },
+  };
+}

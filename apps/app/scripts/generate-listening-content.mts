@@ -18,7 +18,17 @@
 import { readFileSync, readdirSync, writeFileSync, mkdirSync } from 'node:fs';
 import { join } from 'node:path';
 import { generateListeningTrack } from '@bandzen/ai/generate';
-import { type GeneratedListeningTrack as Track } from '@bandzen/ai/schemas';
+import {
+  listeningTrackSchema,
+  type GeneratedListeningTrack as Track,
+} from '@bandzen/ai/schemas';
+import { CURRENT_EXAM_VERSION } from '@bandzen/exams/registry';
+
+/** Every file states its exam and format, and passes the CMS import schema. */
+const OWNERSHIP = {
+  examKey: 'ielts',
+  examVersion: CURRENT_EXAM_VERSION.ielts,
+} as const;
 
 const SEED_DIR = join(import.meta.dirname, '..', 'content', 'listening');
 const SQL_OUT = join(
@@ -45,9 +55,11 @@ async function generate(count: number) {
       console.warn(`  ⚠ ${track.slug}: ${warnings.join('; ')}`);
     }
 
+    const file = { ...track, ...OWNERSHIP };
+    listeningTrackSchema.parse(file);
     writeFileSync(
       join(SEED_DIR, `${track.slug}.json`),
-      `${JSON.stringify(track, null, 2)}\n`,
+      `${JSON.stringify(file, null, 2)}\n`,
     );
     existing.add(track.slug);
     console.log(`  ✓ ${track.slug} — ${track.title}`);
@@ -84,6 +96,9 @@ function toSql() {
       peaks?: number[];
       durationSeconds?: number;
     };
+    // Validated, not stripped: the schema does not know `peaks` or
+    // `durationSeconds`, which the SQL below still needs from the file.
+    listeningTrackSchema.parse(t);
     if (!t.audioUrl) {
       missingAudio += 1;
       console.warn(
@@ -94,12 +109,13 @@ function toSql() {
 
     out.push(
       `-- ${t.title}`,
-      `insert into public.listening_tracks (slug, title, topic, transcript, audio_url, matching_options, peaks, duration_seconds, difficulty)`,
-      `values (${quote(t.slug)}, ${quote(t.title)}, ${quote(t.topic)}, ${quote(t.transcript)}, ${quote(t.audioUrl)}, ${t.matchingOptions?.length ? jsonb(t.matchingOptions) : 'null'}, ${t.peaks?.length ? jsonb(t.peaks) : 'null'}, ${t.durationSeconds ?? 'null'}, ${t.difficulty})`,
+      `insert into public.listening_tracks (slug, title, topic, transcript, audio_url, matching_options, peaks, duration_seconds, difficulty, exam_key, exam_version)`,
+      `values (${quote(t.slug)}, ${quote(t.title)}, ${quote(t.topic)}, ${quote(t.transcript)}, ${quote(t.audioUrl)}, ${t.matchingOptions?.length ? jsonb(t.matchingOptions) : 'null'}, ${t.peaks?.length ? jsonb(t.peaks) : 'null'}, ${t.durationSeconds ?? 'null'}, ${t.difficulty}, 'ielts'::public.exam_key, ${quote(OWNERSHIP.examVersion)})`,
       `on conflict (slug) do update set`,
       `  title = excluded.title, topic = excluded.topic, transcript = excluded.transcript,`,
       `  audio_url = excluded.audio_url, matching_options = excluded.matching_options,`,
-      `  peaks = excluded.peaks, duration_seconds = excluded.duration_seconds, difficulty = excluded.difficulty;`,
+      `  peaks = excluded.peaks, duration_seconds = excluded.duration_seconds, difficulty = excluded.difficulty,`,
+      `  exam_key = excluded.exam_key, exam_version = excluded.exam_version;`,
       '',
     );
 
