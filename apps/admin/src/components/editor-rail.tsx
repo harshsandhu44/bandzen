@@ -40,8 +40,14 @@ export async function EditorRail({
   publishAction,
   unpublishAction,
   deleteAction,
+  previewHref,
 }: {
   type: ContentType;
+  /**
+   * Where "Preview as student" goes. Omit for the app's `/preview/<type>/<id>`;
+   * pass null where that route cannot show the item.
+   */
+  previewHref?: string | null;
   id: string;
   noun: string;
   status: ContentStatus;
@@ -56,9 +62,12 @@ export async function EditorRail({
   const events = await listContentEvents(type, id, 12);
   const emails = await resolveEditorEmails(events.map((e) => e.actorId));
 
-  const previewUrl = process.env.NEXT_PUBLIC_APP_URL
-    ? `${process.env.NEXT_PUBLIC_APP_URL}/preview/${type}/${id}`
-    : null;
+  const previewUrl =
+    previewHref !== undefined
+      ? previewHref
+      : process.env.NEXT_PUBLIC_APP_URL
+        ? `${process.env.NEXT_PUBLIC_APP_URL}/preview/${type}/${id}`
+        : null;
 
   return (
     <div className="space-y-5">

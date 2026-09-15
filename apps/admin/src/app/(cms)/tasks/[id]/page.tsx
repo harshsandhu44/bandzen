@@ -95,6 +95,13 @@ export default async function ExamTaskPage({
             publishAction={publishExamTaskAction}
             unpublishAction={unpublishExamTaskAction}
             deleteAction={deleteExamTaskAction}
+            // The app previews exam tasks by type in the real exam shell, and
+            // shows a published item there; a draft has nothing to show yet.
+            previewHref={
+              definition && task.status === 'published'
+                ? `${APP_URL}/preview/tasks/${task.examKey}/${task.taskType}`
+                : null
+            }
           />
         }
       >
@@ -127,16 +134,6 @@ export default async function ExamTaskPage({
           <Field label="Answer key">{list(task.answer)}</Field>
           <Field label="Transcript">{task.transcript ?? '—'}</Field>
         </dl>
-        {definition && task.status === 'published' ? (
-          <a
-            href={`${APP_URL}/preview/tasks/${task.examKey}/${task.taskType}`}
-            target="_blank"
-            rel="noreferrer noopener"
-            className="inline-block text-sm underline underline-offset-4"
-          >
-            Preview in the exam shell
-          </a>
-        ) : null}
       </EditorShell>
     </div>
   );
