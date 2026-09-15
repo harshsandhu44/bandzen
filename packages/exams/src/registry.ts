@@ -8,6 +8,7 @@ import {
   SKILLS,
   type ExamDefinition,
   type ExamKey,
+  type ScoreScale,
   type TaskDefinition,
 } from './types.ts';
 
@@ -27,6 +28,11 @@ export const CURRENT_EXAM_VERSION = Object.fromEntries(
 
 export function getExam(key: string): ExamDefinition | null {
   return EXAMS.find((e) => e.key === key) ?? null;
+}
+
+/** An exam's score scale; IELTS's for a user who has not picked an exam yet. */
+export function scoreScaleFor(key: string | null | undefined): ScoreScale {
+  return (getExam(key ?? 'ielts') ?? IELTS).scoreScale;
 }
 
 export function getTask(exam: string, key: string): TaskDefinition | null {

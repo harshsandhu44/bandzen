@@ -1,0 +1,92 @@
+/**
+ * IELTS's scoring rules: the adapter behind every IELTS band Bandzen shows.
+ * Moved here unchanged from `apps/app/src/lib/grading.ts`, which re-exports
+ * them, so IELTS arithmetic is IELTS's rather than the shared default.
+ *
+ * Pure functions, no database — these were once Postgres functions, and
+ * keeping them free of the data layer is what makes them testable.
+ */
+
+/**
+ * Academic Reading raw score → band, on the public 40-question scale. Shorter
+ * sets are scaled up to 40 first, so a 13-question practice set reports on the
+ * same scale as a full test.
+ *
+ * ponytail: General Training converts differently and more generously. Take a
+ * format argument when GT ships rather than guessing at it now.
+ */
+export function readingBand(correct: number, total: number): number {
+  if (!total) return 0;
+  const scaled = Math.round((correct / total) * 40);
+  if (scaled >= 39) return 9;
+  if (scaled >= 37) return 8.5;
+  if (scaled >= 35) return 8;
+  if (scaled >= 33) return 7.5;
+  if (scaled >= 30) return 7;
+  if (scaled >= 27) return 6.5;
+  if (scaled >= 23) return 6;
+  if (scaled >= 19) return 5.5;
+  if (scaled >= 15) return 5;
+  if (scaled >= 13) return 4.5;
+  if (scaled >= 10) return 4;
+  if (scaled >= 8) return 3.5;
+  if (scaled >= 6) return 3;
+  return 2.5;
+}
+
+const toHalfBand = (n: number) => Math.round(n * 2) / 2;
+
+/** Task 1 and Task 2 combined, Task 2 weighted double — the IELTS convention. */
+export function writingSectionBand(task1: number, task2: number): number {
+  return toHalfBand((task1 + 2 * task2) / 3);
+}
+
+/**
+ * The highest band an essay can be estimated at given its length. IELTS caps
+ * a response shorter than ~40 words (Task 1) / ~50 words (Task 2) at Band 2,
+ * and a blank response has no assessable language at all. Above that the
+ * length penalty is the grader's to apply within Task Response.
+ */
+export function writingLengthCeiling(wordCount: number, task: number): number {
+  if (wordCount <= 0) return 1;
+  const minimum = task === 1 ? 40 : 50;
+  if (wordCount < minimum) return 2;
+  return 9;
+}
+
+/**
+ * The highest Speaking band a candidate can be estimated at given how much of
+ * the test they actually answered. A speaking band rewards *sustained*
+ * production across Parts 1-3; someone who answered one prompt of ten cannot
+ * have shown that, however fluent the one answer was. The grader is told about
+ * the gaps too — this is the deterministic backstop for when it is still too
+ * generous. No cap once the test is essentially complete.
+ */
+export function speakingCoverageCeiling(
+  answered: number,
+  total: number,
+): number {
+  if (total <= 0 || answered >= total) return 9;
+  const ratio = answered / total;
+  if (ratio >= 0.8) return 9;
+  if (ratio >= 0.6) return 7;
+  if (ratio >= 0.4) return 6;
+  if (ratio >= 0.2) return 4.5;
+  return 3;
+}
+
+/**
+ * The official overall band: the mean of the four skills, rounded
+ * asymmetrically rather than to the nearest half. A mean-fraction under .25
+ * rounds down, .25-.74 rounds to the half band, .75+ rounds up to the next
+ * whole band — e.g. 6.25 -> 6.5, but 6.75 -> 7.0.
+ */
+export function overallBand(
+  bands: readonly [number, number, number, number],
+): number {
+  const mean = bands.reduce((a, b) => a + b, 0) / 4;
+  const frac = mean - Math.floor(mean);
+  if (frac < 0.25) return Math.floor(mean);
+  if (frac < 0.75) return Math.floor(mean) + 0.5;
+  return Math.ceil(mean);
+}
