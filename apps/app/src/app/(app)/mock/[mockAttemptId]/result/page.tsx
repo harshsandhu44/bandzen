@@ -1,3 +1,4 @@
+import { scoreScaleFor } from '@bandzen/exams/registry';
 import { notFound } from 'next/navigation';
 import { requireUserId } from '@/lib/auth';
 import { getMockResult, getProfile } from '@/lib/db/queries';
@@ -22,6 +23,7 @@ export default async function MockResultPage({
       <SittingResult
         sections={data}
         target={profile?.targetScore ?? null}
+        scale={scoreScaleFor(data.mock.examKey)}
         eyebrow="Mock test result"
       />
     </div>

@@ -1,3 +1,4 @@
+import { scoreScaleFor } from '@bandzen/exams/registry';
 import { after } from 'next/server';
 import { notFound, redirect } from 'next/navigation';
 import { ObjectiveReview } from '@/components/exam/objective-review';
@@ -39,7 +40,8 @@ export default async function ReadingReviewPage({
     <ObjectiveReview
       module="reading"
       title={data.passage.title}
-      band={attempt.score}
+      score={attempt.score}
+      scale={scoreScaleFor(attempt.examKey)}
       rawScore={attempt.rawScore}
       total={attempt.total}
       rows={data.rows}

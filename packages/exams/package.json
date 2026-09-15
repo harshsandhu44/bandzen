@@ -5,7 +5,8 @@
   "type": "module",
   "exports": {
     "./types": "./src/types.ts",
-    "./registry": "./src/registry.ts"
+    "./registry": "./src/registry.ts",
+    "./scoring": "./src/scoring.ts"
   },
   "scripts": {
     "lint": "eslint",

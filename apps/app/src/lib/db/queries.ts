@@ -26,6 +26,7 @@ import {
   windowStart,
 } from '@/lib/entitlements';
 import { isAnswerCorrect, readingBand } from '@/lib/grading';
+import { modelAssessment, objectiveAssessment } from '@bandzen/exams/scoring';
 import { preparationWrites, type PreparationValues } from '@/lib/enrollment';
 import { union } from 'drizzle-orm/pg-core';
 import { db } from './index';
@@ -51,6 +52,7 @@ import {
   subscriptions,
   writingPrompts,
   type Annotation,
+  type Attempt,
   type Criterion,
   type ListeningPlayback,
   type Award,
@@ -815,6 +817,36 @@ function attemptVariant(values: {
 // data. Inline `score` and delete this with the column in the drop follow-up.
 const scored = (band: number) => ({ band, score: band });
 
+type AttemptIdentity = Pick<
+  Attempt,
+  'examKey' | 'examVersion' | 'taskType' | 'module'
+>;
+
+const identity = (attempt: AttemptIdentity) => ({
+  exam: attempt.examKey,
+  examVersion: attempt.examVersion,
+  taskType: attempt.taskType ?? attempt.module,
+  skill: attempt.module,
+});
+
+/** A marked Reading or Listening attempt: its band and its assessment. */
+const objectiveResult = (
+  attempt: AttemptIdentity,
+  correct: number,
+  total: number,
+) => {
+  const band = readingBand(correct, total);
+  return {
+    ...scored(band),
+    assessment: objectiveAssessment({
+      ...identity(attempt),
+      correct,
+      total,
+      score: band,
+    }),
+  };
+};
+
 export async function createAttempt(values: {
   userId: string;
   module: Skill;
@@ -975,7 +1007,7 @@ export async function submitReading(userId: string, attemptId: string) {
       status: 'complete',
       rawScore: correct,
       total,
-      ...scored(readingBand(correct, total)),
+      ...objectiveResult(attempt, correct, total),
       submittedAt: new Date(),
     })
     .where(
@@ -1103,7 +1135,7 @@ export async function submitMockReading(userId: string, attemptId: string) {
       status: 'complete',
       rawScore: correct,
       total,
-      ...scored(readingBand(correct, total)),
+      ...objectiveResult(attempt, correct, total),
       submittedAt: new Date(),
     })
     .where(
@@ -1239,7 +1271,7 @@ export async function submitListening(userId: string, attemptId: string) {
       status: 'complete',
       rawScore: correct,
       total,
-      ...scored(readingBand(correct, total)),
+      ...objectiveResult(attempt, correct, total),
       submittedAt: new Date(),
     })
     .where(
@@ -1374,7 +1406,7 @@ export async function submitMockListening(userId: string, attemptId: string) {
       status: 'complete',
       rawScore: correct,
       total,
-      ...scored(readingBand(correct, total)),
+      ...objectiveResult(attempt, correct, total),
       submittedAt: new Date(),
     })
     .where(
@@ -1504,7 +1536,10 @@ export async function saveSpeakingResponse(
  */
 export async function loadSpeakingForGrading(attemptId: string) {
   const [attempt] = await db
-    .select({ speakingTestId: attempts.speakingTestId })
+    .select({
+      speakingTestId: attempts.speakingTestId,
+      examKey: attempts.examKey,
+    })
     .from(attempts)
     .where(eq(attempts.id, attemptId));
   if (!attempt?.speakingTestId) return null;
@@ -1538,7 +1573,7 @@ export async function loadSpeakingForGrading(attemptId: string) {
     .where(eq(speakingPrompts.testId, attempt.speakingTestId))
     .orderBy(speakingPrompts.idx);
 
-  return { title: test.title, prompts: rows };
+  return { title: test.title, examKey: attempt.examKey, prompts: rows };
 }
 
 /** Persist the Whisper transcript of one answer, for the review page. */
@@ -1969,6 +2004,7 @@ export async function loadForGrading(attemptId: string) {
       wordCount: essays.wordCount,
       task: writingPrompts.task,
       promptText: writingPrompts.promptText,
+      examKey: attempts.examKey,
     })
     .from(attempts)
     .innerJoin(essays, eq(essays.attemptId, attempts.id))
@@ -1994,6 +2030,28 @@ export async function writeReport(
     .values({ attemptId, ...report })
     .onConflictDoUpdate({ target: reports.attemptId, set: report });
 
+  // The same normalised result the objective modules write, built here so
+  // both graders get it without assembling it themselves.
+  const [attempt] = await db
+    .select({
+      examKey: attempts.examKey,
+      examVersion: attempts.examVersion,
+      taskType: attempts.taskType,
+      module: attempts.module,
+    })
+    .from(attempts)
+    .where(eq(attempts.id, attemptId));
+  const assessment = attempt
+    ? modelAssessment({
+        ...identity(attempt),
+        score: values.band,
+        criteria: values.criteria,
+        feedback: values.annotations,
+        strengths: values.strengths,
+        weaknesses: values.weaknesses,
+      })
+    : null;
+
   // Returns the owner because this is where a writing attempt becomes a study
   // day -- `submitEssay` leaves it on 'grading' -- and the caller has no userId
   // of its own to check awards with.
@@ -2002,6 +2060,7 @@ export async function writeReport(
     .set({
       status: 'complete',
       ...scored(values.band),
+      assessment,
       submittedAt: new Date(),
     })
     .where(eq(attempts.id, attemptId))

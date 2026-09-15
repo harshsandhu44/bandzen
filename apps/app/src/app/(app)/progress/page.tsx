@@ -9,7 +9,9 @@ import {
   TabsList,
   TabsTrigger,
 } from '@bandzen/ui/components/tabs';
-import { BandChart } from '@/components/progress/band-chart';
+import { scoreScaleFor } from '@bandzen/exams/registry';
+import { formatScore } from '@bandzen/exams/scoring';
+import { ScoreChart } from '@/components/progress/score-chart';
 import {
   EmptyState,
   Eyebrow,
@@ -72,6 +74,7 @@ export default async function ProgressPage() {
       isPro(userId),
       listAwards(userId),
     ]);
+  const scale = scoreScaleFor(profile?.examKey);
 
   // Below MIN_ATTEMPTED a rate is noise, so it cannot name a pattern.
   const ranked = accuracy
@@ -136,20 +139,24 @@ export default async function ProgressPage() {
 
       <Panel
         headingId="overall-heading"
-        title="Estimated band over time"
+        title={`Estimated ${scale.label.toLowerCase()} over time`}
         action={
           <Metric
-            label="Estimated band"
-            value={overall != null ? overall.toFixed(1) : '—'}
+            label={`Estimated ${scale.label.toLowerCase()}`}
+            value={overall != null ? formatScore(scale, overall) : '—'}
             hint={
               profile?.targetScore != null
-                ? `Target ${profile.targetScore.toFixed(1)}`
+                ? `Target ${formatScore(scale, profile.targetScore)}`
                 : undefined
             }
           />
         }
       >
-        <BandChart points={points} target={profile?.targetScore ?? undefined} />
+        <ScoreChart
+          points={points}
+          target={profile?.targetScore ?? undefined}
+          scale={scale}
+        />
         <p className="mt-2 font-mono text-[0.625rem] tracking-[0.16em] text-muted-foreground uppercase">
           {hidden
             ? `Your last ${FREE_TREND_POINTS} attempts, oldest first`
@@ -208,12 +215,14 @@ export default async function ProgressPage() {
                 return (
                   <div key={module} className="space-y-3">
                     <BandScale
+                      scale={scale}
                       value={modulePoints.at(-1)!.value}
                       target={profile?.targetScore ?? undefined}
                       label={MODULE_LABEL[module]}
                     />
                     {modulePoints.length > 1 ? (
                       <BandTrend
+                        scale={scale}
                         points={modulePoints}
                         target={profile?.targetScore ?? undefined}
                         caption={`${MODULE_LABEL[module]} attempts`}
@@ -351,7 +360,7 @@ export default async function ProgressPage() {
                 </div>
                 <span className="flex items-center gap-5">
                   <span className="font-metric text-metric-sm">
-                    {a.band?.toFixed(1) ?? '—'}
+                    {a.band != null ? formatScore(scale, a.band) : '—'}
                   </span>
                   <Link
                     href={`/review/${a.id}`}

@@ -1,6 +1,8 @@
 import Link from 'next/link';
+import type { ScoreScale } from '@bandzen/exams/registry';
+import { ESTIMATE_NOTE, formatScore } from '@bandzen/exams/scoring';
 import { BandScale } from '@bandzen/ui/components/band-scale';
-import { BandReveal } from '@/components/exam/band-reveal';
+import { ScoreReveal } from '@/components/exam/score-reveal';
 import { GradingWatch } from '@/components/app/grading-watch';
 import { meanBand } from '@/lib/plan-data';
 import { overallBand, writingSectionBand } from '@/lib/grading';
@@ -53,12 +55,14 @@ export function sittingBands(s: SittingSections) {
 export function SittingResult({
   sections,
   target,
+  scale,
   eyebrow,
-  overallLabel = 'Estimate, not an official score',
+  overallLabel = ESTIMATE_NOTE,
   speakingSlot,
 }: {
   sections: SittingSections;
   target: number | null;
+  scale: ScoreScale;
   eyebrow: string;
   overallLabel?: string;
   /** Replaces the Speaking row — the diagnostic uses it for the Pro lock / "add speaking" card. */
@@ -118,8 +122,8 @@ export function SittingResult({
       band: bands.writing,
       pending: pendingNote(sections.task1?.status, sections.task2?.status),
       detail:
-        sections.task1?.band != null && sections.task2?.band != null
-          ? `Task 1: ${sections.task1.band.toFixed(1)} · Task 2: ${sections.task2.band.toFixed(1)}`
+        sections.task1?.score != null && sections.task2?.score != null
+          ? `Task 1: ${formatScore(scale, sections.task1.score)} · Task 2: ${formatScore(scale, sections.task2.score)}`
           : null,
       href: sections.task2
         ? `/writing/${sections.task2.id}/report`
@@ -156,7 +160,11 @@ export function SittingResult({
         </p>
         {overall != null ? (
           <>
-            <BandReveal value={overall} target={target ?? undefined} />
+            <ScoreReveal
+              value={overall}
+              target={target ?? undefined}
+              scale={scale}
+            />
             <p className="font-mono text-[0.6875rem] tracking-[0.18em] text-muted-foreground uppercase">
               {overallLabel}
             </p>
@@ -176,7 +184,7 @@ export function SittingResult({
           ) : (
             <div key={r.label} className="space-y-1">
               {r.band != null ? (
-                <BandScale value={r.band} label={r.label} />
+                <BandScale value={r.band} label={r.label} scale={scale} />
               ) : (
                 <p className="text-sm text-muted-foreground">
                   {r.label} — {r.pending}

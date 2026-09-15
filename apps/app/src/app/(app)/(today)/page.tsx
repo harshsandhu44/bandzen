@@ -1,7 +1,8 @@
 import { redirect } from 'next/navigation';
 import { currentUser } from '@clerk/nextjs/server';
 import { Card, CardContent } from '@bandzen/ui/components/card';
-import { BandOverview } from '@/components/dashboard/band-overview';
+import { getExam } from '@bandzen/exams/registry';
+import { ScoreOverview } from '@/components/dashboard/score-overview';
 import { ComingUp } from '@/components/dashboard/coming-up';
 import { ContinuePlan } from '@/components/dashboard/continue-plan';
 import {
@@ -49,6 +50,7 @@ export default async function DashboardPage() {
   // The one onboarding gate in the app. `/` redirects here, so this covers
   // every real entry without adding a second place to get auth wrong.
   if (!profile?.onboardingCompletedAt) redirect('/onboarding');
+  const exam = getExam(profile.examKey ?? 'ielts')!;
 
   const today = todayIso(profile.timezone);
 
@@ -95,6 +97,7 @@ export default async function DashboardPage() {
           <DashboardStats
             estimated={null}
             target={profile.targetScore}
+            scale={exam.scoreScale}
             daysUntilTest={days}
             streak={streak}
             longestStreak={bestStreak}
@@ -120,6 +123,8 @@ export default async function DashboardPage() {
       <DashboardHeader
         firstName={user?.firstName ?? null}
         timezone={profile.timezone}
+        examName={exam.name}
+        scale={exam.scoreScale}
         estimated={estimated}
         target={profile.targetScore}
         daysUntilTest={days}
@@ -137,8 +142,9 @@ export default async function DashboardPage() {
         <div className="space-y-4 lg:col-span-7">
           {progress.tasks.length ? <TodaysPlan progress={progress} /> : null}
           <PerformanceInsight insight={insight} />
-          <BandOverview
-            bands={{
+          <ScoreOverview
+            scale={exam.scoreScale}
+            scores={{
               reading: data.readingBand,
               writing: data.writingBand,
               listening: data.listeningBand,

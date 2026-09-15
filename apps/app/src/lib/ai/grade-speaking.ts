@@ -134,7 +134,7 @@ export async function gradeSpeaking(attemptId: string) {
       // No `schemaName`: this model accepts no `response_format` at all, so
       // the shape stays prose in the prompt and `parseStructured` is the only
       // thing checking it.
-      messages: buildSpeakingMessages(work.prompts, clips),
+      messages: buildSpeakingMessages(work.prompts, clips, work.examKey),
       schema: speakingEvaluationSchema,
       modalities: ['text'],
       retryOnParseFailure: true,
