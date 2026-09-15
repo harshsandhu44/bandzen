@@ -1,3 +1,10 @@
+# app [1.15.0](https://github.com/harshsandhu44/bandzen/compare/app@1.14.0...app@1.15.0) (2026-09-15)
+
+
+### Features
+
+* **exams:** exam definitions, task types and a renderer registry ([#105](https://github.com/harshsandhu44/bandzen/issues/105)) ([1ee3207](https://github.com/harshsandhu44/bandzen/commit/1ee3207ac7e83091010c4c70a90a68ecbb52d9f8))
+
 # app [1.14.0](https://github.com/harshsandhu44/bandzen/compare/app@1.13.1...app@1.14.0) (2026-09-15)
 
 
