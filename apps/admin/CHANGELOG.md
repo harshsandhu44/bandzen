@@ -1,3 +1,10 @@
+## admin [0.11.1](https://github.com/harshsandhu44/bandzen/compare/admin@0.11.0...admin@0.11.1) (2026-09-15)
+
+
+### Bug Fixes
+
+* **admin:** restrict listening questions to the three real kinds ([#81](https://github.com/harshsandhu44/bandzen/issues/81)) ([1b7b8ec](https://github.com/harshsandhu44/bandzen/commit/1b7b8ec47f29d3812c5a7d48c92bc735f7ba91ea))
+
 # admin [0.11.0](https://github.com/harshsandhu44/bandzen/compare/admin@0.10.1...admin@0.11.0) (2026-09-06)
 
 
