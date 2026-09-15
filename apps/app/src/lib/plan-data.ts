@@ -13,6 +13,7 @@ import {
   listWritingPrompts,
 } from '@/lib/db/queries';
 import type { Profile } from '@/lib/db/queries';
+import { planStrategyFor } from '@/lib/plan-strategies';
 import {
   buildPlan,
   derivePlanState,
@@ -53,6 +54,10 @@ export async function loadPlanData(
   today: string,
 ) {
   const { start, end } = dayBounds(today, profile.timezone);
+  // Scores are read for the active exam only: another exam's are on another
+  // scale and must not feed this plan or this estimate.
+  const examKey = profile.examKey ?? 'ielts';
+  const strategy = planStrategyFor(examKey);
 
   const [
     readingBand,
@@ -69,10 +74,10 @@ export async function loadPlanData(
     tracks,
     lessonForKind,
   ] = await Promise.all([
-    latestBand(userId, 'reading'),
-    latestBand(userId, 'writing'),
-    latestBand(userId, 'listening'),
-    latestBand(userId, 'speaking'),
+    latestBand(userId, 'reading', examKey),
+    latestBand(userId, 'writing', examKey),
+    latestBand(userId, 'listening', examKey),
+    latestBand(userId, 'speaking', examKey),
     latestReport(userId, 'writing'),
     accuracyByQuestionKind(userId, 'reading'),
     accuracyByQuestionKind(userId, 'listening'),
@@ -86,11 +91,14 @@ export async function loadPlanData(
 
   const completedLessonIds = lessons.map((l) => l.lessonId);
 
-  const planInput: PlanInput = {
-    readingBand,
-    writingBand,
-    listeningBand,
-    targetBand: profile.targetScore,
+  const planInput: PlanInput | null = strategy && {
+    strategy,
+    scores: {
+      reading: readingBand,
+      writing: writingBand,
+      listening: listeningBand,
+    },
+    targetScore: profile.targetScore,
     testDate: profile.testDate,
     weaknesses: report?.weaknesses ?? undefined,
     weakKinds: [...kindAccuracy]
@@ -105,7 +113,7 @@ export async function loadPlanData(
     },
   };
 
-  const plan = buildPlan(planInput);
+  const plan = planInput ? buildPlan(planInput) : [];
 
   const progress = derivePlanState(
     tasksOn(plan, today),
