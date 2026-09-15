@@ -1,5 +1,11 @@
 import type { ReactNode } from 'react';
 import { cn } from '@bandzen/ui/lib/utils';
+import {
+  Card,
+  CardAction,
+  CardContent,
+  CardHeader,
+} from '@bandzen/ui/components/card';
 
 /** A plain <a>; the consuming app passes its router's Link via `render` if it wants one. */
 function BackLink({ href, label }: { href: string; label: string }) {
@@ -33,6 +39,55 @@ function BackLink({ href, label }: { href: string; label: string }) {
  * app gets the components and the type they are set in from one import. Every
  * app loads the faces themselves from `@bandzen/ui/fonts`.
  */
+
+/**
+ * A card's content without the header/content boilerplate at every call. Moved
+ * here from apps/app so apps/admin's editors compose the same panels.
+ */
+export function StatCard({
+  children,
+  className,
+}: {
+  children: ReactNode;
+  className?: string;
+}) {
+  return (
+    <Card className={className}>
+      <CardContent>{children}</CardContent>
+    </Card>
+  );
+}
+
+/**
+ * A titled card. Heads it with a real `<h2>` rather than shadcn's `CardTitle`
+ * div, so a grid of panels stays navigable by heading. Anything that runs full
+ * width down the page keeps the bare `<section>` + `SectionHeader` pattern.
+ */
+export function Panel({
+  title,
+  action,
+  headingId,
+  children,
+  className,
+}: {
+  title: ReactNode;
+  action?: ReactNode;
+  headingId?: string;
+  children: ReactNode;
+  className?: string;
+}) {
+  return (
+    <Card className={className}>
+      <CardHeader>
+        <h2 id={headingId} className="font-heading text-sm font-medium">
+          {title}
+        </h2>
+        {action ? <CardAction>{action}</CardAction> : null}
+      </CardHeader>
+      <CardContent>{children}</CardContent>
+    </Card>
+  );
+}
 
 /** The mono uppercase label that belongs to a number. */
 export function Eyebrow({

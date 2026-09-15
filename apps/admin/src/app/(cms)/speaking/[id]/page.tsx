@@ -3,13 +3,7 @@ import {
   getSpeakingTestAdmin,
   checkSpeakingTestCompleteness,
 } from '@bandzen/db/queries';
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from '@bandzen/ui/components/card';
-import { PageHeader } from '@bandzen/ui/components/primitives';
+import { PageHeader, Panel } from '@bandzen/ui/components/primitives';
 import { requireAdminOrTeacher } from '@/lib/auth';
 import { StatusBadge } from '@/components/status-badge';
 import { EditorRail } from '@/components/editor-rail';
@@ -90,19 +84,14 @@ export default async function EditSpeakingTestPage({
         }
       >
         {pending > 0 ? (
-          <Card>
-            <CardHeader>
-              <CardTitle>Examiner audio</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <GenerationStatus
-                testId={test.id}
-                pending={pending}
-                error={test.generationError}
-                timedOut={test.generationTimedOut}
-              />
-            </CardContent>
-          </Card>
+          <Panel title="Examiner audio">
+            <GenerationStatus
+              testId={test.id}
+              pending={pending}
+              error={test.generationError}
+              timedOut={test.generationTimedOut}
+            />
+          </Panel>
         ) : null}
 
         <SpeakingEditor

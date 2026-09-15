@@ -8,7 +8,7 @@ import { Checkbox } from '@bandzen/ui/components/checkbox';
 import { ConfirmDialog } from '@bandzen/ui/components/confirm-dialog';
 import { Input } from '@bandzen/ui/components/input';
 import { Select } from '@bandzen/ui/components/select';
-import { EmptyState } from '@bandzen/ui/components/primitives';
+import { EmptyState, Eyebrow } from '@bandzen/ui/components/primitives';
 import type { ContentStatus } from '@bandzen/db/schema';
 import { StatusBadge } from '@/components/status-badge';
 import { toastResult } from '@/components/toast';
@@ -204,9 +204,7 @@ export function ContentList({
                   )
                 }
               />
-              <span className="font-mono text-[0.6875rem] tracking-[0.18em] text-muted-foreground uppercase">
-                Select all
-              </span>
+              <Eyebrow as="span">Select all</Eyebrow>
             </li>
           ) : null}
           {items.map((item) => (

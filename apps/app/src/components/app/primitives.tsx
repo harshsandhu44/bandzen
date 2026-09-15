@@ -1,77 +1,23 @@
 import type { ReactNode } from 'react';
 import { Sparkle } from 'lucide-react';
-import {
-  Card,
-  CardAction,
-  CardContent,
-  CardHeader,
-} from '@bandzen/ui/components/card';
 import { cn } from '@bandzen/ui/lib/utils';
 
 /**
- * Eyebrow, SectionHeader, PageHeader, Metric and EmptyState now live in
- * `@bandzen/ui/components/primitives`, shared with apps/admin. They are
- * re-exported here so the 22 call sites in this app keep importing from one
- * place, and so this file can stay the home of the one primitive that did NOT
- * move.
+ * Eyebrow, SectionHeader, PageHeader, Metric, EmptyState, Panel and StatCard
+ * now live in `@bandzen/ui/components/primitives`, shared with apps/admin.
+ * They are re-exported here so the call sites in this app keep importing from
+ * one place, and so this file can stay the home of the primitives that did
+ * NOT move.
  */
 export {
   Eyebrow,
   EmptyState,
   Metric,
   PageHeader,
+  Panel,
   SectionHeader,
+  StatCard,
 } from '@bandzen/ui/components/primitives';
-
-/**
- * The dashboard and progress pages read as a grid of cards now, not one
- * vertical stack. These two wrap the shared shadcn `Card` so a page composes
- * panels instead of repeating the header/content boilerplate at every call.
- *
- * `Panel` heads its card with a real `<h2>` rather than shadcn's `CardTitle`
- * div, so the grid stays navigable by heading. The bare `<section>` +
- * `SectionHeader` pattern still applies to anything that runs full width down
- * the page.
- */
-export function StatCard({
-  children,
-  className,
-}: {
-  children: ReactNode;
-  className?: string;
-}) {
-  return (
-    <Card className={className}>
-      <CardContent>{children}</CardContent>
-    </Card>
-  );
-}
-
-export function Panel({
-  title,
-  action,
-  headingId,
-  children,
-  className,
-}: {
-  title: ReactNode;
-  action?: ReactNode;
-  headingId?: string;
-  children: ReactNode;
-  className?: string;
-}) {
-  return (
-    <Card className={className}>
-      <CardHeader>
-        <h2 id={headingId} className="font-heading text-sm font-medium">
-          {title}
-        </h2>
-        {action ? <CardAction>{action}</CardAction> : null}
-      </CardHeader>
-      <CardContent>{children}</CardContent>
-    </Card>
-  );
-}
 
 /**
  * The tick rule. The band scale's idiom at block scale -- the same measured
