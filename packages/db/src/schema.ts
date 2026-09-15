@@ -16,6 +16,7 @@ import {
   type AnyPgColumn,
 } from 'drizzle-orm/pg-core';
 import { CURRENT_EXAM_VERSION, EXAM_KEYS } from '@bandzen/exams/registry';
+import type { TaskContent } from '@bandzen/exams/content';
 import type { AssessmentResult } from '@bandzen/exams/scoring';
 
 /**
@@ -563,6 +564,51 @@ export const speakingPrompts = pgTable(
 );
 
 /**
+ * One task item for any exam, in the normalised task-content contract
+ * (`@bandzen/exams/content`): text, audio or image stimuli, option banks,
+ * gaps, pieces to order, examiner turns, timing and calibration. PTE, TOEFL
+ * and DET content lives here; the specialised IELTS tables stay as they are.
+ *
+ * `exam_key` + `exam_version` + `task_type` say exactly what an item is, and
+ * the task type must be one its exam definition declares.
+ */
+export const examTasks = pgTable(
+  'exam_tasks',
+  {
+    id: uuid('id').primaryKey().defaultRandom(),
+    slug: text('slug').notNull().unique(),
+    title: text('title').notNull(),
+    examKey: examKey('exam_key').notNull(),
+    examVersion: text('exam_version').notNull(),
+    section: text('section').notNull(),
+    taskType: text('task_type').notNull(),
+    content: jsonb('content').$type<TaskContent>().notNull(),
+    status: contentStatus('status').notNull().default('draft'),
+    updatedBy: text('updated_by'),
+    updatedAt: timestamp('updated_at', { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+    createdAt: timestamp('created_at', { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+  },
+  (t) => [index('exam_tasks_exam_task_idx').on(t.examKey, t.taskType)],
+);
+
+/**
+ * An exam task's answer key and transcript. Its own table for the same reason
+ * `question_answers` is: a careless select of task content can never carry
+ * the key or the transcript into a page a candidate is sitting.
+ */
+export const examTaskAnswers = pgTable('exam_task_answers', {
+  taskId: uuid('task_id')
+    .primaryKey()
+    .references(() => examTasks.id, { onDelete: 'cascade' }),
+  answer: jsonb('answer').$type<string[] | null>(),
+  transcript: text('transcript'),
+});
+
+/**
  * One sequential exam sitting. Two shapes, told apart by `kind`:
  *
  * - `'mock'` — the full four-skill mock: 3 passages, 4 tracks, both writing
@@ -1068,6 +1114,7 @@ export type AttemptAnswer = typeof attemptAnswers.$inferSelect;
 export type Report = typeof reports.$inferSelect;
 export type Profile = typeof profiles.$inferSelect;
 export type ExamEnrollment = typeof examEnrollments.$inferSelect;
+export type ExamTask = typeof examTasks.$inferSelect;
 export type LessonProgress = typeof lessonProgress.$inferSelect;
 export type Award = typeof awards.$inferSelect;
 export type Subscription = typeof subscriptions.$inferSelect;

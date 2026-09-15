@@ -22,6 +22,14 @@ export type ListItem = {
   status: ContentStatus;
 };
 
+/** A URL-backed select beside search and status: exam, task type, … */
+export type ListFilter = {
+  key: string;
+  /** The "any" option's label, e.g. "All exams". */
+  label: string;
+  options: readonly { value: string; label: string }[];
+};
+
 export type BulkActions = {
   noun: string;
   publish: (ids: string[]) => Promise<ActionResult>;
@@ -37,7 +45,9 @@ export function ContentList({
   bulk,
   page = 1,
   hasMore = false,
+  filters = [],
 }: {
+  filters?: readonly ListFilter[];
   items: ListItem[];
   emptyTitle: string;
   emptyDescription: string;
@@ -55,7 +65,7 @@ export function ContentList({
 
   const q = params.get('q') ?? '';
   const status = params.get('status') ?? '';
-  const filtering = !!q || !!status;
+  const filtering = !!q || !!status || filters.some((f) => params.get(f.key));
 
   const [term, setTerm] = useState(q);
   const debounce = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
@@ -118,6 +128,22 @@ export function ContentList({
           <option value="draft">Draft</option>
           <option value="published">Published</option>
         </Select>
+        {filters.map((f) => (
+          <Select
+            key={f.key}
+            aria-label={f.label}
+            value={params.get(f.key) ?? ''}
+            onChange={(e) => setParam(f.key, e.target.value, true)}
+            className="w-52"
+          >
+            <option value="">{f.label}</option>
+            {f.options.map((o) => (
+              <option key={o.value} value={o.value}>
+                {o.label}
+              </option>
+            ))}
+          </Select>
+        ))}
         {/* ponytail: only exact when there's a single page — with no total-count
             query, a later page can't say how many rows exist beyond it. */}
         {filtering && page === 1 && !hasMore ? (

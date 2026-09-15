@@ -4,7 +4,9 @@ import {
   LISTENING_SYSTEM,
   SPEAKING_SYSTEM,
 } from '@bandzen/ai/prompts';
+import { EXAMS } from '@bandzen/exams/registry';
 import type {
+  examTaskSchema,
   lessonSchema,
   listeningTrackSchema,
   passageSchema,
@@ -1427,6 +1429,186 @@ questions, Part 2 the long turn from a cue card, Part 3 the abstract discussion.
 });
 
 // ---------------------------------------------------------------------------
+// Exam tasks
+// ---------------------------------------------------------------------------
+
+type ExamTaskItem = z.input<typeof examTaskSchema>;
+
+/**
+ * One contract for every exam's tasks. The task list is read off the exam
+ * definitions, so a task type added there is offered here without an edit.
+ */
+const TASK_BASE = `You write practice items for high-stakes English exams. Each item is one task of one exam, in the exact format that exam uses for its current test version.
+
+Fields:
+- slug: kebab-case, unique. title: a short human label.
+- examKey, examVersion, taskType: must match a task below exactly.
+- prompt: the instruction the candidate reads.
+- stimulus: what the candidate is shown — text, audioUrl, imageUrl and imageAlt, as the task needs.
+- options (choice tasks), gapped (text with ___ for each gap), tokens (pieces to put in order, in scrambled display order), turns (an interviewer's questions): only what the task's response needs.
+- timing: omit to use the exam's own; set {prepSeconds, responseSeconds} only to override it.
+- difficulty: 1-5.
+- answer: the answer key, in the task's format. Choice: the correct option text(s), copied exactly. Gaps: one entry per gap, alternatives separated by |. Order: the correct order as token indices, e.g. ["2","0","1"]. Dictation: the sentence. Writing and speaking tasks are graded by a rubric: no answer.
+- transcript: what any audio says. An audio task may arrive with a transcript and no audioUrl; the audio is produced from it before publishing.
+- An image task needs imageAlt now; the image is uploaded before publishing.
+
+Tasks, as exam (version): taskType — stimulus, response:
+${EXAMS.map(
+  (exam) =>
+    `${exam.key} (${exam.version}):\n${exam.tasks
+      .map((t) => `  ${t.key} — ${t.stimulus}, ${t.renderer}`)
+      .join('\n')}`,
+).join('\n')}
+
+Return the result as a JSON array matching the example below exactly. Return JSON only.`;
+
+export const TASK_TEMPLATES = build<ExamTaskItem>(TASK_BASE, {
+  general: {
+    label: 'Re-order (PTE Academic)',
+    focus:
+      'Re-order rules: tokens hold the paragraphs in scrambled order; answer lists their indices in the original order. Every index appears exactly once.',
+    example: {
+      slug: 'pte-reorder-reopened-rivers',
+      title: 'Re-order: reopening city rivers',
+      examKey: 'pte_academic',
+      examVersion: '2025-08-07',
+      taskType: 'reorder_paragraphs',
+      prompt:
+        'The text boxes below have been placed in a random order. Restore the original order.',
+      stimulus: {
+        text: 'Four sentences from a short article about urban rivers.',
+      },
+      tokens: [
+        'Several cities have since reopened them.',
+        'Urban rivers were once buried under roads to make room for traffic.',
+        'The benefits, however, arrive over decades rather than years.',
+        'Open water cools the streets around it and slows flooding.',
+      ],
+      answer: ['1', '0', '3', '2'],
+      difficulty: 3,
+    },
+  },
+  gaps: {
+    label: 'Fill the gaps (Duolingo English Test)',
+    focus:
+      'Gap rules: mark every gap in gapped with ___ and give one answer per gap, in order. Accept close variants with |.',
+    example: {
+      slug: 'det-complete-reopened-rivers',
+      title: 'Read and Complete: reopened rivers',
+      examKey: 'det',
+      examVersion: '2025-07-01',
+      taskType: 'read_and_complete',
+      prompt: 'Type the missing letters to complete the text.',
+      stimulus: { text: 'A short text about cities reopening buried rivers.' },
+      gapped:
+        'Cities that reopen their rivers find that the water ___ nearby streets and slows ___ after heavy rain.',
+      answer: ['cools|cooled', 'flooding'],
+      difficulty: 2,
+    },
+  },
+  choice: {
+    label: 'Single choice (TOEFL iBT)',
+    focus:
+      'Choice rules: four options, one correct, copied into answer exactly. Distractors must be plausible from the text, not absurd.',
+    example: {
+      slug: 'toefl-daily-life-library-notice',
+      title: 'Read in Daily Life: library notice',
+      examKey: 'toefl_ibt',
+      examVersion: '2026-01-21',
+      taskType: 'read_in_daily_life',
+      prompt: 'What does the notice tell students to do?',
+      stimulus: {
+        text: 'LIBRARY NOTICE — The third floor will be closed for repairs from Monday to Wednesday. Group study rooms on that floor can be booked on the second floor instead. Quiet study remains available on the first floor.',
+      },
+      options: [
+        'Book group study rooms on the second floor',
+        'Avoid the library until Thursday',
+        'Study quietly on the third floor',
+        'Return books before Monday',
+      ],
+      answer: ['Book group study rooms on the second floor'],
+      difficulty: 2,
+    },
+  },
+  audio: {
+    label: 'Dictation from audio (PTE Academic)',
+    focus:
+      'Audio rules: give the transcript; audioUrl may be left out and is synthesised from it. For dictation the answer is the same sentence.',
+    example: {
+      slug: 'pte-dictation-library-friday',
+      title: 'Write from Dictation: library hours',
+      examKey: 'pte_academic',
+      examVersion: '2025-08-07',
+      taskType: 'write_from_dictation',
+      prompt:
+        'You will hear a sentence. Type the sentence exactly as you hear it.',
+      transcript:
+        'The university library will close early on Friday afternoon.',
+      answer: ['The university library will close early on Friday afternoon.'],
+      difficulty: 3,
+    },
+  },
+  image: {
+    label: 'Speak about an image (PTE Academic)',
+    focus:
+      'Image rules: describe the image in imageAlt precisely enough to draw it; the image itself is uploaded before publishing. A speaking task has no answer.',
+    example: {
+      slug: 'pte-describe-image-renewables',
+      title: 'Describe Image: renewable electricity',
+      examKey: 'pte_academic',
+      examVersion: '2025-08-07',
+      taskType: 'describe_image',
+      prompt:
+        'Look at the image below. In 25 seconds, prepare to describe it in detail. You will have 40 seconds to give your response.',
+      stimulus: {
+        imageAlt:
+          'Bar chart of the share of electricity from renewable sources in three countries, 2000 and 2020, each rising, the largest from 15% to 48%.',
+      },
+      difficulty: 3,
+    },
+  },
+  writing: {
+    label: 'Write an email (TOEFL iBT)',
+    focus:
+      'Writing rules: the stimulus sets a situation with three things the email must do; a rubric grades it, so there is no answer.',
+    example: {
+      slug: 'toefl-email-missed-seminar',
+      title: 'Write an Email: missed seminar',
+      examKey: 'toefl_ibt',
+      examVersion: '2026-01-21',
+      taskType: 'write_an_email',
+      prompt: 'Write an email to your professor. You have 7 minutes.',
+      stimulus: {
+        text: 'You missed yesterday’s seminar because your train was cancelled. In your email: explain why you were absent, ask how to catch up on what was covered, and suggest a time to meet.',
+      },
+      difficulty: 2,
+    },
+  },
+  conversation: {
+    label: 'Interview (TOEFL iBT)',
+    focus:
+      'Conversation rules: the transcript introduces the interview; turns are the interviewer’s questions, easiest first. A rubric grades it, so there is no answer.',
+    example: {
+      slug: 'toefl-interview-city-parks',
+      title: 'Take an Interview: city parks',
+      examKey: 'toefl_ibt',
+      examVersion: '2026-01-21',
+      taskType: 'take_an_interview',
+      prompt: 'An interviewer will ask you four questions. Answer each one.',
+      transcript:
+        'Thanks for joining us. We are asking students about how they use public spaces in their city.',
+      turns: [
+        'How often do you visit a park, and what do you usually do there?',
+        'What would make the parks near you more useful to students?',
+        'Some people say cities should spend more on parks than on roads. What do you think?',
+        'How might parks change as cities get hotter?',
+      ],
+      difficulty: 3,
+    },
+  },
+});
+
+// ---------------------------------------------------------------------------
 
 export const TEMPLATES = {
   passages: PASSAGE_TEMPLATES,
@@ -1435,4 +1617,5 @@ export const TEMPLATES = {
   'writing-prompts': WRITING_PROMPT_TEMPLATES,
   lessons: LESSON_TEMPLATES,
   resources: RESOURCE_TEMPLATES,
+  tasks: TASK_TEMPLATES,
 } satisfies Record<string, TemplateOption[]>;

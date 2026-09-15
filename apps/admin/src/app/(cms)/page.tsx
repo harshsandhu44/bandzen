@@ -30,6 +30,7 @@ const SECTIONS: { type: ContentType; label: string; href: string }[] = [
   },
   { type: 'lesson', label: 'Lessons', href: '/lessons' },
   { type: 'resource', label: 'Resources', href: '/resources' },
+  { type: 'exam-task', label: 'Exam tasks', href: '/tasks' },
 ];
 
 const EDIT_HREF: Record<ContentType, (id: string) => string> = {
@@ -39,6 +40,7 @@ const EDIT_HREF: Record<ContentType, (id: string) => string> = {
   'writing-prompt': (id) => `/writing-prompts/${id}`,
   lesson: (id) => `/lessons/${id}`,
   resource: (id) => `/resources/${id}`,
+  'exam-task': (id) => `/tasks/${id}`,
 };
 
 const TYPE_LABEL: Record<ContentType, string> = {
@@ -48,6 +50,7 @@ const TYPE_LABEL: Record<ContentType, string> = {
   'writing-prompt': 'Prompt',
   lesson: 'Lesson',
   resource: 'Resource',
+  'exam-task': 'Exam task',
 };
 
 /** Coarse on purpose — this is an "is anything stale?" signal, not a timestamp. */

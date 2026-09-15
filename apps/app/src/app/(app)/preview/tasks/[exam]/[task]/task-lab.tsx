@@ -14,6 +14,7 @@ const saveNowhere = async () => {};
 /** One sample task in the real exam shell. State lives in this tab only. */
 export function TaskLab({
   examName,
+  source,
   task,
   stimulus,
   item,
@@ -21,6 +22,8 @@ export function TaskLab({
   startedAt,
 }: {
   examName: string;
+  /** Whether this is a real published item or placeholder content. */
+  source: string;
   task: TaskDefinition;
   stimulus: StimulusData;
   item: TaskItem;
@@ -42,7 +45,8 @@ export function TaskLab({
       left={
         <div className="space-y-4">
           <p className="font-mono text-[0.6875rem] tracking-[0.18em] text-muted-foreground uppercase">
-            {examName} · {task.label} · {task.measuredSkills.join(' + ')}
+            {examName} · {task.label} · {task.measuredSkills.join(' + ')} ·{' '}
+            {source}
           </p>
           <Stimulus data={stimulus} />
         </div>

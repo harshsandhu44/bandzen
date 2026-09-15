@@ -13,6 +13,7 @@
   "dependencies": {
     "@bandzen/ai": "workspace:*",
     "@bandzen/db": "workspace:*",
+    "@bandzen/exams": "workspace:*",
     "@bandzen/storage": "workspace:*",
     "@bandzen/ui": "workspace:*",
     "@clerk/nextjs": "^7.8.3",

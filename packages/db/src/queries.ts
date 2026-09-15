@@ -19,6 +19,8 @@ import { unionAll } from 'drizzle-orm/pg-core';
 import { db } from './client';
 import { ContentInUseError, PublishValidationError } from './errors';
 import {
+  examTaskAnswers,
+  examTasks,
   attempts,
   lessonProgress,
   lessons,
@@ -39,6 +41,12 @@ import {
   type Question,
   type Resource,
 } from './schema';
+import { getExam, getTask, type ExamKey } from '@bandzen/exams/registry';
+import {
+  taskContentIssues,
+  type TaskAnswerKey,
+  type TaskContent,
+} from '@bandzen/exams/content';
 
 /**
  * Content and lesson-progress queries shared across apps (student-facing and
@@ -54,6 +62,14 @@ async function firstRow<T>(rows: T[]) {
 export type AdminListFilters = {
   status?: ContentStatus;
   q?: string;
+  /** Only this exam's content. */
+  exam?: ExamKey;
+  /**
+   * Only content for this task type: an IELTS question-kind task
+   * (`reading_matching_headings`), a writing task (`writing_task_1`), or an
+   * exam task's own type.
+   */
+  task?: string;
   /** Omit both to fetch every matching row — the import registry and the
    *  AI-generation dedup check need the full set, not a page of it. */
   limit?: number;
@@ -495,6 +511,10 @@ export async function listPassagesAdmin(filters?: AdminListFilters) {
     .where(
       and(
         filters?.status ? eq(passages.status, filters.status) : undefined,
+        filters?.exam ? eq(passages.examKey, filters.exam) : undefined,
+        filters?.task?.startsWith('reading_')
+          ? sql`exists (select 1 from ${questions} where ${questions.passageId} = ${passages.id} and ${questions.kind}::text = ${filters.task.slice('reading_'.length)})`
+          : undefined,
         adminSearch(passages.slug, passages.title, filters?.q),
       ),
     )
@@ -737,6 +757,10 @@ export async function listTracksAdmin(filters?: AdminListFilters) {
         filters?.status
           ? eq(listeningTracks.status, filters.status)
           : undefined,
+        filters?.exam ? eq(listeningTracks.examKey, filters.exam) : undefined,
+        filters?.task?.startsWith('listening_')
+          ? sql`exists (select 1 from ${questions} where ${questions.trackId} = ${listeningTracks.id} and ${questions.kind}::text = ${filters.task.slice('listening_'.length)})`
+          : undefined,
         adminSearch(listeningTracks.slug, listeningTracks.title, filters?.q),
       ),
     )
@@ -943,6 +967,7 @@ export async function listSpeakingTestsAdmin(filters?: AdminListFilters) {
     .where(
       and(
         filters?.status ? eq(speakingTests.status, filters.status) : undefined,
+        filters?.exam ? eq(speakingTests.examKey, filters.exam) : undefined,
         adminSearch(speakingTests.slug, speakingTests.title, filters?.q),
       ),
     )
@@ -1161,6 +1186,13 @@ export async function listWritingPromptsAdmin(filters?: AdminListFilters) {
     .where(
       and(
         filters?.status ? eq(writingPrompts.status, filters.status) : undefined,
+        filters?.exam ? eq(writingPrompts.examKey, filters.exam) : undefined,
+        filters?.task?.startsWith('writing_task_')
+          ? eq(
+              writingPrompts.task,
+              Number(filters.task.slice('writing_task_'.length)),
+            )
+          : undefined,
         adminSearch(writingPrompts.slug, null, filters?.q),
       ),
     )
@@ -1263,6 +1295,7 @@ export async function listLessonsAdmin(filters?: AdminListFilters) {
     .where(
       and(
         filters?.status ? eq(lessons.status, filters.status) : undefined,
+        filters?.exam ? eq(lessons.examKey, filters.exam) : undefined,
         adminSearch(lessons.slug, lessons.title, filters?.q),
       ),
     )
@@ -1385,6 +1418,7 @@ export async function listResourcesAdmin(filters?: AdminListFilters) {
     .where(
       and(
         filters?.status ? eq(resources.status, filters.status) : undefined,
+        filters?.exam ? eq(resources.examKey, filters.exam) : undefined,
         adminSearch(resources.slug, resources.title, filters?.q),
       ),
     )
@@ -1485,6 +1519,7 @@ export async function deleteResource(id: string) {
 // ---------------------------------------------------------------------------
 
 export type ContentType =
+  | 'exam-task'
   | 'passage'
   | 'listening-track'
   | 'speaking-test'
@@ -1512,33 +1547,44 @@ function tally(rows: { status: ContentStatus; n: number }[]): StatusCount {
 export async function contentCounts(): Promise<
   Record<ContentType, StatusCount>
 > {
-  const [passage, track, speakingTest, writingPrompt, lesson, resource] =
-    await Promise.all([
-      db
-        .select({ status: passages.status, n: count() })
-        .from(passages)
-        .groupBy(passages.status),
-      db
-        .select({ status: listeningTracks.status, n: count() })
-        .from(listeningTracks)
-        .groupBy(listeningTracks.status),
-      db
-        .select({ status: speakingTests.status, n: count() })
-        .from(speakingTests)
-        .groupBy(speakingTests.status),
-      db
-        .select({ status: writingPrompts.status, n: count() })
-        .from(writingPrompts)
-        .groupBy(writingPrompts.status),
-      db
-        .select({ status: lessons.status, n: count() })
-        .from(lessons)
-        .groupBy(lessons.status),
-      db
-        .select({ status: resources.status, n: count() })
-        .from(resources)
-        .groupBy(resources.status),
-    ]);
+  const [
+    passage,
+    track,
+    speakingTest,
+    writingPrompt,
+    lesson,
+    resource,
+    examTask,
+  ] = await Promise.all([
+    db
+      .select({ status: passages.status, n: count() })
+      .from(passages)
+      .groupBy(passages.status),
+    db
+      .select({ status: listeningTracks.status, n: count() })
+      .from(listeningTracks)
+      .groupBy(listeningTracks.status),
+    db
+      .select({ status: speakingTests.status, n: count() })
+      .from(speakingTests)
+      .groupBy(speakingTests.status),
+    db
+      .select({ status: writingPrompts.status, n: count() })
+      .from(writingPrompts)
+      .groupBy(writingPrompts.status),
+    db
+      .select({ status: lessons.status, n: count() })
+      .from(lessons)
+      .groupBy(lessons.status),
+    db
+      .select({ status: resources.status, n: count() })
+      .from(resources)
+      .groupBy(resources.status),
+    db
+      .select({ status: examTasks.status, n: count() })
+      .from(examTasks)
+      .groupBy(examTasks.status),
+  ]);
 
   return {
     passage: tally(passage),
@@ -1547,6 +1593,7 @@ export async function contentCounts(): Promise<
     'writing-prompt': tally(writingPrompt),
     lesson: tally(lesson),
     resource: tally(resource),
+    'exam-task': tally(examTask),
   };
 }
 
@@ -1789,4 +1836,156 @@ export async function listContentEvents(
     )
     .orderBy(desc(contentEvents.createdAt))
     .limit(limit);
+}
+
+// ---------------------------------------------------------------------------
+// Exam tasks — PTE, TOEFL and DET items in the normalised task contract
+// ---------------------------------------------------------------------------
+
+export async function listExamTasksAdmin(filters?: AdminListFilters) {
+  const query = db
+    .select({
+      id: examTasks.id,
+      slug: examTasks.slug,
+      title: examTasks.title,
+      examKey: examTasks.examKey,
+      examVersion: examTasks.examVersion,
+      section: examTasks.section,
+      taskType: examTasks.taskType,
+      status: examTasks.status,
+    })
+    .from(examTasks)
+    .where(
+      and(
+        filters?.status ? eq(examTasks.status, filters.status) : undefined,
+        filters?.exam ? eq(examTasks.examKey, filters.exam) : undefined,
+        filters?.task ? eq(examTasks.taskType, filters.task) : undefined,
+        adminSearch(examTasks.slug, examTasks.title, filters?.q),
+      ),
+    )
+    .orderBy(examTasks.createdAt);
+
+  return filters?.limit != null
+    ? query.limit(filters.limit).offset(filters.offset ?? 0)
+    : query;
+}
+
+/** An exam task with its answer key and transcript — for the CMS only. */
+export async function getExamTaskAdmin(id: string) {
+  const [row] = await db
+    .select({
+      task: examTasks,
+      answer: examTaskAnswers.answer,
+      transcript: examTaskAnswers.transcript,
+    })
+    .from(examTasks)
+    .leftJoin(examTaskAnswers, eq(examTaskAnswers.taskId, examTasks.id))
+    .where(eq(examTasks.id, id))
+    .limit(1);
+  return row
+    ? {
+        ...row.task,
+        answer: row.answer ?? null,
+        transcript: row.transcript ?? null,
+      }
+    : null;
+}
+
+/**
+ * A new draft and its key. Sequential, not transactional (neon-http): a key
+ * that fails to write leaves a draft publish validation refuses.
+ */
+export async function createExamTask(
+  input: {
+    slug: string;
+    title: string;
+    examKey: ExamKey;
+    examVersion: string;
+    section: string;
+    taskType: string;
+    content: TaskContent;
+    updatedBy: string;
+  },
+  key: TaskAnswerKey,
+) {
+  const task = await firstRow(
+    await db
+      .insert(examTasks)
+      .values({ ...input, status: 'draft' })
+      .returning(),
+  );
+  if (task) {
+    await db.insert(examTaskAnswers).values({ taskId: task.id, ...key });
+  }
+  return task;
+}
+
+/** Everything the item's task type needs before it can go live. */
+export async function checkExamTaskCompleteness(id: string): Promise<string[]> {
+  const task = await getExamTaskAdmin(id);
+  if (!task) return ['the task itself (not found)'];
+  const exam = getExam(task.examKey);
+  const definition = getTask(task.examKey, task.taskType);
+  if (!exam || !definition) {
+    return [`a task type ${task.examKey} declares (not "${task.taskType}")`];
+  }
+  return taskContentIssues(
+    exam,
+    definition,
+    task.content,
+    { answer: task.answer, transcript: task.transcript },
+    'publish',
+  );
+}
+
+export async function publishExamTask(id: string, updatedBy: string) {
+  const issues = await checkExamTaskCompleteness(id);
+  if (issues.length > 0) throw new PublishValidationError(issues);
+  return firstRow(
+    await db
+      .update(examTasks)
+      .set({ status: 'published', updatedBy, updatedAt: new Date() })
+      .where(eq(examTasks.id, id))
+      .returning(),
+  );
+}
+
+export async function unpublishExamTask(id: string, updatedBy: string) {
+  return firstRow(
+    await db
+      .update(examTasks)
+      .set({ status: 'draft', updatedBy, updatedAt: new Date() })
+      .where(eq(examTasks.id, id))
+      .returning(),
+  );
+}
+
+/** Nothing references an exam task yet, so a draft deletes outright. */
+export async function deleteExamTask(id: string) {
+  await db.delete(examTasks).where(eq(examTasks.id, id));
+}
+
+/**
+ * A published item of one task type, as a candidate may see it: the content
+ * only. The answer key and transcript are in a table this never joins.
+ */
+export async function getPublishedExamTask(examKey: ExamKey, taskType: string) {
+  return firstRow(
+    await db
+      .select({
+        id: examTasks.id,
+        slug: examTasks.slug,
+        title: examTasks.title,
+        content: examTasks.content,
+      })
+      .from(examTasks)
+      .where(
+        and(
+          eq(examTasks.status, 'published'),
+          eq(examTasks.examKey, examKey),
+          eq(examTasks.taskType, taskType),
+        ),
+      )
+      .limit(1),
+  );
 }

@@ -19,7 +19,23 @@ import {
 } from 'node:fs';
 import { join } from 'node:path';
 import { generatePassage } from '@bandzen/ai/generate';
-import { type GeneratedPassage as Passage } from '@bandzen/ai/schemas';
+import {
+  passageSchema,
+  writingPromptSchema,
+  type GeneratedPassage as Passage,
+} from '@bandzen/ai/schemas';
+import { CURRENT_EXAM_VERSION } from '@bandzen/exams/registry';
+
+/**
+ * Every file this pipeline writes says which exam and format it is for, and
+ * passes the same schema the CMS import uses — so a file that would be refused
+ * at import is refused here instead, before a human reviews it.
+ */
+const OWNERSHIP = {
+  examKey: 'ielts',
+  examVersion: CURRENT_EXAM_VERSION.ielts,
+} as const;
+const EXAM_COLUMNS = `'ielts'::public.exam_key, ${`'${CURRENT_EXAM_VERSION.ielts}'`}`;
 
 const SEED_DIR = join(import.meta.dirname, '..', 'content', 'passages');
 const PROMPTS_FILE = join(import.meta.dirname, '..', 'content', 'prompts.json');
@@ -58,9 +74,10 @@ async function generate(count: number) {
       console.warn(`  ⚠ ${passage.slug}: ${warnings.join('; ')}`);
     }
 
+    const file = passageSchema.parse({ ...passage, ...OWNERSHIP });
     writeFileSync(
       join(SEED_DIR, `${passage.slug}.json`),
-      `${JSON.stringify(passage, null, 2)}\n`,
+      `${JSON.stringify(file, null, 2)}\n`,
     );
     existing.add(passage.slug);
     console.log(`  ✓ ${passage.slug} — ${passage.title}`);
@@ -89,14 +106,17 @@ function toSql() {
 
   for (const file of files.sort()) {
     const p = JSON.parse(readFileSync(join(SEED_DIR, file), 'utf8')) as Passage;
+    // A hand edit between the two steps must still be importable content.
+    passageSchema.parse(p);
 
     out.push(
       `-- ${p.title}`,
-      `insert into public.passages (slug, title, body, topic, headings, difficulty)`,
-      `values (${quote(p.slug)}, ${quote(p.title)}, ${quote(p.body)}, ${quote(p.topic)}, ${p.headings?.length ? jsonb(p.headings) : 'null'}, ${p.difficulty})`,
+      `insert into public.passages (slug, title, body, topic, headings, difficulty, exam_key, exam_version)`,
+      `values (${quote(p.slug)}, ${quote(p.title)}, ${quote(p.body)}, ${quote(p.topic)}, ${p.headings?.length ? jsonb(p.headings) : 'null'}, ${p.difficulty}, ${EXAM_COLUMNS})`,
       `on conflict (slug) do update set`,
       `  title = excluded.title, body = excluded.body, topic = excluded.topic,`,
-      `  headings = excluded.headings, difficulty = excluded.difficulty;`,
+      `  headings = excluded.headings, difficulty = excluded.difficulty,`,
+      `  exam_key = excluded.exam_key, exam_version = excluded.exam_version;`,
       '',
     );
 
@@ -129,12 +149,13 @@ function toSql() {
     const prompts = JSON.parse(readFileSync(PROMPTS_FILE, 'utf8')) as Prompt[];
     promptCount = prompts.length;
     for (const prompt of prompts) {
+      writingPromptSchema.parse(prompt);
       out.push(
-        `insert into public.writing_prompts (slug, task, format, prompt_text, chart_data)`,
-        `values (${quote(prompt.slug)}, ${prompt.task}, ${quote(prompt.format ?? 'academic')}::public.test_format, ${quote(prompt.promptText)}, ${prompt.chartData ? jsonb(prompt.chartData) : 'null'})`,
+        `insert into public.writing_prompts (slug, task, format, prompt_text, chart_data, exam_key, exam_version)`,
+        `values (${quote(prompt.slug)}, ${prompt.task}, ${quote(prompt.format ?? 'academic')}::public.test_format, ${quote(prompt.promptText)}, ${prompt.chartData ? jsonb(prompt.chartData) : 'null'}, ${EXAM_COLUMNS})`,
         `on conflict (slug) do update set`,
         `  task = excluded.task, format = excluded.format, prompt_text = excluded.prompt_text,`,
-        `  chart_data = excluded.chart_data;`,
+        `  chart_data = excluded.chart_data, exam_key = excluded.exam_key, exam_version = excluded.exam_version;`,
         '',
       );
     }

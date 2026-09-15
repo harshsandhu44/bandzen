@@ -162,6 +162,13 @@
       "when": 1789499945383,
       "tag": "0022_attempt_assessment",
       "breakpoints": true
+    },
+    {
+      "idx": 23,
+      "version": "7",
+      "when": 1789502599420,
+      "tag": "0023_exam_tasks",
+      "breakpoints": true
     }
   ]
 }
