@@ -1,4 +1,7 @@
-import { PageHeader } from '@/components/app/primitives';
+import Link from 'next/link';
+import { getExam } from '@bandzen/exams/registry';
+import { Button } from '@bandzen/ui/components/button';
+import { EmptyState, PageHeader } from '@/components/app/primitives';
 import { CoachChat } from '@/components/coach/coach-chat';
 import { COACH_PROMPTS } from '@/lib/ai/coach';
 import { capture } from '@/lib/analytics';
@@ -16,6 +19,31 @@ export default async function CoachPage() {
     coachAllowance(userId),
     getProfile(userId),
   ]);
+
+  // Coach is an IELTS tutor, built on IELTS results and IELTS material. For
+  // another exam it would have nothing true to say, so it says that instead.
+  const exam = getExam(profile?.examKey ?? 'ielts')!;
+  if (exam.key !== 'ielts') {
+    return (
+      <div className="flex max-w-3xl flex-col gap-6">
+        <PageHeader eyebrow="Bandzen Coach" title="Coach covers IELTS only" />
+        <EmptyState
+          title={`Coach does not know ${exam.name} yet`}
+          description={`Coach answers from your IELTS results and Bandzen's IELTS material, so it would be guessing about ${exam.name}. Switch your active exam to IELTS to use it.`}
+          action={
+            <Button
+              size="sm"
+              variant="outline"
+              nativeButton={false}
+              render={<Link href="/settings" />}
+            >
+              Change exam
+            </Button>
+          }
+        />
+      </div>
+    );
+  }
 
   if (!quota.unlimited && quota.remaining === 0) {
     await capture(userId, 'quota_exhausted', { surface: 'coach' });

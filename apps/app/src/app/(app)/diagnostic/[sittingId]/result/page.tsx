@@ -11,6 +11,7 @@ import { requireUserId } from '@/lib/auth';
 import { todayIso } from '@/lib/dates';
 import { getDiagnosticResult, getProfile } from '@/lib/db/queries';
 import { overallBand } from '@/lib/grading';
+import { planStrategyFor } from '@/lib/plan-strategies';
 import { buildPlan, nextAction } from '@/lib/study-plan';
 import { addDiagnosticSpeaking } from '../../actions';
 
@@ -78,10 +79,13 @@ export default async function DiagnosticResultPage({
     );
 
   const planInput = {
-    readingBand: bands.reading,
-    writingBand: bands.writing,
-    listeningBand: bands.listening,
-    targetBand: profile?.targetScore ?? null,
+    strategy: planStrategyFor(data.mock.examKey)!,
+    scores: {
+      reading: bands.reading,
+      writing: bands.writing,
+      listening: bands.listening,
+    },
+    targetScore: profile?.targetScore ?? null,
     testDate: profile?.testDate ?? null,
     weaknesses: data.weaknesses,
   };

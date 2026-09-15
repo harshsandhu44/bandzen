@@ -25,7 +25,8 @@ export async function saveSettings(
 
   await upsertProfile(userId, parsed.data);
 
-  // The sidebar countdown and every plan read from this profile.
+  // The sidebar countdown, the exam menu and every plan read from this profile.
+  // A new exam here becomes an enrollment of its own; the old one is kept.
   revalidatePath('/', 'layout');
   return { error: null, saved: true };
 }

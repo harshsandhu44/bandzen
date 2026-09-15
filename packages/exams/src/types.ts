@@ -111,6 +111,11 @@ export type ExamDefinition = {
   /** IELTS Academic/General; empty for exams without variants. */
   variants: readonly { key: string; label: string }[];
   scoreScale: ScoreScale;
+  /**
+   * The targets a candidate realistically sets, offered as choices at sign-up.
+   * Narrower than the scale: nobody books IELTS aiming for Band 2.
+   */
+  targetRange: { min: number; max: number; step: number };
   sections: readonly SectionDefinition[];
   tasks: readonly TaskDefinition[];
 };

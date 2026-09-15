@@ -1,7 +1,8 @@
 import { redirect } from 'next/navigation';
 import { currentUser } from '@clerk/nextjs/server';
 import { Card, CardContent } from '@bandzen/ui/components/card';
-import { getExam } from '@bandzen/exams/registry';
+import { examSkills, getExam } from '@bandzen/exams/registry';
+import { ExamComingSoon } from '@/components/app/exam-coming-soon';
 import { ScoreOverview } from '@/components/dashboard/score-overview';
 import { ComingUp } from '@/components/dashboard/coming-up';
 import { ContinuePlan } from '@/components/dashboard/continue-plan';
@@ -20,6 +21,7 @@ import { AwardStrip } from '@/components/awards/award-strip';
 import { requireUserId } from '@/lib/auth';
 import { daysUntil, todayIso } from '@/lib/dates';
 import {
+  examHasContent,
   essayAllowance,
   getProfile,
   isPro,
@@ -52,12 +54,29 @@ export default async function DashboardPage() {
   if (!profile?.onboardingCompletedAt) redirect('/onboarding');
   const exam = getExam(profile.examKey ?? 'ielts')!;
 
+  if (!(await examHasContent(exam.key))) {
+    const user = await currentUser();
+    return (
+      <div className="max-w-5xl space-y-10">
+        <GreetingRow
+          firstName={user?.firstName ?? null}
+          timezone={profile.timezone}
+        />
+        <ExamComingSoon
+          exam={exam}
+          targetScore={profile.targetScore}
+          testDate={profile.testDate}
+        />
+      </div>
+    );
+  }
+
   const today = todayIso(profile.timezone);
 
   const [user, attempts, data, quota, awards, activeDays, pro] =
     await Promise.all([
       currentUser(),
-      listCompletedAttempts(userId, 8),
+      listCompletedAttempts(userId, 8, exam.key),
       loadPlanData(userId, profile, today),
       essayAllowance(userId),
       listAwards(userId),
@@ -136,7 +155,7 @@ export default async function DashboardPage() {
 
       {next ? <ContinuePlan task={next} /> : null}
 
-      <p className="text-sm">{nextAction(planInput)}</p>
+      {planInput ? <p className="text-sm">{nextAction(planInput)}</p> : null}
 
       <div className="grid gap-4 lg:grid-cols-12 lg:items-start">
         <div className="space-y-4 lg:col-span-7">
@@ -144,10 +163,12 @@ export default async function DashboardPage() {
           <PerformanceInsight insight={insight} />
           <ScoreOverview
             scale={exam.scoreScale}
+            skills={examSkills(exam)}
             scores={{
               reading: data.readingBand,
               writing: data.writingBand,
               listening: data.listeningBand,
+              speaking: data.speakingBand,
             }}
             target={profile.targetScore}
           />
@@ -155,7 +176,9 @@ export default async function DashboardPage() {
 
         <div className="space-y-4 lg:col-span-5">
           <QuickLinks pro={pro} />
-          {attempts.length ? <RecentAttempts attempts={attempts} /> : null}
+          {attempts.length ? (
+            <RecentAttempts attempts={attempts} scale={exam.scoreScale} />
+          ) : null}
           {quota.unlimited ? null : (
             <Card>
               <CardContent>

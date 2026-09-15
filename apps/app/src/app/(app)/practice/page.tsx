@@ -4,9 +4,14 @@ import { Button } from '@bandzen/ui/components/button';
 import { Progress } from '@bandzen/ui/components/progress';
 import { Eyebrow, PageHeader, Panel } from '@/components/app/primitives';
 import { ProTag } from '@/components/billing/pro';
+import { getExam } from '@bandzen/exams/registry';
+import { formatScore } from '@bandzen/exams/scoring';
+import { ExamComingSoon } from '@/components/app/exam-coming-soon';
 import { requireUserId } from '@/lib/auth';
 import {
   diagnosticCount,
+  examHasContent,
+  getProfile,
   isPro,
   latestDiagnostic,
   latestOpenMock,
@@ -36,8 +41,24 @@ const MODULE_BLURB: Record<string, string> = {
  */
 export default async function PracticePage() {
   const userId = await requireUserId();
+  const profile = await getProfile(userId);
+  const exam = getExam(profile?.examKey ?? 'ielts')!;
+
+  if (!(await examHasContent(exam.key))) {
+    return (
+      <div className="max-w-4xl space-y-6">
+        <PageHeader eyebrow="Practice" title="What do you want to practise?" />
+        <ExamComingSoon
+          exam={exam}
+          targetScore={profile?.targetScore}
+          testDate={profile?.testDate}
+        />
+      </div>
+    );
+  }
+
   const [overview, next, diagnostic, taken, pro, openMock] = await Promise.all([
-    practiceOverview(userId),
+    practiceOverview(userId, exam),
     nextPracticeStep(userId),
     latestDiagnostic(userId),
     diagnosticCount(userId),
@@ -87,7 +108,7 @@ export default async function PracticePage() {
                     <ProTag />
                   ) : m.band != null ? (
                     <span className="font-metric text-metric-sm">
-                      {m.band.toFixed(1)}
+                      {formatScore(exam.scoreScale, m.band)}
                     </span>
                   ) : m.total ? (
                     <span className="font-metric text-metric-sm text-muted-foreground">

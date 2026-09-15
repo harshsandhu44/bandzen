@@ -9,7 +9,9 @@ import {
   TabsList,
   TabsTrigger,
 } from '@bandzen/ui/components/tabs';
-import { scoreScaleFor } from '@bandzen/exams/registry';
+import { examSkills, getExam, type ExamKey } from '@bandzen/exams/registry';
+import { cn } from '@bandzen/ui/lib/utils';
+import { ExamComingSoon } from '@/components/app/exam-coming-soon';
 import { formatScore } from '@bandzen/exams/scoring';
 import { ScoreChart } from '@/components/progress/score-chart';
 import {
@@ -26,6 +28,8 @@ import {
 } from '@/components/app/status';
 import { requireUserId } from '@/lib/auth';
 import {
+  attemptExams,
+  examHasContent,
   accuracyByQuestionKind,
   activitySummary,
   bandHistory,
@@ -38,7 +42,6 @@ import {
 import { AwardWall } from '@/components/awards/award-wall';
 import { ProTag } from '@/components/billing/pro';
 import {
-  AVAILABLE_MODULES,
   IELTS_MODULES,
   MODULE_LABEL,
   QUESTION_KIND_LABEL,
@@ -60,21 +63,58 @@ const MIN_ATTEMPTED = 5;
 /** How far back the trend goes without Pro. */
 const FREE_TREND_POINTS = 5;
 
-export default async function ProgressPage() {
+export default async function ProgressPage({
+  searchParams,
+}: PageProps<'/progress'>) {
   const userId = await requireUserId();
+  const [profile, exams] = await Promise.all([
+    getProfile(userId),
+    attemptExams(userId),
+  ]);
 
-  const [profile, history, accuracy, activity, lessons, attempts, pro, awards] =
+  // Scores on different scales never share a chart or a list: Progress shows
+  // one exam at a time — the active one, unless another exam with history is
+  // picked. Nothing about an exam's attempts changes when the active one does.
+  const active: ExamKey = profile?.examKey ?? 'ielts';
+  const shown = [...new Set<ExamKey>([active, ...exams])];
+  const { exam: picked } = await searchParams;
+  const examKey = shown.find((k) => k === picked) ?? active;
+  const exam = getExam(examKey)!;
+  const target =
+    examKey === active ? (profile?.targetScore ?? undefined) : undefined;
+
+  const examFilter =
+    shown.length > 1 ? (
+      <nav aria-label="Exam" className="flex flex-wrap gap-2">
+        {shown.map((k) => (
+          <Link
+            key={k}
+            href={`/progress?exam=${k}`}
+            aria-current={k === examKey ? 'page' : undefined}
+            className={cn(
+              'border px-2.5 py-1 font-mono text-[0.625rem] tracking-[0.14em] uppercase',
+              k === examKey
+                ? 'border-foreground'
+                : 'border-border text-muted-foreground hover:text-foreground',
+            )}
+          >
+            {getExam(k)?.name}
+          </Link>
+        ))}
+      </nav>
+    ) : null;
+
+  const [history, accuracy, activity, lessons, attempts, pro, awards] =
     await Promise.all([
-      getProfile(userId),
-      bandHistory(userId),
+      bandHistory(userId, undefined, examKey),
       accuracyByQuestionKind(userId, 'reading'),
       activitySummary(userId),
       listLessonProgress(userId),
-      listCompletedAttempts(userId, 50),
+      listCompletedAttempts(userId, 50, examKey),
       isPro(userId),
       listAwards(userId),
     ]);
-  const scale = scoreScaleFor(profile?.examKey);
+  const scale = exam.scoreScale;
 
   // Below MIN_ATTEMPTED a rate is noise, so it cannot name a pattern.
   const ranked = accuracy
@@ -109,9 +149,23 @@ export default async function ProgressPage() {
   const overall = meanBand(reading, writing, listening, speaking);
 
   if (!points.length) {
+    if (!(await examHasContent(examKey))) {
+      return (
+        <div className="max-w-6xl space-y-8">
+          <PageHeader eyebrow="Progress" title="Your progression" />
+          {examFilter}
+          <ExamComingSoon
+            exam={exam}
+            targetScore={target}
+            testDate={examKey === active ? profile?.testDate : null}
+          />
+        </div>
+      );
+    }
     return (
       <div className="max-w-6xl space-y-8">
         <PageHeader eyebrow="Progress" title="Your progression" />
+        {examFilter}
         <EmptyState
           title="No results yet"
           description="Progress is measured from completed attempts. Take the diagnostic and this page starts filling in."
@@ -136,6 +190,7 @@ export default async function ProgressPage() {
         title="Your progression"
         description="Every figure here is measured from attempts you have completed. Nothing is projected."
       />
+      {examFilter}
 
       <Panel
         headingId="overall-heading"
@@ -145,18 +200,14 @@ export default async function ProgressPage() {
             label={`Estimated ${scale.label.toLowerCase()}`}
             value={overall != null ? formatScore(scale, overall) : '—'}
             hint={
-              profile?.targetScore != null
-                ? `Target ${formatScore(scale, profile.targetScore)}`
+              target != null
+                ? `Target ${formatScore(scale, target)}`
                 : undefined
             }
           />
         }
       >
-        <ScoreChart
-          points={points}
-          target={profile?.targetScore ?? undefined}
-          scale={scale}
-        />
+        <ScoreChart points={points} target={target} scale={scale} />
         <p className="mt-2 font-mono text-[0.625rem] tracking-[0.16em] text-muted-foreground uppercase">
           {hidden
             ? `Your last ${FREE_TREND_POINTS} attempts, oldest first`
@@ -199,7 +250,7 @@ export default async function ProgressPage() {
 
           <TabsContent value="modules">
             <div className="space-y-4">
-              {AVAILABLE_MODULES.map((module) => {
+              {examSkills(exam).map((module) => {
                 const modulePoints = byModule(module);
                 if (!modulePoints.length) {
                   return (
@@ -217,14 +268,14 @@ export default async function ProgressPage() {
                     <BandScale
                       scale={scale}
                       value={modulePoints.at(-1)!.value}
-                      target={profile?.targetScore ?? undefined}
+                      target={target}
                       label={MODULE_LABEL[module]}
                     />
                     {modulePoints.length > 1 ? (
                       <BandTrend
                         scale={scale}
                         points={modulePoints}
-                        target={profile?.targetScore ?? undefined}
+                        target={target}
                         caption={`${MODULE_LABEL[module]} attempts`}
                       />
                     ) : null}

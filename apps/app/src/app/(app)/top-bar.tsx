@@ -2,9 +2,9 @@
 
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
-import { Fragment } from 'react';
+import { Fragment, useTransition } from 'react';
 import { useClerk } from '@clerk/nextjs';
-import { ChevronDown } from 'lucide-react';
+import { Check, ChevronDown } from 'lucide-react';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -14,6 +14,7 @@ import {
 } from '@bandzen/ui/components/dropdown-menu';
 import { ThemeToggle } from '@bandzen/ui/components/theme-toggle';
 import { cn } from '@bandzen/ui/lib/utils';
+import { switchExam } from './exam-actions';
 import { isExamRunner } from './exam-route';
 import { DOCS_URL } from './nav-links';
 
@@ -88,15 +89,22 @@ export function TopBar({
   email,
   testDays,
   essaysLeft,
+  activeExam,
+  exams,
 }: {
   email: string | null;
   testDays: number | null;
-  /** Marks left this week, or null when unlimited. */
+  /** Marks left this week, or null when unlimited or not on offer. */
   essaysLeft: number | null;
+  /** The exam every screen is about right now. */
+  activeExam: { key: string; label: string } | null;
+  /** Every exam this candidate has set up, to switch between. */
+  exams: readonly { key: string; label: string }[];
 }) {
   const pathname = usePathname();
   const router = useRouter();
   const { signOut } = useClerk();
+  const [switching, startSwitch] = useTransition();
 
   if (isExamRunner(pathname)) return null;
 
@@ -164,6 +172,46 @@ export function TopBar({
           >
             {essaysLeft} {essaysLeft === 1 ? 'essay' : 'essays'} left
           </Link>
+        ) : null}
+
+        {activeExam ? (
+          <DropdownMenu>
+            <DropdownMenuTrigger
+              className="flex items-center gap-1 border border-border px-2 py-1 font-mono text-[0.625rem] tracking-[0.14em] whitespace-nowrap uppercase transition-colors hover:text-foreground focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring disabled:opacity-50"
+              aria-label={`Active exam: ${activeExam.label}. Switch exam`}
+              disabled={switching}
+            >
+              {activeExam.label}
+              <ChevronDown className="size-3" aria-hidden />
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" sideOffset={6} className="w-56">
+              <p className="px-2 pt-1.5 pb-2 font-mono text-[0.6875rem] text-muted-foreground">
+                Preparing for
+              </p>
+              {exams.map((exam) => (
+                <DropdownMenuItem
+                  key={exam.key}
+                  onClick={() =>
+                    exam.key !== activeExam.key &&
+                    startSwitch(() => switchExam(exam.key))
+                  }
+                >
+                  <Check
+                    className={cn(
+                      'size-3.5',
+                      exam.key === activeExam.key ? 'opacity-100' : 'opacity-0',
+                    )}
+                    aria-hidden
+                  />
+                  {exam.label}
+                </DropdownMenuItem>
+              ))}
+              <DropdownMenuSeparator />
+              <DropdownMenuItem render={<Link href="/settings" />}>
+                Add or change exam
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
         ) : null}
 
         <ThemeToggle />

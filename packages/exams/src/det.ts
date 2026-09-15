@@ -18,6 +18,7 @@ export const DET = {
   source: 'https://englishtest.duolingo.com/scores',
   variants: [],
   scoreScale: { label: 'Score', min: 10, max: 160, step: 5 },
+  targetRange: { min: 60, max: 160, step: 10 },
   sections: [
     { key: 'reading', label: 'Reading', skills: ['reading'], minutes: null },
     {

@@ -18,6 +18,7 @@ export const PTE_ACADEMIC = {
     'https://www.pearsonpte.com/articles/pte-changes-2025-everything-you-need-to-know/',
   variants: [],
   scoreScale: { label: 'Score', min: 10, max: 90, step: 1 },
+  targetRange: { min: 30, max: 90, step: 5 },
   sections: [
     {
       key: 'speaking_writing',

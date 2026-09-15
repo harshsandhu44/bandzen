@@ -5,11 +5,11 @@ import {
   diagnosticCount,
   latestBand,
 } from '@/lib/db/queries';
+import { examSkills, type ExamDefinition } from '@bandzen/exams/registry';
+import type { Skill } from '@/lib/db/schema';
 import {
-  IELTS_MODULES,
   MODULE_LABEL,
   QUESTION_KIND_LABEL,
-  type IELTSModule,
   type QuestionKind,
 } from '@/lib/modules';
 
@@ -25,7 +25,7 @@ const MIN_ATTEMPTED = 5;
 const WEAK_BELOW = 0.75;
 
 export type PracticeModuleOverview = {
-  module: IELTSModule;
+  module: Skill;
   band: number | null;
   /** Question accuracy across every completed attempt in this module. */
   correct: number;
@@ -34,13 +34,15 @@ export type PracticeModuleOverview = {
 
 export async function practiceOverview(
   userId: string,
+  exam: ExamDefinition,
 ): Promise<PracticeModuleOverview[]> {
+  const skills = examSkills(exam);
   const [accuracy, ...bands] = await Promise.all([
     accuracyByQuestionKind(userId),
-    ...IELTS_MODULES.map((m) => latestBand(userId, m)),
+    ...skills.map((m) => latestBand(userId, m, exam.key)),
   ]);
 
-  return IELTS_MODULES.map((module, i) => {
+  return skills.map((module, i) => {
     const kinds = accuracy.filter((k) => k.module === module);
     return {
       module,
@@ -54,7 +56,7 @@ export async function practiceOverview(
 export type PracticeNextStep =
   | {
       kind: 'weakness';
-      module: IELTSModule;
+      module: Skill;
       href: string;
       title: string;
       reason: string;

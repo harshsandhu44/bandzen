@@ -4,6 +4,7 @@ import { Badge } from '@bandzen/ui/components/badge';
 import { Button } from '@bandzen/ui/components/button';
 import { cn } from '@bandzen/ui/lib/utils';
 import {
+  EmptyState,
   Eyebrow,
   PageHeader,
   SectionHeader,
@@ -11,7 +12,13 @@ import {
 import { capture } from '@/lib/analytics';
 import { requireUserId } from '@/lib/auth';
 import { daysUntil } from '@/lib/dates';
-import { getProfile, getSubscription, latestBand } from '@/lib/db/queries';
+import { getExam } from '@bandzen/exams/registry';
+import {
+  examHasContent,
+  getProfile,
+  getSubscription,
+  latestBand,
+} from '@/lib/db/queries';
 import { meanBand } from '@/lib/plan-data';
 import {
   FREE_COACH_MESSAGES_PER_WINDOW,
@@ -86,6 +93,35 @@ export default async function UpgradePage(props: PageProps<'/upgrade'>) {
 
   const hasTimeLeft = isProAt(subscription?.currentPeriodEnd);
   const paying = hasTimeLeft && subscription?.polarSubscriptionId != null;
+
+  // Nothing to sell for an exam with no content: Pro would unlock marking
+  // and practice that do not exist for it yet. A subscriber still sees their
+  // plan below, whatever exam is active.
+  const exam = getExam(profile?.examKey ?? 'ielts')!;
+  if (!paying && !(await examHasContent(exam.key))) {
+    return (
+      <div className="max-w-3xl space-y-10">
+        <PageHeader
+          eyebrow="Bandzen Pro"
+          title={`Pro is not offered for ${exam.name} yet`}
+        />
+        <EmptyState
+          title="Nothing to unlock yet"
+          description={`Pro removes the limits on marking and practice, and there is no ${exam.name} practice to mark. It will be offered when there is. Pro for IELTS is available if you switch your active exam.`}
+          action={
+            <Button
+              size="sm"
+              variant="outline"
+              nativeButton={false}
+              render={<Link href="/settings" />}
+            >
+              Change exam
+            </Button>
+          }
+        />
+      </div>
+    );
+  }
 
   const days = profile?.testDate
     ? daysUntil(profile.testDate, profile.timezone)

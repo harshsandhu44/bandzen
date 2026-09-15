@@ -16,6 +16,7 @@ export const IELTS = {
     { key: 'general', label: 'General Training' },
   ],
   scoreScale: { label: 'Band', min: 0, max: 9, step: 0.5 },
+  targetRange: { min: 5, max: 9, step: 0.5 },
   sections: [
     {
       key: 'listening',

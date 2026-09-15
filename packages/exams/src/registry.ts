@@ -9,6 +9,7 @@ import {
   type ExamDefinition,
   type ExamKey,
   type ScoreScale,
+  type Skill,
   type TaskDefinition,
 } from './types.ts';
 
@@ -69,12 +70,57 @@ export function timeLimitSeconds(
   return minutes == null ? null : minutes * 60;
 }
 
+/** The sign-up target choices, low to high, as numbers. */
+export function targetChoices(exam: ExamDefinition): number[] {
+  const { min, max, step } = exam.targetRange;
+  const out: number[] = [];
+  for (let n = 0; min + n * step <= max + 1e-9; n++) out.push(min + n * step);
+  return out;
+}
+
+/**
+ * Whether a score is one this exam can report: inside the scale and on its
+ * step. What a submitted target or self-estimate is checked against.
+ */
+export function isOnScale(exam: ExamDefinition, value: number): boolean {
+  const { min, max, step } = exam.scoreScale;
+  const steps = (value - min) / step;
+  return (
+    value >= min && value <= max && Math.abs(steps - Math.round(steps)) < 1e-9
+  );
+}
+
+/** The skills an exam measures, in the order its sections first name them. */
+export function examSkills(exam: ExamDefinition): Skill[] {
+  return [...new Set(exam.sections.flatMap((s) => s.skills))];
+}
+
+/** "IELTS Academic", "PTE Academic": the exam as the candidate names it. */
+export function examLabel(key: string, variant?: string | null): string {
+  const exam = getExam(key);
+  if (!exam) return key;
+  const v = exam.variants.find((x) => x.key === variant);
+  return v ? `${exam.name} ${v.label}` : exam.name;
+}
+
 /** Everything wrong with a definition, as sentences. Empty means valid. */
 export function validateDefinition(exam: ExamDefinition): string[] {
   const problems: string[] = [];
   const { min, max, step } = exam.scoreScale;
   if (!(min < max) || !(step > 0) || !Number.isInteger((max - min) / step)) {
     problems.push(`score scale ${min}–${max} step ${step} is not a scale`);
+  }
+
+  const range = exam.targetRange;
+  if (
+    !(range.min <= range.max) ||
+    !isOnScale(exam, range.min) ||
+    !isOnScale(exam, range.max) ||
+    !Number.isInteger((range.max - range.min) / range.step)
+  ) {
+    problems.push(
+      `target range ${range.min}–${range.max} does not fit the scale`,
+    );
   }
 
   const sectionKeys = new Set<string>();

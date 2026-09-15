@@ -15,7 +15,13 @@ import { PageHeader } from '@/components/app/primitives';
 import { PreparationForm } from '@/components/app/preparation-form';
 import { DOCS_URL } from '../nav-links';
 import { requireUserId } from '@/lib/auth';
-import { getProfile, getSubscription } from '@/lib/db/queries';
+import { EXAM_KEYS } from '@bandzen/exams/registry';
+import {
+  examHasContent,
+  getProfile,
+  getSubscription,
+  listEnrollments,
+} from '@/lib/db/queries';
 import {
   FREE_COACH_MESSAGES_PER_WINDOW,
   FREE_ESSAYS_PER_WINDOW,
@@ -37,10 +43,12 @@ const DATE = new Intl.DateTimeFormat('en-GB', {
 
 export default async function SettingsPage() {
   const userId = await requireUserId();
-  const [profile, user, subscription] = await Promise.all([
+  const [profile, user, subscription, enrollments, has] = await Promise.all([
     getProfile(userId),
     currentUser(),
     getSubscription(userId),
+    listEnrollments(userId),
+    Promise.all(EXAM_KEYS.map((k) => examHasContent(k))),
   ]);
 
   const pro = isProAt(subscription?.currentPeriodEnd);
@@ -71,7 +79,10 @@ export default async function SettingsPage() {
             mode="settings"
             action={saveSettings}
             submitLabel="Save changes"
+            enrollments={enrollments}
+            withContent={EXAM_KEYS.filter((_, i) => has[i])}
             defaults={{
+              examKey: profile?.examKey ?? null,
               examVariant: profile?.examVariant ?? null,
               targetScore: profile?.targetScore ?? null,
               testDate: profile?.testDate ?? null,

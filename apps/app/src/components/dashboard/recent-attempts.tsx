@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import { Panel } from '@/components/app/primitives';
+import type { ScaleSpec } from '@bandzen/ui/components/band-scale';
 import { MODULE_LABEL } from '@/lib/modules';
 import type { Skill } from '@/lib/db/schema';
 
@@ -17,7 +18,14 @@ function reviewHref(a: Attempt): string {
   return `/writing/${a.id}/report`;
 }
 
-export function RecentAttempts({ attempts }: { attempts: Attempt[] }) {
+/** One exam's attempts only: `scale` formats them, so they must share it. */
+export function RecentAttempts({
+  attempts,
+  scale,
+}: {
+  attempts: Attempt[];
+  scale: ScaleSpec;
+}) {
   return (
     <Panel title="Recent attempts" headingId="recent-attempts">
       <ul className="-my-2.5 divide-y divide-border">
@@ -34,7 +42,7 @@ export function RecentAttempts({ attempts }: { attempts: Attempt[] }) {
               {a.kind === 'diagnostic' ? ' · diagnostic' : ''}
             </Link>
             <span className="font-metric text-metric-sm">
-              {a.band?.toFixed(1)}
+              {a.band?.toFixed(Number.isInteger(scale.step) ? 0 : 1)}
             </span>
           </li>
         ))}

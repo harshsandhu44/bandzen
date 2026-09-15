@@ -24,6 +24,8 @@ export type PlanTask = {
   minutes: number;
   /** Null when nothing in the catalogue can satisfy this task. */
   target: PlanTarget | null;
+  /** Where the task opens, resolved by the exam's strategy. Null with no target. */
+  href: string | null;
 };
 
 /**
@@ -44,47 +46,61 @@ export type PlanCatalogue = {
   completedLessonIds?: readonly string[];
 };
 
+/** One schedulable exercise. `task` narrows it to content of that subtype. */
+export type Drill = { label: string; minutes: number; task?: number };
+
+/**
+ * Everything exam-specific about planning, supplied per exam (see
+ * `plan-strategies.ts`). The engine below knows rotation, horizons and weakest
+ * skills; it knows nothing about IELTS, its drills, its routes or its scale.
+ */
+export type PlanStrategy = {
+  /** The skills the plan may schedule, in rotation order. */
+  plannable: readonly Skill[];
+  /** The rotation before any skill has been measured. */
+  startingRotation: readonly Skill[];
+  /** How far apart two scores must be before one skill is holding the rest back. */
+  meaningfulGap: number;
+  /** What this exam calls a score, for the dashboard's one line. */
+  scoreNoun: string;
+  /** What to tell a candidate with nothing measured yet. */
+  noEstimateAction: string;
+  drills: Partial<Record<Skill, readonly Drill[]>>;
+  /** Whether the catalogue can satisfy this drill at all. */
+  canSchedule(
+    skill: Skill,
+    drill: Drill,
+    catalogue: PlanCatalogue | undefined,
+  ): boolean;
+  /** The content a drill opens the nth time it comes round, or null. */
+  targetFor(
+    skill: Skill,
+    drill: Drill,
+    catalogue: PlanCatalogue | undefined,
+    nth: number,
+  ): PlanTarget | null;
+  /** The skill whose first slot teaches the weakest question kind, if any. */
+  lessonSkill: Skill | null;
+  /** The skill whose first task names the latest graded weakness, if any. */
+  feedbackSkill: Skill | null;
+  href(skill: Skill, target: PlanTarget): string;
+};
+
 export type PlanInput = {
-  readingBand: number | null;
-  writingBand: number | null;
-  /** Null until the diagnostic (or a listening practice attempt) measures it. */
-  listeningBand?: number | null;
-  targetBand: number | null;
+  strategy: PlanStrategy;
+  /** The latest measured score per skill, on the exam's own scale. */
+  scores: Partial<Record<Skill, number | null>>;
+  targetScore: number | null;
   /** ISO date. Null means no exam booked; the plan then runs a fortnight. */
   testDate: string | null;
-  /** Weakness phrases from the most recent writing report, most severe first. */
+  /** Weakness phrases from the most recent graded report, most severe first. */
   weaknesses?: string[];
-  /** Reading question kinds with the worst accuracy, worst first. */
+  /** Question kinds with the worst accuracy, worst first. */
   weakKinds?: readonly string[];
   catalogue?: PlanCatalogue;
   /** Injected so the output is testable. */
   today?: Date;
 };
-
-const READING_DRILLS = [
-  { label: 'True / False / Not Given drill', minutes: 25 },
-  { label: 'Matching headings drill', minutes: 25 },
-  { label: 'Sentence completion under timing', minutes: 20 },
-  { label: 'Full passage, timed', minutes: 40 },
-];
-
-const LISTENING_DRILLS = [
-  { label: 'One section, note completion under timing', minutes: 15 },
-  { label: 'Matching and multiple choice, one section', minutes: 15 },
-  { label: 'Full track, played once', minutes: 30 },
-  { label: 'Section 3 and 4 back to back', minutes: 20 },
-];
-
-const WRITING_DRILLS = [
-  { label: 'Task 2 essay, full timing', minutes: 40, task: 2 },
-  { label: 'Task 2 introduction and thesis only', minutes: 15, task: 2 },
-  {
-    label: 'Paragraph development from a weak body paragraph',
-    minutes: 25,
-    task: 2,
-  },
-  { label: 'Task 1 summary, full timing', minutes: 20, task: 1 },
-];
 
 const MAX_DAYS = 14;
 const DAY_MS = 86_400_000;
@@ -99,43 +115,28 @@ function daysUntil(from: Date, to: string): number {
   return Math.max(0, Math.round((target - start) / DAY_MS));
 }
 
-/** The skills the plan schedules — Speaking is Pro-only and never drilled here. */
-const PLANNABLE: readonly Skill[] = ['listening', 'reading', 'writing'];
-
-function bandOf(input: PlanInput, skill: Skill): number | null {
-  if (skill === 'reading') return input.readingBand;
-  if (skill === 'writing') return input.writingBand;
-  if (skill === 'listening') return input.listeningBand ?? null;
-  return null;
-}
+const scoreOf = (input: PlanInput, skill: Skill) => input.scores[skill] ?? null;
 
 /** Plannable skills that have actually been measured. */
 function measuredSkills(input: PlanInput): Skill[] {
-  return PLANNABLE.filter((s) => bandOf(input, s) != null);
+  return input.strategy.plannable.filter((s) => scoreOf(input, s) != null);
 }
 
 /**
- * The one skill holding the band back: the weakest measured skill, but only
- * when it is a real band clear of the next-worst — a 0.5 difference is inside
- * the noise of an estimate and does not justify skewing a fortnight of study.
- * Null when nothing is measured, only one skill is, or the field is even.
+ * The one skill holding the score back: the weakest measured skill, but only
+ * when it is clear of the next-worst by the exam's meaningful gap — a smaller
+ * difference is inside the noise of an estimate and does not justify skewing a
+ * fortnight of study. Null when nothing is measured, only one skill is, or the
+ * field is even.
  */
 export function weakestSkill(input: PlanInput): Skill | null {
   const scored = measuredSkills(input)
-    .map((skill) => ({ skill, band: bandOf(input, skill)! }))
-    .sort((a, b) => a.band - b.band);
+    .map((skill) => ({ skill, score: scoreOf(input, skill)! }))
+    .sort((a, b) => a.score - b.score);
   if (scored.length < 2) return null;
-  return scored[1]!.band - scored[0]!.band >= 1 ? scored[0]!.skill : null;
-}
-
-/**
- * Rotate through what is available so two consecutive reading days do not hand
- * back the same passage. An empty catalogue yields null, and the task renders
- * without a Continue button rather than with one that goes nowhere.
- */
-function pick<T>(items: readonly T[] | undefined, cursor: number): T | null {
-  if (!items?.length) return null;
-  return items[cursor % items.length]!;
+  return scored[1]!.score - scored[0]!.score >= input.strategy.meaningfulGap
+    ? scored[0]!.skill
+    : null;
 }
 
 /**
@@ -158,6 +159,7 @@ function lessonFirst(input: PlanInput): PlanTarget | null {
 }
 
 export function buildPlan(input: PlanInput): PlanTask[] {
+  const { strategy, catalogue } = input;
   const today = input.today ?? new Date();
 
   const horizon = input.testDate
@@ -168,29 +170,26 @@ export function buildPlan(input: PlanInput): PlanTask[] {
 
   const weakest = weakestSkill(input);
   const measured = measuredSkills(input);
-  // The skills the rotation cycles, in a stable order. Falls back to the
-  // original reading/writing pair when nothing has been measured yet.
-  const rotation: Skill[] = measured.length ? measured : ['reading', 'writing'];
+  // The skills the rotation cycles, in a stable order.
+  const rotation: Skill[] = measured.length
+    ? measured
+    : [...strategy.startingRotation];
   const others = weakest ? rotation.filter((s) => s !== weakest) : [];
   const tasks: PlanTask[] = [];
 
-  // A drill may only be scheduled if a prompt exists for the task it names.
-  // Content is seeded Task 2 first, so without this the plan booked "Task 1
-  // summary, full timing" against a library of Task 2 prompts: the label
-  // promised one exercise and Continue opened another. An absent catalogue
-  // keeps every drill, so a plan built without one is unchanged.
-  const prompts = input.catalogue?.prompts;
-  const available = prompts?.length
-    ? WRITING_DRILLS.filter((d) => prompts.some((p) => p.task === d.task))
-    : WRITING_DRILLS;
-  const writingDrills = available.length ? available : WRITING_DRILLS;
-
-  let readingCursor = 0;
-  let writingCursor = 0;
-  let listeningCursor = 0;
+  // A drill may only be scheduled if the catalogue can satisfy it: the plan
+  // once booked "Task 1 summary, full timing" against a library of Task 2
+  // prompts, so the label promised one exercise and Continue opened another.
+  // If nothing qualifies, every drill stays rather than the skill vanishing.
+  const drillsFor = (skill: Skill) => {
+    const all = strategy.drills[skill] ?? [];
+    const ok = all.filter((d) => strategy.canSchedule(skill, d, catalogue));
+    return ok.length ? ok : all;
+  };
+  const cursors = new Map<Skill, number>();
   let otherCursor = 0;
 
-  // Spent on the first reading day only; after that the drills take over.
+  // Spent on the lesson skill's first slot only; after that the drills take over.
   let pendingLesson = lessonFirst(input);
 
   for (let day = 1; day <= horizon; day += 1) {
@@ -209,9 +208,7 @@ export function buildPlan(input: PlanInput): PlanTask[] {
     // leaves the dashboard with nothing to put under "Today".
     const date = new Date(today.getTime() + (day - 1) * DAY_MS);
 
-    // The first reading slot teaches the weakest question kind rather than
-    // drilling it, when there is a lesson for it the candidate has not read.
-    if (skill === 'reading' && pendingLesson) {
+    if (skill === strategy.lessonSkill && pendingLesson) {
       const lesson = pendingLesson;
       pendingLesson = null;
       tasks.push({
@@ -221,43 +218,33 @@ export function buildPlan(input: PlanInput): PlanTask[] {
         label: 'Learn the technique before drilling it',
         minutes: 15,
         target: lesson,
+        href: strategy.href(skill, lesson),
       });
       continue;
     }
 
-    let drill: { label: string; minutes: number };
-    let target: PlanTarget | null = null;
-
-    if (skill === 'writing') {
-      const wd = writingDrills[writingCursor++ % writingDrills.length]!;
-      drill = wd;
-      // Rotate within the drill's own task, so the prompt that opens is the
-      // kind of exercise the label just promised.
-      const forTask = prompts?.filter((p) => p.task === wd.task);
-      const prompt = pick(forTask, writingCursor - 1);
-      if (prompt) target = { kind: 'writing', promptId: prompt.id };
-    } else if (skill === 'listening') {
-      drill = LISTENING_DRILLS[listeningCursor++ % LISTENING_DRILLS.length]!;
-      const trackId = pick(input.catalogue?.trackIds, listeningCursor - 1);
-      if (trackId) target = { kind: 'listening', trackId };
-    } else {
-      drill = READING_DRILLS[readingCursor++ % READING_DRILLS.length]!;
-      const passageId = pick(input.catalogue?.passageIds, readingCursor - 1);
-      if (passageId) target = { kind: 'reading', passageId };
-    }
+    const drills = drillsFor(skill);
+    if (!drills.length) continue;
+    const nth = cursors.get(skill) ?? 0;
+    cursors.set(skill, nth + 1);
+    const drill = drills[nth % drills.length]!;
+    const target = strategy.targetFor(skill, drill, catalogue, nth);
 
     tasks.push({
       day,
       date: iso(date),
       skill,
-      // The first writing task names the actual weakness the grader found,
-      // so the plan reads as a response to the report rather than a template.
+      // The first graded-skill task names the actual weakness the grader
+      // found, so the plan reads as a response to the report, not a template.
       label:
-        skill === 'writing' && writingCursor === 1 && input.weaknesses?.length
+        skill === strategy.feedbackSkill &&
+        nth === 0 &&
+        input.weaknesses?.length
           ? `${drill.label} — focus: ${input.weaknesses[0]}`
           : drill.label,
       minutes: drill.minutes,
       target,
+      href: target ? strategy.href(skill, target) : null,
     });
   }
 
@@ -273,16 +260,17 @@ const SKILL_LABEL: Record<Skill, string> = {
 };
 
 export function nextAction(input: PlanInput): string {
+  const { strategy } = input;
   const measured = measuredSkills(input);
-  if (!measured.length) {
-    return 'Take the diagnostic to get your first estimate.';
-  }
+  if (!measured.length) return strategy.noEstimateAction;
   const weakest = weakestSkill(input);
-  if (weakest) return `${SKILL_LABEL[weakest]} is holding your band back.`;
-  if (input.targetBand != null) {
-    const best = Math.max(...measured.map((s) => bandOf(input, s)!));
-    if (best >= input.targetBand)
-      return 'You are at your target band in practice. Keep it warm.';
+  if (weakest) {
+    return `${SKILL_LABEL[weakest]} is holding your ${strategy.scoreNoun} back.`;
+  }
+  if (input.targetScore != null) {
+    const best = Math.max(...measured.map((s) => scoreOf(input, s)!));
+    if (best >= input.targetScore)
+      return `You are at your target ${strategy.scoreNoun} in practice. Keep it warm.`;
   }
   return 'Your skills are close. Keep the rotation even.';
 }
@@ -376,17 +364,5 @@ export function tasksOn(tasks: PlanTask[], isoDate: string) {
  * a task whose material is not seeded yet must not render a dead link.
  */
 export function targetHref(task: PlanTask): string | null {
-  switch (task.target?.kind) {
-    case 'reading':
-      return `/reading?passage=${task.target.passageId}`;
-    case 'writing':
-      return `/writing?prompt=${task.target.promptId}`;
-    case 'listening':
-      return `/listening?track=${task.target.trackId}`;
-    case 'lesson':
-      // Lesson routes are module-scoped, and the task's skill is that module.
-      return `/learn/${task.skill}/${task.target.lessonId}`;
-    default:
-      return null;
-  }
+  return task.href;
 }

@@ -1,6 +1,9 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import {
+  examSkills,
+  isOnScale,
+  targetChoices,
   CURRENT_EXAM_VERSION,
   EXAM_KEYS,
   EXAMS,
@@ -85,11 +88,42 @@ test('time limits come from the task window, else the section clock', () => {
   );
 });
 
+test('target choices come from each exam, on its own scale', () => {
+  assert.deepEqual(
+    targetChoices(getExam('ielts')!),
+    [5, 5.5, 6, 6.5, 7, 7.5, 8, 8.5, 9],
+  );
+  assert.equal(targetChoices(getExam('pte_academic')!).length, 13);
+  assert.deepEqual(targetChoices(getExam('toefl_ibt')!).slice(0, 2), [3, 3.5]);
+  assert.equal(targetChoices(getExam('det')!).at(-1), 160);
+  assert.equal(isOnScale(getExam('ielts')!, 7.5), true);
+  assert.equal(isOnScale(getExam('ielts')!, 7.3), false);
+  assert.equal(isOnScale(getExam('pte_academic')!, 95), false);
+  assert.equal(isOnScale(getExam('det')!, 115), true);
+  assert.equal(isOnScale(getExam('det')!, 112), false);
+});
+
+test('an exam lists the skills its sections measure, once each', () => {
+  assert.deepEqual(examSkills(getExam('ielts')!), [
+    'listening',
+    'reading',
+    'writing',
+    'speaking',
+  ]);
+  assert.deepEqual(examSkills(getExam('pte_academic')!), [
+    'speaking',
+    'writing',
+    'reading',
+    'listening',
+  ]);
+});
+
 test('invalid definitions are reported, not accepted', () => {
   const base = getExam('ielts')!;
   const broken: ExamDefinition = {
     ...base,
     scoreScale: { label: 'Band', min: 9, max: 0, step: 0.5 },
+    targetRange: { min: 5, max: 9.25, step: 0.5 },
     tasks: [
       ...base.tasks,
       { ...base.tasks[0]!, section: 'maths' },
@@ -110,6 +144,7 @@ test('invalid definitions are reported, not accepted', () => {
       `expected a problem mentioning "${fragment}" in ${JSON.stringify(problems)}`,
     );
   has('is not a scale');
+  has('does not fit the scale');
   has('declared twice');
   has('unknown section "maths"');
   has('unknown renderer "hologram"');

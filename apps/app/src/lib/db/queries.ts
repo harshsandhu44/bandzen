@@ -54,6 +54,7 @@ import {
   type Annotation,
   type Attempt,
   type Criterion,
+  type ExamKey,
   type ListeningPlayback,
   type Award,
   type Question,
@@ -158,8 +159,77 @@ export async function upsertProfile(userId: string, values: PreparationValues) {
 
   await db
     .insert(profiles)
-    .values({ userId, ...profile })
+    // A brand-new profile points at the enrollment just written, even when the
+    // save did not name its exam.
+    .values({
+      userId,
+      ...profile,
+      activeExamKey: profile.activeExamKey ?? enrollment.examKey,
+    })
     .onConflictDoUpdate({ target: profiles.userId, set: profile });
+}
+
+/** Every exam this candidate has set up, oldest first. */
+export async function listEnrollments(userId: string) {
+  return db
+    .select({
+      examKey: examEnrollments.examKey,
+      examVariant: examEnrollments.examVariant,
+      targetScore: examEnrollments.targetScore,
+      testDate: examEnrollments.testDate,
+    })
+    .from(examEnrollments)
+    .where(eq(examEnrollments.userId, userId))
+    .orderBy(examEnrollments.createdAt);
+}
+
+/**
+ * Make one of the candidate's exams the active one. Only to an exam they have
+ * already set up — switching to a new exam goes through Settings, which asks
+ * for its target. Nothing else changes: every enrollment and every attempt
+ * stays exactly as it was. Returns whether it switched.
+ */
+export async function setActiveExam(userId: string, examKey: ExamKey) {
+  const [row] = await db
+    .update(profiles)
+    .set({ activeExamKey: examKey })
+    .where(
+      and(
+        eq(profiles.userId, userId),
+        sql`exists (select 1 from ${examEnrollments} where ${examEnrollments.userId} = ${userId} and ${examEnrollments.examKey} = ${examKey})`,
+      ),
+    )
+    .returning({ userId: profiles.userId });
+  return row != null;
+}
+
+/**
+ * Whether an exam has any published practice content. This is what decides
+ * between an exam's real screens and its honest "on the way" state, so the
+ * day PTE content is published the switch flips without a deploy.
+ */
+export const examHasContent = cache(async function examHasContent(
+  examKey: ExamKey,
+) {
+  const found = await Promise.all(
+    [passages, writingPrompts, listeningTracks, speakingTests].map((table) =>
+      db
+        .select({ id: table.id })
+        .from(table)
+        .where(and(eq(table.examKey, examKey), eq(table.status, 'published')))
+        .limit(1),
+    ),
+  );
+  return found.some((rows) => rows.length > 0);
+});
+
+/** The exams this candidate has completed attempts in, for Progress's filter. */
+export async function attemptExams(userId: string) {
+  const rows = await db
+    .selectDistinct({ examKey: attempts.examKey })
+    .from(attempts)
+    .where(and(eq(attempts.userId, userId), eq(attempts.status, 'complete')));
+  return rows.map((r) => r.examKey);
 }
 
 /**
@@ -734,22 +804,41 @@ export async function getMockSiblings(userId: string, mockAttemptId: string) {
     );
 }
 
-export async function listCompletedAttempts(userId: string, limit = 20) {
+/**
+ * Pass `examKey` wherever scores are compared or plotted: two exams' scores
+ * are on different scales and must never share a list or a line.
+ */
+export async function listCompletedAttempts(
+  userId: string,
+  limit = 20,
+  examKey?: ExamKey,
+) {
   return db
     .select({
       id: attempts.id,
+      examKey: attempts.examKey,
       module: attempts.module,
       kind: attempts.kind,
       band: attempts.score,
       submittedAt: attempts.submittedAt,
     })
     .from(attempts)
-    .where(and(eq(attempts.userId, userId), eq(attempts.status, 'complete')))
+    .where(
+      and(
+        eq(attempts.userId, userId),
+        eq(attempts.status, 'complete'),
+        examKey ? eq(attempts.examKey, examKey) : undefined,
+      ),
+    )
     .orderBy(desc(attempts.submittedAt))
     .limit(limit);
 }
 
-export async function latestBand(userId: string, module: Skill) {
+export async function latestBand(
+  userId: string,
+  module: Skill,
+  examKey?: ExamKey,
+) {
   const [row] = await db
     .select({ band: attempts.score })
     .from(attempts)
@@ -759,6 +848,7 @@ export async function latestBand(userId: string, module: Skill) {
         eq(attempts.module, module),
         eq(attempts.status, 'complete'),
         isNotNull(attempts.score),
+        examKey ? eq(attempts.examKey, examKey) : undefined,
       ),
     )
     .orderBy(desc(attempts.submittedAt))
@@ -1912,7 +2002,11 @@ export async function accuracyByQuestionKind(userId: string, module?: Skill) {
 }
 
 /** Every completed band for this user, oldest first, for the trend chart. */
-export async function bandHistory(userId: string, module?: Skill) {
+export async function bandHistory(
+  userId: string,
+  module?: Skill,
+  examKey?: ExamKey,
+) {
   return db
     .select({
       module: attempts.module,
@@ -1927,6 +2021,7 @@ export async function bandHistory(userId: string, module?: Skill) {
         isNotNull(attempts.score),
         isNotNull(attempts.submittedAt),
         ...(module ? [eq(attempts.module, module)] : []),
+        ...(examKey ? [eq(attempts.examKey, examKey)] : []),
       ),
     )
     .orderBy(attempts.submittedAt);

@@ -49,7 +49,7 @@ export async function saveOnboarding(
         study_minutes: parsed.data.studyMinutes,
       },
       {
-        exam_key: 'ielts',
+        exam_key: parsed.data.examKey,
         exam_type: parsed.data.examVariant,
         target_band: parsed.data.targetScore,
         plan: 'free',
@@ -57,5 +57,11 @@ export async function saveOnboarding(
     ),
   );
 
-  redirect(profile?.selfAssessedScore == null ? '/diagnostic' : '/');
+  // The diagnostic is an IELTS sitting; nobody preparing for another exam is
+  // sent to measure themselves on it.
+  redirect(
+    parsed.data.examKey === 'ielts' && profile?.selfAssessedScore == null
+      ? '/diagnostic'
+      : '/',
+  );
 }
