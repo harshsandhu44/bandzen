@@ -1,3 +1,10 @@
+## web [0.9.1](https://github.com/harshsandhu44/bandzen/compare/web@0.9.0...web@0.9.1) (2026-09-15)
+
+
+### Bug Fixes
+
+* align web, docs and app copy with what the app does ([#80](https://github.com/harshsandhu44/bandzen/issues/80)) ([a05d03c](https://github.com/harshsandhu44/bandzen/commit/a05d03c5b45b685458c580d3a8a57faf2615d66c))
+
 # web [0.9.0](https://github.com/harshsandhu44/bandzen/compare/web@0.8.1...web@0.9.0) (2026-09-14)
 
 
