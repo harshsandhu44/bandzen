@@ -116,32 +116,31 @@ export function parseStructured<T>(
 }
 
 /**
- * `parseStructured` with one more try when the model broke the contract.
+ * `parseStructured` with more tries when the model broke the contract.
  *
  * For models that accept no `response_format`, where the shape is prose asking
  * nicely and compliance is not deterministic -- #74 measured 3 contract
- * failures in 17 full Speaking tests. Only a parse failure retries: a failed
- * request has already been retried by the SDK, and a second failure throws.
+ * failures in 17 full Speaking tests, on identical input, so the tries are
+ * independent and each one multiplies the residual by p again. At p ~= 0.18 a
+ * single retry still leaves ~1 in 32 tests dead; three tries leave ~1 in 180.
+ * The extra call is only ever paid by the ~3% that already failed twice.
+ *
+ * Only a parse failure retries: a failed request has already been retried by
+ * the SDK, and the last failure throws.
  */
 export async function createStructured<T>(
   create: () => Promise<ChatCompletion>,
   schema: z.ZodType<T>,
   onRetry: (error: unknown) => void,
+  tries = 3,
 ): Promise<{ response: ChatCompletion; parsed: T; tries: number }> {
-  const first = await create();
-  try {
-    return {
-      response: first,
-      parsed: parseStructured(first, schema),
-      tries: 1,
-    };
-  } catch (error) {
-    onRetry(error);
+  for (let n = 1; ; n++) {
+    const response = await create();
+    try {
+      return { response, parsed: parseStructured(response, schema), tries: n };
+    } catch (error) {
+      if (n >= tries) throw error;
+      onRetry(error);
+    }
   }
-  const second = await create();
-  return {
-    response: second,
-    parsed: parseStructured(second, schema),
-    tries: 2,
-  };
 }
