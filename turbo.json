@@ -7,7 +7,9 @@
         "DATABASE_URL",
         "CLERK_SECRET_KEY",
         "ADMIN_EMAILS",
-        "OPENAI_API_KEY",
+        "OPENAI_*",
+        "ELEVENLABS_*",
+        "TRANSCRIBE_MODEL",
         "POLAR_*",
         "NEXT_PUBLIC_*"
       ],

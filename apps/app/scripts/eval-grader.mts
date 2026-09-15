@@ -2,8 +2,8 @@ import { existsSync } from 'node:fs';
 if (existsSync('.env.local')) process.loadEnvFile('.env.local');
 
 import { neon } from '@neondatabase/serverless';
-import OpenAI from 'openai';
-import { parseStructured, strictJsonSchema } from '@bandzen/ai/structured';
+import { runAI } from '@bandzen/ai/runtime';
+import { PRICES_USD_PER_MTOK } from '@bandzen/ai/runtime/pricing';
 import {
   speakingEvaluationSchema,
   writingEvaluationSchema,
@@ -44,21 +44,6 @@ import {
  *     --models gpt-5.4-mini,gpt-5.6-luna --repeat 3 --effort none
  */
 
-const PRICES_USD_PER_MTOK: Record<
-  string,
-  { in: number; cached: number; out: number; audioIn?: number }
-> = {
-  // developers.openai.com/api/docs/pricing, fetched 2026-09-14. Prices move;
-  // token counts above are the durable fact, these only turn them into dollars.
-  'gpt-5.4-mini': { in: 0.75, cached: 0.075, out: 4.5 },
-  'gpt-5.6-luna': { in: 0.2, cached: 0.02, out: 1.2 },
-  'gpt-5.6-terra': { in: 2, cached: 0.2, out: 12 },
-  'gpt-5.6-sol': { in: 4, cached: 0.4, out: 20 },
-  'gpt-5.5': { in: 5, cached: 0.5, out: 30 },
-  'gpt-audio-mini': { in: 0.6, cached: 0.06, out: 2.4, audioIn: 10 },
-  'gpt-audio-1.5': { in: 2.5, cached: 0.25, out: 10, audioIn: 32 },
-};
-
 function arg(name: string, fallback?: string) {
   const i = process.argv.indexOf(`--${name}`);
   const v = i === -1 ? undefined : process.argv[i + 1];
@@ -81,7 +66,6 @@ const REPEAT = Number(arg('repeat', '1'));
 const EFFORT = process.argv.includes('--effort') ? arg('effort') : undefined;
 
 const sql = neon(process.env.DATABASE_URL!);
-const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY! });
 
 const toBand = (n: number) => Math.min(9, Math.max(0, Math.round(n * 2) / 2));
 const pct = (n: number, d: number) =>
@@ -201,37 +185,42 @@ async function speakingCases(): Promise<Case[]> {
   return cases;
 }
 
-const WRITING_SCHEMA = strictJsonSchema(writingEvaluationSchema);
-
 async function runOne(model: string, c: Case) {
   const isAudio = model.includes('audio');
-  const startedAt = Date.now();
 
-  const response = await openai.chat.completions.create({
+  // Through the same gateway production uses, for the same reason the prompt
+  // builders live in `src/lib/ai/messages.ts`: a harness that replays a copy of
+  // the real call measures the copy. No `record` — this writes nothing, which
+  // is what keeps it safe to point at a production database.
+  // Audio models accept neither a response_format nor a reasoning effort, and
+  // the speaking grader has none either way. The schema is chosen by --module
+  // alone, exactly as before: a writing replay through an audio model still
+  // parses a writing report.
+  const common = {
     model,
     messages: c.messages,
     ...(isAudio ? { modalities: ['text' as const] } : {}),
-    // Audio models accept neither a response_format nor a reasoning effort.
-    ...(isAudio || MODULE === 'speaking'
-      ? {}
-      : {
-          response_format: {
-            type: 'json_schema' as const,
-            json_schema: {
-              name: 'writing_report',
-              strict: true,
-              schema: WRITING_SCHEMA,
-            },
-          },
-        }),
-    ...(EFFORT && !isAudio ? { reasoning_effort: EFFORT as never } : {}),
-  });
+    ...(EFFORT && !isAudio ? { reasoningEffort: EFFORT as never } : {}),
+  };
 
-  const latencyMs = Date.now() - startedAt;
-  const parsed =
-    MODULE === 'writing'
-      ? parseStructured(response, writingEvaluationSchema)
-      : parseStructured(response, speakingEvaluationSchema);
+  // Branched rather than a ternary on `schema`: the two evaluation schemas have
+  // different criterion enums, and a union of them infers as neither.
+  const {
+    data: parsed,
+    latencyMs,
+    response,
+  } = MODULE === 'writing'
+    ? await runAI({
+        ...common,
+        feature: 'writing_grader' as const,
+        schema: writingEvaluationSchema,
+        ...(isAudio ? {} : { schemaName: 'writing_report' }),
+      })
+    : await runAI({
+        ...common,
+        feature: 'speaking_grader' as const,
+        schema: speakingEvaluationSchema,
+      });
 
   const kept = parsed.annotations.filter((a) =>
     MODULE === 'writing'

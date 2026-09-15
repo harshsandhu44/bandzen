@@ -6,6 +6,7 @@ import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import OpenAI from 'openai';
 import { parseStructured } from '@bandzen/ai/structured';
+import { PRICES_USD_PER_MTOK } from '@bandzen/ai/runtime/pricing';
 import { speakingEvaluationSchema } from '@bandzen/ai/schemas';
 import { synthesizeSpeech } from '@bandzen/ai/speech';
 import { buildSpeakingMessages } from '../src/lib/ai/messages.ts';
@@ -55,16 +56,6 @@ import { sliceWav } from '../src/lib/wav.ts';
  *   pnpm --filter @bandzen/app eval:speaking-audio -- \
  *     --models gpt-audio-mini --arms AB --repeat 1      # the smoke run
  */
-
-/** developers.openai.com/api/docs/pricing, fetched 2026-09-14. */
-const PRICES_USD_PER_MTOK: Record<
-  string,
-  { in: number; audioIn: number; out: number }
-> = {
-  'gpt-audio-mini': { in: 0.6, audioIn: 10, out: 2.4 },
-  'gpt-audio': { in: 2.5, audioIn: 32, out: 10 },
-  'gpt-audio-1.5': { in: 2.5, audioIn: 32, out: 10 },
-};
 
 /**
  * The #70 signature — *"I don't have the candidate's spoken answers"*.
@@ -427,7 +418,7 @@ for (const model of MODELS) {
     const ran = REPEAT - counts.error;
     const cost = p
       ? (Math.max(0, promptTok - audioTok) * p.in +
-          audioTok * p.audioIn +
+          audioTok * (p.audioIn ?? p.in) +
           outTok * p.out) /
         1e6
       : NaN;

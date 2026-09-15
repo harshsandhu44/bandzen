@@ -7,8 +7,11 @@ import {
   setOpenAIAPI,
   setTracingDisabled,
   user,
+  type Usage,
 } from '@openai/agents';
 
+import { randomUUID } from 'node:crypto';
+import { record } from '@bandzen/ai/runtime/usage';
 import { COACH_SYSTEM } from '@/lib/ai/coach';
 import { COACH_MODEL } from '@/lib/ai/models';
 import { tutorTools, type TutorAction } from '@/lib/ai/tutor-tools';
@@ -87,7 +90,9 @@ export async function runTutor(
   context: string,
   messages: { role: 'user' | 'assistant'; content: string }[],
 ): Promise<TutorRun> {
-  const { tools, takeAction } = tutorTools(userId);
+  const { tools, takeAction, takeCalls } = tutorTools(userId);
+  const startedAt = Date.now();
+  const traceId = randomUUID();
 
   const agent = new Agent({
     name: 'Bandzen Coach',
@@ -140,10 +145,78 @@ export async function runTutor(
         const text = textDelta(value);
         if (text) yield text;
       }
-      // Surfaces a guardrail or max-turns failure that the event loop swallows.
-      await result.completed;
+      let failure: unknown = null;
+      try {
+        // Surfaces a guardrail or max-turns failure that the event loop swallows.
+        await result.completed;
+      } catch (error) {
+        failure = error;
+        throw error;
+      } finally {
+        // A maxTurns overrun or the 20s abort throws out of `completed`, and a
+        // failed Tutor run is exactly the one worth a row -- so the write
+        // happens either way, carrying which it was. This is also the only
+        // point where usage is final: the generator returns at the first text
+        // token, long before it is.
+        await recordRun(
+          result,
+          takeCalls(),
+          startedAt,
+          traceId,
+          userId,
+          failure,
+        );
+      }
     })(),
   };
+}
+
+/**
+ * The Agents SDK gives no provider request id, so `trace_id` is all that
+ * identifies this call -- which is why every row carries one.
+ *
+ * `inputTokensDetails` is a loosely-typed array here and does not reliably
+ * carry `cached_tokens` the way `prompt_tokens_details` does on the plain
+ * path. Tutor rows will usually read 0 cached even though `COACH_SYSTEM` is
+ * byte-identical and caching, so Tutor cost is **overstated** relative to
+ * Coach. Do not read a Pro-vs-Free gap off that difference alone.
+ */
+async function recordRun(
+  result: { state: { usage: Usage } },
+  toolCalls: number,
+  startedAt: number,
+  traceId: string,
+  userId: string,
+  failure: unknown,
+) {
+  const usage = result.state.usage;
+  const cached = (usage.inputTokensDetails ?? []).reduce(
+    (n, d) => n + (d.cached_tokens ?? 0),
+    0,
+  );
+  await record(
+    {
+      feature: 'tutor',
+      model: COACH_MODEL,
+      requestId: null,
+      traceId,
+      inputTokens: usage.inputTokens ?? 0,
+      cachedInputTokens: cached,
+      outputTokens: usage.outputTokens ?? 0,
+      reasoningTokens: 0,
+      audioInputTokens: null,
+      toolCalls,
+      latencyMs: Date.now() - startedAt,
+      status: failure ? 'failed' : 'ok',
+      errorCode: failure
+        ? failure instanceof Error
+          ? failure.name
+          : 'unknown'
+        : null,
+      userId,
+    },
+    true,
+  );
 }
 
 /** The one event shape that carries answer text; everything else is tool traffic. */

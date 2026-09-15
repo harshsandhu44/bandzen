@@ -8,7 +8,12 @@
  * call `apps/app/src/lib/ai/structured.ts` makes.
  */
 import { MPEGDecoder } from 'mpg123-decoder';
-import OpenAI, { toFile } from 'openai';
+import { toFile } from 'openai';
+import { openai } from './client.ts';
+import { ELEVENLABS_MODEL_ID, TRANSCRIBE_MODEL } from './models.ts';
+import { randomUUID } from 'node:crypto';
+import { estimateTranscriptionCost } from './runtime/pricing.ts';
+import { record } from './runtime/usage.ts';
 
 function requireEnv(name: string) {
   const value = process.env[name];
@@ -30,19 +35,8 @@ const VOICE_POOL: Record<'male' | 'female', string[]> = {
   male: ['TxGEqnHWrfWFTfGW9XjX', 'VR6AewLTigWG4xSOukaG'], // Josh, Arnold
 };
 
-/** OpenAI's stable transcription model. Cheap ($0.006/min) and accurate enough. */
-const TRANSCRIBE_MODEL = process.env.TRANSCRIBE_MODEL ?? 'whisper-1';
-
 /** One ElevenLabs request tops out around here; a real track is well under. */
 const MAX_TTS_CHARS = 10_000;
-
-/**
- * Cheaper, lower-latency model than eleven_multilingual_v2 (1 credit per 2
- * chars instead of 1:1) — ElevenLabs' own recommended default over both
- * multilingual and turbo, with no meaningful quality loss for the narration
- * and dialogue this app synthesizes.
- */
-const MODEL_ID = 'eleven_flash_v2_5';
 
 async function synthesizeWithVoice(
   text: string,
@@ -63,7 +57,7 @@ async function synthesizeWithVoice(
         'xi-api-key': requireEnv('ELEVENLABS_API_KEY'),
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({ text, model_id: MODEL_ID }),
+      body: JSON.stringify({ text, model_id: ELEVENLABS_MODEL_ID }),
     },
   );
   if (!res.ok) {
@@ -229,19 +223,81 @@ export async function computePeaks(
  * Transcribes an audio file to text. The result is a first draft of an answer
  * key — a human must read it before the track is published, since `evidence`
  * matching and grading both compare against it verbatim.
+ *
+ * Every token column on its `ai_usage` row is zero, and that is not an
+ * oversight: `audio.transcriptions.create` returns `{ text }` and no `usage`
+ * object at all. Whisper is billed per minute, so the cost comes from
+ * `seconds` — which the Speaking grader already derives from the WAV bytes and
+ * can pass. The CMS transcribes an MP3 whose duration it does not know without
+ * decoding, so it passes nothing and the cost lands null rather than wrong.
  */
 export async function transcribeAudio(
   audio: ArrayBuffer | Uint8Array,
   filename = 'audio.mp3',
+  opts: {
+    record?: boolean;
+    userId?: string | null;
+    attemptId?: string | null;
+    seconds?: number | null;
+  } = {},
 ): Promise<string> {
-  const client = new OpenAI({ apiKey: requireEnv('OPENAI_API_KEY') });
+  const startedAt = Date.now();
+  const traceId = randomUUID();
+  const row = (status: 'ok' | 'failed', errorCode: string | null) => ({
+    feature: 'transcribe' as const,
+    model: TRANSCRIBE_MODEL,
+    requestId: null,
+    traceId,
+    inputTokens: 0,
+    cachedInputTokens: 0,
+    outputTokens: 0,
+    reasoningTokens: 0,
+    audioInputTokens: null,
+    toolCalls: 0,
+    latencyMs: Date.now() - startedAt,
+    status,
+    errorCode,
+    userId: opts.userId,
+    attemptId: opts.attemptId,
+  });
+
   const file = await toFile(
     audio instanceof Uint8Array ? audio : new Uint8Array(audio),
     filename,
   );
-  const result = await client.audio.transcriptions.create({
-    file,
-    model: TRANSCRIBE_MODEL,
-  });
-  return result.text.trim();
+  try {
+    const result = await openai().audio.transcriptions.create(
+      { file, model: TRANSCRIBE_MODEL },
+      // The shared client defaults to 60s, sized for the graders. This call
+      // transcribes a whole listening track from the CMS — that route sets
+      // `maxDuration = 120` precisely because it is slow — and Whisper on a
+      // four-minute file can exceed a minute. Overriding per call keeps one
+      // client without turning a slow-but-working transcription into a
+      // timeout.
+      { timeout: 120_000 },
+    );
+    await record(
+      row('ok', null),
+      opts.record,
+      estimateTranscriptionCost(TRANSCRIBE_MODEL, opts.seconds),
+    );
+    return result.text.trim();
+  } catch (error) {
+    // The Speaking grader swallows transcription failures on purpose — the
+    // grade hears the audio and does not need them. Recording the failure here
+    // is what keeps that deliberate silence visible in the one table built to
+    // see it.
+    await record(row('failed', transcribeErrorCode(error)), opts.record, null);
+    throw error;
+  }
+}
+
+function transcribeErrorCode(error: unknown): string {
+  if (error && typeof error === 'object') {
+    const status = (error as { status?: number }).status;
+    if (typeof status === 'number') return `http_${status}`;
+    const name = (error as { name?: string }).name;
+    if (name) return name;
+  }
+  return 'unknown';
 }

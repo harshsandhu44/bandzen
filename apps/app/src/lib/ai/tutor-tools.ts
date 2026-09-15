@@ -62,12 +62,19 @@ export function tutorTools(userId: string) {
     return a;
   };
 
+  // Counted at each tool's entry rather than through `record`, which only
+  // fires when a tool actually found something to offer -- a lookup that came
+  // back empty is still a round trip, and a bounded agent's whole point is
+  // knowing how many of those it made.
+  let calls = 0;
+
   const getTodayPlan = tool({
     name: 'get_today_plan',
     description:
       "The candidate's study plan for today: what to work on, for how long, and what it opens. Use this before recommending what to do next.",
     parameters: getTodayPlanSchema,
     async execute() {
+      calls += 1;
       const profile = await getProfile(userId);
       if (!profile)
         return { tasks: [], note: 'This candidate has no profile.' };
@@ -108,6 +115,7 @@ export function tutorTools(userId: string) {
       'Find a Bandzen lesson that teaches a skill. Use this when explaining a technique the candidate could go and learn properly.',
     parameters: findLessonSchema,
     async execute({ skill, topic }) {
+      calls += 1;
       const all = await lessonsForModule(skill);
       const needle = topic?.trim().toLowerCase();
       const matched = needle
@@ -152,6 +160,7 @@ export function tutorTools(userId: string) {
       'Find a real practice item the candidate can attempt now. Use this when recommending practice rather than describing it.',
     parameters: findPracticeSchema,
     async execute({ skill, questionKind }) {
+      calls += 1;
       // A switch, not an abstraction: the three catalogues genuinely differ
       // (writing has a task number and no question kinds at all).
       const kind = questionKind ?? undefined;
@@ -202,6 +211,8 @@ export function tutorTools(userId: string) {
     tools: [getTodayPlan, findLesson, findPractice],
     /** Read after the run -- or, for the CTA header, at the first text token. */
     takeAction: () => action,
+    /** Read after the run, for the usage row. */
+    takeCalls: () => calls,
   };
 }
 

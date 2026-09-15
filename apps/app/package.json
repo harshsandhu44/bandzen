@@ -17,6 +17,7 @@
     "content:speaking:audio": "node --env-file=.env.local scripts/synthesize-speaking-audio.mts",
     "content:speaking:sql": "node scripts/generate-speaking-content.mts sql",
     "analytics:retention": "node --env-file=.env.local scripts/analytics-retention.mts",
+    "analytics:ai-cost": "node --env-file=.env.local scripts/ai-cost.mts",
     "eval:grader": "node --env-file=.env.local scripts/eval-grader.mts",
     "eval:speaking-audio": "node --env-file=.env.local scripts/eval-speaking-audio.mts",
     "test": "node --test \"src/**/*.test.ts\"",
