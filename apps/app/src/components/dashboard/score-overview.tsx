@@ -1,7 +1,7 @@
 import { BandScale, type ScaleSpec } from '@bandzen/ui/components/band-scale';
 import { Panel } from '@/components/app/primitives';
 import { LockedModule } from '@/components/app/status';
-import { IELTS_MODULES, MODULE_LABEL, isAvailable } from '@/lib/modules';
+import { MODULE_LABEL, isAvailable } from '@/lib/modules';
 import type { Skill } from '@/lib/db/schema';
 
 /**
@@ -14,7 +14,10 @@ export function ScoreOverview({
   scores,
   target,
   scale,
+  skills,
 }: {
+  /** The skills the active exam measures, in its order. */
+  skills: readonly Skill[];
   scores: Partial<Record<Skill, number | null>>;
   target?: number | null;
   scale: ScaleSpec;
@@ -22,7 +25,7 @@ export function ScoreOverview({
   return (
     <Panel title="By module" headingId="bands-heading">
       <div className="space-y-3">
-        {IELTS_MODULES.map((module) => {
+        {skills.map((module) => {
           if (!isAvailable(module)) {
             return <LockedModule key={module} module={module} />;
           }

@@ -13,7 +13,14 @@ import {
 import { Wordmark } from '@bandzen/ui/components/wordmark';
 import { Toaster } from '@bandzen/ui/components/sonner';
 import { requireUserId } from '@/lib/auth';
-import { essayAllowance, getProfile, getSubscription } from '@/lib/db/queries';
+import { examLabel } from '@bandzen/exams/registry';
+import {
+  essayAllowance,
+  examHasContent,
+  getProfile,
+  getSubscription,
+  listEnrollments,
+} from '@/lib/db/queries';
 import { isProAt } from '@/lib/entitlements';
 import { resolveCurrency } from '@/lib/currency';
 import { polarPricing } from '@/lib/polar';
@@ -54,13 +61,17 @@ const FOUNDING_DATE = new Intl.DateTimeFormat('en-GB', {
  */
 export default async function AppLayout({ children }: LayoutProps<'/'>) {
   const userId = await requireUserId();
-  const [profile, subscription, quota, user, cookieStore] = await Promise.all([
-    getProfile(userId),
-    getSubscription(userId),
-    essayAllowance(userId),
-    currentUser(),
-    cookies(),
-  ]);
+  const [profile, subscription, quota, user, cookieStore, enrollments] =
+    await Promise.all([
+      getProfile(userId),
+      getSubscription(userId),
+      essayAllowance(userId),
+      currentUser(),
+      cookies(),
+      listEnrollments(userId),
+    ]);
+  // No Pro pitch and no marks meter for an exam with nothing to mark yet.
+  const hasContent = await examHasContent(profile?.examKey ?? 'ielts');
   const days = profile?.testDate
     ? daysUntil(profile.testDate, profile.timezone)
     : null;
@@ -96,7 +107,7 @@ export default async function AppLayout({ children }: LayoutProps<'/'>) {
         </SidebarContent>
 
         <SidebarFooter className="p-4">
-          {pro ? null : (
+          {pro || !hasContent ? null : (
             <Link
               href="/upgrade?from=sidebar"
               className="block border border-chrome/40 px-3 py-2.5 transition-colors hover:border-chrome"
@@ -120,7 +131,19 @@ export default async function AppLayout({ children }: LayoutProps<'/'>) {
         <TopBar
           email={user?.primaryEmailAddress?.emailAddress ?? null}
           testDays={testDays}
-          essaysLeft={quota.unlimited ? null : quota.remaining}
+          essaysLeft={quota.unlimited || !hasContent ? null : quota.remaining}
+          activeExam={
+            profile?.examKey
+              ? {
+                  key: profile.examKey,
+                  label: examLabel(profile.examKey, profile.examVariant),
+                }
+              : null
+          }
+          exams={enrollments.map((e) => ({
+            key: e.examKey,
+            label: examLabel(e.examKey, e.examVariant),
+          }))}
         />
 
         {/* `p-6 sm:p-10` is load-bearing: the exam screens cancel exactly these

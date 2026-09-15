@@ -4,7 +4,12 @@ import { z } from 'zod';
 import { runAIStream } from '@bandzen/ai/runtime/stream';
 import { buildCoachContext, COACH_SYSTEM, MAX_TURNS } from '@/lib/ai/coach';
 import { capture } from '@/lib/analytics';
-import { coachAllowance, proUntil, recordCoachMessage } from '@/lib/db/queries';
+import {
+  coachAllowance,
+  getProfile,
+  proUntil,
+  recordCoachMessage,
+} from '@/lib/db/queries';
 import { isProAt } from '@/lib/entitlements';
 import { COACH_MODEL } from '@/lib/ai/models';
 import { runTutor } from '@/lib/ai/tutor';
@@ -42,6 +47,13 @@ export async function POST(request: Request) {
 
   const parsed = bodySchema.safeParse(await request.json().catch(() => null));
   if (!parsed.success) return new Response('Bad request', { status: 400 });
+
+  // The page already explains this; the handler enforces it, before anything
+  // is counted against the allowance.
+  const profile = await getProfile(userId);
+  if (profile?.examKey && profile.examKey !== 'ielts') {
+    return Response.json({ error: 'exam' }, { status: 409 });
+  }
 
   const quota = await coachAllowance(userId);
   if (!quota.allowed) {
