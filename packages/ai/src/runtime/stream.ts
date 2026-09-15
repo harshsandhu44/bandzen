@@ -90,6 +90,10 @@ export async function runAIStream(options: {
         attemptId: options.attemptId,
       },
       options.record,
+      // Explicitly null, not the 0 that zero tokens would compute to. The
+      // spend was real; we merely cannot size it, and a $0.00 row would let
+      // SUM() report it as free. Null makes the hole countable instead.
+      usage ? undefined : null,
     ).finally(() => settle());
   };
 

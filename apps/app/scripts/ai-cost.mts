@@ -45,7 +45,8 @@ async function sectionA() {
            sum(input_tokens)  as input_tokens,
            sum(output_tokens) as output_tokens,
            round(sum(estimated_cost_usd)::numeric, 4) as cost_usd,
-           count(*) filter (where estimated_cost_usd is null) as unpriced
+           count(*) filter (where error_code = 'aborted') as aborted,
+           count(*) filter (where estimated_cost_usd is null and error_code is null) as unpriced
       from ai_usage
      where created_at > now() - ${since}::interval
      group by feature
@@ -167,8 +168,8 @@ async function sectionE() {
   const rows = await sql`
     select count(*) as total_calls,
            count(*) filter (where error_code = 'aborted') as aborted_coach_streams,
-           count(*) filter (where estimated_cost_usd is null and status = 'ok') as priced_null,
-           count(distinct model) filter (where estimated_cost_usd is null and status = 'ok') as unpriced_models,
+           count(*) filter (where estimated_cost_usd is null and error_code is null) as unpriced_calls,
+           count(distinct model) filter (where estimated_cost_usd is null and error_code is null) as unpriced_models,
            count(distinct pricing_version) as pricing_versions
       from ai_usage
      where created_at > now() - ${since}::interval
@@ -179,7 +180,12 @@ async function sectionE() {
   const unpriced = await sql`
     select model, count(*) as calls
       from ai_usage
-     where estimated_cost_usd is null and status = 'ok'
+     where estimated_cost_usd is null
+       -- A null error_code is what separates a model we cannot price from a
+       -- stream we could not measure. Both land a null cost; only the first is
+       -- a missing price-table entry, and conflating them reports a priced
+       -- model as unpriced every time someone closes the Coach mid-answer.
+       and error_code is null
        and created_at > now() - ${since}::interval
      group by model
      order by calls desc
