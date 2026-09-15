@@ -1,3 +1,10 @@
+# docs [0.6.0](https://github.com/harshsandhu44/bandzen/compare/docs@0.5.1...docs@0.6.0) (2026-09-15)
+
+
+### Features
+
+* default every app but the marketing site to light, with dark as a choice ([#82](https://github.com/harshsandhu44/bandzen/issues/82)) ([bb87805](https://github.com/harshsandhu44/bandzen/commit/bb87805566b694ea2b3e30c65d1a2424d23585d0))
+
 ## docs [0.5.1](https://github.com/harshsandhu44/bandzen/compare/docs@0.5.0...docs@0.5.1) (2026-09-15)
 
 
