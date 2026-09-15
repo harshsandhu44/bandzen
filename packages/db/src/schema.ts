@@ -96,6 +96,22 @@ export const resourceLevel = pgEnum('resource_level', [
   'advanced',
 ]);
 
+/**
+ * Which model call a usage row belongs to. One value per call site, not per
+ * model — the model is its own column precisely so a swap does not invent a
+ * new feature, and so cost can be compared across models for the same job.
+ */
+export const aiFeature = pgEnum('ai_feature', [
+  'writing_grader',
+  'speaking_grader',
+  'coach',
+  'tutor',
+  'content_generator',
+  'transcribe',
+]);
+
+export const aiStatus = pgEnum('ai_status', ['ok', 'failed']);
+
 // ---------------------------------------------------------------------------
 // Accounts
 // ---------------------------------------------------------------------------
@@ -859,6 +875,70 @@ export const contentEvents = pgTable(
       t.entityId,
       desc(t.createdAt),
     ),
+  ],
+);
+
+// ---------------------------------------------------------------------------
+// AI usage
+// ---------------------------------------------------------------------------
+
+/**
+ * One row per model call, written by `@bandzen/ai`'s runtime.
+ *
+ * **Metadata only.** No prompt, no completion, no student text ever lands here.
+ * What is durable is the token counts; `estimatedCostUsd` is a derived number
+ * that was true under `pricingVersion` and may not be true now, which is why
+ * both columns exist rather than just the dollars.
+ *
+ * Neither id is a foreign key. Content generation has no user and no attempt,
+ * and a telemetry row must never be the thing that blocks deleting a profile
+ * or an attempt. Rows are append-only; nothing updates them.
+ */
+export const aiUsage = pgTable(
+  'ai_usage',
+  {
+    id: uuid('id').primaryKey().defaultRandom(),
+    /**
+     * Set by the Coach and Tutor, which run inside a request that knows who is
+     * asking. Null for the graders — `gradeEssay`/`gradeSpeaking` deliberately
+     * take no userId, so they set `attemptId` instead and the cost script joins
+     * `attempts` for the user.
+     */
+    userId: text('user_id'),
+    attemptId: uuid('attempt_id'),
+    feature: aiFeature('feature').notNull(),
+    /** The model actually called, not the constant's current value. */
+    model: text('model').notNull(),
+    /** OpenAI's `_request_id`. Null where the SDK does not surface one — the Agents SDK does not. */
+    requestId: text('request_id'),
+    /** Ours, always set, so every call is identifiable even without the above. */
+    traceId: text('trace_id').notNull(),
+    inputTokens: integer('input_tokens').notNull().default(0),
+    cachedInputTokens: integer('cached_input_tokens').notNull().default(0),
+    outputTokens: integer('output_tokens').notNull().default(0),
+    /** Billed as output. Broken out because a model whose reasoning default changes can silently double the bill. */
+    reasoningTokens: integer('reasoning_tokens').notNull().default(0),
+    /** Audio models only: 10 tokens/second of input audio, flat. Null elsewhere. */
+    audioInputTokens: integer('audio_input_tokens'),
+    toolCalls: integer('tool_calls').notNull().default(0),
+    latencyMs: integer('latency_ms').notNull(),
+    status: aiStatus('status').notNull(),
+    errorCode: text('error_code'),
+    estimatedCostUsd: numeric('estimated_cost_usd', {
+      precision: 10,
+      scale: 6,
+      mode: 'number',
+    }),
+    /** Which price table produced `estimatedCostUsd`. Prices change; this says which ones applied. */
+    pricingVersion: text('pricing_version').notNull(),
+    createdAt: timestamp('created_at', { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+  },
+  (t) => [
+    index('ai_usage_feature_created_idx').on(t.feature, desc(t.createdAt)),
+    index('ai_usage_user_created_idx').on(t.userId, desc(t.createdAt)),
+    index('ai_usage_attempt_idx').on(t.attemptId),
   ],
 );
 

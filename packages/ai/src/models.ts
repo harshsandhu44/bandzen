@@ -71,3 +71,38 @@ export const SPEAKING_GRADER_MODEL =
  * has always used, so splitting it changed no behaviour.
  */
 export const COACH_MODEL = process.env.OPENAI_COACH_MODEL ?? 'gpt-5.4-mini';
+
+/** OpenAI's stable transcription model. Cheap ($0.006/min) and accurate enough. */
+export const TRANSCRIBE_MODEL = process.env.TRANSCRIBE_MODEL ?? 'whisper-1';
+
+/**
+ * ElevenLabs TTS. Cheaper and lower-latency than eleven_multilingual_v2 (1
+ * credit per 2 chars instead of 1:1) — ElevenLabs' own recommended default
+ * over both multilingual and turbo, with no meaningful quality loss for the
+ * narration and dialogue this app synthesizes.
+ */
+export const ELEVENLABS_MODEL_ID =
+  process.env.ELEVENLABS_MODEL_ID ?? 'eleven_flash_v2_5';
+
+/**
+ * Which model each call site uses, keyed by the `ai_usage.feature` it records.
+ *
+ * Feature to model directly, with no capability tier in between: the mapping
+ * is 1:1 for all six, and a tier would only make "which model graded this?" a
+ * two-step answer. Each value is still its own env var, so re-pointing one
+ * feature never moves another.
+ *
+ * `tutor` and `coach` share `COACH_MODEL` on purpose — same conversation, one
+ * with tools — but are separate features because their cost and latency
+ * profiles differ enough to want telling apart.
+ */
+export const AI_MODELS = {
+  writing_grader: GRADER_MODEL,
+  speaking_grader: SPEAKING_GRADER_MODEL,
+  coach: COACH_MODEL,
+  tutor: COACH_MODEL,
+  content_generator: CONTENT_MODEL,
+  transcribe: TRANSCRIBE_MODEL,
+} as const;
+
+export type AiFeature = keyof typeof AI_MODELS;

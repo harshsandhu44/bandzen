@@ -83,6 +83,9 @@ export async function POST(
       const transcript = await transcribeAudio(
         await res.arrayBuffer(),
         `${track.slug}.mp3`,
+        // No `seconds`: this is an MP3 whose duration is unknown without
+        // decoding it, so the row's cost lands null rather than wrong.
+        { record: true },
       );
       await updateTrack(id, { transcript, generationStartedAt: null }, userId);
       return NextResponse.json({ status: 'done', generated: 'transcript' });

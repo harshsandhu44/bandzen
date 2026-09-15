@@ -8,9 +8,7 @@
  * a human to fix before publishing, never fatal.
  */
 import { z } from 'zod';
-import { openai } from './client.ts';
-import { CONTENT_MODEL } from './models.ts';
-import { parseStructured, strictJsonSchema } from './structured.ts';
+import { runAI } from './runtime/request.ts';
 import {
   generatedPassageSchema,
   generatedListeningTrackSchema,
@@ -31,6 +29,11 @@ export type GenOptions = {
   difficulty?: number;
   /** Slugs already in the bank, so the model picks something new. */
   avoid?: string[];
+  /**
+   * Write an `ai_usage` row. The CMS passes it; the offline scripts do not, so
+   * a generation run against production leaves the ledger alone.
+   */
+  record?: boolean;
 };
 
 export type SpeakingTestFile = z.infer<typeof speakingTestSchema>;
@@ -39,23 +42,19 @@ async function call<T>(
   schema: z.ZodType<T>,
   system: string,
   user: string,
+  record?: boolean,
 ): Promise<T> {
-  const response = await openai().chat.completions.create({
-    model: CONTENT_MODEL,
+  const { data } = await runAI({
+    feature: 'content_generator',
     messages: [
       { role: 'system', content: system },
       { role: 'user', content: user },
     ],
-    response_format: {
-      type: 'json_schema',
-      json_schema: {
-        name: 'content',
-        strict: true,
-        schema: strictJsonSchema(schema),
-      },
-    },
+    schema,
+    schemaName: 'content',
+    record,
   });
-  return parseStructured(response, schema);
+  return data;
 }
 
 function userLine(base: string, o: GenOptions) {
@@ -124,6 +123,7 @@ export async function generatePassage(
       'Write one IELTS Academic Reading passage with 13 questions.',
       opts,
     ),
+    opts.record,
   );
   return { data, warnings: validatePassage(data) };
 }
@@ -182,6 +182,7 @@ export async function generateListeningTrack(
     generatedListeningTrackSchema,
     LISTENING_SYSTEM,
     userLine('Write one IELTS Listening transcript with 10 questions.', opts),
+    opts.record,
   );
   return { data, warnings: validateListeningTrack(data) };
 }
@@ -245,6 +246,7 @@ export async function generateSpeakingTest(
     generatedSpeakingTestSchema,
     SPEAKING_SYSTEM,
     userLine('Write one full IELTS Speaking test (Parts 1-3).', opts),
+    opts.record,
   );
   const data = flattenSpeakingTest(generated);
   return { data, warnings: validateSpeakingTest(data) };

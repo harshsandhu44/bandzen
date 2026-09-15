@@ -54,6 +54,13 @@ export async function POST(
       body.difficulty && body.difficulty >= 1 && body.difficulty <= 5
         ? body.difficulty
         : undefined,
+    // CONTENT_MODEL is the most expensive model in the repo and the bank is
+    // built entirely through here, so leaving the CMS out of the ledger would
+    // have hidden the largest line item. No `userId`: this is an admin
+    // generating catalogue content, not spend attributable to a candidate, and
+    // `ai-cost.mts` excludes the feature from its per-user figures for exactly
+    // that reason.
+    record: true,
   };
 
   try {

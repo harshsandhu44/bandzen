@@ -1,8 +1,7 @@
 import { after } from 'next/server';
 import { auth } from '@clerk/nextjs/server';
 import { z } from 'zod';
-import type { ChatCompletionChunk } from 'openai/resources/chat/completions';
-import { openai } from '@/lib/ai/client';
+import { runAIStream } from '@bandzen/ai/runtime/stream';
 import { buildCoachContext, COACH_SYSTEM, MAX_TURNS } from '@/lib/ai/coach';
 import { capture } from '@/lib/analytics';
 import { coachAllowance, proUntil, recordCoachMessage } from '@/lib/db/queries';
@@ -81,52 +80,62 @@ export async function POST(request: Request) {
     }
   }
 
-  const stream = await openai().chat.completions.create({
-    model: COACH_MODEL,
-    stream: true,
-    // The usage chunk arrives last and carries no delta, so it costs nothing
-    // to ask for. Without it the Coach is the one recurring model call whose
-    // spend cannot be measured at all -- see the log in `finally` below.
-    stream_options: { include_usage: true },
+  const { stream, done, finish } = await runAIStream({
+    feature: 'coach',
     messages: [
       // First and byte-identical, so prompt caching applies -- see coach.ts.
       { role: 'system', content: COACH_SYSTEM },
       { role: 'system', content: context },
       ...parsed.data.messages,
     ],
+    record: true,
+    userId,
   });
+
+  // Registered in request scope, not from inside the stream: by the time the
+  // stream drains the response has long been returned, and `after()` is what
+  // keeps the function alive for the pending write. Same contract the graders
+  // already rely on.
+  after(() => done);
 
   const encoder = new TextEncoder();
 
   return new Response(
     new ReadableStream({
       async start(controller) {
-        // Set by the final chunk, which carries usage and no choices.
-        let usage: ChatCompletionChunk['usage'];
+        // A cancelled stream has already closed its controller, so enqueueing
+        // or closing it throws `TypeError: Invalid state` -- inside an async
+        // `start` with nothing to catch it, which is an unhandled rejection on
+        // exactly the path the abort row exists to record.
+        const open = () => controller.desiredSize !== null;
         try {
-          for await (const chunk of stream) {
-            if (chunk.usage) usage = chunk.usage;
-            const text = chunk.choices[0]?.delta?.content;
-            if (text) controller.enqueue(encoder.encode(text));
+          for await (const text of stream) {
+            if (!open()) break;
+            controller.enqueue(encoder.encode(text));
           }
+          finish();
         } catch (error) {
           console.error('[coach] stream failed', error);
+          finish(errorName(error));
           // The reader has already been shown partial text, so end the stream
           // with a visible note rather than an error it cannot see.
-          controller.enqueue(
-            encoder.encode('\n\n[The answer was cut short. Please ask again.]'),
-          );
-        } finally {
-          // Same shape as the grader logs, so all three are greppable together.
-          // A stream the reader aborted never yields the usage chunk; that is
-          // a real spend we cannot see, not a bug to work around here.
-          if (usage) {
-            console.log(
-              `[coach] model=${COACH_MODEL} cached_tokens ${usage.prompt_tokens_details?.cached_tokens ?? 0}/${usage.prompt_tokens} completion_tokens ${usage.completion_tokens}`,
+          if (open()) {
+            controller.enqueue(
+              encoder.encode(
+                '\n\n[The answer was cut short. Please ask again.]',
+              ),
             );
           }
-          controller.close();
+        } finally {
+          // Idempotent -- a stream that errored has already been finished, and
+          // one the reader abandoned lands here with no usage chunk and is
+          // recorded as 'aborted'.
+          finish();
+          if (open()) controller.close();
         }
+      },
+      cancel() {
+        finish('aborted');
       },
     }),
     {
@@ -136,6 +145,10 @@ export async function POST(request: Request) {
       },
     },
   );
+}
+
+function errorName(error: unknown): string {
+  return error instanceof Error ? error.name : 'unknown';
 }
 
 /**

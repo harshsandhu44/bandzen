@@ -10,11 +10,10 @@ import { transcribeAudio } from '@bandzen/ai/speech';
 import { capture } from '@/lib/analytics';
 import { checkAwards } from '@/lib/award-check';
 import { speakingCoverageCeiling } from '@/lib/grading';
-import { openai } from './client';
+import { runAI } from '@bandzen/ai/runtime';
 import { SPEAKING_GRADER_MODEL } from './models';
 import { buildSpeakingMessages } from './messages';
 import { speakingEvaluationSchema } from './schemas';
-import { createStructured } from './structured';
 
 /** Half-band rounding, and never outside the scale whatever the model says. */
 const toBand = (n: number) => Math.min(9, Math.max(0, Math.round(n * 2) / 2));
@@ -105,7 +104,14 @@ export async function gradeSpeaking(attemptId: string) {
     const transcripts = await Promise.all(
       clips.map(async (c) => {
         try {
-          const text = await transcribeAudio(c.bytes, `${c.promptId}.wav`);
+          const text = await transcribeAudio(c.bytes, `${c.promptId}.wav`, {
+            record: true,
+            attemptId,
+            // Same 16 kHz mono 16-bit arithmetic as `audioSeconds` above, per
+            // clip. Whisper bills per minute, so this is the only thing that
+            // makes the row's cost real.
+            seconds: Math.max(0, c.bytes.length - 44) / 32_000,
+          });
           await saveResponseTranscript(attemptId, c.promptId, text);
           return text;
         } catch (e) {
@@ -119,23 +125,34 @@ export async function gradeSpeaking(attemptId: string) {
     // asked for in prose and it sometimes stops mid-object or strays outside
     // the enum (#74). One retry, logged, rather than a failed attempt on a
     // test the candidate completed.
-    const { response, parsed, tries } = await createStructured(
-      async () => {
-        const r = await openai().chat.completions.create({
-          model: SPEAKING_GRADER_MODEL,
-          modalities: ['text'],
-          messages: buildSpeakingMessages(work.prompts, clips),
-        });
-        requestId = r._request_id ?? 'unknown';
-        return r;
+    const {
+      response,
+      data: parsed,
+      tries,
+    } = await runAI({
+      feature: 'speaking_grader',
+      // No `schemaName`: this model accepts no `response_format` at all, so
+      // the shape stays prose in the prompt and `parseStructured` is the only
+      // thing checking it.
+      messages: buildSpeakingMessages(work.prompts, clips),
+      schema: speakingEvaluationSchema,
+      modalities: ['text'],
+      retryOnParseFailure: true,
+      // Each physical call writes its own row, so the retry rate #74 measured
+      // becomes queryable rather than needing its own counter.
+      record: true,
+      attemptId,
+      // Set per physical call, so the retry warning and the failure line below
+      // name the request that actually answered rather than the last one.
+      onCall: (id) => {
+        requestId = id ?? 'unknown';
       },
-      speakingEvaluationSchema,
-      (error) =>
+      onRetry: (error) =>
         console.warn(
           `[grade-speaking] ${attemptId} broke the JSON contract, retrying · request ${requestId} · clips ${clipCount} · audio ${audioSeconds}s`,
           error,
         ),
-    );
+    });
 
     // Drop annotations the model did not actually lift from an answer -- a
     // quote the review page cannot find in a transcript is one it cannot show.

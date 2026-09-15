@@ -351,6 +351,9 @@ importers:
 
   packages/ai:
     dependencies:
+      '@bandzen/db':
+        specifier: workspace:*
+        version: link:../db
       mpg123-decoder:
         specifier: ^1.0.3
         version: 1.0.3
