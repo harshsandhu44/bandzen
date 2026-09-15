@@ -1,3 +1,10 @@
+## app [1.13.1](https://github.com/harshsandhu44/bandzen/compare/app@1.13.0...app@1.13.1) (2026-09-15)
+
+
+### Bug Fixes
+
+* **ai:** give a broken speaking JSON contract three tries, not two ([#87](https://github.com/harshsandhu44/bandzen/issues/87)) ([07be507](https://github.com/harshsandhu44/bandzen/commit/07be507fae73ae65b5d734d92747c73bb5799c07)), closes [#75](https://github.com/harshsandhu44/bandzen/issues/75) [#75](https://github.com/harshsandhu44/bandzen/issues/75) [#74](https://github.com/harshsandhu44/bandzen/issues/74)
+
 # app [1.13.0](https://github.com/harshsandhu44/bandzen/compare/app@1.12.0...app@1.13.0) (2026-09-15)
 
 
