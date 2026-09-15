@@ -128,7 +128,7 @@ test('emits no $ref, which strict mode could not follow', () => {
   assert.equal(json.includes('$defs'), false);
 });
 
-test('retries once when the model breaks the contract, then gives up', async () => {
+test('retries twice when the model breaks the contract, then gives up', async () => {
   const body = JSON.stringify({
     band: 7,
     criteria: [],
@@ -153,12 +153,12 @@ test('retries once when the model breaks the contract, then gives up', async () 
   assert.equal(tries, 2);
   assert.equal(retries, 1);
 
-  const twice = replies('not json', 'still not json', body);
+  const thrice = replies('not json', 'still not json', 'nope');
   await assert.rejects(
-    createStructured(twice.create, writingEvaluationSchema, onRetry),
+    createStructured(thrice.create, writingEvaluationSchema, onRetry),
     ModelOutputError,
   );
-  assert.equal(twice.calls(), 2);
+  assert.equal(thrice.calls(), 3);
 
   const clean = replies(body);
   assert.equal(

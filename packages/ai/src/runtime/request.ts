@@ -144,6 +144,10 @@ export async function runAI<T>(options: RunOptions<T>): Promise<RunResult<T>> {
           ...tokensFrom(response.usage),
           requestId,
           latencyMs,
+          // The HTTP call succeeded and was billed -- not that the grade was
+          // usable. `parseStructured` runs after this returns, so a broken JSON
+          // contract lands here as 'ok'. Repeat `attempt_id` rows are how you
+          // count contract failures (#74).
           status: 'ok',
           errorCode: null,
         },
