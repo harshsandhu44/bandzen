@@ -4,7 +4,7 @@ import { useMemo, useRef, useState, type ReactNode } from 'react';
 import { ArrowLeft, ArrowRight, Flag } from 'lucide-react';
 import { Button } from '@bandzen/ui/components/button';
 import { Input } from '@bandzen/ui/components/input';
-import { RadioCardGroup } from '@bandzen/ui/components/radio-card-group';
+import { AnswerChoices } from '@bandzen/ui/components/answer-choices';
 import { Select } from '@bandzen/ui/components/select';
 import { useIsMobile } from '@bandzen/ui/hooks/use-mobile';
 import { cn } from '@bandzen/ui/lib/utils';
@@ -17,6 +17,7 @@ import { SaveStatus } from '@/components/app/save-status';
 import { SubmitConfirm } from '@/components/app/submit-confirm';
 import { Timer } from '@/components/app/timer';
 import { ExamNavigator } from '@/components/exam/exam-navigator';
+import { HighlightProvider, HighlightText } from '@/components/exam/highlights';
 import type { Question } from '@/lib/db/schema';
 import { groupQuestions, pageGroups } from '@/lib/question-groups';
 import { useAutosave } from '@/lib/use-autosave';
@@ -88,6 +89,7 @@ export function ObjectiveRunner({
   choicesFor,
   selectOptionsFor,
   timer,
+  highlightKey,
 }: {
   attemptId: string;
   /** localStorage key suffix for the divider position. */
@@ -112,6 +114,8 @@ export function ObjectiveRunner({
   ) => readonly { value: string; label: string }[] | null;
   /** Present for reading; absent for listening (no timer in the exam). */
   timer?: { startedAt: string; minutes: number; autoSubmit: boolean };
+  /** localStorage key for passage/prompt highlights; absent = not highlightable. */
+  highlightKey?: string;
 }) {
   const isMobile = useIsMobile();
   const splitKey = `runner-split-${splitId}`;
@@ -259,7 +263,15 @@ export function ObjectiveRunner({
                     <span className="font-mono text-xs text-muted-foreground">
                       {String(q.idx).padStart(2, '0')}
                     </span>
-                    <p className="flex-1 text-sm">{q.prompt}</p>
+                    {highlightKey ? (
+                      <HighlightText
+                        id={`q:${q.id}`}
+                        text={q.prompt}
+                        className="flex-1 text-sm"
+                      />
+                    ) : (
+                      <p className="flex-1 text-sm">{q.prompt}</p>
+                    )}
                     <button
                       type="button"
                       onClick={() => toggleFlag(q)}
@@ -318,7 +330,7 @@ export function ObjectiveRunner({
 
   const leftBody = typeof left === 'function' ? left(currentSection) : left;
 
-  return (
+  const runner = (
     <div className="-m-6 flex min-h-svh flex-col sm:-m-10 lg:h-svh lg:min-h-0">
       <header className="flex shrink-0 items-center justify-between gap-4 border-b border-border bg-background px-6 py-3">
         <p className="font-metric text-metric-sm text-muted-foreground">
@@ -410,6 +422,12 @@ export function ObjectiveRunner({
       </form>
     </div>
   );
+
+  return highlightKey ? (
+    <HighlightProvider storageKey={highlightKey}>{runner}</HighlightProvider>
+  ) : (
+    runner
+  );
 }
 
 function AnswerField({
@@ -425,11 +443,6 @@ function AnswerField({
   choices: readonly string[] | null;
   selectOptions: readonly { value: string; label: string }[] | null;
 }) {
-  const cards = useMemo(
-    () => choices?.map((c) => ({ value: c, label: c })) ?? null,
-    [choices],
-  );
-
   if (selectOptions) {
     return (
       <div className="max-w-sm">
@@ -449,15 +462,13 @@ function AnswerField({
     );
   }
 
-  if (cards) {
+  if (choices) {
     return (
-      <RadioCardGroup
-        legend={`Answer for question ${q.idx}`}
-        cards={cards}
-        value={value || null}
+      <AnswerChoices
+        label={`Answer for question ${q.idx}`}
+        choices={choices}
+        value={value}
         onValueChange={onChange}
-        columns={cards.length > 3 ? 2 : 3}
-        className="[&_legend]:sr-only max-w-md"
       />
     );
   }

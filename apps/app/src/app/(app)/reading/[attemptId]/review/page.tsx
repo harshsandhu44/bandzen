@@ -44,6 +44,8 @@ export default async function ReadingReviewPage({
       total={attempt.total}
       rows={data.rows}
       history={history}
+      passage={data.passage}
+      highlightKey={`reading-highlights-${attemptId}`}
     />
   );
 }

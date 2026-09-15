@@ -6,6 +6,7 @@ import {
   type RunnerQuestion,
   type RunnerSaved,
 } from '@/components/exam/objective-runner';
+import { Passage } from '@/components/exam/passage';
 import { saveReadingAnswer, submitReadingAttempt } from '../actions';
 import { ROMAN, TFNG, YNNG } from './reading-test';
 
@@ -69,14 +70,7 @@ export function MockReadingTest({
                 Passage {i + 1} of {passages.length}
               </p>
               <h1 className="mb-6 font-title text-title">{p.title}</h1>
-              {p.body.split(/\n\s*\n/).map((para, j) => (
-                <p
-                  key={j}
-                  className="mb-4 text-sm leading-7 whitespace-pre-line"
-                >
-                  {para}
-                </p>
-              ))}
+              <Passage id={p.id} body={p.body} />
             </section>
           );
         }}
@@ -97,6 +91,7 @@ export function MockReadingTest({
           q.kind === 'matching_headings' ? headingOptionsFor(q) : null
         }
         timer={{ startedAt, minutes, autoSubmit: true }}
+        highlightKey={`reading-highlights-${attemptId}`}
       />
     </>
   );

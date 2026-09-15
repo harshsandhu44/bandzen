@@ -8,6 +8,8 @@ import {
   Watermark,
 } from '@/components/app/primitives';
 import { BandReveal } from '@/components/exam/band-reveal';
+import { HighlightProvider, HighlightText } from '@/components/exam/highlights';
+import { Passage } from '@/components/exam/passage';
 import { isAnswerCorrect } from '@/lib/db/queries';
 import {
   MODULE_LABEL,
@@ -57,6 +59,8 @@ export function ObjectiveReview({
   history,
   transcript,
   conditions,
+  passage,
+  highlightKey,
 }: {
   module: IELTSModule;
   title: string;
@@ -70,6 +74,10 @@ export function ObjectiveReview({
   transcript?: string | null;
   /** Listening only: how the audio was played. Reading never passes it. */
   conditions?: string;
+  /** Reading only: the passage, shown with the candidate's highlights. */
+  passage?: { id: string; body: string };
+  /** The key the runner stored highlights under. */
+  highlightKey?: string;
 }) {
   const byKind = new Map(history.map((k) => [k.kind, k]));
   const noun = module === 'listening' ? 'track' : 'passage';
@@ -92,7 +100,7 @@ export function ObjectiveReview({
     ? `/${module}?kind=${patterns[0].kind}`
     : `/${module}`;
 
-  return (
+  const page = (
     <div className="relative isolate max-w-3xl space-y-10 overflow-clip">
       <Watermark text={module} />
       <header className="space-y-4">
@@ -143,7 +151,15 @@ export function ObjectiveReview({
                     <span className="font-mono text-xs text-muted-foreground">
                       {String(q.idx).padStart(2, '0')}{' '}
                     </span>
-                    {q.prompt}
+                    {highlightKey ? (
+                      <HighlightText
+                        as="span"
+                        id={`q:${q.id}`}
+                        text={q.prompt}
+                      />
+                    ) : (
+                      q.prompt
+                    )}
                   </p>
 
                   <p className="font-mono text-[0.6875rem] tracking-[0.18em] text-muted-foreground uppercase">
@@ -210,6 +226,15 @@ export function ObjectiveReview({
         </section>
       ) : null}
 
+      {passage ? (
+        <section aria-labelledby="passage-heading" className="space-y-3">
+          <SectionHeader as="h2">
+            <span id="passage-heading">Passage</span>
+          </SectionHeader>
+          <Passage id={passage.id} body={passage.body} />
+        </section>
+      ) : null}
+
       {transcript ? (
         <section aria-labelledby="transcript-heading" className="space-y-3">
           <SectionHeader as="h2">
@@ -238,5 +263,13 @@ export function ObjectiveReview({
         </Link>
       </div>
     </div>
+  );
+
+  return highlightKey ? (
+    <HighlightProvider storageKey={highlightKey} readOnly>
+      {page}
+    </HighlightProvider>
+  ) : (
+    page
   );
 }
