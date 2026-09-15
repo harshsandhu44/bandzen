@@ -1,3 +1,10 @@
+# app [1.14.0](https://github.com/harshsandhu44/bandzen/compare/app@1.13.1...app@1.14.0) (2026-09-15)
+
+
+### Features
+
+* **db:** make exam identity and version first-class ([#104](https://github.com/harshsandhu44/bandzen/issues/104)) ([72f15ee](https://github.com/harshsandhu44/bandzen/commit/72f15eee6a66b4d77cb274ba63d51690158c6168))
+
 ## app [1.13.1](https://github.com/harshsandhu44/bandzen/compare/app@1.13.0...app@1.13.1) (2026-09-15)
 
 
