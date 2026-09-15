@@ -1,3 +1,10 @@
+# app [1.13.0](https://github.com/harshsandhu44/bandzen/compare/app@1.12.0...app@1.13.0) (2026-09-15)
+
+
+### Features
+
+* **ai:** one AI runtime, one usage table, one cost script ([#83](https://github.com/harshsandhu44/bandzen/issues/83)) ([4c39939](https://github.com/harshsandhu44/bandzen/commit/4c399396f49dfe5b11756185d815a1a7ae742e68)), closes [#73](https://github.com/harshsandhu44/bandzen/issues/73) [#74](https://github.com/harshsandhu44/bandzen/issues/74) [#60](https://github.com/harshsandhu44/bandzen/issues/60)
+
 # app [1.12.0](https://github.com/harshsandhu44/bandzen/compare/app@1.11.1...app@1.12.0) (2026-09-15)
 
 
