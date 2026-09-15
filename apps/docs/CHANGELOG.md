@@ -1,3 +1,10 @@
+# docs [0.7.0](https://github.com/harshsandhu44/bandzen/compare/docs@0.6.0...docs@0.7.0) (2026-09-15)
+
+
+### Features
+
+* **exams:** exam-aware scoring, AI evaluation and result reporting ([#106](https://github.com/harshsandhu44/bandzen/issues/106)) ([02fb36b](https://github.com/harshsandhu44/bandzen/commit/02fb36b10e02a0cbeb791ff62f5ee3c2cbdbcf53))
+
 # docs [0.6.0](https://github.com/harshsandhu44/bandzen/compare/docs@0.5.1...docs@0.6.0) (2026-09-15)
 
 
