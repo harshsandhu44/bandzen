@@ -6,7 +6,8 @@
   "exports": {
     "./types": "./src/types.ts",
     "./registry": "./src/registry.ts",
-    "./scoring": "./src/scoring.ts"
+    "./scoring": "./src/scoring.ts",
+    "./content": "./src/content.ts"
   },
   "scripts": {
     "lint": "eslint",
