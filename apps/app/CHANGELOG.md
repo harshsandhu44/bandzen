@@ -1,3 +1,10 @@
+## app [1.24.1](https://github.com/harshsandhu44/bandzen/compare/app@1.24.0...app@1.24.1) (2026-09-16)
+
+
+### Bug Fixes
+
+* **app:** correct the PTE definition against Pearson's score guide ([#124](https://github.com/harshsandhu44/bandzen/issues/124)) ([4533916](https://github.com/harshsandhu44/bandzen/commit/4533916325bf89d0347e84030993f3a5d74565fc)), closes [#122](https://github.com/harshsandhu44/bandzen/issues/122)
+
 # app [1.24.0](https://github.com/harshsandhu44/bandzen/compare/app@1.23.1...app@1.24.0) (2026-09-16)
 
 
