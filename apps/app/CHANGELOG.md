@@ -1,3 +1,10 @@
+# app [1.23.0](https://github.com/harshsandhu44/bandzen/compare/app@1.22.0...app@1.23.0) (2026-09-16)
+
+
+### Features
+
+* **exams:** PTE Academic scoring, mock and score report ([#115](https://github.com/harshsandhu44/bandzen/issues/115)) ([ff4601d](https://github.com/harshsandhu44/bandzen/commit/ff4601d5f372398b76e4f597a7c1d826f2c0566d))
+
 # app [1.22.0](https://github.com/harshsandhu44/bandzen/compare/app@1.21.0...app@1.22.0) (2026-09-16)
 
 
