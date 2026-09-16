@@ -169,6 +169,13 @@
       "when": 1789502599420,
       "tag": "0023_exam_tasks",
       "breakpoints": true
+    },
+    {
+      "idx": 24,
+      "version": "7",
+      "when": 1789520090333,
+      "tag": "0024_exam_task_responses",
+      "breakpoints": true
     }
   ]
 }
