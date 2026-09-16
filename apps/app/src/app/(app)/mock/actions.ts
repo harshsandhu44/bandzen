@@ -30,15 +30,6 @@ const PASSAGES_PER_MOCK = 3;
 const TRACKS_PER_MOCK = 4;
 
 /**
- * Items per task type in a sitting built from exam tasks.
- *
- * Pearson does not publish how many of each type a real PTE test contains, and
- * candidate reports vary, so this is a configuration rather than a claim. One
- * of each is what the QA bank can currently fill.
- */
-const ITEMS_PER_TASK_TYPE = 1;
-
-/**
  * Start (or resume) a full four-skill mock.
  *
  * Resuming is always free, same reasoning as `startWritingAttempt` — the
@@ -69,7 +60,7 @@ export async function startMock() {
     if (!cap.allowed) redirect('/upgrade?from=mock_wall');
 
     const published = await listPublishedExamTasks(exam.key);
-    const taskIds = composeSitting(exam, published, ITEMS_PER_TASK_TYPE);
+    const { taskIds } = composeSitting(exam, published);
     if (!taskIds.length) notFound();
 
     const sitting = await createExamTaskSitting({

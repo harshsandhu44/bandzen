@@ -16,6 +16,7 @@ export const DET = {
   name: 'Duolingo English Test',
   version: '2025-07-01',
   source: 'https://englishtest.duolingo.com/scores',
+  duration: 'About 1 hr',
   variants: [],
   scoreScale: { label: 'Score', min: 10, max: 160, step: 5 },
   targetRange: { min: 60, max: 160, step: 10 },

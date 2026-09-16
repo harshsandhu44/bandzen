@@ -9,6 +9,7 @@ import {
   type ExamDefinition,
   type ExamKey,
   type ScoreScale,
+  type SectionDefinition,
   type Skill,
   type TaskDefinition,
 } from './types.ts';
@@ -67,7 +68,27 @@ export function timeLimitSeconds(
     return task.timing.prepSeconds + task.timing.responseSeconds;
   }
   const minutes = exam.sections.find((s) => s.key === task.section)?.minutes;
-  return minutes == null ? null : minutes * 60;
+  // The longest the section can run. A candidate cut short by the shorter
+  // version of a test would be cut short by us too, which is the worse error.
+  return minutes == null ? null : minutes.max * 60;
+}
+
+/** "30 min", or "23-30 min" where the board publishes a range. */
+export function sectionMinutesLabel(section: SectionDefinition): string | null {
+  const m = section.minutes;
+  if (!m) return null;
+  return m.min === m.max ? `${m.max} min` : `${m.min}\u2013${m.max} min`;
+}
+
+/**
+ * The shortest sitting the real format can be, in items.
+ *
+ * The minimum rather than the mean, because it is the number a sitting has to
+ * reach before calling itself full-length. Zero for an exam that declares no
+ * counts, which is every exam but PTE.
+ */
+export function fullLengthItems(exam: ExamDefinition): number {
+  return exam.tasks.reduce((total, t) => total + (t.items?.min ?? 0), 0);
 }
 
 /** The sign-up target choices, low to high, as numbers. */
@@ -128,8 +149,11 @@ export function validateDefinition(exam: ExamDefinition): string[] {
     if (sectionKeys.has(s.key))
       problems.push(`section "${s.key}" is declared twice`);
     sectionKeys.add(s.key);
-    if (s.minutes != null && !(s.minutes > 0)) {
-      problems.push(`section "${s.key}" has a non-positive length`);
+    if (
+      s.minutes != null &&
+      !(0 < s.minutes.min && s.minutes.min <= s.minutes.max)
+    ) {
+      problems.push(`section "${s.key}" has an impossible length`);
     }
   }
 
@@ -157,6 +181,9 @@ export function validateDefinition(exam: ExamDefinition): string[] {
       (t.timing.prepSeconds < 0 || !(t.timing.responseSeconds > 0))
     ) {
       problems.push(`task "${t.key}" has an impossible time window`);
+    }
+    if (t.items && !(0 < t.items.min && t.items.min <= t.items.max)) {
+      problems.push(`task "${t.key}" has an impossible item count`);
     }
     if (t.audio) {
       if (!Number.isInteger(t.audio.plays) || t.audio.plays < 1) {

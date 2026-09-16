@@ -1,4 +1,9 @@
-import { getExam, getTask, type ExamDefinition } from '@bandzen/exams/registry';
+import {
+  fullLengthItems,
+  getExam,
+  getTask,
+  type ExamDefinition,
+} from '@bandzen/exams/registry';
 import type { Skill } from './db/schema';
 
 /**
@@ -17,37 +22,47 @@ export type PublishedTask = {
 };
 
 /**
- * The items a sitting will run, in the exam's own order.
+ * The items a sitting will run, in the exam's own order, and how many the real
+ * format asks for.
  *
  * Task types come in the order the exam declares them, which is the order the
- * real test runs them in, and each contributes up to `perType` items. Pearson
- * does not publish how many of each type a real PTE sitting contains — the
- * counts reported by candidates vary — so this is deliberately a
- * configuration, not a claim.
+ * real test runs them in, and each contributes as many items as the exam's
+ * definition says that type carries — `items.min`, the shortest a real sitting
+ * can be. A type with too little published contributes what there is.
+ *
+ * `demanded` comes back alongside so the caller can say how long the sitting
+ * actually is rather than claim a full-length test. Nothing here decides that:
+ * the numbers are a fact about the sitting, and the label is a fact about the
+ * numbers.
  */
 export function composeSitting(
   exam: ExamDefinition,
   published: readonly PublishedTask[],
-  perType: number,
-): string[] {
+): { taskIds: string[]; demanded: number } {
   const byType = new Map<string, PublishedTask[]>();
   for (const task of published) {
     byType.set(task.taskType, [...(byType.get(task.taskType) ?? []), task]);
   }
-  return exam.tasks.flatMap((definition) =>
-    (byType.get(definition.key) ?? []).slice(0, perType).map((t) => t.id),
-  );
+  return {
+    taskIds: exam.tasks.flatMap((definition) =>
+      (byType.get(definition.key) ?? [])
+        .slice(0, definition.items?.min ?? 1)
+        .map((t) => t.id),
+    ),
+    demanded: fullLengthItems(exam),
+  };
 }
 
 /**
  * The skill a task type is sat under.
  *
  * Deliberately NOT the first skill the task measures: PTE's tasks are
- * integrated, so Read Aloud measures reading and speaking, and filing it under
- * reading would sit a spoken task in the Reading part. What decides it is the
- * section the task belongs to — and where that section covers two skills, as
- * PTE's Speaking & Writing does, the task's own response says which half of it
- * this is. Spoken answers are Speaking; written ones are Writing.
+ * integrated, so Repeat Sentence measures listening and speaking, and filing
+ * it under listening would sit a spoken task in the Listening part. What
+ * decides it is the section the task belongs to — and where that section
+ * covers two skills, as PTE's Speaking & Writing does, the task's own response
+ * says which half of it this is. Spoken answers are Speaking; written ones are
+ * Writing.
  */
 export function skillForTaskType(
   examKey: string,

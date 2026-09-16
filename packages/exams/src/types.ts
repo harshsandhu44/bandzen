@@ -100,12 +100,21 @@ export type ScoreScale = {
   step: number;
 };
 
+/**
+ * How long a section runs. A range because most boards publish one: PTE's
+ * Reading is 23-30 minutes depending on which version of the test you get.
+ * `min` and `max` are equal where the length is fixed, as IELTS's are.
+ *
+ * Deliberately never summed into a test length — see `ExamDefinition.duration`.
+ */
+export type SectionMinutes = { min: number; max: number };
+
 export type SectionDefinition = {
   key: string;
   label: string;
   skills: readonly Skill[];
   /** Null where the section is adaptive and its length varies. */
-  minutes: number | null;
+  minutes: SectionMinutes | null;
 };
 
 export type TaskDefinition = {
@@ -123,6 +132,12 @@ export type TaskDefinition = {
    * passage is.
    */
   words?: { min: number; max: number };
+  /**
+   * How many items of this type a real sitting contains, as the board
+   * publishes it. Absent where it does not: IELTS fixes its content in its own
+   * tables, and an adaptive exam has no fixed count.
+   */
+  items?: { min: number; max: number };
   measuredSkills: readonly Skill[];
   renderer: RendererKey;
   evaluator: EvaluatorKey;
@@ -133,8 +148,17 @@ export type ExamDefinition = {
   name: string;
   /** The format version new attempts are stamped with. See `exam_version`. */
   version: string;
-  /** Where the structure was taken from. */
+  /** Where the structure was taken from. The board's own specification. */
   source: string;
+  /**
+   * How long the whole test takes, in the board's own words.
+   *
+   * Carried rather than derived because the sections do not add up to it:
+   * Pearson balances versions for total length, so the published ranges
+   * deliberately over- and under-shoot, and summing them invents a number the
+   * board never states.
+   */
+  duration: string;
   /** IELTS Academic/General; empty for exams without variants. */
   variants: readonly { key: string; label: string }[];
   scoreScale: ScoreScale;

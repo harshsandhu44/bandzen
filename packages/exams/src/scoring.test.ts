@@ -32,12 +32,19 @@ test('formatting follows the step, not the word band', () => {
 });
 
 test('a task contributes to every skill it measures', () => {
+  // Repeat Sentence is one of PTE's integrated types: the score guide credits
+  // it to Listening and Speaking both.
   assert.deepEqual(
-    measuredSkillsFor('pte_academic', 'read_aloud', 'speaking'),
+    measuredSkillsFor('pte_academic', 'repeat_sentence', 'speaking'),
     [
-      { skill: 'reading', weight: 0.5 },
+      { skill: 'listening', weight: 0.5 },
       { skill: 'speaking', weight: 0.5 },
     ],
+  );
+  // Read Aloud is not, whatever its name suggests — Speaking only.
+  assert.deepEqual(
+    measuredSkillsFor('pte_academic', 'read_aloud', 'speaking'),
+    [{ skill: 'speaking', weight: 1 }],
   );
   // An IELTS attempt-level unit is not a task definition: its module counts.
   assert.deepEqual(measuredSkillsFor('ielts', 'reading_passage', 'reading'), [

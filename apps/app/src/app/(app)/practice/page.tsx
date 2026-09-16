@@ -15,11 +15,13 @@ import {
   isPro,
   latestDiagnostic,
   latestOpenMock,
+  listPublishedExamTasks,
 } from '@/lib/db/queries';
 import { canStartDiagnostic } from '@/lib/entitlements';
+import { composeSitting } from '@/lib/exam-sitting';
 import { nextPracticeStep, practiceOverview } from '@/lib/practice';
 import { MODULE_LABEL } from '@/lib/modules';
-import { DIAGNOSTIC_DURATION_LABEL, MOCK_DURATION_LABEL } from '@/lib/timing';
+import { DIAGNOSTIC_DURATION_LABEL } from '@/lib/timing';
 
 export const metadata = { title: 'Practice' };
 
@@ -57,14 +59,21 @@ export default async function PracticePage() {
     );
   }
 
-  const [overview, next, diagnostic, taken, pro, openMock] = await Promise.all([
-    practiceOverview(userId, exam),
-    nextPracticeStep(userId),
-    latestDiagnostic(userId),
-    diagnosticCount(userId),
-    isPro(userId),
-    latestOpenMock(userId),
-  ]);
+  const [overview, next, diagnostic, taken, pro, openMock, published] =
+    await Promise.all([
+      practiceOverview(userId, exam),
+      nextPracticeStep(userId),
+      latestDiagnostic(userId),
+      diagnosticCount(userId),
+      isPro(userId),
+      latestOpenMock(userId),
+      exam.key === 'ielts' ? [] : listPublishedExamTasks(exam.key),
+    ]);
+
+  // Same reckoning as `/mock`: a sitting composed from task items is only a
+  // full mock if the bank can fill the format. See `composeSitting`.
+  const mock = composeSitting(exam, published);
+  const shortMock = mock.taskIds.length < mock.demanded;
 
   const canRetake = canStartDiagnostic({ isPro: pro, taken });
 
@@ -193,18 +202,21 @@ export default async function PracticePage() {
 
         <article className="mt-3 border border-border">
           <div className="border-b border-border px-5 py-4">
-            <h3 className="font-title text-title">Full mock test</h3>
+            <h3 className="font-title text-title">
+              {shortMock ? 'Short mock test' : 'Full mock test'}
+            </h3>
             <p className="mt-1 max-w-prose text-sm text-muted-foreground text-pretty">
-              All four skills, back to back, in real IELTS order and real IELTS
-              lockstep — the closest this app gets to exam day.{' '}
+              {shortMock
+                ? `${mock.taskIds.length} questions against the real ${exam.name}'s ${mock.demanded}, in the exam's own order and lockstep.`
+                : `All four skills, back to back, in real ${exam.name} order and real ${exam.name} lockstep — the closest this app gets to exam day.`}{' '}
               {!pro ? 'Pro.' : null}
             </p>
           </div>
 
           <dl className="grid grid-cols-2 divide-x divide-y divide-border border-b border-border sm:grid-cols-4 sm:divide-y-0">
             {[
-              ['Sections', 'Listening · Reading · Writing · Speaking'],
-              ['Duration', MOCK_DURATION_LABEL],
+              ['Sections', exam.sections.map((x) => x.label).join(' · ')],
+              ['Duration', exam.duration],
               ['Difficulty', 'Full exam pace'],
               ['Status', openMock ? 'In progress' : 'Not started'],
             ].map(([label, value]) => (

@@ -1,4 +1,8 @@
-import { getExam, scoreScaleFor } from '@bandzen/exams/registry';
+import {
+  fullLengthItems,
+  getExam,
+  scoreScaleFor,
+} from '@bandzen/exams/registry';
 import { notFound } from 'next/navigation';
 import { requireUserId } from '@/lib/auth';
 import {
@@ -36,6 +40,10 @@ export default async function MockResultPage({
           sections={taskSitting.sections}
           scale={scoreScaleFor(taskSitting.mock.examKey)}
           target={profile?.targetScore ?? null}
+          items={{
+            sat: taskSitting.mock.taskIds?.length ?? 0,
+            full: fullLengthItems(getExam(taskSitting.mock.examKey)!),
+          }}
         />
         {/* Kept below the estimate and visually apart from it: this is the one
             number here that is not a guess. */}

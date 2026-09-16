@@ -58,17 +58,22 @@ test('a task nobody marked is not a task marked zero', () => {
 });
 
 test('an integrated task counts towards every skill it measures', () => {
-  // Read Aloud measures reading and speaking, half each.
+  // Repeat Sentence is credited to listening and speaking, half each — one of
+  // the eight types the score guide scores against two skills at once.
   const fractions = pteSkillFractions([
-    graded('read_aloud', { Content: 5, 'Oral fluency': 5, Pronunciation: 5 }, [
-      { skill: 'reading', weight: 0.5 },
-      { skill: 'speaking', weight: 0.5 },
-    ]),
+    graded(
+      'repeat_sentence',
+      { Content: 5, 'Oral fluency': 5, Pronunciation: 5 },
+      [
+        { skill: 'listening', weight: 0.5 },
+        { skill: 'speaking', weight: 0.5 },
+      ],
+    ),
   ]);
-  assert.equal(fractions.reading, 1);
+  assert.equal(fractions.listening, 1);
   assert.equal(fractions.speaking, 1);
   // Nothing measured these, so they are unknown rather than zero.
-  assert.equal(fractions.listening, null);
+  assert.equal(fractions.reading, null);
   assert.equal(fractions.writing, null);
 });
 

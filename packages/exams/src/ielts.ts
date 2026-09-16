@@ -1,4 +1,4 @@
-import { task, timed } from './task.ts';
+import { mins, task, timed } from './task.ts';
 import type { ExamDefinition } from './types.ts';
 
 /**
@@ -11,6 +11,8 @@ export const IELTS = {
   name: 'IELTS',
   version: '2026',
   source: 'https://ielts.org/take-a-test/test-types/ielts-academic-test',
+  // The sitting Bandzen runs, gaps between sections included.
+  duration: 'About 2 hr 45 min',
   variants: [
     { key: 'academic', label: 'Academic' },
     { key: 'general', label: 'General Training' },
@@ -22,11 +24,26 @@ export const IELTS = {
       key: 'listening',
       label: 'Listening',
       skills: ['listening'],
-      minutes: 30,
+      minutes: mins(30),
     },
-    { key: 'reading', label: 'Reading', skills: ['reading'], minutes: 60 },
-    { key: 'writing', label: 'Writing', skills: ['writing'], minutes: 60 },
-    { key: 'speaking', label: 'Speaking', skills: ['speaking'], minutes: 14 },
+    {
+      key: 'reading',
+      label: 'Reading',
+      skills: ['reading'],
+      minutes: mins(60),
+    },
+    {
+      key: 'writing',
+      label: 'Writing',
+      skills: ['writing'],
+      minutes: mins(60),
+    },
+    {
+      key: 'speaking',
+      label: 'Speaking',
+      skills: ['speaking'],
+      minutes: mins(14),
+    },
   ],
   tasks: [
     task(

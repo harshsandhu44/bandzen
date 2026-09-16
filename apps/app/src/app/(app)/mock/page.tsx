@@ -8,10 +8,11 @@ import {
   getProfile,
   isPro,
   latestOpenMock,
+  listPublishedExamTasks,
   mockAllowance,
 } from '@/lib/db/queries';
 import { getExam } from '@bandzen/exams/registry';
-import { MOCK_DURATION_LABEL } from '@/lib/timing';
+import { composeSitting } from '@/lib/exam-sitting';
 import { startMock } from './actions';
 
 export const metadata = { title: 'Mock test' };
@@ -23,6 +24,11 @@ export const metadata = { title: 'Mock test' };
  * page comes from the exam definition rather than from a constant. Pro-only,
  * capped at one a week — see `entitlements.ts#canStartMock` for why the cap
  * applies even to Pro.
+ *
+ * An exam composed from task items says how long the sitting it would start
+ * actually is. PTE's real format is 65-85 items and the question bank cannot
+ * fill that yet, and a page that called the result a full mock anyway would be
+ * selling something it does not have.
  */
 export default async function MockPage() {
   const userId = await requireUserId();
@@ -35,14 +41,17 @@ export default async function MockPage() {
 
   const exam = getExam(profile?.examKey ?? 'ielts');
   const parts = exam?.sections.map((s) => s.label).join(' · ') ?? '';
-  const minutes =
-    exam?.sections.reduce((total, s) => total + (s.minutes ?? 0), 0) ?? 0;
-  // IELTS keeps its measured label, which includes the gaps between sections.
-  const duration =
-    exam?.key === 'ielts' || !minutes
-      ? MOCK_DURATION_LABEL
-      : `About ${Math.floor(minutes / 60)} hr ${minutes % 60} min`;
   const scoreNoun = exam?.scoreScale.label.toLowerCase() ?? 'score';
+
+  // What starting a mock right now would actually compose. IELTS picks from its
+  // own content tables and is always full length.
+  const sitting =
+    exam && exam.key !== 'ielts'
+      ? composeSitting(exam, await listPublishedExamTasks(exam.key))
+      : null;
+  const composed = sitting?.taskIds.length ?? 0;
+  const demanded = sitting?.demanded ?? 0;
+  const short = composed < demanded;
 
   if (!pro) {
     await capture(userId, 'pro_feature_locked', { surface: 'mock' });
@@ -54,15 +63,19 @@ export default async function MockPage() {
     <div className="max-w-4xl space-y-6">
       <PageHeader
         eyebrow="Timed test"
-        title="Full mock test"
-        description={`${parts}, back to back, exactly as the real test runs. One overall ${scoreNoun} at the end.`}
+        title={short ? 'Short mock test' : 'Full mock test'}
+        description={
+          short
+            ? `${parts}, back to back, in the real test's order — but ${composed} questions where the real ${exam?.name} runs ${demanded}. One overall ${scoreNoun} at the end, estimated from what you sat.`
+            : `${parts}, back to back, exactly as the real test runs. One overall ${scoreNoun} at the end.`
+        }
       />
 
       <Panel headingId="mock-heading" title="Mock test">
         <dl className="grid grid-cols-2 divide-x divide-y divide-border border-b border-border sm:grid-cols-4 sm:divide-y-0">
           {[
             ['Sections', parts],
-            ['Duration', duration],
+            ['Duration', exam?.duration ?? ''],
             ['Rules', 'No going back once a section is submitted'],
             ['Status', open ? 'In progress' : 'Not started'],
           ].map(([label, value]) => (
