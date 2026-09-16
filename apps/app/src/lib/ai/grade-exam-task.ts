@@ -69,6 +69,29 @@ export async function gradeExamTask(attemptId: string) {
     if (!task) throw new Error(`Unknown task ${taskType}`);
     const spoken = task.evaluator === 'speaking_model';
 
+    // Nothing recorded at all: the audio grader rejects a request with no
+    // audio in it (http_400), so this writes the floor directly and skips the
+    // call — the same shape `gradeSpeaking` uses for a test with no answers.
+    if (spoken && !work.items.some((i) => i.audioUrl)) {
+      gradedUserId = await writeExamTaskAssessment(attemptId, {
+        exam: attempt.examKey,
+        examVersion: attempt.examVersion,
+        taskType,
+        score: null,
+        dimensions: { Content: 0, 'Oral fluency': 0, Pronunciation: 0 },
+        measuredSkills: measuredSkillsFor(
+          attempt.examKey,
+          taskType,
+          attempt.module,
+        ),
+        strengths: [],
+        weaknesses: ['No answer was recorded for this task.'],
+        feedback: [],
+      });
+      ok = true;
+      return;
+    }
+
     const graded: Graded[] = [];
     for (const item of work.items) {
       if (spoken) {

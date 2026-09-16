@@ -5,7 +5,8 @@ import { notFound, redirect } from 'next/navigation';
 import { getExam, getTask } from '@bandzen/exams/registry';
 import { uploadObject } from '@bandzen/storage/r2';
 import { gradeExamTask } from '@/lib/ai/grade-exam-task';
-import { requireContentRole, requireUserId } from '@/lib/auth';
+import { requireUserId } from '@/lib/auth';
+import { finishSittingSection } from '@/lib/mock-guard';
 import {
   createExamTaskAttempt,
   findInProgressExamTask,
@@ -18,20 +19,15 @@ import {
 /**
  * Server actions for a task session.
  *
- * Every one re-runs `requireContentRole`. PTE is not open to students until its
- * scoring lands (#96), and a gate that only the page checks is not a gate —
- * these are POST endpoints a browser can reach directly.
- *
  * ponytail: no practice quota here yet. `practiceAllowance` counts IELTS
- * modules, and while this is staff-only there is nobody to meter. #96 opens it
- * to students and is where the entitlement check belongs.
+ * modules by name, so metering these needs a per-exam allowance rather than a
+ * fourth hardcoded module. Sittings are already metered by `mockAllowance`.
  */
 
 /** Items in one practice session. Real PTE sections are longer; #96 sizes them. */
 const ITEMS_PER_SESSION = 3;
 
 export async function startExamTaskAttempt(formData: FormData) {
-  await requireContentRole();
   const examKey = String(formData.get('exam') ?? '');
   const taskKey = String(formData.get('task') ?? '');
 
@@ -72,7 +68,6 @@ export async function saveExamTaskAnswer(input: {
   taskId: string;
   value: string;
 }) {
-  await requireContentRole();
   const userId = await requireUserId();
   await saveExamTaskResponse(userId, input.attemptId, input.taskId, {
     value: input.value,
@@ -93,7 +88,6 @@ export async function saveExamTaskAnswer(input: {
 export async function saveExamTaskRecording(
   formData: FormData,
 ): Promise<{ ok: boolean; url: string | null }> {
-  await requireContentRole();
   const userId = await requireUserId();
   const attemptId = String(formData.get('attemptId') ?? '');
   const taskId = String(formData.get('taskId') ?? '');
@@ -121,7 +115,6 @@ export async function saveExamTaskRecording(
 }
 
 export async function submitExamTaskSession(formData: FormData) {
-  await requireContentRole();
   const attemptId = String(formData.get('attemptId') ?? '');
   if (!attemptId) throw new Error('Missing attempt');
 
@@ -137,6 +130,13 @@ export async function submitExamTaskSession(formData: FormData) {
   // field, so a hand-edited form cannot send someone into another task's review.
   const attempt = await getAttempt(userId, attemptId);
   if (!attempt?.taskType) throw new Error('Attempt not found');
+
+  // A sitting section hands back to the sitting rather than to this task's
+  // review: the candidate is mid-mock, and what comes next is the next task or
+  // the next part, not a result they cannot act on yet.
+  if (attempt.mockAttemptId) {
+    await finishSittingSection(userId, attempt.mockAttemptId);
+  }
 
   redirect(
     `/practice/${attempt.examKey}/${attempt.taskType}/${attempt.id}/review`,

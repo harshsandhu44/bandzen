@@ -2,7 +2,7 @@ import { notFound } from 'next/navigation';
 import { getExam, getTask, timeLimitSeconds } from '@bandzen/exams/registry';
 import { Button } from '@bandzen/ui/components/button';
 import { Eyebrow, PageHeader, Panel } from '@/components/app/primitives';
-import { requireContentRole } from '@/lib/auth';
+import { requireUserId } from '@/lib/auth';
 import { getPublishedExamTasks } from '@/lib/db/queries';
 import { startExamTaskAttempt } from './actions';
 
@@ -11,7 +11,8 @@ export const metadata = { title: 'Practice task', robots: { index: false } };
 export default async function TaskStartPage({
   params,
 }: PageProps<'/practice/[exam]/[task]'>) {
-  await requireContentRole();
+  // Signed in, but no longer staff-only: this PR is what opens PTE to students.
+  await requireUserId();
   const { exam: examKey, task: taskKey } = await params;
 
   const exam = getExam(examKey);

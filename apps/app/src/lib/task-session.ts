@@ -57,6 +57,13 @@ export function sessionMinutes(
   task: TaskDefinition,
   count: number,
 ): number | null {
+  // A one-shot recording enforces its own preparation and response windows,
+  // and it starts them when the candidate starts — so a page countdown on top
+  // of it auto-submits the task on its own schedule. For Repeat Sentence, a
+  // fifteen-second window, that fires before anyone can begin speaking.
+  if (task.renderer === 'recording' || task.renderer === 'conversation') {
+    return null;
+  }
   if (task.timing.scope !== 'task') return null;
   const perItem = timeLimitSeconds(exam, task);
   return perItem == null ? null : (perItem * count) / 60;
