@@ -1014,6 +1014,11 @@ export async function recordOfficialScore(values: {
   examVersion: string;
   score: number;
   takenOn: string | null;
+  /** The sitting this is the truth for, already checked to be theirs. */
+  mockAttemptId?: string | null;
+  /** Bandzen's estimate for that sitting, frozen as it stood right now. */
+  estimatedScore?: number | null;
+  scoringVersion?: string | null;
 }) {
   const [row] = await db.insert(officialScores).values(values).returning({
     id: officialScores.id,
@@ -1057,6 +1062,30 @@ export async function listPublishedExamTasks(examKey: ExamKey) {
       and(eq(examTasks.examKey, examKey), eq(examTasks.status, 'published')),
     )
     .orderBy(examTasks.taskType, examTasks.slug);
+}
+
+/**
+ * The items a sitting already locked, by id, whatever their status now is.
+ *
+ * Deliberately not filtered by `published`: the sitting chose these, and
+ * unpublishing one afterwards must not shorten a test somebody is part way
+ * through. Only `startMock` cares whether a task is published, because only it
+ * is still choosing.
+ *
+ * Content, never answers — `exam_task_answers` is a separate table for exactly
+ * that reason.
+ */
+export async function getExamTasksByIds(ids: readonly string[]) {
+  if (!ids.length) return [];
+  return db
+    .select({
+      id: examTasks.id,
+      slug: examTasks.slug,
+      taskType: examTasks.taskType,
+      section: examTasks.section,
+    })
+    .from(examTasks)
+    .where(inArray(examTasks.id, [...ids]));
 }
 
 /**
