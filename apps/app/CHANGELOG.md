@@ -1,3 +1,10 @@
+# app [1.19.0](https://github.com/harshsandhu44/bandzen/compare/app@1.18.0...app@1.19.0) (2026-09-16)
+
+
+### Features
+
+* **app:** sit an exam task ([#111](https://github.com/harshsandhu44/bandzen/issues/111)) ([2d3916d](https://github.com/harshsandhu44/bandzen/commit/2d3916dd77fe1eb0d05ff0c5118bc06e710a519f)), closes [#93](https://github.com/harshsandhu44/bandzen/issues/93)
+
 # app [1.18.0](https://github.com/harshsandhu44/bandzen/compare/app@1.17.0...app@1.18.0) (2026-09-15)
 
 
