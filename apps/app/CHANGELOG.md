@@ -1,3 +1,10 @@
+# app [1.20.0](https://github.com/harshsandhu44/bandzen/compare/app@1.19.0...app@1.20.0) (2026-09-16)
+
+
+### Features
+
+* **app:** PTE Academic Speaking & Writing task runners ([#112](https://github.com/harshsandhu44/bandzen/issues/112)) ([0229c69](https://github.com/harshsandhu44/bandzen/commit/0229c6965b0991b643a325974bcf1b01aeea0bc4))
+
 # app [1.19.0](https://github.com/harshsandhu44/bandzen/compare/app@1.18.0...app@1.19.0) (2026-09-16)
 
 
