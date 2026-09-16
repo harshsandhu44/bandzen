@@ -200,11 +200,9 @@ export async function confirmCheckout(
     { plan: 'pro' },
   );
 
-  // The sidebar block, every meter and every locked control are server
-  // rendered, so without this they stay Free until something else happens to
-  // revalidate — at the exact moment the candidate is looking for proof that
-  // their money did something.
-  revalidatePath('/', 'layout');
+  // No revalidatePath: this runs during `/upgrade/complete`'s render, where
+  // Next throws on it. It is not needed either — Polar returns the browser
+  // with a full page load, and the redirect to `/` renders the layout fresh.
   return { ok: true };
 }
 
