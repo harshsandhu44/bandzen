@@ -1,3 +1,10 @@
+# app [1.22.0](https://github.com/harshsandhu44/bandzen/compare/app@1.21.0...app@1.22.0) (2026-09-16)
+
+
+### Features
+
+* **app:** PTE Academic Listening task runners ([#114](https://github.com/harshsandhu44/bandzen/issues/114)) ([1685ac4](https://github.com/harshsandhu44/bandzen/commit/1685ac46054665e00157d640996064e1374e9eec))
+
 # app [1.21.0](https://github.com/harshsandhu44/bandzen/compare/app@1.20.0...app@1.21.0) (2026-09-16)
 
 
