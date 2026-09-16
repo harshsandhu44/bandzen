@@ -1,3 +1,10 @@
+# app [1.21.0](https://github.com/harshsandhu44/bandzen/compare/app@1.20.0...app@1.21.0) (2026-09-16)
+
+
+### Features
+
+* **app:** PTE Academic Reading task runners ([#113](https://github.com/harshsandhu44/bandzen/issues/113)) ([e72bee1](https://github.com/harshsandhu44/bandzen/commit/e72bee105584ec73840bdd9b11c9e065668f5e6a))
+
 # app [1.20.0](https://github.com/harshsandhu44/bandzen/compare/app@1.19.0...app@1.20.0) (2026-09-16)
 
 
