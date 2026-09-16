@@ -65,6 +65,57 @@ export default async function TaskReviewPage({
         }
       />
 
+      {/* Model-graded only: a deterministic task's dimensions are correct/total,
+          not traits out of five, and rendering them here would say 2 / 5 for
+          what was actually full marks. */}
+      {!mark && data.attempt.assessment ? (
+        <Panel headingId="grader" title="What the grader found">
+          <div className="space-y-5 text-sm">
+            <dl className="grid grid-cols-2 gap-x-6 gap-y-3 sm:grid-cols-3">
+              {Object.entries(data.attempt.assessment.dimensions).map(
+                ([name, score]) => (
+                  <div key={name}>
+                    <dt className="text-muted-foreground">{name}</dt>
+                    <dd className="font-mono tabular-nums">
+                      {score == null ? '\u2014' : `${score} / 5`}
+                    </dd>
+                  </div>
+                ),
+              )}
+            </dl>
+
+            {data.attempt.assessment.strengths.length ? (
+              <div className="space-y-1">
+                <Eyebrow>Strengths</Eyebrow>
+                <ul className="list-disc space-y-1 pl-5">
+                  {data.attempt.assessment.strengths.map((t) => (
+                    <li key={t}>{t}</li>
+                  ))}
+                </ul>
+              </div>
+            ) : null}
+
+            {data.attempt.assessment.weaknesses.length ? (
+              <div className="space-y-1">
+                <Eyebrow>To work on</Eyebrow>
+                <ul className="list-disc space-y-1 pl-5">
+                  {data.attempt.assessment.weaknesses.map((t) => (
+                    <li key={t}>{t}</li>
+                  ))}
+                </ul>
+              </div>
+            ) : null}
+
+            {data.attempt.assessment.feedback.map((f, i) => (
+              <div key={i} className="border-l-2 border-border pl-4">
+                <p className="text-muted-foreground italic">“{f.quote}”</p>
+                <p>{f.comment}</p>
+              </div>
+            ))}
+          </div>
+        </Panel>
+      ) : null}
+
       {data.items.map((row, n) => {
         const marks = mark ? mark(row.answer ?? [], row.value) : null;
         return (
