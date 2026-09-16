@@ -1,3 +1,10 @@
+## app [1.25.2](https://github.com/harshsandhu44/bandzen/compare/app@1.25.1...app@1.25.2) (2026-09-16)
+
+
+### Bug Fixes
+
+* **app:** stop revalidating during the checkout confirmation render ([#129](https://github.com/harshsandhu44/bandzen/issues/129)) ([8a73517](https://github.com/harshsandhu44/bandzen/commit/8a73517f719db0a74b62c2f88faed15dacee5fd9))
+
 ## app [1.25.1](https://github.com/harshsandhu44/bandzen/compare/app@1.25.0...app@1.25.1) (2026-09-16)
 
 
