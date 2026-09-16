@@ -1,0 +1,171 @@
+[
+  {
+    "slug": "pte-sst-drainage-lecture",
+    "title": "Summarize Spoken Text: urban drainage",
+    "examKey": "pte_academic",
+    "examVersion": "2025-08-07",
+    "taskType": "summarize_spoken_text",
+    "prompt": "You will hear a short lecture. Write a summary for a fellow student who was not present. You should write 50-70 words. You have 10 minutes to finish this task.",
+    "stimulus": {
+      "audioUrl": "https://pub-fbae5ca09eba4fd0820da2b390dd7ca0.r2.dev/exam-tasks/pte-sst-drainage-lecture.mp3"
+    },
+    "transcript": "Drainage is the part of a city nobody photographs. For a century the answer to rainfall was to move it away as fast as possible, through pipes sized for the storms of the day. Two things have since changed. Storms are heavier, and the surfaces above the pipes are harder, so more of the rain arrives at once. The current thinking reverses the old instinct: instead of speeding water away, slow it down where it falls, with permeable paving, planted verges and, where there is room, open water.",
+    "difficulty": 4
+  },
+  {
+    "slug": "pte-listening-mcma-drainage",
+    "title": "Multiple answers: drainage design",
+    "examKey": "pte_academic",
+    "examVersion": "2025-08-07",
+    "taskType": "listening_multiple_choice_multiple",
+    "prompt": "Listen to the recording and answer the question by selecting all the correct responses. You will need to select more than one response.",
+    "stimulus": {
+      "audioUrl": "https://pub-fbae5ca09eba4fd0820da2b390dd7ca0.r2.dev/exam-tasks/pte-listening-mcma-drainage.mp3"
+    },
+    "transcript": "The difficulty with older drainage is not only the size of the pipes. It is that the surfaces feeding them have changed. A street that was gravel and garden fifty years ago may now be entirely sealed, so rain that once soaked away arrives in the drain within minutes. Engineers therefore talk less about capacity and more about delay: permeable paving, planted verges, and storage that holds a storm for an hour until the pipes can take it.",
+    "options": [
+      "Sealed surfaces send rain to the drains faster than they once did.",
+      "The size of the pipes is the only problem with older drainage.",
+      "Delaying water is now discussed more than raw capacity.",
+      "Permeable paving and planted verges are given as examples.",
+      "Engineers have concluded that storage tanks are ineffective."
+    ],
+    "answer": [
+      "Sealed surfaces send rain to the drains faster than they once did.",
+      "Delaying water is now discussed more than raw capacity.",
+      "Permeable paving and planted verges are given as examples."
+    ],
+    "difficulty": 4
+  },
+  {
+    "slug": "pte-listening-blanks-reopened",
+    "title": "Fill in the blanks: reopened rivers",
+    "examKey": "pte_academic",
+    "examVersion": "2025-08-07",
+    "taskType": "listening_fill_in_the_blanks",
+    "prompt": "You will hear a recording. Type the missing words in each blank.",
+    "stimulus": {
+      "audioUrl": "https://pub-fbae5ca09eba4fd0820da2b390dd7ca0.r2.dev/exam-tasks/pte-listening-blanks-reopened.mp3"
+    },
+    "transcript": "Cities that reopen their rivers find the water cools nearby streets and slows flooding after heavy rain.",
+    "gapped": "Cities that reopen their rivers find the water ___ nearby streets and slows ___ after heavy ___.",
+    "answer": [
+      "cools",
+      "flooding",
+      "rain"
+    ],
+    "difficulty": 3
+  },
+  {
+    "slug": "pte-hcs-restoration-costs",
+    "title": "Highlight Correct Summary: restoration costs",
+    "examKey": "pte_academic",
+    "examVersion": "2025-08-07",
+    "taskType": "highlight_correct_summary",
+    "prompt": "You will hear a recording. Click on the paragraph that best relates to the recording.",
+    "stimulus": {
+      "audioUrl": "https://pub-fbae5ca09eba4fd0820da2b390dd7ca0.r2.dev/exam-tasks/pte-hcs-restoration-costs.mp3"
+    },
+    "transcript": "River restoration is expensive and slow, and its returns arrive over decades rather than within a term of office. That timing, more than the engineering, is what keeps most councils from attempting it. Where it has been done, the measured benefits are real but gradual: cooler streets, slower flooding, and land beside the water worth more than the road it replaced.",
+    "options": [
+      "Restoration is held back mainly by how long its benefits take to appear, rather than by engineering difficulty; where it has happened the gains are real but gradual.",
+      "Restoration is straightforward and inexpensive, which explains why so many councils have already completed such projects.",
+      "The engineering of reopening a river remains unsolved, so no measured benefits have yet been recorded anywhere.",
+      "Councils avoid restoration because residents object to losing road space, not because of any question of cost or timing."
+    ],
+    "answer": [
+      "Restoration is held back mainly by how long its benefits take to appear, rather than by engineering difficulty; where it has happened the gains are real but gradual."
+    ],
+    "difficulty": 4
+  },
+  {
+    "slug": "pte-listening-mcsa-verges",
+    "title": "Single answer: planted verges",
+    "examKey": "pte_academic",
+    "examVersion": "2025-08-07",
+    "taskType": "listening_multiple_choice_single",
+    "prompt": "Listen to the recording and answer the multiple-choice question by selecting the correct response. Only one response is correct.",
+    "stimulus": {
+      "audioUrl": "https://pub-fbae5ca09eba4fd0820da2b390dd7ca0.r2.dev/exam-tasks/pte-listening-mcsa-verges.mp3"
+    },
+    "transcript": "A planted verge is not decoration. Its soil holds a surprising volume of water during a storm and releases it slowly afterwards, which is exactly what an overloaded drain needs. The planting matters less than the depth of soil beneath it.",
+    "options": [
+      "The depth of soil matters more than what is planted in it.",
+      "Planted verges are valued mainly for how they look.",
+      "Verges release water quickly once a storm ends.",
+      "Shallow planting outperforms deep soil during storms."
+    ],
+    "answer": [
+      "The depth of soil matters more than what is planted in it."
+    ],
+    "difficulty": 3
+  },
+  {
+    "slug": "pte-smw-culvert-timeline",
+    "title": "Select Missing Word: culvert timeline",
+    "examKey": "pte_academic",
+    "examVersion": "2025-08-07",
+    "taskType": "select_missing_word",
+    "prompt": "You will hear a recording about a council decision. At the end of the recording the last word or group of words has been replaced by a beep. Select the correct option to complete the recording.",
+    "stimulus": {
+      "audioUrl": "https://pub-fbae5ca09eba4fd0820da2b390dd7ca0.r2.dev/exam-tasks/pte-smw-culvert-timeline.mp3"
+    },
+    "transcript": "The council accepted the report and agreed in principle that the culvert beneath Mill Street should be reopened. Officers were asked to prepare costings, and members were warned that, on the experience of comparable schemes elsewhere, the work would take at least three",
+    "options": [
+      "years",
+      "minutes",
+      "metres",
+      "meetings"
+    ],
+    "answer": [
+      "years"
+    ],
+    "difficulty": 3
+  },
+  {
+    "slug": "pte-hiw-open-water",
+    "title": "Highlight Incorrect Words: open water",
+    "examKey": "pte_academic",
+    "examVersion": "2025-08-07",
+    "taskType": "highlight_incorrect_words",
+    "prompt": "You will hear a recording. Below is a transcription of it. Some words in the transcription differ from what the speaker said. Please click on the words that are different.",
+    "stimulus": {
+      "audioUrl": "https://pub-fbae5ca09eba4fd0820da2b390dd7ca0.r2.dev/exam-tasks/pte-hiw-open-water.mp3"
+    },
+    "transcript": "Open water cools nearby streets and slows flooding after heavy rain.",
+    "tokens": [
+      "Open",
+      "water",
+      "warms",
+      "nearby",
+      "roads",
+      "and",
+      "slows",
+      "flooding",
+      "after",
+      "heavy",
+      "rain."
+    ],
+    "answer": [
+      "2",
+      "4"
+    ],
+    "difficulty": 3
+  },
+  {
+    "slug": "pte-wfd-lecture-nine",
+    "title": "Write from Dictation: lecture time",
+    "examKey": "pte_academic",
+    "examVersion": "2025-08-07",
+    "taskType": "write_from_dictation",
+    "prompt": "You will hear a sentence. Type the sentence in the box below exactly as you hear it. You will hear the sentence only once.",
+    "stimulus": {
+      "audioUrl": "https://pub-fbae5ca09eba4fd0820da2b390dd7ca0.r2.dev/exam-tasks/pte-wfd-lecture-nine.mp3"
+    },
+    "transcript": "The lecture on urban drainage begins at nine in the main hall.",
+    "answer": [
+      "The lecture on urban drainage begins at nine in the main hall."
+    ],
+    "difficulty": 2
+  }
+]

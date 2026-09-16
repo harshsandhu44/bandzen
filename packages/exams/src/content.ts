@@ -30,7 +30,12 @@ export type TaskContent = {
    * each one, which a single flat `options` cannot express.
    */
   gapOptions: string[][] | null;
-  /** `reorder` and `sentence_builder`: the pieces, in the order shown. */
+  /**
+   * The piece renderers: `reorder` and `sentence_builder` order them,
+   * `token_select` shows them as running text to be marked. Holding the words
+   * explicitly is what makes a selection a stable id rather than an offset
+   * into a string someone may later re-punctuate.
+   */
   tokens: string[] | null;
   /** `conversation`: the examiner's turns. */
   turns: string[] | null;
@@ -143,6 +148,9 @@ export function taskContentIssues(
   ) {
     issues.push('at least two pieces to put in order');
   }
+  if (task.renderer === 'token_select' && tokens.length < 2) {
+    issues.push('at least two words to mark');
+  }
   if (task.renderer === 'conversation' && !content.turns?.length) {
     issues.push('at least one examiner turn');
   }
@@ -171,6 +179,17 @@ export function taskContentIssues(
         !answer.every((a) => options.includes(a))
       ) {
         issues.push('answers that are among the options');
+      }
+      // A marked-words answer is the positions of the wrong words, so a key
+      // pointing past the end of the text can never be matched.
+      if (
+        task.renderer === 'token_select' &&
+        !answer.every((a) => {
+          const at = Number(a);
+          return Number.isInteger(at) && at >= 0 && at < tokens.length;
+        })
+      ) {
+        issues.push('answers that are positions in the text');
       }
       break;
     case 'gap_match': {

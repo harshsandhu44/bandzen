@@ -407,6 +407,57 @@ export function FillBlankDrag({
   );
 }
 
+/**
+ * Running text whose words can each be marked — PTE's Highlight Incorrect
+ * Words, where the transcript on screen differs from what was read out and the
+ * candidate marks every word that does not match.
+ *
+ * The answer is the positions of the marked words, not the words themselves:
+ * the same word may appear twice and only one of them be wrong. Each word is a
+ * real button with `aria-pressed`, so this works by keyboard and is announced
+ * as a toggle rather than as decorated text.
+ */
+export function TokenSelect({
+  label,
+  item,
+  value,
+  onChange,
+}: ResponseRendererProps) {
+  const tokens = item.tokens ?? [];
+  const marked = new Set(parseList(value));
+
+  const toggle = (i: number) => {
+    const next = new Set(marked);
+    const at = String(i);
+    if (next.has(at)) next.delete(at);
+    else next.add(at);
+    // Sorted numerically so the stored answer does not depend on the order
+    // the candidate happened to click in.
+    onChange(JSON.stringify([...next].sort((a, b) => Number(a) - Number(b))));
+  };
+
+  return (
+    <p aria-label={label} className="text-sm leading-9">
+      {tokens.map((word, i) => (
+        <button
+          key={i}
+          type="button"
+          aria-pressed={marked.has(String(i))}
+          onClick={() => toggle(i)}
+          className={cn(
+            'mr-1 px-1',
+            marked.has(String(i))
+              ? 'bg-primary/15 text-foreground underline decoration-primary decoration-2'
+              : 'hover:bg-muted',
+          )}
+        >
+          {word}
+        </button>
+      ))}
+    </p>
+  );
+}
+
 /** Build a sentence by picking words from a bank; pick a placed word to return it. */
 export function SentenceBuilder({
   label,
