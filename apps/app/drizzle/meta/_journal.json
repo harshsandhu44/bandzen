@@ -183,6 +183,13 @@
       "when": 1789537471728,
       "tag": "0025_pte_scoring",
       "breakpoints": true
+    },
+    {
+      "idx": 26,
+      "version": "7",
+      "when": 1789558760911,
+      "tag": "0026_drop_legacy_columns",
+      "breakpoints": true
     }
   ]
 }
