@@ -1,4 +1,5 @@
 import { Button } from '@bandzen/ui/components/button';
+import { Separator } from '@bandzen/ui/components/separator';
 import { signInWithGoogle } from '@/app/(auth)/actions';
 
 /**
@@ -24,23 +25,26 @@ async function googleEnabled() {
   }
 }
 
-/** "Continue with Google", with the divider that separates it from the form. */
+/**
+ * login-02's "Or continue with" separator and the Google button. The separator
+ * lives here rather than in the form, so a project without Google shows neither.
+ */
 export async function GoogleButton() {
   if (!(await googleEnabled())) return null;
 
   return (
-    <div className="mb-6 space-y-6">
+    <div className="flex flex-col gap-6">
+      <div className="flex items-center gap-3 text-sm text-muted-foreground">
+        <Separator className="flex-1" />
+        Or continue with
+        <Separator className="flex-1" />
+      </div>
       <form action={signInWithGoogle}>
         <Button type="submit" variant="outline" className="w-full gap-2">
           <GoogleMark />
           Continue with Google
         </Button>
       </form>
-      <div className="flex items-center gap-3 text-xs text-muted-foreground">
-        <span className="h-px flex-1 bg-border" />
-        or with email
-        <span className="h-px flex-1 bg-border" />
-      </div>
     </div>
   );
 }

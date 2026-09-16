@@ -33,14 +33,15 @@ export async function currentUser() {
     data: { user },
   } = await supabase.auth.getUser();
   if (!user) return null;
-  // Email sign-up writes `first_name`; Google writes `full_name`, whose first
-  // word is the closest thing it offers.
+  // Sign-up and Google both write `full_name`; the greeting uses its first
+  // word. `first_name` is what sign-up wrote before that, kept for those
+  // accounts.
   const meta = user.user_metadata ?? {};
   const name =
-    typeof meta.first_name === 'string' && meta.first_name
-      ? meta.first_name
-      : typeof meta.full_name === 'string'
-        ? meta.full_name.trim().split(/\s+/)[0]
+    typeof meta.full_name === 'string' && meta.full_name.trim()
+      ? meta.full_name.trim().split(/\s+/)[0]
+      : typeof meta.first_name === 'string'
+        ? meta.first_name
         : '';
   return { id: user.id, email: user.email ?? null, firstName: name || null };
 }

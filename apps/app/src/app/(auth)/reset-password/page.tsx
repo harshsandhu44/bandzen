@@ -10,22 +10,21 @@ export const metadata = { title: 'Set a new password' };
  */
 export default function ResetPasswordPage() {
   return (
-    <div className="space-y-4">
-      <h1 className="text-lg">Set a new password</h1>
-      <AuthForm
-        action={updatePassword}
-        submitLabel="Save and continue"
-        pendingLabel="Saving…"
-        fields={[
-          {
-            name: 'password',
-            label: 'New password',
-            type: 'password',
-            autoComplete: 'new-password',
-            hint: 'At least 8 characters.',
-          },
-        ]}
-      />
-    </div>
+    <AuthForm
+      action={updatePassword}
+      title="Set a new password"
+      description="You'll be signed in once it's saved."
+      submitLabel="Save and continue"
+      pendingLabel="Saving…"
+      fields={[
+        {
+          name: 'password',
+          label: 'New password',
+          type: 'password',
+          autoComplete: 'new-password',
+          hint: 'At least 8 characters.',
+        },
+      ]}
+    />
   );
 }

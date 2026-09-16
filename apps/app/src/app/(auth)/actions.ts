@@ -54,6 +54,10 @@ export async function signUp(
   data: FormData,
 ): Promise<AuthState> {
   const password = String(data.get('password') ?? '');
+  const fullName = read(data, 'fullName');
+  if (!fullName) {
+    return { error: 'Enter your name.', email: read(data, 'email') };
+  }
   if (password.length < 8) {
     return {
       error: 'Use at least 8 characters for your password.',
@@ -67,10 +71,9 @@ export async function signUp(
     password,
     options: {
       emailRedirectTo: `${await origin()}/auth/callback`,
-      // The dashboard greets candidates by name. Optional, because a blank
-      // greeting is a smaller cost than a field standing between someone and
-      // their first practice.
-      data: { first_name: read(data, 'firstName') || null },
+      // `full_name` is the key Google writes too, so one read in
+      // `currentUser()` greets both kinds of account by name.
+      data: { full_name: fullName },
     },
   });
   if (error) return { error: error.message, email: read(data, 'email') };
