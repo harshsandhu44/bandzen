@@ -4,7 +4,7 @@ The Bandzen product app (port 3002). Deploys to `app.bandzen.com` as its own
 Vercel project with root directory `apps/app`; `apps/web` stays a separate,
 static deployment.
 
-**Stack:** Clerk (auth) · Neon (Postgres) · Drizzle (schema, migrations, types)
+**Stack:** Supabase Auth · Supabase Postgres · Drizzle (schema, migrations, types)
 · OpenAI (essay grading, Bandzen Coach, offline content generation) · Zod
 (form input and model output).
 
@@ -19,17 +19,18 @@ vars, prod schema, error monitoring, a live payment) is done; see #46.
 
 ## Setup
 
-1. Create a Neon project and a Clerk application, then `cp .env.example .env.local`
-   and fill in the keys.
-2. In Clerk: sign-up mode is **Public** — nothing to configure.
-3. In Clerk: enable Google under **User & Authentication → Social Connections**
-   (custom credentials for production — see Clerk's Google guide), then add
-   `/sign-in` and `/signup` as the sign-in/sign-up paths. `<SignIn/>`/`<SignUp/>`
-   render whatever's enabled here; no app code changes with it.
-4. `pnpm db:migrate` to create the schema.
-5. `pnpm content:generate` → review the JSON in `content/passages/` by hand →
+1. With Docker running, `pnpm db:start` from the repo root. It starts Postgres
+   and Supabase Auth locally and prints the keys; the stack is defined by
+   `supabase/config.toml`, so there is no dashboard step.
+2. `cp .env.example .env.local`. The Supabase values in it are the local
+   stack's, which are the same on every machine; paste the printed anon key.
+3. `pnpm db:reset` from the repo root: an empty database, every Drizzle
+   migration, then all three content seeds. Run it again any time you want a
+   clean slate — it destroys local data.
+4. To regenerate content instead of using the committed seeds:
+   `pnpm content:generate` → review the JSON in `content/passages/` by hand →
    `pnpm content:sql` → `pnpm db:seed`.
-6. In Polar: create two products (Monthly, and 3 months as a monthly interval
+5. In Polar: create two products (Monthly, and 3 months as a monthly interval
    with a count of 3), each priced in INR, USD, GBP and EUR; set the
    organisation's tax behaviour to **Inclusive** so the advertised price is the
    charged price. Add two fixed-amount discounts coded `FOUNDINGMONTHLY` and
@@ -39,7 +40,11 @@ vars, prod schema, error monitoring, a live payment) is done; see #46.
    subscribed to `subscription.active`, `.updated`, `.uncanceled`, `.canceled`,
    `.revoked` and `order.paid`. Put the product ids, the access token and the
    webhook secret in `.env.local`.
-7. `pnpm dev` from the repo root.
+6. `pnpm dev` from the repo root.
+
+Emails the local stack sends — password resets, and confirmations if they are
+turned on — never leave the machine; read them in Mailpit at
+http://127.0.0.1:54324. Studio is at http://127.0.0.1:54323.
 
 | Command                   | What it does                                      |
 | ------------------------- | ------------------------------------------------- |
@@ -56,7 +61,7 @@ vars, prod schema, error monitoring, a live payment) is done; see #46.
 
 ## Access model
 
-Sign-up is open in Clerk — anyone can create an account. What they get once in
+Sign-up is open — anyone can create an account with an email and password. What they get once in
 is decided by `subscriptions`: **`isPro` is `current_period_end > now()`**, one
 date comparison, and everything falls out of it. A cancellation keeps the period
 already paid for because cancelling does not move the date; a failed renewal
@@ -86,11 +91,12 @@ numbers is what it is.
 
 [pricing]: https://www.notion.so/3cf5047e85f78107856fe3abd65b7c14
 
-`src/proxy.ts` hydrates the session and deliberately does **not** gate routes.
-Clerk dropped `createRouteMatcher` because middleware protection relies on path
-matching, which can diverge from how Next actually routes a request and leave a
+`src/proxy.ts` refreshes the session and deliberately does **not** gate routes.
+It cannot be removed: an access token can only be rotated by a request that can
+still write cookies, which a server component cannot. It does not gate because
+middleware protection relies on path matching, which can diverge from how Next actually routes a request and leave a
 protected resource reachable. So the gate is at each resource instead: every
-page calls `requireUserId()`, `/api/coach` calls `auth()`, and `/api/polar`
+page calls `requireUserId()`, `/api/coach` calls `currentUser()`, and `/api/polar`
 verifies a Standard Webhooks signature because its caller is Polar rather than
 a person.
 
@@ -137,9 +143,11 @@ nothing else: the next activity re-reads the whole log and writes with
 
 ## Where isolation lives — read this before adding a query
 
-There is no row-level security. Clerk owns identity, Neon is a plain Postgres,
-and the browser holds **no** database credentials at all — every read and write
-goes through server code.
+There is no row-level security. Supabase Auth owns identity, and Postgres is
+used as plain Postgres: the browser holds **no** database credentials, and
+migration `0029_supabase_auth_bridge` revokes every `public` table from the
+`anon` and `authenticated` roles, so the Supabase REST API cannot reach them
+either. Every read and write goes through server code.
 
 That means one rule, and it is not optional:
 
@@ -287,17 +295,17 @@ exception rather than a precedent:
 - **`POST /api/polar`**, because the caller is Polar rather than a signed-in
   person. There is no session to read, and the webhook signature is over the
   raw request body, which a server action never receives. It authenticates with
-  `validateEvent` and resolves the user from `customer.external_id` — the Clerk
+  `validateEvent` and resolves the user from `customer.external_id` — the user
   id we set ourselves when the checkout was created, never one the payload is
   trusted to assert.
 
 Checkout deliberately did **not** add a third. Paying happens on Polar's hosted
 page; they come back to `/upgrade/complete`, which is an ordinary page with the
 ordinary `requireUserId()` gate, and it reads the checkout back from Polar
-before granting anything. A route handler could not have read the Clerk session
+before granting anything. A route handler could not have read the session
 that guard depends on without duplicating the whole gate.
 
-It is not a precedent. It authenticates itself with `auth()` like every page
+It is not a precedent. It authenticates itself like every page
 does, and it assembles what the model is told about the candidate server-side
 from their own rows, so nothing the client sends can widen what Coach sees. If
 you are about to add a second handler, check first whether an action would do.
@@ -333,11 +341,11 @@ TypeScript arrays until then, on the reasoning that a wording fix should be a
 diff rather than a migration — which stopped holding the moment someone without
 a checkout needed to make one.
 
-| Kind                                              | Lives in                     | Edited by                          |
-| ------------------------------------------------- | ---------------------------- | ---------------------------------- |
-| Passages, questions, answer keys, writing prompts | Neon, seeded from `content/` | `apps/admin`, or the seed pipeline |
-| Lessons, resources                                | Neon                         | `apps/admin`                       |
-| Lesson completion                                 | Neon (`lesson_progress`)     | the candidate                      |
+| Kind                                              | Lives in                         | Edited by                          |
+| ------------------------------------------------- | -------------------------------- | ---------------------------------- |
+| Passages, questions, answer keys, writing prompts | Postgres, seeded from `content/` | `apps/admin`, or the seed pipeline |
+| Lessons, resources                                | Postgres                         | `apps/admin`                       |
+| Lesson completion                                 | Postgres (`lesson_progress`)     | the candidate                      |
 
 **`src/content/lessons.ts` and `resources.ts` are adapters, not content.** They
 read published rows through `@bandzen/db/queries` and map them to the shape the
