@@ -4,11 +4,15 @@ import type {
   ResponseType,
   Skill,
   Stimulus,
+  TaskAudioPolicy,
   TaskDefinition,
   TimingRule,
 } from './types.ts';
 
 export const SECTION_TIMED: TimingRule = { scope: 'section' };
+
+/** Plays once, starts itself: every PTE audio task, and most of TOEFL's. */
+export const ONE_PLAY: TaskAudioPolicy = { plays: 1, autoplay: true };
 
 export const timed = (
   prepSeconds: number,
@@ -30,6 +34,7 @@ export function task(
   evaluator: EvaluatorKey,
   measuredSkills: readonly Skill[],
   timing: TimingRule = SECTION_TIMED,
+  audio?: TaskAudioPolicy,
 ): TaskDefinition {
   return {
     key,
@@ -38,6 +43,7 @@ export function task(
     stimulus,
     response,
     timing,
+    ...(audio ? { audio } : {}),
     measuredSkills,
     renderer,
     evaluator,

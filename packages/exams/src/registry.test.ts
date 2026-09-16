@@ -152,3 +152,45 @@ test('invalid definitions are reported, not accepted', () => {
   has('measures no known skill');
   has('impossible time window');
 });
+
+test('every PTE audio task plays once and starts itself', () => {
+  const pte = getExam('pte_academic')!;
+  for (const task of pte.tasks) {
+    const shows = task.stimulus === 'audio' || task.stimulus === 'mixed';
+    const where = `pte_academic/${task.key}`;
+    if (!shows) {
+      assert.equal(task.audio, undefined, `${where} has audio it never shows`);
+      continue;
+    }
+    assert.deepEqual(
+      task.audio,
+      { plays: 1, autoplay: true },
+      `${where} must be single-play`,
+    );
+  }
+});
+
+test('an impossible audio policy is reported', () => {
+  const base = getExam('pte_academic')!;
+  const broken: ExamDefinition = {
+    ...base,
+    tasks: [
+      { ...base.tasks[0]!, key: 'silent', audio: { plays: 0, autoplay: true } },
+      {
+        ...base.tasks[0]!,
+        key: 'unheard',
+        stimulus: 'text',
+        audio: { plays: 1, autoplay: true, startDelaySeconds: -3 },
+      },
+    ],
+  };
+  const problems = validateDefinition(broken);
+  const has = (fragment: string) =>
+    assert.ok(
+      problems.some((p) => p.includes(fragment)),
+      `expected "${fragment}" in ${JSON.stringify(problems)}`,
+    );
+  has('allows no plays');
+  has('has an audio policy but shows no audio');
+  has('starts its audio before it begins');
+});

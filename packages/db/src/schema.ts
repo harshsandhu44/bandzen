@@ -761,6 +761,38 @@ export const attemptAnswers = pgTable(
   ],
 );
 
+/**
+ * One candidate answer to one exam task — every exam but IELTS, whose answers
+ * stay in `attempt_answers` keyed by its own `questions` table.
+ *
+ * The shape mirrors `attempt_answers` deliberately, including having no
+ * `user_id` of its own: every writer must verify ownership through the attempt
+ * first, exactly as `saveAnswer` does. `value` is what the renderer reports —
+ * a JSON array when the answer has several parts — and `audio_url` is the
+ * uploaded take for a recording task, never a browser object URL.
+ */
+export const examTaskResponses = pgTable(
+  'exam_task_responses',
+  {
+    attemptId: uuid('attempt_id')
+      .notNull()
+      .references(() => attempts.id, { onDelete: 'cascade' }),
+    taskId: uuid('task_id')
+      .notNull()
+      .references(() => examTasks.id, { onDelete: 'cascade' }),
+    value: text('value'),
+    audioUrl: text('audio_url'),
+    flagged: boolean('flagged').notNull().default(false),
+    updatedAt: timestamp('updated_at', { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+  },
+  (t) => [
+    primaryKey({ columns: [t.attemptId, t.taskId] }),
+    index('exam_task_responses_task_idx').on(t.taskId),
+  ],
+);
+
 export const essays = pgTable('essays', {
   attemptId: uuid('attempt_id')
     .primaryKey()
@@ -1115,6 +1147,7 @@ export type Report = typeof reports.$inferSelect;
 export type Profile = typeof profiles.$inferSelect;
 export type ExamEnrollment = typeof examEnrollments.$inferSelect;
 export type ExamTask = typeof examTasks.$inferSelect;
+export type ExamTaskResponse = typeof examTaskResponses.$inferSelect;
 export type LessonProgress = typeof lessonProgress.$inferSelect;
 export type Award = typeof awards.$inferSelect;
 export type Subscription = typeof subscriptions.$inferSelect;

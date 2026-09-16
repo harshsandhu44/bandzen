@@ -26,7 +26,11 @@ import {
   windowStart,
 } from '@/lib/entitlements';
 import { isAnswerCorrect, readingBand } from '@/lib/grading';
-import { modelAssessment, objectiveAssessment } from '@bandzen/exams/scoring';
+import {
+  evaluatorFor,
+  modelAssessment,
+  objectiveAssessment,
+} from '@bandzen/exams/scoring';
 import { preparationWrites, type PreparationValues } from '@/lib/enrollment';
 import { union } from 'drizzle-orm/pg-core';
 import { db } from './index';
@@ -38,6 +42,9 @@ import {
   coachMessages,
   essays,
   examEnrollments,
+  examTaskAnswers,
+  examTaskResponses,
+  examTasks,
   lessonProgress,
   listeningTracks,
   mockAttempts,
@@ -64,6 +71,7 @@ import {
 export {
   DIFFICULTY_RANGE,
   getPublishedExamTask,
+  getPublishedExamTasks,
   listLessonProgress,
   listPassages,
   listSpeakingTests,
@@ -967,6 +975,227 @@ export async function createAttempt(values: {
     await db.insert(essays).values({ attemptId: row.id }).onConflictDoNothing();
   }
   return row;
+}
+
+// ---------------------------------------------------------------------------
+// Exam tasks
+//
+// Every exam but IELTS, whose Reading/Listening answers stay in
+// `attempt_answers` against its own `questions` table. These four functions are
+// the whole persistence leg: create, load, save, submit.
+// ---------------------------------------------------------------------------
+
+/**
+ * Start a session over `taskIds` of one task type.
+ *
+ * The chosen items are written as empty response rows up front, and that is
+ * deliberate: it is what locks the item set in. Without it a refresh would
+ * re-pick from a bank that may have grown, and the candidate would find a
+ * different test than the one they started.
+ */
+export async function createExamTaskAttempt(values: {
+  userId: string;
+  examKey: ExamKey;
+  examVersion: string;
+  taskType: string;
+  module: Skill;
+  taskIds: string[];
+  mockAttemptId?: string;
+}) {
+  const [row] = await db
+    .insert(attempts)
+    .values({
+      userId: values.userId,
+      module: values.module,
+      kind: values.mockAttemptId ? 'mock' : 'practice',
+      examKey: values.examKey,
+      examVersion: values.examVersion,
+      taskType: values.taskType,
+      mockAttemptId: values.mockAttemptId,
+    })
+    .returning({ id: attempts.id });
+  if (!row) throw new Error('Could not create attempt');
+
+  if (values.taskIds.length) {
+    await db
+      .insert(examTaskResponses)
+      .values(values.taskIds.map((taskId) => ({ attemptId: row.id, taskId })))
+      .onConflictDoNothing();
+  }
+  return row;
+}
+
+/**
+ * An exam-task attempt as its runner needs it: the items in their locked
+ * order, with the answers so far.
+ *
+ * Selects `exam_tasks.content` and never joins `exam_task_answers`, so the
+ * answer key and the transcript cannot reach a page an attempt is running in.
+ */
+export async function getExamTaskAttempt(userId: string, attemptId: string) {
+  const attempt = await getAttempt(userId, attemptId);
+  if (!attempt?.taskType) return null;
+
+  const items = await db
+    .select({
+      taskId: examTasks.id,
+      slug: examTasks.slug,
+      title: examTasks.title,
+      content: examTasks.content,
+      value: examTaskResponses.value,
+      audioUrl: examTaskResponses.audioUrl,
+      flagged: examTaskResponses.flagged,
+    })
+    .from(examTaskResponses)
+    .innerJoin(examTasks, eq(examTasks.id, examTaskResponses.taskId))
+    .where(eq(examTaskResponses.attemptId, attemptId))
+    .orderBy(sql`(${examTasks.content} ->> 'difficulty')::int`, examTasks.slug);
+
+  return { attempt, items };
+}
+
+/**
+ * Autosave one answer. Guarded exactly as `saveAnswer` is: the table has no
+ * `user_id` of its own, so without this check an attempt id from anywhere
+ * would be writable.
+ *
+ * The row already exists — `createExamTaskAttempt` wrote it — so this updates
+ * rather than upserts, and an id that is not part of this attempt touches
+ * nothing instead of quietly joining it.
+ */
+export async function saveExamTaskResponse(
+  userId: string,
+  attemptId: string,
+  taskId: string,
+  values: {
+    value?: string | null;
+    audioUrl?: string | null;
+    flagged?: boolean;
+  },
+) {
+  const attempt = await getAttempt(userId, attemptId);
+  if (!attempt || attempt.status !== 'in_progress') return;
+
+  await db
+    .update(examTaskResponses)
+    .set({ ...values, updatedAt: new Date() })
+    .where(
+      and(
+        eq(examTaskResponses.attemptId, attemptId),
+        eq(examTaskResponses.taskId, taskId),
+      ),
+    );
+}
+
+/**
+ * Mark and close an exam-task attempt.
+ *
+ * Only deterministic task types are marked here. PTE's nine model-graded types
+ * have no rubric yet, so they finish unscored rather than being given a number
+ * nobody computed — #93 adds the rubrics and #96 the 10–90 estimate. Either
+ * way the attempt reaches a terminal status: a row stuck on `in_progress` is a
+ * review page that never opens.
+ *
+ * The answer keys are read here, at submit time, on the server. They are
+ * joined to nothing the runner ever loads.
+ */
+export async function submitExamTaskAttempt(userId: string, attemptId: string) {
+  const [claimed] = await db
+    .update(attempts)
+    .set({ status: 'grading' })
+    .where(
+      and(ownAttempt(userId, attemptId), eq(attempts.status, 'in_progress')),
+    )
+    .returning({ id: attempts.id });
+  if (!claimed) return null;
+
+  const attempt = await getAttempt(userId, attemptId);
+  if (!attempt?.taskType) return null;
+
+  const rows = await db
+    .select({
+      value: examTaskResponses.value,
+      answer: examTaskAnswers.answer,
+    })
+    .from(examTaskResponses)
+    .leftJoin(
+      examTaskAnswers,
+      eq(examTaskAnswers.taskId, examTaskResponses.taskId),
+    )
+    .where(eq(examTaskResponses.attemptId, attemptId));
+
+  const evaluator = evaluatorFor(attempt.examKey, attempt.taskType);
+  const marked = evaluator.mark
+    ? rows.reduce(
+        (acc, row) => {
+          const { correct, total } = evaluator.mark!(
+            row.answer ?? [],
+            row.value,
+          );
+          return { correct: acc.correct + correct, total: acc.total + total };
+        },
+        { correct: 0, total: 0 },
+      )
+    : null;
+
+  const [row] = await db
+    .update(attempts)
+    .set({
+      status: 'complete',
+      submittedAt: new Date(),
+      rawScore: marked?.correct ?? null,
+      total: marked?.total ?? null,
+      // Raw marks only. Mapping them onto PTE's 10–90 scale is #96's job, and
+      // writing an IELTS band here — as `objectiveResult` still does for every
+      // other objective attempt — would be a number from the wrong exam.
+      assessment: marked
+        ? objectiveAssessment({
+            exam: attempt.examKey,
+            examVersion: attempt.examVersion,
+            taskType: attempt.taskType,
+            skill: attempt.module,
+            correct: marked.correct,
+            total: marked.total,
+            score: null,
+          })
+        : null,
+    })
+    .where(eq(attempts.id, attemptId))
+    .returning({ id: attempts.id, mockAttemptId: attempts.mockAttemptId });
+  return row ?? null;
+}
+
+/**
+ * A finished exam-task attempt, with the answer keys.
+ *
+ * The keys are the reason this is separate from `getExamTaskAttempt`: they may
+ * only be read once the attempt is over, so this refuses anything still in
+ * progress rather than leaving that to its caller to remember.
+ */
+export async function getExamTaskReview(userId: string, attemptId: string) {
+  const attempt = await getAttempt(userId, attemptId);
+  if (!attempt?.taskType || attempt.status !== 'complete') return null;
+
+  const items = await db
+    .select({
+      taskId: examTasks.id,
+      title: examTasks.title,
+      content: examTasks.content,
+      value: examTaskResponses.value,
+      audioUrl: examTaskResponses.audioUrl,
+      answer: examTaskAnswers.answer,
+      transcript: examTaskAnswers.transcript,
+    })
+    .from(examTaskResponses)
+    .innerJoin(examTasks, eq(examTasks.id, examTaskResponses.taskId))
+    .leftJoin(
+      examTaskAnswers,
+      eq(examTaskAnswers.taskId, examTaskResponses.taskId),
+    )
+    .where(eq(examTaskResponses.attemptId, attemptId))
+    .orderBy(sql`(${examTasks.content} ->> 'difficulty')::int`, examTasks.slug);
+
+  return { attempt, items };
 }
 
 // ---------------------------------------------------------------------------

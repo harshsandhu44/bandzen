@@ -1966,6 +1966,39 @@ export async function deleteExamTask(id: string) {
 }
 
 /**
+ * The published items of one task type a candidate is about to sit: the
+ * content only, for the same reason as the singular above — the answer key and
+ * the transcript live in a table this never joins, so a careless select cannot
+ * carry them into a page an attempt is running in.
+ *
+ * Ordered by difficulty so a session ramps rather than opening on its hardest
+ * item, and capped by `limit` because a task type's bank will outgrow a sitting.
+ */
+export async function getPublishedExamTasks(
+  examKey: ExamKey,
+  taskType: string,
+  limit: number,
+) {
+  return db
+    .select({
+      id: examTasks.id,
+      slug: examTasks.slug,
+      title: examTasks.title,
+      content: examTasks.content,
+    })
+    .from(examTasks)
+    .where(
+      and(
+        eq(examTasks.status, 'published'),
+        eq(examTasks.examKey, examKey),
+        eq(examTasks.taskType, taskType),
+      ),
+    )
+    .orderBy(sql`(${examTasks.content} ->> 'difficulty')::int`, examTasks.slug)
+    .limit(limit);
+}
+
+/**
  * A published item of one task type, as a candidate may see it: the content
  * only. The answer key and transcript are in a table this never joins.
  */

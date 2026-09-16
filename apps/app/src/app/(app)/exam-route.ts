@@ -16,6 +16,9 @@ const RUNNER_ROUTES: readonly RegExp[] = [
       .join('|')})/[^/]+$`,
   ),
   /^\/preview\/tasks\/[^/]+\/[^/]+$/,
+  // A task session: /practice/<exam>/<task>/<attemptId>. Its review page has a
+  // further segment and is deliberately not a runner.
+  /^\/practice\/[^/]+\/[^/]+\/[^/]+$/,
 ];
 
 export const isExamRunner = (pathname: string) =>
