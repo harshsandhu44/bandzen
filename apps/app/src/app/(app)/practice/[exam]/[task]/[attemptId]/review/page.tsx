@@ -1,7 +1,7 @@
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { getExam, getTask } from '@bandzen/exams/registry';
-import { ESTIMATE_NOTE, evaluatorFor } from '@bandzen/exams/scoring';
+import { evaluatorFor } from '@bandzen/exams/scoring';
 import { Button } from '@bandzen/ui/components/button';
 import { Eyebrow, PageHeader, Panel } from '@/components/app/primitives';
 import { requireContentRole, requireUserId } from '@/lib/auth';
@@ -39,8 +39,8 @@ export default async function TaskReviewPage({
         }
         description={
           mark
-            ? ESTIMATE_NOTE
-            : 'A model grades this task type. Its score arrives with the PTE score report.'
+            ? 'Raw marks. A score on this exam\u2019s own scale arrives with the score report.'
+            : 'A model grades this task type. Its score arrives with the score report.'
         }
       />
 
