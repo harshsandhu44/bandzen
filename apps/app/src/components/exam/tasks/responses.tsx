@@ -1,7 +1,7 @@
 'use client';
 
 import { ArrowDown, ArrowUp } from 'lucide-react';
-import { useState } from 'react';
+import { Fragment, useState } from 'react';
 import { AnswerChoices } from '@bandzen/ui/components/answer-choices';
 import { Button } from '@bandzen/ui/components/button';
 import { Checkbox } from '@bandzen/ui/components/checkbox';
@@ -438,21 +438,25 @@ export function TokenSelect({
 
   return (
     <p aria-label={label} className="text-sm leading-9">
+      {/* A real space between the words, not a margin: this is running text,
+          and a screen reader reading it continuously — or anyone copying it —
+          would otherwise get "Openwaterwarms". */}
       {tokens.map((word, i) => (
-        <button
-          key={i}
-          type="button"
-          aria-pressed={marked.has(String(i))}
-          onClick={() => toggle(i)}
-          className={cn(
-            'mr-1 px-1',
-            marked.has(String(i))
-              ? 'bg-primary/15 text-foreground underline decoration-primary decoration-2'
-              : 'hover:bg-muted',
-          )}
-        >
-          {word}
-        </button>
+        <Fragment key={i}>
+          <button
+            type="button"
+            aria-pressed={marked.has(String(i))}
+            onClick={() => toggle(i)}
+            className={cn(
+              'px-1',
+              marked.has(String(i))
+                ? 'bg-primary/15 text-foreground underline decoration-primary decoration-2'
+                : 'hover:bg-muted',
+            )}
+          >
+            {word}
+          </button>{' '}
+        </Fragment>
       ))}
     </p>
   );
