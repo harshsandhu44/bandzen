@@ -948,7 +948,7 @@ const identity = (attempt: AttemptIdentity) => ({
   skill: attempt.module,
 });
 
-/** A marked Reading or Listening attempt: its band and its assessment. */
+/** A marked Reading or Listening attempt: its score and its assessment. */
 const objectiveResult = (
   attempt: AttemptIdentity,
   correct: number,
@@ -1638,7 +1638,7 @@ export async function getMockReadingTest(userId: string, attemptId: string) {
   };
 }
 
-/** Grades all 3 passages in one pass and writes one aggregate band, same rule as `submitReading`. */
+/** Grades all 3 passages in one pass and writes one aggregate score, same rule as `submitReading`. */
 export async function submitMockReading(userId: string, attemptId: string) {
   const attempt = await getAttempt(userId, attemptId);
   if (!attempt?.mockAttemptId || attempt.module !== 'reading') return null;
@@ -1909,7 +1909,7 @@ export async function getMockListeningTest(userId: string, attemptId: string) {
   };
 }
 
-/** Grades all 4 tracks in one pass and writes one aggregate band, same rule as `submitListening`. */
+/** Grades all 4 tracks in one pass and writes one aggregate score, same rule as `submitListening`. */
 export async function submitMockListening(userId: string, attemptId: string) {
   const attempt = await getAttempt(userId, attemptId);
   if (!attempt?.mockAttemptId || attempt.module !== 'listening') return null;
