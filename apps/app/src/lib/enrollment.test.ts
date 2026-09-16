@@ -2,7 +2,7 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { preparationWrites } from './enrollment.ts';
 
-test('an IELTS save writes the enrollment and mirrors the legacy profile columns', () => {
+test('an IELTS save writes the enrollment and nothing IELTS-only on the profile', () => {
   const { enrollment, profile } = preparationWrites({
     examKey: 'ielts',
     examVariant: 'general',
@@ -22,10 +22,16 @@ test('an IELTS save writes the enrollment and mirrors the legacy profile columns
   });
   assert.equal(profile.activeExamKey, 'ielts');
   assert.equal(profile.studyMinutes, 45);
-  assert.equal(profile.examType, 'general');
-  assert.equal(profile.targetBand, 7.5);
-  assert.equal(profile.selfAssessedBand, null);
-  assert.equal(profile.testDate, '2026-12-01');
+  // The legacy IELTS columns are no longer written, for IELTS least of all —
+  // it was the only exam that ever mirrored into them.
+  for (const key of [
+    'examType',
+    'targetBand',
+    'selfAssessedBand',
+    'testDate',
+  ]) {
+    assert.equal(key in profile, false, key);
+  }
 });
 
 test('a partial save leaves the fields it does not mention undefined', () => {
@@ -37,13 +43,12 @@ test('a partial save leaves the fields it does not mention undefined', () => {
 
   assert.equal(enrollment.examVariant, undefined);
   assert.equal(enrollment.selfAssessedScore, undefined);
-  assert.equal(profile.examType, undefined);
+  assert.equal(enrollment.targetScore, 6.5);
   assert.equal(profile.activeExamKey, undefined);
-  assert.equal(profile.targetBand, 6.5);
   assert.equal('onboardingCompletedAt' in profile, false);
 });
 
-test('another exam never touches the IELTS-only profile columns', () => {
+test('no exam touches the IELTS-only profile columns', () => {
   const { enrollment, profile } = preparationWrites({
     examKey: 'pte_academic',
     targetScore: 79,

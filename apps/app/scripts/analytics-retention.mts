@@ -47,9 +47,13 @@ async function sectionA() {
   const rows = await sql`
     with ${sql.unsafe(activityCte)},
     cand as (
-      select user_id, onboarding_completed_at as onboarded, test_date
-        from profiles
-       where onboarding_completed_at is not null
+      -- The test date lives on the active exam's enrollment now; the profile
+      -- column it used to come from is being dropped.
+      select p.user_id, p.onboarding_completed_at as onboarded, e.test_date
+        from profiles p
+        left join exam_enrollments e
+          on e.user_id = p.user_id and e.exam_key = p.active_exam_key
+       where p.onboarding_completed_at is not null
     ),
     agg as (
       select c.user_id,
