@@ -1,3 +1,10 @@
+# app [1.24.0](https://github.com/harshsandhu44/bandzen/compare/app@1.23.1...app@1.24.0) (2026-09-16)
+
+
+### Features
+
+* **app:** drop the legacy IELTS profile and band columns ([#119](https://github.com/harshsandhu44/bandzen/issues/119)) ([ab18e8b](https://github.com/harshsandhu44/bandzen/commit/ab18e8b6ce9b6f7a6606dda77eebd0492c45da3a)), closes [#109](https://github.com/harshsandhu44/bandzen/issues/109)
+
 ## app [1.23.1](https://github.com/harshsandhu44/bandzen/compare/app@1.23.0...app@1.23.1) (2026-09-16)
 
 
