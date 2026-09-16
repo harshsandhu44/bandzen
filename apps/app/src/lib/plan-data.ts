@@ -11,6 +11,7 @@ import {
   listPassages,
   listTracks,
   listWritingPrompts,
+  publishedExamTaskTypes,
 } from '@/lib/db/queries';
 import type { Profile } from '@/lib/db/queries';
 import { planStrategyFor } from '@/lib/plan-strategies';
@@ -73,6 +74,7 @@ export async function loadPlanData(
     prompts,
     tracks,
     lessonForKind,
+    examTaskTypes,
   ] = await Promise.all([
     latestBand(userId, 'reading', examKey),
     latestBand(userId, 'writing', examKey),
@@ -87,6 +89,7 @@ export async function loadPlanData(
     listWritingPrompts(),
     listTracks(),
     lessonForKindMap(),
+    publishedExamTaskTypes(examKey),
   ]);
 
   const completedLessonIds = lessons.map((l) => l.lessonId);
@@ -97,6 +100,9 @@ export async function loadPlanData(
       reading: readingBand,
       writing: writingBand,
       listening: listeningBand,
+      // PTE plans speaking too — seven of its nine Speaking & Writing tasks
+      // are spoken, so a plan that cannot see the skill cannot rank it.
+      speaking: speakingBand,
     },
     targetScore: profile.targetScore,
     testDate: profile.testDate,
@@ -108,6 +114,7 @@ export async function loadPlanData(
       passageIds: passages.map((p) => p.id),
       prompts: prompts.map((p) => ({ id: p.id, task: p.task })),
       trackIds: tracks.map((t) => t.id),
+      examTaskTypes,
       lessonForKind,
       completedLessonIds,
     },

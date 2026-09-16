@@ -221,17 +221,39 @@ export async function setActiveExam(userId: string, examKey: ExamKey) {
 export const examHasContent = cache(async function examHasContent(
   examKey: ExamKey,
 ) {
+  // `exam_tasks` counts from here on: it is the only content PTE, TOEFL and DET
+  // have, and a published item of it is now something a candidate can actually
+  // sit. Until the runner existed, counting it would have promised a screen
+  // that did not exist.
   const found = await Promise.all(
-    [passages, writingPrompts, listeningTracks, speakingTests].map((table) =>
-      db
-        .select({ id: table.id })
-        .from(table)
-        .where(and(eq(table.examKey, examKey), eq(table.status, 'published')))
-        .limit(1),
+    [passages, writingPrompts, listeningTracks, speakingTests, examTasks].map(
+      (table) =>
+        db
+          .select({ id: table.id })
+          .from(table)
+          .where(and(eq(table.examKey, examKey), eq(table.status, 'published')))
+          .limit(1),
     ),
   );
   return found.some((rows) => rows.length > 0);
 });
+
+/**
+ * The task types this exam has published content for. A study plan only
+ * schedules a drill it can actually open, so a task type with no item is not
+ * offered at all rather than handed over as a dead link.
+ */
+export const publishedExamTaskTypes = cache(
+  async function publishedExamTaskTypes(examKey: ExamKey) {
+    const rows = await db
+      .selectDistinct({ taskType: examTasks.taskType })
+      .from(examTasks)
+      .where(
+        and(eq(examTasks.examKey, examKey), eq(examTasks.status, 'published')),
+      );
+    return rows.map((r) => r.taskType);
+  },
+);
 
 /** The exams this candidate has completed attempts in, for Progress's filter. */
 export async function attemptExams(userId: string) {
@@ -935,9 +957,13 @@ const objectiveResult = (
   correct: number,
   total: number,
 ) => {
-  const band = readingBand(correct, total);
+  // `readingBand` is IELTS's own 40-question conversion, and was being applied
+  // to every objective attempt in the app whatever exam it belonged to. Another
+  // exam gets its marks and no score here: PTE reports at the level of a whole
+  // sitting, not per item, so its estimate is assembled there instead.
+  const band = attempt.examKey === 'ielts' ? readingBand(correct, total) : null;
   return {
-    ...scored(band),
+    ...(band == null ? { band: null, score: null } : scored(band)),
     assessment: objectiveAssessment({
       ...identity(attempt),
       correct,

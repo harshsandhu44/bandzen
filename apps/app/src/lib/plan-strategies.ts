@@ -86,12 +86,136 @@ export const IELTS_PLAN: PlanStrategy = {
       case 'lesson':
         // Lesson routes are module-scoped, and the task's skill is that module.
         return `/learn/${skill}/${target.lessonId}`;
+      case 'exam_task':
+        // IELTS content is passages and prompts, never exam tasks, so its own
+        // `targetFor` cannot produce one of these.
+        throw new Error('IELTS plans do not open exam tasks');
     }
+  },
+};
+
+/**
+ * PTE's content is task items, so every drill names the task type it opens and
+ * the plan points straight at that task's practice route. Nothing here is
+ * scheduled unless the CMS has published an item of it — a plan that opens an
+ * empty task type is worse than a shorter plan.
+ */
+export const PTE_PLAN: PlanStrategy = {
+  plannable: ['speaking', 'writing', 'reading', 'listening'],
+  // PTE opens with Speaking & Writing, so the plan does too.
+  startingRotation: ['speaking', 'reading'],
+  // On a 10-90 scale a single point means nothing; five is about the smallest
+  // gap worth calling a weak skill.
+  meaningfulGap: 5,
+  scoreNoun: 'score',
+  noEstimateAction: 'Sit a full mock to get your first estimate.',
+  drills: {
+    speaking: [
+      {
+        label: 'Read Aloud, one take each',
+        minutes: 15,
+        taskType: 'read_aloud',
+      },
+      {
+        label: 'Repeat Sentence drill',
+        minutes: 15,
+        taskType: 'repeat_sentence',
+      },
+      {
+        label: 'Describe Image, timed',
+        minutes: 20,
+        taskType: 'describe_image',
+      },
+      {
+        label: 'Re-tell Lecture, timed',
+        minutes: 20,
+        taskType: 'retell_lecture',
+      },
+    ],
+    writing: [
+      {
+        label: 'Summarize Written Text, one sentence',
+        minutes: 20,
+        taskType: 'summarize_written_text',
+      },
+      {
+        label: 'Write Essay, full timing',
+        minutes: 25,
+        taskType: 'write_essay',
+      },
+      {
+        label: 'Summarize Spoken Text',
+        minutes: 20,
+        taskType: 'summarize_spoken_text',
+      },
+    ],
+    reading: [
+      {
+        label: 'Fill in the Blanks, drag and drop',
+        minutes: 20,
+        taskType: 'reading_fill_in_the_blanks',
+      },
+      {
+        label: 'Reading & Writing blanks',
+        minutes: 20,
+        taskType: 'reading_writing_fill_in_the_blanks',
+      },
+      {
+        label: 'Re-order Paragraphs',
+        minutes: 15,
+        taskType: 'reorder_paragraphs',
+      },
+      {
+        label: 'Multiple choice, multiple answers',
+        minutes: 15,
+        taskType: 'reading_multiple_choice_multiple',
+      },
+    ],
+    listening: [
+      {
+        label: 'Write from Dictation drill',
+        minutes: 15,
+        taskType: 'write_from_dictation',
+      },
+      {
+        label: 'Highlight Incorrect Words',
+        minutes: 15,
+        taskType: 'highlight_incorrect_words',
+      },
+      {
+        label: 'Summarize Spoken Text, timed',
+        minutes: 20,
+        taskType: 'summarize_spoken_text',
+      },
+      {
+        label: 'Select Missing Word',
+        minutes: 15,
+        taskType: 'select_missing_word',
+      },
+    ],
+  },
+  canSchedule: (_skill, drill, catalogue) =>
+    !drill.taskType ||
+    !catalogue?.examTaskTypes ||
+    catalogue.examTaskTypes.includes(drill.taskType),
+  targetFor: (_skill, drill, catalogue) =>
+    drill.taskType && catalogue?.examTaskTypes?.includes(drill.taskType)
+      ? { kind: 'exam_task', taskType: drill.taskType }
+      : null,
+  // PTE has no lesson library yet, and no written report to quote back.
+  lessonSkill: null,
+  feedbackSkill: null,
+  href(_skill, target) {
+    if (target.kind !== 'exam_task') {
+      throw new Error('PTE plans only open exam tasks');
+    }
+    return `/practice/pte_academic/${target.taskType}`;
   },
 };
 
 const PLAN_STRATEGIES: Partial<Record<ExamKey, PlanStrategy>> = {
   ielts: IELTS_PLAN,
+  pte_academic: PTE_PLAN,
 };
 
 export function planStrategyFor(exam: ExamKey): PlanStrategy | null {
