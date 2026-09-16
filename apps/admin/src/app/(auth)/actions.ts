@@ -1,5 +1,6 @@
 'use server';
 
+import { headers } from 'next/headers';
 import { redirect } from 'next/navigation';
 import { revalidatePath } from 'next/cache';
 import { createClient } from '@/lib/supabase/server';
@@ -29,6 +30,23 @@ export async function signIn(
 
   revalidatePath('/', 'layout');
   redirect('/');
+}
+
+/**
+ * Start the Google round trip; `/auth/callback` finishes it. The origin comes
+ * from the request, which is safe because Supabase only redirects to URLs on
+ * the project's allow list.
+ */
+export async function signInWithGoogle() {
+  const h = await headers();
+  const origin = `${h.get('x-forwarded-proto') ?? 'http'}://${h.get('x-forwarded-host') ?? h.get('host')}`;
+  const supabase = await createClient();
+  const { data, error } = await supabase.auth.signInWithOAuth({
+    provider: 'google',
+    options: { redirectTo: `${origin}/auth/callback` },
+  });
+  if (error || !data.url) redirect('/sign-in?error=oauth');
+  redirect(data.url);
 }
 
 export async function signOut() {

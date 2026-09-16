@@ -340,6 +340,17 @@ skip_nonce_check = false
 # If enabled, it will allow the user to successfully authenticate when the provider does not return an email address.
 email_optional = false
 
+# Google sign-in. Off by default so the stack starts on any machine; the button
+# hides itself while it is off. To try it locally: create a separate Google
+# OAuth client whose redirect URI is http://127.0.0.1:54321/auth/v1/callback,
+# export the two variables below, set `enabled = true` and `pnpm db:stop &&
+# pnpm db:start`. Production's credentials live in the hosted dashboard only.
+[auth.external.google]
+enabled = false
+client_id = "env(SUPABASE_AUTH_EXTERNAL_GOOGLE_CLIENT_ID)"
+secret = "env(SUPABASE_AUTH_EXTERNAL_GOOGLE_SECRET)"
+skip_nonce_check = true
+
 # Allow Solana wallet holders to sign in to your project via the Sign in with Solana (SIWS, EIP-4361) standard.
 # You can configure "web3" rate limit in the [auth.rate_limit] section and set up [auth.captcha] if self-hosting.
 [auth.web3.solana]

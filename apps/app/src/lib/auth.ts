@@ -25,7 +25,7 @@ export async function requireUserId(): Promise<string> {
  * The account behind the session, in the shape the screens actually use: an
  * email for the settings page and the Polar checkout, a first name for the
  * dashboard greeting. Normalised here so `user_metadata` — which is whatever
- * sign-up happened to write — is read in one place rather than five.
+ * sign-up or Google happened to write — is read in one place rather than five.
  */
 export async function currentUser() {
   const supabase = await createClient();
@@ -33,12 +33,16 @@ export async function currentUser() {
     data: { user },
   } = await supabase.auth.getUser();
   if (!user) return null;
-  const firstName = user.user_metadata?.first_name;
-  return {
-    id: user.id,
-    email: user.email ?? null,
-    firstName: typeof firstName === 'string' && firstName ? firstName : null,
-  };
+  // Email sign-up writes `first_name`; Google writes `full_name`, whose first
+  // word is the closest thing it offers.
+  const meta = user.user_metadata ?? {};
+  const name =
+    typeof meta.first_name === 'string' && meta.first_name
+      ? meta.first_name
+      : typeof meta.full_name === 'string'
+        ? meta.full_name.trim().split(/\s+/)[0]
+        : '';
+  return { id: user.id, email: user.email ?? null, firstName: name || null };
 }
 
 const ADMIN_EMAILS = new Set(

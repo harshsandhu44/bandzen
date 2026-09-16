@@ -2,7 +2,7 @@ import { NextResponse, type NextRequest } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 
 /**
- * Where every emailed link lands — confirmation and password recovery both.
+ * Where every emailed link and every Google sign-in lands.
  *
  * The link carries a one-time code, not a session. Exchanging it here, on a
  * route that can write cookies, is what turns it into one.
@@ -21,5 +21,8 @@ export async function GET(request: NextRequest) {
     if (!error) return NextResponse.redirect(new URL(to, origin));
   }
 
-  return NextResponse.redirect(new URL('/sign-in?error=link', origin));
+  // Google sends `error` (a cancelled consent, say) where it would have sent a
+  // code; anything else without a working code is a spent or expired link.
+  const reason = searchParams.has('error') ? 'oauth' : 'link';
+  return NextResponse.redirect(new URL(`/sign-in?error=${reason}`, origin));
 }

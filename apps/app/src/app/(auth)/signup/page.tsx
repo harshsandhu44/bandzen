@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import { AuthForm } from '@/components/auth/auth-form';
+import { GoogleButton } from '@/components/auth/google-button';
 import { signUp } from '../actions';
 
 export const metadata = { title: 'Create your account' };
@@ -10,6 +11,8 @@ export default function SignUpPage() {
       <p className="mb-4 font-mono text-[0.6875rem] tracking-[0.18em] text-muted-foreground uppercase">
         Beta
       </p>
+
+      <GoogleButton />
 
       <AuthForm
         action={signUp}

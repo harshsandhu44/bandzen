@@ -1,5 +1,6 @@
 'use server';
 
+import { headers } from 'next/headers';
 import { redirect } from 'next/navigation';
 import { revalidatePath } from 'next/cache';
 import { createClient } from '@/lib/supabase/server';
@@ -10,9 +11,18 @@ import { createClient } from '@/lib/supabase/server';
  */
 export type AuthState = { error: string | null; email?: string };
 
-/** Where the confirmation and recovery links come back to. */
-function origin() {
-  return process.env.NEXT_PUBLIC_SITE_URL ?? 'http://localhost:3002';
+/**
+ * Where emailed links and the Google round trip come back to: this app, as
+ * the request reached it. Not NEXT_PUBLIC_SITE_URL, which is the marketing
+ * site. Trusting the Host header is safe here only because Supabase
+ * checks `redirectTo` against the project's redirect allow list and falls
+ * back to the Site URL, so a forged host cannot send a link anywhere else.
+ */
+async function origin() {
+  const h = await headers();
+  const host = h.get('x-forwarded-host') ?? h.get('host');
+  const proto = h.get('x-forwarded-proto') ?? 'http';
+  return `${proto}://${host}`;
 }
 
 const read = (data: FormData, key: string) =>
@@ -56,7 +66,7 @@ export async function signUp(
     email: read(data, 'email').toLowerCase(),
     password,
     options: {
-      emailRedirectTo: `${origin()}/auth/callback`,
+      emailRedirectTo: `${await origin()}/auth/callback`,
       // The dashboard greets candidates by name. Optional, because a blank
       // greeting is a smaller cost than a field standing between someone and
       // their first practice.
@@ -78,7 +88,7 @@ export async function requestPasswordReset(
 ): Promise<AuthState> {
   const supabase = await createClient();
   await supabase.auth.resetPasswordForEmail(read(data, 'email').toLowerCase(), {
-    redirectTo: `${origin()}/auth/callback?next=/reset-password`,
+    redirectTo: `${await origin()}/auth/callback?next=/reset-password`,
   });
   // No error branch on purpose: a failure here would say whether the address
   // has an account. The page says "if that address has an account" regardless.
@@ -102,6 +112,23 @@ export async function updatePassword(
 
   revalidatePath('/', 'layout');
   redirect('/');
+}
+
+/**
+ * Start the Google round trip. Nothing is sent to Google from here:
+ * Supabase hands back the authorize URL and writes the PKCE verifier to a
+ * cookie, and `/auth/callback` finishes the job with the code Google returns.
+ * A Google account whose verified email matches an existing account is
+ * linked to it rather than becoming a second account.
+ */
+export async function signInWithGoogle() {
+  const supabase = await createClient();
+  const { data, error } = await supabase.auth.signInWithOAuth({
+    provider: 'google',
+    options: { redirectTo: `${await origin()}/auth/callback` },
+  });
+  if (error || !data.url) redirect('/sign-in?error=oauth');
+  redirect(data.url);
 }
 
 export async function signOut() {
