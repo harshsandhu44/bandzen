@@ -170,7 +170,7 @@ export async function upsertProfile(userId: string, values: PreparationValues) {
       },
     });
 
-  await db
+  const insert = db
     .insert(profiles)
     // A brand-new profile points at the enrollment just written, even when the
     // save did not name its exam.
@@ -178,8 +178,14 @@ export async function upsertProfile(userId: string, values: PreparationValues) {
       userId,
       ...profile,
       activeExamKey: profile.activeExamKey ?? enrollment.examKey,
-    })
-    .onConflictDoUpdate({ target: profiles.userId, set: profile });
+    });
+
+  // The diagnostic's target-and-date save leaves every profile field
+  // undefined, and Drizzle throws "No values to set" on an empty update.
+  // The signup trigger means the row always exists, so that save always hit it.
+  await (Object.values(profile).some((v) => v !== undefined)
+    ? insert.onConflictDoUpdate({ target: profiles.userId, set: profile })
+    : insert.onConflictDoNothing());
 }
 
 /** Every exam this candidate has set up, oldest first. */
