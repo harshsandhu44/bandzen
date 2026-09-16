@@ -5,7 +5,6 @@
       "dependsOn": ["^build"],
       "env": [
         "DATABASE_URL",
-        "CLERK_SECRET_KEY",
         "ADMIN_EMAILS",
         "OPENAI_*",
         "ELEVENLABS_*",
