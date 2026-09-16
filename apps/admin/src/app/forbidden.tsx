@@ -1,11 +1,11 @@
 import Link from 'next/link';
-import { SignOutButton } from '@clerk/nextjs';
+import { signOut } from '@/app/(auth)/actions';
 import { Button } from '@bandzen/ui/components/button';
 import { Wordmark } from '@bandzen/ui/components/wordmark';
 
 /**
  * Rendered by `forbidden()` in `src/lib/auth.ts` when a signed-in account has
- * no CMS role. It must not redirect: this app shares a Clerk instance with
+ * no CMS role. It must not redirect: this app shares a Supabase project with
  * apps/app (and on localhost the session cookie ignores the port), so a student
  * session is a valid session here. Sending them anywhere would put them back
  * through a gate — which is exactly the `/` → `/teachers` → `/` loop this
@@ -34,15 +34,15 @@ export default function Forbidden() {
         that has access. Otherwise ask an admin for the teacher role.
       </p>
       <div className="flex items-center gap-2">
-        <SignOutButton>
+        <form action={signOut}>
           <Button
-            type="button"
+            type="submit"
             size="xl"
             className="font-mono text-xs tracking-[0.14em] uppercase"
           >
             Sign out
           </Button>
-        </SignOutButton>
+        </form>
         <Button
           nativeButton={false}
           variant="ghost"

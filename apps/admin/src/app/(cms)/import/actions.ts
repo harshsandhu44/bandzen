@@ -51,8 +51,8 @@ export async function importAction(
   if ('error' in prepared) return { error: prepared.error, created: [] };
 
   // Nothing is written until every slug is known to be free. Inserts are not
-  // transactional (neon-http), so this check is the only thing standing
-  // between a half-imported file and a clean one.
+  // transactional, so this check is the only thing standing between a
+  // half-imported file and a clean one.
   const existing = new Set(await config.listSlugs());
   const clashes = findSlugClashes(prepared.slugs, existing);
   if (clashes.length > 0) {

@@ -7,6 +7,7 @@ import {
   jsonb,
   numeric,
   pgEnum,
+  pgSchema,
   pgTable,
   primaryKey,
   text,
@@ -24,9 +25,20 @@ import type { AssessmentResult } from '@bandzen/exams/scoring';
  * from it. Change a column here, run `pnpm db:generate`, and the migration and
  * the types move together — nothing is hand-maintained.
  *
- * User ids are Clerk's (`user_2ab...`), so they are text, not uuid, and there
- * is no users table here for them to reference. Clerk owns identity.
+ * User ids are Supabase's, so they are uuid and reference `auth.users`. Only
+ * `profiles` holds that foreign key: it is the row that must not outlive the
+ * account. Everything else stays unreferenced on purpose — see `ai_usage`.
  */
+
+/**
+ * Supabase Auth's user table, declared only so `profiles` can point at it.
+ * Drizzle never reads or writes it and no migration of ours creates it — GoTrue
+ * owns that schema entirely. This is a type-level handle, nothing more.
+ */
+const authSchema = pgSchema('auth');
+const authUsers = authSchema.table('users', {
+  id: uuid('id').primaryKey(),
+});
 
 /**
  * IELTS's Academic/General Training split. A *variant* of one exam, not an
@@ -147,11 +159,26 @@ export const aiStatus = pgEnum('ai_status', ['ok', 'failed']);
 // ---------------------------------------------------------------------------
 
 /**
- * Everything about a user that is ours rather than Clerk's. Created lazily on
- * first write — there is no auth trigger to hang creation off any more.
+ * Everything about a user that is ours rather than Supabase Auth's. Created by
+ * the `handle_new_user` trigger on `auth.users`, so the row exists from the
+ * moment the account does and every query below it has something to find.
  */
 export const profiles = pgTable('profiles', {
-  userId: text('user_id').primaryKey(),
+  userId: uuid('user_id')
+    .primaryKey()
+    .references(() => authUsers.id, { onDelete: 'cascade' }),
+  /**
+   * Mirrored from `auth.users` by a trigger, not written by the app. It is here
+   * so the CMS can show who edited a lesson, and so the ADMIN_EMAILS
+   * break-glass list can be checked, without a round trip to the auth admin API.
+   */
+  email: text('email'),
+  /**
+   * 'admin' | 'teacher', or null for a candidate — which is almost everyone.
+   * Text rather than an enum because a role is a grant we may add to, and a
+   * value we have not seen should not turn into a failed insert.
+   */
+  role: text('role'),
   /**
    * Which `exam_enrollments` row is the one they are studying for now. Null
    * until they tell us. The enrollment holds the target, date and variant.
@@ -183,7 +210,7 @@ export const examEnrollments = pgTable(
   'exam_enrollments',
   {
     id: uuid('id').primaryKey().defaultRandom(),
-    userId: text('user_id').notNull(),
+    userId: uuid('user_id').notNull(),
     examKey: examKey('exam_key').notNull(),
     /** IELTS `academic`/`general`; null for exams without variants. */
     examVariant: text('exam_variant'),
@@ -213,8 +240,8 @@ export const examEnrollments = pgTable(
 );
 
 /**
- * The landing page's "no invite code?" path. Clerk owns the actual gate
- * (Restricted sign-up + Clerk Invitations); this is only demand capture.
+ * The landing page's "no invite code?" path. Sign-up is open now, so nothing
+ * gates on this; it is demand capture and nothing else.
  */
 export const accessRequests = pgTable(
   'access_requests',
@@ -245,7 +272,7 @@ export const accessRequests = pgTable(
  * than a status matrix.
  */
 export const subscriptions = pgTable('subscriptions', {
-  userId: text('user_id').primaryKey(),
+  userId: uuid('user_id').primaryKey(),
   /** Null for a grant; a Polar subscription id for anything charged for. */
   polarSubscriptionId: text('polar_subscription_id'),
   /** A Polar product id, or `trial` / `founding` for a grant. */
@@ -298,7 +325,7 @@ export const coachMessages = pgTable(
   'coach_messages',
   {
     id: uuid('id').primaryKey().defaultRandom(),
-    userId: text('user_id').notNull(),
+    userId: uuid('user_id').notNull(),
     createdAt: timestamp('created_at', { withTimezone: true })
       .notNull()
       .defaultNow(),
@@ -331,7 +358,7 @@ export const passages = pgTable('passages', {
   difficulty: integer('difficulty').notNull().default(3),
   /** New rows default to 'published' — draft is set explicitly by the CMS on create. */
   status: contentStatus('status').notNull().default('published'),
-  updatedBy: text('updated_by'),
+  updatedBy: uuid('updated_by'),
   updatedAt: timestamp('updated_at', { withTimezone: true })
     .notNull()
     .defaultNow(),
@@ -425,7 +452,7 @@ export const writingPrompts = pgTable('writing_prompts', {
   chartData: jsonb('chart_data').$type<WritingChartData | null>(),
   /** New rows default to 'published' — draft is set explicitly by the CMS on create. */
   status: contentStatus('status').notNull().default('published'),
-  updatedBy: text('updated_by'),
+  updatedBy: uuid('updated_by'),
   updatedAt: timestamp('updated_at', { withTimezone: true })
     .notNull()
     .defaultNow(),
@@ -470,7 +497,7 @@ export const listeningTracks = pgTable('listening_tracks', {
   difficulty: integer('difficulty').notNull().default(3),
   /** New rows default to 'published' — draft is set explicitly by the CMS on create. */
   status: contentStatus('status').notNull().default('published'),
-  updatedBy: text('updated_by'),
+  updatedBy: uuid('updated_by'),
   updatedAt: timestamp('updated_at', { withTimezone: true })
     .notNull()
     .defaultNow(),
@@ -503,7 +530,7 @@ export const speakingTests = pgTable('speaking_tests', {
   difficulty: integer('difficulty').notNull().default(3),
   /** New rows default to 'published' — draft is set explicitly by the CMS on create. */
   status: contentStatus('status').notNull().default('published'),
-  updatedBy: text('updated_by'),
+  updatedBy: uuid('updated_by'),
   updatedAt: timestamp('updated_at', { withTimezone: true })
     .notNull()
     .defaultNow(),
@@ -562,7 +589,7 @@ export const examTasks = pgTable(
     taskType: text('task_type').notNull(),
     content: jsonb('content').$type<TaskContent>().notNull(),
     status: contentStatus('status').notNull().default('draft'),
-    updatedBy: text('updated_by'),
+    updatedBy: uuid('updated_by'),
     updatedAt: timestamp('updated_at', { withTimezone: true })
       .notNull()
       .defaultNow(),
@@ -608,7 +635,7 @@ export const mockAttempts = pgTable(
   'mock_attempts',
   {
     id: uuid('id').primaryKey().defaultRandom(),
-    userId: text('user_id').notNull(),
+    userId: uuid('user_id').notNull(),
     kind: sittingKind('kind').notNull().default('mock'),
     ...examOwnership(),
     /** The IELTS variant the sitting's content was picked for. */
@@ -658,7 +685,7 @@ export const attempts = pgTable(
   'attempts',
   {
     id: uuid('id').primaryKey().defaultRandom(),
-    userId: text('user_id').notNull(),
+    userId: uuid('user_id').notNull(),
     module: attemptModule('module').notNull(),
     kind: attemptKind('kind').notNull().default('practice'),
     status: attemptStatus('status').notNull().default('in_progress'),
@@ -834,7 +861,7 @@ export const officialScores = pgTable(
   'official_scores',
   {
     id: uuid('id').primaryKey().defaultRandom(),
-    userId: text('user_id').notNull(),
+    userId: uuid('user_id').notNull(),
     ...examOwnership(),
     score: numeric('score', {
       precision: 5,
@@ -990,7 +1017,7 @@ export const lessons = pgTable(
     /** Display order within a module+group. Was implicit array order before this table existed. */
     orderIndex: integer('order_index').notNull().default(0),
     status: contentStatus('status').notNull().default('published'),
-    updatedBy: text('updated_by'),
+    updatedBy: uuid('updated_by'),
     updatedAt: timestamp('updated_at', { withTimezone: true })
       .notNull()
       .defaultNow(),
@@ -1019,7 +1046,7 @@ export const resources = pgTable('resources', {
   body: jsonb('body').$type<string[] | null>(),
   orderIndex: integer('order_index').notNull().default(0),
   status: contentStatus('status').notNull().default('published'),
-  updatedBy: text('updated_by'),
+  updatedBy: uuid('updated_by'),
   updatedAt: timestamp('updated_at', { withTimezone: true })
     .notNull()
     .defaultNow(),
@@ -1032,7 +1059,7 @@ export const resources = pgTable('resources', {
 export const lessonProgress = pgTable(
   'lesson_progress',
   {
-    userId: text('user_id').notNull(),
+    userId: uuid('user_id').notNull(),
     lessonId: uuid('lesson_id')
       .notNull()
       .references(() => lessons.id),
@@ -1054,7 +1081,7 @@ export const lessonProgress = pgTable(
 export const awards = pgTable(
   'awards',
   {
-    userId: text('user_id').notNull(),
+    userId: uuid('user_id').notNull(),
     /** A catalogue slug, not an FK — the catalogue is code, not rows. */
     awardId: text('award_id').notNull(),
     earnedAt: timestamp('earned_at', { withTimezone: true })
@@ -1080,8 +1107,8 @@ export const contentEvents = pgTable(
     id: uuid('id').primaryKey().defaultRandom(),
     entityType: text('entity_type').notNull(),
     entityId: uuid('entity_id').notNull(),
-    /** Clerk userId of whoever made the change; null for pre-audit backfill. */
-    actorId: text('actor_id'),
+    /** Who made the change; null for pre-audit backfill. */
+    actorId: uuid('actor_id'),
     action: contentEventAction('action').notNull(),
     createdAt: timestamp('created_at', { withTimezone: true })
       .notNull()
@@ -1122,7 +1149,7 @@ export const aiUsage = pgTable(
      * take no userId, so they set `attemptId` instead and the cost script joins
      * `attempts` for the user.
      */
-    userId: text('user_id'),
+    userId: uuid('user_id'),
     attemptId: uuid('attempt_id'),
     feature: aiFeature('feature').notNull(),
     /** The model actually called, not the constant's current value. */

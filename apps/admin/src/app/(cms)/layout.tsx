@@ -1,5 +1,5 @@
 import { cookies } from 'next/headers';
-import { SignOutButton } from '@clerk/nextjs';
+import { signOut } from '@/app/(auth)/actions';
 import { Button } from '@bandzen/ui/components/button';
 import { Eyebrow } from '@bandzen/ui/components/primitives';
 import {
@@ -68,8 +68,7 @@ export default async function CmsLayout({
 
         <SidebarFooter className="gap-4 p-4">
           {/* Who you are, and what that lets you do. The role is the thing that
-              decides whether you see this shell or the 403 page, and Clerk's
-              UserButton never showed it. */}
+              decides whether you see this shell or the 403 page. */}
           <div className="space-y-0.5 border-t border-sidebar-border pt-4">
             <Eyebrow>{role}</Eyebrow>
             {email ? (
@@ -84,11 +83,11 @@ export default async function CmsLayout({
 
           <div className="flex items-center justify-between gap-2">
             <ThemeToggle />
-            <SignOutButton>
-              <Button type="button" variant="ghost" size="sm">
+            <form action={signOut}>
+              <Button type="submit" variant="ghost" size="sm">
                 Sign out
               </Button>
-            </SignOutButton>
+            </form>
           </div>
 
           <Version value={pkg.version} className="self-start" />

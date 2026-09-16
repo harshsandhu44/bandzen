@@ -10,7 +10,7 @@
  *
  * So this reads the real source AS TEXT and asserts each documented value still
  * appears in it. It does not import: `apps/app` is an app rather than a package,
- * and its modules pull in a database client and a Clerk session that have no
+ * and its modules pull in a database client and an auth session that have no
  * business being instantiated by a docs test. (The writing/speaking criteria
  * are the one exception — see `facts.ts` — because they live in `@bandzen/ai`,
  * a real package, and are imported there instead of copied.)

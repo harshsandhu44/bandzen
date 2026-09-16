@@ -1,10 +1,9 @@
 'use server';
 
 import { revalidatePath } from 'next/cache';
-import { currentUser } from '@clerk/nextjs/server';
 import { cookies } from 'next/headers';
 import { redirect } from 'next/navigation';
-import { requireUserId } from '@/lib/auth';
+import { currentUser, requireUserId } from '@/lib/auth';
 import { capture } from '@/lib/analytics';
 import { activateSubscription, getSubscription } from '@/lib/db/queries';
 import { isProAt } from '@/lib/entitlements';
@@ -59,9 +58,9 @@ export async function startCheckout(
   const discount = founding[planKey];
   const discounted = discount != null && discount.off[currency] != null;
 
-  // Prefilled so the candidate does not retype what Clerk already knows. Polar
-  // still owns the field — it is the Merchant of Record and the invoice is its
-  // to address.
+  // Prefilled so the candidate does not retype what their account already
+  // knows. Polar still owns the field — it is the Merchant of Record and the
+  // invoice is its to address.
   const user = await currentUser();
 
   const checkout = await polar.checkouts.create({
@@ -70,7 +69,7 @@ export async function startCheckout(
     // The anchor every later guard hangs off: Polar echoes this back on the
     // checkout and on every webhook, and it is how we know whose money this is.
     externalCustomerId: userId,
-    customerEmail: user?.primaryEmailAddress?.emailAddress,
+    customerEmail: user?.email ?? undefined,
     customerName: user?.firstName ?? undefined,
     customerIpAddress: await clientIp(),
     discountId: discounted ? discount.id : undefined,
@@ -276,7 +275,7 @@ export async function cancelPro(): Promise<{ ok: boolean }> {
  * legally belong there — and a customer being able to cancel the way they
  * signed up is a legal requirement in several of the places we now sell.
  *
- * The session is created from `external_customer_id`, which is the Clerk id we
+ * The session is created from `external_customer_id`, which is the user id we
  * set at checkout, so no Polar customer id needs storing on our side.
  */
 export async function manageBilling(): Promise<void> {

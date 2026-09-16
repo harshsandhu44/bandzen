@@ -1,7 +1,7 @@
 import { existsSync } from 'node:fs';
 if (existsSync('.env.local')) process.loadEnvFile('.env.local');
 
-import { neon } from '@neondatabase/serverless';
+import { sql } from './sql.mts';
 
 /**
  * Populates lesson_progress.lesson_id_new (a uuid FK to lessons.id) from the
@@ -18,8 +18,6 @@ import { neon } from '@neondatabase/serverless';
  * empty `lessons` table every row reads as an orphan and 0006 then deletes
  * all of them.
  */
-
-const sql = neon(process.env.DATABASE_URL!);
 
 // RETURNING is what makes the count real. Without it the driver hands back an
 // empty array for an UPDATE, and the run always reported matching nothing.

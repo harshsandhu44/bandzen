@@ -8,11 +8,11 @@ pnpm workspaces + Turborepo monorepo.
 apps/
   web/                 marketing site (port 3000)
   docs/                user and teacher documentation (port 3001)
-  app/                 the product: Clerk + Neon + OpenAI (port 3002)
+  app/                 the product: Supabase + OpenAI (port 3002)
   admin/               the CMS: content editing behind a role gate (port 3003)
 packages/
   ui/                  shared shadcn design system (@bandzen/ui)
-  db/                  schema, Neon client, shared queries (@bandzen/db)
+  db/                  schema, Postgres client, shared queries (@bandzen/db)
   eslint-config/       shared ESLint configs (@bandzen/eslint-config)
   tsconfig/            shared TypeScript configs (@bandzen/tsconfig)
 ```
@@ -22,7 +22,7 @@ the documentation on `docs.bandzen.com`, the signed-in product on
 `app.bandzen.com`, and the CMS on its own project. The marketing CTAs point at
 the product app through `NEXT_PUBLIC_APP_URL`, and both it and the product link
 to the documentation through `NEXT_PUBLIC_DOCS_URL`. `apps/admin` is a separate deployment but not a separate
-system: it shares the product's Clerk instance and its Neon database, which is
+system: it shares the product's Supabase project and its database, which is
 why a signed-in student is a real session there and has to be turned away
 rather than redirected.
 
@@ -54,6 +54,9 @@ packages in parallel and caches the results.
 | Command          | What it does                                                     |
 | ---------------- | ---------------------------------------------------------------- |
 | `pnpm dev`       | Every dev server (web :3000, docs :3001, app :3002, admin :3003) |
+| `pnpm db:start`  | Local Supabase (Postgres, Auth, Studio :54323, Mailpit :54324)   |
+| `pnpm db:stop`   | Stops it; data is kept                                           |
+| `pnpm db:reset`  | Empty database, every migration, every content seed              |
 | `pnpm build`     | Builds every app                                                 |
 | `pnpm lint`      | Lints every app and package                                      |
 | `pnpm typecheck` | Type-checks every package                                        |

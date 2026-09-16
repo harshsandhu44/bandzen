@@ -1,5 +1,4 @@
 import { redirect } from 'next/navigation';
-import { currentUser } from '@clerk/nextjs/server';
 import { Card, CardContent } from '@bandzen/ui/components/card';
 import { examSkills, getExam } from '@bandzen/exams/registry';
 import { ExamComingSoon } from '@/components/app/exam-coming-soon';
@@ -18,7 +17,7 @@ import { PerformanceInsight } from '@/components/dashboard/performance-insight';
 import { RecentAttempts } from '@/components/dashboard/recent-attempts';
 import { TodaysPlan } from '@/components/dashboard/todays-plan';
 import { AwardStrip } from '@/components/awards/award-strip';
-import { requireUserId } from '@/lib/auth';
+import { currentUser, requireUserId } from '@/lib/auth';
 import { daysUntil, todayIso } from '@/lib/dates';
 import {
   examHasContent,

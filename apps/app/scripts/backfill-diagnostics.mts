@@ -22,13 +22,8 @@
  *
  * Delete this script once it has run against production.
  */
-import { neon } from '@neondatabase/serverless';
+import { sql } from './sql.mts';
 
-const url = process.env.DATABASE_URL;
-if (!url)
-  throw new Error('Missing DATABASE_URL. Try: node --env-file=.env.local ...');
-
-const sql = neon(url);
 const apply = process.argv.includes('--apply');
 
 const rows = (await sql`

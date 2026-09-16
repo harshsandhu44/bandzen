@@ -17,9 +17,9 @@ const ROWS: {
   retention: string;
 }[] = [
   {
-    name: '__session, __client_uat, __clerk_*',
+    name: 'sb-*-auth-token',
     category: 'Necessary',
-    setBy: 'Clerk',
+    setBy: 'Supabase',
     purpose: 'Keeps you signed in and protects the sign-in flow.',
     retention: 'Session / short-lived',
   },

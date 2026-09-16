@@ -8,6 +8,7 @@ import {
   exists,
   gte,
   ilike,
+  inArray,
   isNotNull,
   lt,
   lte,
@@ -26,6 +27,7 @@ import {
   lessons,
   listeningTracks,
   passages,
+  profiles,
   questionAnswers,
   questions,
   contentEvents,
@@ -495,10 +497,11 @@ export async function markLessonComplete(userId: string, lessonSlug: string) {
 // ---------------------------------------------------------------------------
 // CMS — passages, questions, and answers
 //
-// The neon-http driver has no transaction support (verified: it throws "No
-// transactions support in neon-http driver"), so a question and its answer
-// are written as two sequential statements, not one transaction. That's fine
-// here: nothing else depends on them landing atomically, and a question left
+// ponytail: a question and its answer are written as two sequential
+// statements, not one transaction. The neon-http driver could not do better;
+// postgres-js can, so this is now a choice rather than a limit. Wrap these in
+// `db.transaction()` if a half-written question ever reaches a reader. Fine as
+// it is today: nothing else depends on them landing atomically, and a question left
 // without an answer by a failed second write is exactly what
 // `checkPassageCompleteness` already exists to catch before publish — it is
 // a visible "incomplete" draft, not silent data corruption.
@@ -1610,8 +1613,8 @@ export type RecentEdit = {
  * The most recently touched content across all four tables, newest first.
  *
  * `writing_prompts` has no title column, so it contributes its slug — the same
- * label the /writing-prompts list uses. `updatedBy` is a raw Clerk userId; the
- * caller resolves it to an email (this package has no Clerk access).
+ * label the /writing-prompts list uses. `updatedBy` is a raw user id; the
+ * caller resolves it to an email.
  */
 export async function listRecentlyEdited(limit = 10): Promise<RecentEdit[]> {
   const rows = await unionAll(
@@ -1892,8 +1895,8 @@ export async function getExamTaskAdmin(id: string) {
 }
 
 /**
- * A new draft and its key. Sequential, not transactional (neon-http): a key
- * that fails to write leaves a draft publish validation refuses.
+ * A new draft and its key. Sequential, not transactional: a key that fails to
+ * write leaves a draft publish validation refuses.
  */
 export async function createExamTask(
   input: {
@@ -2021,4 +2024,73 @@ export async function getPublishedExamTask(examKey: ExamKey, taskType: string) {
       )
       .limit(1),
   );
+}
+
+// ---------------------------------------------------------------------------
+// Accounts — who may edit content
+//
+// Roles live on `profiles` rather than on the auth user. Supabase can carry
+// them in `app_metadata`, but reading that means an admin-API round trip or
+// parsing a JWT, and listing everyone who holds one means paging the auth
+// admin API. Here they are an ordinary column: joinable, indexable, and
+// readable by the same connection every other query already uses.
+// ---------------------------------------------------------------------------
+
+export type Role = 'admin' | 'teacher';
+
+/** The role and email behind a session, for the CMS gate. */
+export async function getAccount(userId: string) {
+  const [row] = await db
+    .select({ email: profiles.email, role: profiles.role })
+    .from(profiles)
+    .where(eq(profiles.userId, userId));
+  return row ?? null;
+}
+
+/** Everyone who holds a role. Candidates — almost everyone — are not listed. */
+export async function listStaff() {
+  return db
+    .select({
+      userId: profiles.userId,
+      email: profiles.email,
+      role: profiles.role,
+    })
+    .from(profiles)
+    .where(isNotNull(profiles.role))
+    .orderBy(profiles.email);
+}
+
+/**
+ * Grant or revoke, by the email the account signed up with. Returns null when
+ * nobody has that address — the caller says so rather than silently succeeding.
+ *
+ * `profiles.email` is kept current by the `handle_new_user` trigger, so this
+ * never goes looking at a stale copy.
+ */
+export async function setRoleByEmail(email: string, role: Role | null) {
+  const [row] = await db
+    .update(profiles)
+    .set({ role })
+    .where(eq(profiles.email, email.trim().toLowerCase()))
+    .returning({ userId: profiles.userId });
+  return row ?? null;
+}
+
+/** Revoke by id, for the list that already knows one. */
+export async function setRole(userId: string, role: Role | null) {
+  await db.update(profiles).set({ role }).where(eq(profiles.userId, userId));
+}
+
+/**
+ * Resolve the user ids stored in `updated_by` to emails for display. Ids with
+ * no profile are simply absent from the map; the caller falls back to the id.
+ */
+export async function editorEmails(userIds: string[]) {
+  const unique = [...new Set(userIds)];
+  if (unique.length === 0) return new Map<string, string>();
+  const rows = await db
+    .select({ userId: profiles.userId, email: profiles.email })
+    .from(profiles)
+    .where(inArray(profiles.userId, unique));
+  return new Map(rows.filter((r) => r.email).map((r) => [r.userId, r.email!]));
 }

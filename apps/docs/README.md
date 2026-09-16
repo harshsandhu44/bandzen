@@ -6,7 +6,7 @@ indexable, and the only surface besides `apps/web` that is.
 
 Two audiences, and they share almost nothing: **candidates** preparing for
 IELTS, and **teachers** writing the content they practise on. A "teacher" here
-is a Clerk `publicMetadata.role` — a CMS author. There is no roster, no class
+is an account with `profiles.role` set — a CMS author. There is no roster, no class
 and no teacher↔student link anywhere in the schema, so `/teachers` is an
 authoring guide rather than a classroom one.
 

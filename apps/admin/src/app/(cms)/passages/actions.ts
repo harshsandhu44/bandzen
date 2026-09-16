@@ -90,7 +90,7 @@ export async function deletePassageAction(
  * One Save for the whole passage editor: the passage fields plus its full
  * question list. Questions are diffed against what is stored — rows dropped
  * from the form are deleted, rows with an id are updated, rows without one are
- * created. Sequential, not transactional (neon-http), same as the importer.
+ * created. Sequential, not transactional, same as the importer.
  */
 export async function savePassageAction(
   payload: SavePassagePayload,

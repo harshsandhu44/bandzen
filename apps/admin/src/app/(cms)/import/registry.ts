@@ -115,10 +115,9 @@ export const REGISTRY = {
       });
       if (!passage) throw new Error('the passage row was not created');
 
-      // Sequential, not transactional -- see packages/db/src/queries.ts's note
-      // on the neon-http driver having no transaction support. A question that
-      // fails here leaves an incomplete draft, which publish-validation
-      // already catches.
+      // Sequential, not transactional -- see packages/db/src/queries.ts's note.
+      // A question that fails here leaves an incomplete draft, which
+      // publish-validation already catches.
       for (const q of item.questions) {
         await createQuestion(
           { passageId: passage.id },
@@ -156,7 +155,7 @@ export const REGISTRY = {
       });
       if (!track) throw new Error('the listening track row was not created');
 
-      // Sequential, not transactional -- same neon-http limitation as passages.
+      // Sequential, not transactional -- same as passages.
       for (const q of item.questions) {
         await createQuestion(
           { trackId: track.id },
@@ -191,7 +190,7 @@ export const REGISTRY = {
       });
       if (!test) throw new Error('the speaking test row was not created');
 
-      // Sequential, not transactional -- same neon-http limitation as passages.
+      // Sequential, not transactional -- same as passages.
       for (const p of item.prompts) {
         const prompt = await createSpeakingPrompt(test.id, {
           idx: p.idx,

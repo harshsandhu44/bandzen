@@ -1,11 +1,11 @@
 # admin
 
 The Bandzen CMS (port 3003). Its own Vercel project with root directory
-`apps/admin`, sharing **the same Clerk instance and the same Neon database** as
+`apps/admin`, sharing **the same Supabase project and the same database** as
 `apps/app`. Nothing here is student-facing, and `robots` is `noindex, nofollow`
 on every route.
 
-**Stack:** Clerk (auth + roles in `publicMetadata`) · Neon (Postgres, via
+**Stack:** Supabase Auth · Postgres (roles in `profiles.role`, via
 `@bandzen/db`) · Drizzle · Zod (the JSON imports).
 
 It exists so passages, questions, answer keys, writing prompts, lessons and
@@ -15,8 +15,8 @@ which is what made a CMS possible at all.
 
 ## Setup
 
-1. `cp .env.example .env.local` and fill it in. `DATABASE_URL` and both Clerk
-   keys are **the same values as `apps/app`** — this is one database and one
+1. `cp .env.example .env.local` and fill it in. `DATABASE_URL` and both Supabase
+   values are **the same as `apps/app`** — this is one database and one
    sign-in, not a second of each.
 2. Put your own email in `ADMIN_EMAILS`. This is how the first admin exists at
    all: the `/teachers` screen grants roles, and there is nobody to grant you
@@ -40,17 +40,23 @@ is gated behind it — without the flag it throws E488 instead of rendering the 
 
 ## Access model
 
-Two roles, in Clerk `publicMetadata.role`: **`admin`** and **`teacher`**. No
-roles table, no rows. Teachers have full content CRUD parity with admin;
+Two roles, in `profiles.role`: **`admin`** and **`teacher`**, or null for a
+candidate. No roles table. Teachers have full content CRUD parity with admin;
 `/teachers` is the only admin-only screen, because granting a role is the one
 thing a teacher cannot do.
 
-`ADMIN_EMAILS` is a comma-separated allowlist checked _alongside_ the Clerk
+`ADMIN_EMAILS` is a comma-separated allowlist checked _alongside_ the stored
 role, and it is **permanent, not a bootstrap hack**. Keep it set. It is the way
-back in if `publicMetadata` is ever cleared or wiped, and without it a bad
-write to Clerk locks every editor out of the CMS with no recourse.
+back in if `profiles.role` is ever cleared or wiped, and without it a bad write
+locks every editor out of the CMS with no recourse.
 
-`src/proxy.ts` hydrates the session and deliberately does **not** gate routes —
+Roles live on `profiles` rather than in Supabase's `app_metadata` so reading one
+is an ordinary query on the connection every page already has — not an auth
+admin API call, and not a service-role key in this app. `profiles.email` is
+kept current by a trigger on `auth.users`, which is what `/teachers` grants
+against and what the editor names in the feed resolve through.
+
+`src/proxy.ts` refreshes the session and deliberately does **not** gate routes —
 the same convention as `apps/app`, for the same reason: middleware protection
 relies on path matching, which can diverge from how Next actually routes a
 request. The gate is at each resource. Every page calls
@@ -67,7 +73,7 @@ When a signed-in account has no CMS role, `requireAdminOrTeacher()` calls
 `forbidden()`, which renders `src/app/forbidden.tsx` and terminates. It does
 **not** redirect, and it must not start to.
 
-This app shares its Clerk instance with `apps/app`, and on localhost the
+This app shares its Supabase project with `apps/app`, and on localhost the
 session cookie ignores the port — so a signed-in _student_ at :3002 is a real,
 valid session here at :3003. A denied session sent to another page in this app
 lands on a page that is itself gated, which is precisely how `/` → `/teachers`
@@ -84,8 +90,8 @@ Three things came out of that, and each is load-bearing:
   The shell's footer shows the signed-in email and role for the same reason:
   not knowing which account you were on is what made the loop confusing.
 
-Only `redirect()` for a _missing_ session, which goes to `/sign-in` and is
-Clerk's screen, not a gated one.
+Only `redirect()` for a _missing_ session, which goes to `/sign-in` — a
+sign-in form, not a gated page.
 
 ## Publish workflow
 
@@ -194,7 +200,7 @@ exactly this reason: a drift fails there rather than at an upload.
 
 A file may hold one object or an array of up to 50. Nothing at all is written
 until every slug is checked against the existing rows **and** against the rest
-of the file — inserts are not transactional (neon-http), so that pre-check is
+of the file — inserts are not transactional, so that pre-check is
 the only thing between a half-imported file and a clean one. A failure inside
 the loop reports how far it got and names the row that stopped it.
 

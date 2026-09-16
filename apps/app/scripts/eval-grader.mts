@@ -1,7 +1,7 @@
 import { existsSync } from 'node:fs';
 if (existsSync('.env.local')) process.loadEnvFile('.env.local');
 
-import { neon } from '@neondatabase/serverless';
+import { sql } from './sql.mts';
 import { runAI } from '@bandzen/ai/runtime';
 import { PRICES_USD_PER_MTOK } from '@bandzen/ai/runtime/pricing';
 import {
@@ -65,8 +65,6 @@ const REPEAT = Number(arg('repeat', '1'));
 // reasoning tokens bill as output — so pin it unless you mean to measure that.
 const EFFORT = process.argv.includes('--effort') ? arg('effort') : undefined;
 
-const sql = neon(process.env.DATABASE_URL!);
-
 const toBand = (n: number) => Math.min(9, Math.max(0, Math.round(n * 2) / 2));
 const pct = (n: number, d: number) =>
   d === 0 ? '—' : `${Math.round((n / d) * 100)}%`;
@@ -77,7 +75,7 @@ function quantile(xs: number[], q: number) {
   return s[Math.min(s.length - 1, Math.floor(q * s.length))];
 }
 
-/** neon() returns untyped rows; one cast at the query boundary, not per field. */
+/** The driver returns untyped rows; one cast at the query boundary, not per field. */
 type Row = Record<string, string & number & null>;
 
 type Case = {
