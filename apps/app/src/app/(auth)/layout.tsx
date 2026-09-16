@@ -1,10 +1,10 @@
-import { BandRulerArt } from '@bandzen/ui/components/band-ruler-art';
+import { AuthIllustration } from '@bandzen/ui/components/auth-illustration';
 import { Wordmark } from '@bandzen/ui/components/wordmark';
 
 /**
  * shadcn's login-02 split: the form on the left, a picture on the right from
  * `lg` up. Every auth screen shares it, so none of them looks a generation
- * older than the rest. The picture is the band ruler; see `BandRulerArt`.
+ * older than the rest. The picture is `AuthIllustration`.
  */
 export default function AuthLayout({ children }: LayoutProps<'/'>) {
   return (
@@ -17,8 +17,8 @@ export default function AuthLayout({ children }: LayoutProps<'/'>) {
           <div className="w-full max-w-xs">{children}</div>
         </div>
       </div>
-      <div className="relative hidden overflow-hidden bg-muted lg:block">
-        <BandRulerArt className="absolute inset-0 size-full" />
+      <div className="hidden items-center justify-center bg-muted p-16 lg:flex">
+        <AuthIllustration className="max-w-lg" />
       </div>
     </main>
   );

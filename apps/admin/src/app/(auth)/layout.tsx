@@ -1,7 +1,7 @@
-import { BandRulerArt } from '@bandzen/ui/components/band-ruler-art';
+import { AuthIllustration } from '@bandzen/ui/components/auth-illustration';
 import { Wordmark } from '@bandzen/ui/components/wordmark';
 
-/** The same split as apps/app's auth layout; the ruler picks up the CMS's plum. */
+/** The same split as apps/app's auth layout; the illustration picks up the CMS's plum. */
 export default function AuthLayout({
   children,
 }: {
@@ -19,8 +19,8 @@ export default function AuthLayout({
           <div className="w-full max-w-xs">{children}</div>
         </div>
       </div>
-      <div className="relative hidden overflow-hidden bg-muted lg:block">
-        <BandRulerArt className="absolute inset-0 size-full" />
+      <div className="hidden items-center justify-center bg-muted p-16 lg:flex">
+        <AuthIllustration className="max-w-lg" />
       </div>
     </main>
   );
