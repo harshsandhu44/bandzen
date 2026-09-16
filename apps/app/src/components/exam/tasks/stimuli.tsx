@@ -1,8 +1,12 @@
-import type { Stimulus } from '@bandzen/exams/registry';
+import type { Stimulus, TaskAudioPolicy } from '@bandzen/exams/registry';
 import type { ComponentType } from 'react';
 import type { StimulusData } from '@/lib/task-content';
+import { TaskAudio } from './task-audio';
 
-function Text({ data }: { data: StimulusData }) {
+/** Every stimulus takes the item's data; only audio reads the task's policy. */
+export type StimulusProps = { data: StimulusData; audio?: TaskAudioPolicy };
+
+function Text({ data }: StimulusProps) {
   if (!data.text) return null;
   return (
     <div className="space-y-4 text-sm leading-7 text-pretty">
@@ -13,15 +17,20 @@ function Text({ data }: { data: StimulusData }) {
   );
 }
 
-function Audio({ data }: { data: StimulusData }) {
-  return data.audioUrl ? (
-    <audio controls preload="none" src={data.audioUrl} className="w-full" />
+function Audio({ data, audio }: StimulusProps) {
+  if (!data.audioUrl) {
+    return <p className="text-sm text-muted-foreground">No audio attached.</p>;
+  }
+  // No policy means an ordinary player with a full transport, which is what
+  // IELTS practice wants: the point there is going back over the bit you missed.
+  return audio ? (
+    <TaskAudio src={data.audioUrl} policy={audio} />
   ) : (
-    <p className="text-sm text-muted-foreground">No audio attached.</p>
+    <audio controls preload="none" src={data.audioUrl} className="w-full" />
   );
 }
 
-function ImageStimulus({ data }: { data: StimulusData }) {
+function ImageStimulus({ data }: StimulusProps) {
   if (!data.imageUrl) return null;
   return (
     // A data URI or R2 URL of unknown size: next/image needs dimensions it
@@ -35,11 +44,11 @@ function ImageStimulus({ data }: { data: StimulusData }) {
   );
 }
 
-function Mixed({ data }: { data: StimulusData }) {
+function Mixed({ data, audio }: StimulusProps) {
   return (
     <div className="space-y-6">
       <ImageStimulus data={data} />
-      {data.audioUrl !== undefined ? <Audio data={data} /> : null}
+      {data.audioUrl !== undefined ? <Audio data={data} audio={audio} /> : null}
       <Text data={data} />
     </div>
   );
@@ -48,7 +57,7 @@ function Mixed({ data }: { data: StimulusData }) {
 /** What the candidate is shown, keyed by the task definition's `stimulus`. */
 export const STIMULUS_RENDERERS: Record<
   Stimulus,
-  ComponentType<{ data: StimulusData }>
+  ComponentType<StimulusProps>
 > = {
   text: Text,
   audio: Audio,

@@ -48,7 +48,7 @@ export function TaskLab({
             {examName} · {task.label} · {task.measuredSkills.join(' + ')} ·{' '}
             {source}
           </p>
-          <Stimulus data={stimulus} />
+          <Stimulus data={stimulus} audio={task.audio} />
         </div>
       }
       right={
