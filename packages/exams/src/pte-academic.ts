@@ -1,4 +1,4 @@
-import { task, timed } from './task.ts';
+import { ONE_PLAY, SECTION_TIMED, task, timed } from './task.ts';
 import type { ExamDefinition } from './types.ts';
 
 /**
@@ -56,6 +56,7 @@ export const PTE_ACADEMIC = {
       'speaking_model',
       ['listening', 'speaking'],
       timed(0, 15),
+      ONE_PLAY,
     ),
     task(
       'speaking_writing',
@@ -78,6 +79,7 @@ export const PTE_ACADEMIC = {
       'speaking_model',
       ['listening', 'speaking'],
       timed(10, 40),
+      ONE_PLAY,
     ),
     task(
       'speaking_writing',
@@ -89,6 +91,7 @@ export const PTE_ACADEMIC = {
       'speaking_model',
       ['listening', 'speaking'],
       timed(0, 10),
+      ONE_PLAY,
     ),
     task(
       'speaking_writing',
@@ -100,6 +103,7 @@ export const PTE_ACADEMIC = {
       'speaking_model',
       ['listening', 'speaking'],
       timed(10, 120),
+      ONE_PLAY,
     ),
     task(
       'speaking_writing',
@@ -111,6 +115,7 @@ export const PTE_ACADEMIC = {
       'speaking_model',
       ['listening', 'speaking'],
       timed(10, 40),
+      ONE_PLAY,
     ),
     task(
       'speaking_writing',
@@ -194,6 +199,7 @@ export const PTE_ACADEMIC = {
       'writing_model',
       ['listening', 'writing'],
       timed(0, 600),
+      ONE_PLAY,
     ),
     task(
       'listening',
@@ -204,6 +210,8 @@ export const PTE_ACADEMIC = {
       'multi_choice',
       'multi_match',
       ['listening'],
+      SECTION_TIMED,
+      ONE_PLAY,
     ),
     task(
       'listening',
@@ -214,6 +222,8 @@ export const PTE_ACADEMIC = {
       'fill_blank',
       'gap_match',
       ['listening', 'writing'],
+      SECTION_TIMED,
+      ONE_PLAY,
     ),
     task(
       'listening',
@@ -224,6 +234,8 @@ export const PTE_ACADEMIC = {
       'choice_cards',
       'exact_match',
       ['listening', 'reading'],
+      SECTION_TIMED,
+      ONE_PLAY,
     ),
     task(
       'listening',
@@ -234,6 +246,8 @@ export const PTE_ACADEMIC = {
       'choice_cards',
       'exact_match',
       ['listening'],
+      SECTION_TIMED,
+      ONE_PLAY,
     ),
     task(
       'listening',
@@ -244,6 +258,8 @@ export const PTE_ACADEMIC = {
       'choice_cards',
       'exact_match',
       ['listening'],
+      SECTION_TIMED,
+      ONE_PLAY,
     ),
     task(
       'listening',
@@ -254,6 +270,8 @@ export const PTE_ACADEMIC = {
       'multi_choice',
       'multi_match',
       ['listening', 'reading'],
+      SECTION_TIMED,
+      ONE_PLAY,
     ),
     task(
       'listening',
@@ -264,6 +282,8 @@ export const PTE_ACADEMIC = {
       'text_input',
       'dictation_match',
       ['listening', 'writing'],
+      SECTION_TIMED,
+      ONE_PLAY,
     ),
   ],
 } as const satisfies ExamDefinition;

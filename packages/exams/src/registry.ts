@@ -158,6 +158,17 @@ export function validateDefinition(exam: ExamDefinition): string[] {
     ) {
       problems.push(`task "${t.key}" has an impossible time window`);
     }
+    if (t.audio) {
+      if (!Number.isInteger(t.audio.plays) || t.audio.plays < 1) {
+        problems.push(`task "${t.key}" allows no plays of its audio`);
+      }
+      if (t.stimulus !== 'audio' && t.stimulus !== 'mixed') {
+        problems.push(`task "${t.key}" has an audio policy but shows no audio`);
+      }
+      if ((t.audio.startDelaySeconds ?? 0) < 0) {
+        problems.push(`task "${t.key}" starts its audio before it begins`);
+      }
+    }
   }
 
   for (const s of exam.sections) {

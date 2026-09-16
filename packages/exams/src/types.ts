@@ -73,6 +73,22 @@ export type TimingRule =
   | { scope: 'section' }
   | { scope: 'task'; prepSeconds: number; responseSeconds: number };
 
+/**
+ * How a task's audio stimulus behaves. Absent means an ordinary player with a
+ * full transport, which is what IELTS practice wants. PTE declares one play
+ * and auto-start, and the stimulus renderer is what enforces it — a task
+ * component deciding for itself is how the IELTS mock ended up with a
+ * hardcoded `replayable` boolean.
+ */
+export type TaskAudioPolicy = {
+  /** How many times the candidate may hear it. Every PTE audio task: 1. */
+  plays: number;
+  /** Begins on its own rather than waiting to be clicked. */
+  autoplay: boolean;
+  /** Silence before it begins, as the real test gives. */
+  startDelaySeconds?: number;
+};
+
 export type ScoreScale = {
   /** What the number is called on this exam's own score report. */
   label: 'Band' | 'Score';
@@ -96,6 +112,8 @@ export type TaskDefinition = {
   stimulus: Stimulus;
   response: ResponseType;
   timing: TimingRule;
+  /** Only for a task with audio, and only where the format constrains it. */
+  audio?: TaskAudioPolicy;
   measuredSkills: readonly Skill[];
   renderer: RendererKey;
   evaluator: EvaluatorKey;
