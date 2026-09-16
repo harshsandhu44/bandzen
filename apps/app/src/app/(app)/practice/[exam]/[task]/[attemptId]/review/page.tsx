@@ -1,13 +1,25 @@
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { getExam, getTask } from '@bandzen/exams/registry';
-import { evaluatorFor } from '@bandzen/exams/scoring';
+import { evaluatorFor, isAnswerCorrect } from '@bandzen/exams/scoring';
 import { Button } from '@bandzen/ui/components/button';
+import { cn } from '@bandzen/ui/lib/utils';
 import { Eyebrow, PageHeader, Panel } from '@/components/app/primitives';
 import { requireContentRole, requireUserId } from '@/lib/auth';
 import { getAttempt, getExamTaskReview } from '@/lib/db/queries';
 
 export const metadata = { title: 'Task review', robots: { index: false } };
+
+/** Multi-part answers are stored as a JSON array; a malformed one reads empty. */
+function parts(value: string | null): string[] {
+  if (!value) return [];
+  try {
+    const parsed: unknown = JSON.parse(value);
+    return Array.isArray(parsed) ? parsed.map(String) : [];
+  } catch {
+    return [];
+  }
+}
 
 export default async function TaskReviewPage({
   params,
@@ -118,6 +130,17 @@ export default async function TaskReviewPage({
 
       {data.items.map((row, n) => {
         const marks = mark ? mark(row.answer ?? [], row.value) : null;
+        const given = parts(row.value);
+        // Per gap, which is what makes a partly-right answer legible. Only
+        // ever here: the key reaches this page because the attempt is over.
+        const gaps =
+          task.evaluator === 'gap_match' && row.answer
+            ? row.answer.map((key, i) => ({
+                accepted: key.split('|'),
+                given: given[i] ?? '',
+                ok: isAnswerCorrect(key.split('|'), given[i]),
+              }))
+            : null;
         return (
           <Panel
             key={row.taskId}
@@ -131,7 +154,35 @@ export default async function TaskReviewPage({
                   {row.value || row.audioUrl || '—'}
                 </dd>
               </div>
-              {row.answer?.length ? (
+              {gaps ? (
+                <div>
+                  <dt className="text-muted-foreground">Gaps</dt>
+                  <dd>
+                    <ol className="space-y-1">
+                      {gaps.map((gap, i) => (
+                        <li key={i} className="flex items-baseline gap-2">
+                          <span className="font-mono text-xs text-muted-foreground">
+                            {i + 1}
+                          </span>
+                          <span
+                            className={cn(
+                              'font-mono text-xs',
+                              gap.ok ? 'text-foreground' : 'text-destructive',
+                            )}
+                          >
+                            {gap.given || '—'}
+                          </span>
+                          {gap.ok ? null : (
+                            <span className="font-mono text-xs text-muted-foreground">
+                              → {gap.accepted.join(' / ')}
+                            </span>
+                          )}
+                        </li>
+                      ))}
+                    </ol>
+                  </dd>
+                </div>
+              ) : row.answer?.length ? (
                 <div>
                   <dt className="text-muted-foreground">Accepted</dt>
                   <dd className="font-mono text-xs">

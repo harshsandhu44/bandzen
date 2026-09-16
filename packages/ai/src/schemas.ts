@@ -516,6 +516,8 @@ export const examTaskSchema = z
       .default({}),
     options: z.array(z.string().min(1)).nullish(),
     gapped: z.string().nullish(),
+    /** `fill_blank_select`: the choices at each gap, in gap order. */
+    gapOptions: z.array(z.array(z.string().min(1))).nullish(),
     tokens: z.array(z.string().min(1)).nullish(),
     turns: z.array(z.string().min(1)).nullish(),
     timing: z
@@ -573,6 +575,7 @@ export function toTaskContent(t: {
   };
   options?: string[] | null;
   gapped?: string | null;
+  gapOptions?: string[][] | null;
   tokens?: string[] | null;
   turns?: string[] | null;
   timing?: { prepSeconds: number; responseSeconds: number } | null;
@@ -588,6 +591,7 @@ export function toTaskContent(t: {
     },
     options: t.options ?? null,
     gapped: t.gapped ?? null,
+    gapOptions: t.gapOptions ?? null,
     tokens: t.tokens ?? null,
     turns: t.turns ?? null,
     timing: t.timing ?? null,

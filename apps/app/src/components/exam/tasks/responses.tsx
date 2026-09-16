@@ -268,6 +268,145 @@ export function Reorder({
   );
 }
 
+/**
+ * Gaps filled from a dropdown at each one — PTE's Reading & Writing blanks,
+ * where every gap offers a different set of words.
+ *
+ * Stored exactly as `FillBlank` stores it, one answer per gap in gap order, so
+ * `gap_match` marks all three blank renderers without knowing them apart.
+ */
+export function FillBlankSelect({
+  label,
+  item,
+  value,
+  onChange,
+}: ResponseRendererProps) {
+  const parts = (item.gapped ?? '').split('___');
+  const gaps = parseList(value);
+  const setGap = (i: number, v: string) => {
+    const next = Array.from(
+      { length: parts.length - 1 },
+      (_, j) => gaps[j] ?? '',
+    );
+    next[i] = v;
+    onChange(JSON.stringify(next));
+  };
+  // A div rather than a p: `Select` wraps its control in a div, which is
+  // invalid inside a paragraph and breaks hydration.
+  return (
+    <div className="text-sm leading-9">
+      {parts.map((part, i) => (
+        <span key={i}>
+          {part}
+          {i < parts.length - 1 ? (
+            <Select
+              value={gaps[i] ?? ''}
+              onChange={(e) => setGap(i, e.target.value)}
+              aria-label={`${label}, gap ${i + 1}`}
+              className="mx-1 inline-flex h-7 w-auto"
+            >
+              <option value="">Choose…</option>
+              {(item.gapOptions?.[i] ?? []).map((choice) => (
+                <option key={choice} value={choice}>
+                  {choice}
+                </option>
+              ))}
+            </Select>
+          ) : null}
+        </span>
+      ))}
+    </div>
+  );
+}
+
+/**
+ * Gaps filled from a shared word bank that holds more words than there are
+ * gaps — PTE's Reading blanks, where the extra words are the distractors.
+ *
+ * Drag a word onto a gap, or pick the gap and then the word: dragging alone
+ * would shut out keyboard and screen-reader users, exactly as it would in
+ * `Reorder`. A filled gap returns its word to the bank when picked again.
+ */
+export function FillBlankDrag({
+  label,
+  item,
+  value,
+  onChange,
+}: ResponseRendererProps) {
+  const parts = (item.gapped ?? '').split('___');
+  const count = parts.length - 1;
+  const gaps = Array.from(
+    { length: count },
+    (_, i) => parseList(value)[i] ?? '',
+  );
+  const [active, setActive] = useState<number | null>(null);
+
+  const set = (i: number, word: string) => {
+    const next = [...gaps];
+    // A word lives in one gap at a time; placing it elsewhere moves it.
+    for (let j = 0; j < next.length; j++) if (next[j] === word) next[j] = '';
+    next[i] = word;
+    onChange(JSON.stringify(next));
+    setActive(null);
+  };
+
+  const clear = (i: number) => {
+    const next = [...gaps];
+    next[i] = '';
+    onChange(JSON.stringify(next));
+  };
+
+  const bank = (item.options ?? []).filter((o) => !gaps.includes(o.value));
+
+  return (
+    <div className="space-y-4">
+      <p className="text-sm leading-9">
+        {parts.map((part, i) => (
+          <span key={i}>
+            {part}
+            {i < count ? (
+              <button
+                type="button"
+                onDragOver={(e) => e.preventDefault()}
+                onDrop={(e) => set(i, e.dataTransfer.getData('text/plain'))}
+                onClick={() => (gaps[i] ? clear(i) : setActive(i))}
+                aria-label={
+                  gaps[i]
+                    ? `${label}, gap ${i + 1}: ${gaps[i]}. Pick to clear.`
+                    : `${label}, gap ${i + 1}: empty. Pick, then choose a word.`
+                }
+                className={cn(
+                  'mx-1 inline-flex h-7 min-w-24 items-center justify-center border px-2 text-sm',
+                  active === i ? 'border-primary' : 'border-input',
+                  !gaps[i] && 'text-muted-foreground',
+                )}
+              >
+                {gaps[i] || '\u2014'}
+              </button>
+            ) : null}
+          </span>
+        ))}
+      </p>
+      <div className="flex flex-wrap gap-1.5">
+        {bank.map((o) => (
+          <Button
+            key={o.value}
+            type="button"
+            variant="outline"
+            size="sm"
+            draggable
+            onDragStart={(e) => e.dataTransfer.setData('text/plain', o.value)}
+            onClick={() => set(active ?? gaps.findIndex((g) => !g), o.value)}
+            disabled={active == null && gaps.every(Boolean)}
+          >
+            {o.label}
+          </Button>
+        ))}
+      </div>
+    </div>
+  );
+}
+
 /** Build a sentence by picking words from a bank; pick a placed word to return it. */
 export function SentenceBuilder({
   label,

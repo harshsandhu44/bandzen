@@ -23,6 +23,18 @@ test('every task of every exam gets a sample its renderer can draw', () => {
         case 'fill_blank':
           assert.ok(item.gapped?.includes('___'), where);
           break;
+        case 'fill_blank_select': {
+          const gaps = (item.gapped ?? '').split('___').length - 1;
+          assert.ok(gaps >= 1, where);
+          assert.equal(item.gapOptions?.length, gaps, where);
+          break;
+        }
+        case 'fill_blank_drag': {
+          const gaps = (item.gapped ?? '').split('___').length - 1;
+          assert.ok(gaps >= 1, where);
+          assert.ok((item.options?.length ?? 0) >= gaps, where);
+          break;
+        }
         case 'reorder':
         case 'sentence_builder':
           assert.ok((item.tokens?.length ?? 0) >= 2, where);

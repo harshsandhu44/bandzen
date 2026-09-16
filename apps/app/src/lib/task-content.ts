@@ -13,8 +13,10 @@ export type TaskItem = {
   prompt: string;
   /** Choice renderers. */
   options?: readonly TaskOption[];
-  /** `fill_blank`: the text, with `___` marking each gap. */
+  /** The blank renderers: the text, with `___` marking each gap. */
   gapped?: string;
+  /** `fill_blank_select`: the choices at each gap, in gap order. */
+  gapOptions?: readonly (readonly string[])[];
   /** `reorder` and `sentence_builder`: the pieces, in the order shown. */
   tokens?: readonly string[];
   /** `conversation`: the examiner's turns, one answer each. */
@@ -61,6 +63,7 @@ export function itemFromContent(
       prompt: content.prompt,
       options: content.options?.map((o) => ({ value: o, label: o })),
       gapped: content.gapped ?? undefined,
+      gapOptions: content.gapOptions ?? undefined,
       tokens: content.tokens ?? undefined,
       turns: content.turns ?? undefined,
       ...(task.words

@@ -59,6 +59,23 @@ export function sampleTask(
       item.gapped =
         'Open water ___ nearby streets and slows ___, but the benefits arrive over ___.';
       break;
+    case 'fill_blank_select':
+      item.gapped =
+        'Open water ___ nearby streets and slows ___, but the benefits arrive over ___.';
+      item.gapOptions = [
+        ['cools', 'heats', 'widens'],
+        ['flooding', 'traffic', 'planning'],
+        ['decades', 'minutes', 'inches'],
+      ];
+      break;
+    case 'fill_blank_drag':
+      item.gapped =
+        'Open water ___ nearby streets and slows ___, but the benefits arrive over ___.';
+      // More words than gaps: the extras are the distractors.
+      item.options = ['cools', 'flooding', 'decades', 'heats', 'traffic'].map(
+        (w) => ({ value: w, label: w }),
+      );
+      break;
     case 'reorder':
       item.prompt = 'Put the paragraphs in order.';
       item.tokens = [

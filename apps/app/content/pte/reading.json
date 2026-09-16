@@ -1,0 +1,105 @@
+[
+  {
+    "slug": "pte-rw-blanks-buried-rivers",
+    "title": "Reading & Writing blanks: buried rivers",
+    "examKey": "pte_academic",
+    "examVersion": "2025-08-07",
+    "taskType": "reading_writing_fill_in_the_blanks",
+    "prompt": "In the text below some words are missing. Choose the correct word to fill each gap from the drop-down list.",
+    "stimulus": {
+      "text": "A short extract about what happens when a city buries its rivers."
+    },
+    "gapped": "Burying a river does not ___ the water; it merely moves it out of sight, where a heavy storm can still ___ the drains beneath the street. Cities that have reopened their watercourses report streets several degrees ___ on a summer afternoon.",
+    "gapOptions": [
+      ["remove", "widen", "deepen", "clean"],
+      ["overwhelm", "encourage", "measure", "protect"],
+      ["cooler", "louder", "drier", "steeper"]
+    ],
+    "answer": ["remove", "overwhelm", "cooler"],
+    "difficulty": 3
+  },
+  {
+    "slug": "pte-reading-blanks-heat-islands",
+    "title": "Reading blanks: urban heat",
+    "examKey": "pte_academic",
+    "examVersion": "2025-08-07",
+    "taskType": "reading_fill_in_the_blanks",
+    "prompt": "In the text below some words are missing. Drag words from the box below to the appropriate place in the text. To undo an answer choice, drag the word back to the box below the text.",
+    "stimulus": {
+      "text": "A short extract about why cities are warmer than the land around them."
+    },
+    "gapped": "Concrete and asphalt ___ heat through the day and release it slowly after dark, while open country ___ quickly. Removing the trees whose shade once did the cooling makes the ___ sharper still.",
+    "options": [
+      "absorb",
+      "cools",
+      "difference",
+      "reflect",
+      "warms",
+      "distance"
+    ],
+    "answer": ["absorb", "cools", "difference"],
+    "difficulty": 3
+  },
+  {
+    "slug": "pte-reading-mcma-restoration",
+    "title": "Multiple answers: river restoration",
+    "examKey": "pte_academic",
+    "examVersion": "2025-08-07",
+    "taskType": "reading_multiple_choice_multiple",
+    "prompt": "Read the text and answer the question by selecting all the correct responses. More than one response is correct.",
+    "stimulus": {
+      "text": "Restoring a buried river is rarely a single project. The channel must be reopened, the water cleaned enough to sit beside, and the roads that ran above it rebuilt elsewhere. Seoul's Cheonggyecheon required removing an elevated motorway before any water was visible. The payoff is measured over decades: cooler streets, slower flooding, and land beside the water that becomes worth more than the road it replaced. Cities rarely attempt it for the cooling alone."
+    },
+    "options": [
+      "Restoration usually involves more than reopening the channel.",
+      "Seoul removed an elevated motorway as part of its project.",
+      "The benefits of restoration appear within a single year.",
+      "Cooling is generally a city's only reason to restore a river.",
+      "Land beside restored water can rise in value."
+    ],
+    "answer": [
+      "Restoration usually involves more than reopening the channel.",
+      "Seoul removed an elevated motorway as part of its project.",
+      "Land beside restored water can rise in value."
+    ],
+    "difficulty": 4
+  },
+  {
+    "slug": "pte-reorder-culverts",
+    "title": "Re-order: why culverts were built",
+    "examKey": "pte_academic",
+    "examVersion": "2025-08-07",
+    "taskType": "reorder_paragraphs",
+    "prompt": "The text boxes in the left panel have been placed in a random order. Restore the original order by dragging the text boxes.",
+    "stimulus": {
+      "text": "Four sentences from a short article about culverted rivers."
+    },
+    "tokens": [
+      "The reasoning was that a covered channel took up no land and carried waste away without complaint.",
+      "For most of the twentieth century, planners treated urban rivers as obstacles.",
+      "Cities are now paying to undo the work, one channel at a time.",
+      "That calculation ignored what a buried river does during a storm."
+    ],
+    "answer": ["1", "0", "3", "2"],
+    "difficulty": 3
+  },
+  {
+    "slug": "pte-reading-mcsa-notice",
+    "title": "Single answer: a drainage notice",
+    "examKey": "pte_academic",
+    "examVersion": "2025-08-07",
+    "taskType": "reading_multiple_choice_single",
+    "prompt": "Read the text and answer the multiple-choice question by selecting the correct response. Only one response is correct.",
+    "stimulus": {
+      "text": "NOTICE TO RESIDENTS — Work on the culvert beneath Mill Street begins on Monday and is expected to last four weeks. The street will stay open to pedestrians throughout. Vehicle access will be suspended between Mill Lane and the bridge, and refuse collection will move to Tuesday mornings for the duration."
+    },
+    "options": [
+      "Refuse collection moves to Tuesday while the work continues.",
+      "Mill Street will close to pedestrians for four weeks.",
+      "The bridge will be demolished during the work.",
+      "Vehicle access is unaffected by the work."
+    ],
+    "answer": ["Refuse collection moves to Tuesday while the work continues."],
+    "difficulty": 2
+  }
+]

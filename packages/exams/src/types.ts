@@ -42,6 +42,8 @@ export const RENDERERS = [
   'text_input',
   'essay',
   'fill_blank',
+  'fill_blank_select',
+  'fill_blank_drag',
   'reorder',
   'sentence_builder',
   'recording',

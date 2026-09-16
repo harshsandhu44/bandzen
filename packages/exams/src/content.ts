@@ -22,8 +22,14 @@ export type TaskContent = {
   stimulus: TaskStimulus;
   /** Choice renderers. */
   options: string[] | null;
-  /** `fill_blank`: the text, with GAP marking each gap. */
+  /** The blank renderers: the text, with GAP marking each gap. */
   gapped: string | null;
+  /**
+   * `fill_blank_select`: the dropdown choices for each gap, in gap order. One
+   * list per gap — PTE's Reading & Writing blanks offer a different set at
+   * each one, which a single flat `options` cannot express.
+   */
+  gapOptions: string[][] | null;
   /** `reorder` and `sentence_builder`: the pieces, in the order shown. */
   tokens: string[] | null;
   /** `conversation`: the examiner's turns. */
@@ -49,6 +55,12 @@ const CHOICE_RENDERERS = new Set([
   'multi_choice',
 ]);
 const MODEL_EVALUATORS = new Set(['writing_model', 'speaking_model']);
+/** Everything drawn as text with gaps in it, however the gaps are filled. */
+const FILL_RENDERERS = new Set([
+  'fill_blank',
+  'fill_blank_select',
+  'fill_blank_drag',
+]);
 
 const gapCount = (gapped: string | null) =>
   gapped ? gapped.split(GAP).length - 1 : 0;
@@ -109,8 +121,21 @@ export function taskContentIssues(
   if (CHOICE_RENDERERS.has(task.renderer) && options.length < 2) {
     issues.push('at least two options');
   }
-  if (task.renderer === 'fill_blank' && gaps < 1) {
+  if (FILL_RENDERERS.has(task.renderer) && gaps < 1) {
     issues.push(`text with ${GAP} marking each gap`);
+  }
+  if (task.renderer === 'fill_blank_select') {
+    const perGap = content.gapOptions ?? [];
+    if (perGap.length !== gaps) {
+      issues.push(`one list of choices per gap (${gaps})`);
+    } else if (perGap.some((choices) => choices.length < 2)) {
+      issues.push('at least two choices at every gap');
+    }
+  }
+  // A word bank needs a word for every gap; more than that are the
+  // distractors the task is supposed to have.
+  if (task.renderer === 'fill_blank_drag' && options.length < gaps) {
+    issues.push(`a word bank covering every gap (${gaps})`);
   }
   if (
     (task.renderer === 'reorder' || task.renderer === 'sentence_builder') &&
@@ -148,9 +173,28 @@ export function taskContentIssues(
         issues.push('answers that are among the options');
       }
       break;
-    case 'gap_match':
-      if (answer.length !== gaps) issues.push(`one answer per gap (${gaps})`);
+    case 'gap_match': {
+      if (answer.length !== gaps) {
+        issues.push(`one answer per gap (${gaps})`);
+        break;
+      }
+      // A gap whose key is not among its own choices can never be answered.
+      const perGap = content.gapOptions ?? [];
+      if (
+        task.renderer === 'fill_blank_select' &&
+        perGap.length === gaps &&
+        answer.some((a, i) => !a.split('|').some((x) => perGap[i]?.includes(x)))
+      ) {
+        issues.push('answers that are among their gap\u2019s choices');
+      }
+      if (
+        task.renderer === 'fill_blank_drag' &&
+        answer.some((a) => !a.split('|').some((x) => options.includes(x)))
+      ) {
+        issues.push('answers that are in the word bank');
+      }
       break;
+    }
     case 'order_match': {
       const expected = tokens
         .map((_, i) => String(i))
