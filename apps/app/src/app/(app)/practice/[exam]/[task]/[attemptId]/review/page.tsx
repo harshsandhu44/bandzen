@@ -5,7 +5,7 @@ import { evaluatorFor } from '@bandzen/exams/scoring';
 import { Button } from '@bandzen/ui/components/button';
 import { Eyebrow, PageHeader, Panel } from '@/components/app/primitives';
 import { requireContentRole, requireUserId } from '@/lib/auth';
-import { getExamTaskReview } from '@/lib/db/queries';
+import { getAttempt, getExamTaskReview } from '@/lib/db/queries';
 
 export const metadata = { title: 'Task review', robots: { index: false } };
 
@@ -20,6 +20,27 @@ export default async function TaskReviewPage({
   if (!exam || !task) notFound();
 
   const userId = await requireUserId();
+
+  // A model-graded task is still being marked when the candidate arrives here.
+  // Say so rather than 404ing, and say it without a fake percentage.
+  const pending = await getAttempt(userId, attemptId);
+  if (pending?.status === 'grading') {
+    return (
+      <div className="max-w-2xl space-y-6">
+        <PageHeader
+          eyebrow={`${exam.name} · ${task.label}`}
+          title="Marking your answer"
+          description="A grader is working through it. This page will show the result once it is done."
+        />
+        <Panel headingId="grading" title="In progress">
+          <p className="text-sm text-muted-foreground">
+            Reload in a moment. Nothing is lost if you close this page.
+          </p>
+        </Panel>
+      </div>
+    );
+  }
+
   // Refuses an attempt still in progress, so the keys below cannot be read
   // before it is over.
   const data = await getExamTaskReview(userId, attemptId);
@@ -43,6 +64,57 @@ export default async function TaskReviewPage({
             : 'A model grades this task type. Its score arrives with the score report.'
         }
       />
+
+      {/* Model-graded only: a deterministic task's dimensions are correct/total,
+          not traits out of five, and rendering them here would say 2 / 5 for
+          what was actually full marks. */}
+      {!mark && data.attempt.assessment ? (
+        <Panel headingId="grader" title="What the grader found">
+          <div className="space-y-5 text-sm">
+            <dl className="grid grid-cols-2 gap-x-6 gap-y-3 sm:grid-cols-3">
+              {Object.entries(data.attempt.assessment.dimensions).map(
+                ([name, score]) => (
+                  <div key={name}>
+                    <dt className="text-muted-foreground">{name}</dt>
+                    <dd className="font-mono tabular-nums">
+                      {score == null ? '\u2014' : `${score} / 5`}
+                    </dd>
+                  </div>
+                ),
+              )}
+            </dl>
+
+            {data.attempt.assessment.strengths.length ? (
+              <div className="space-y-1">
+                <Eyebrow>Strengths</Eyebrow>
+                <ul className="list-disc space-y-1 pl-5">
+                  {data.attempt.assessment.strengths.map((t) => (
+                    <li key={t}>{t}</li>
+                  ))}
+                </ul>
+              </div>
+            ) : null}
+
+            {data.attempt.assessment.weaknesses.length ? (
+              <div className="space-y-1">
+                <Eyebrow>To work on</Eyebrow>
+                <ul className="list-disc space-y-1 pl-5">
+                  {data.attempt.assessment.weaknesses.map((t) => (
+                    <li key={t}>{t}</li>
+                  ))}
+                </ul>
+              </div>
+            ) : null}
+
+            {data.attempt.assessment.feedback.map((f, i) => (
+              <div key={i} className="border-l-2 border-border pl-4">
+                <p className="text-muted-foreground italic">“{f.quote}”</p>
+                <p>{f.comment}</p>
+              </div>
+            ))}
+          </div>
+        </Panel>
+      ) : null}
 
       {data.items.map((row, n) => {
         const marks = mark ? mark(row.answer ?? [], row.value) : null;

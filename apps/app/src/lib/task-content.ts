@@ -22,6 +22,9 @@ export type TaskItem = {
   /** `recording` and `conversation`. */
   prepSeconds?: number;
   responseSeconds?: number;
+  /** `essay`, where the format states a length. */
+  minWords?: number;
+  maxWords?: number;
 };
 
 export type StimulusData = {
@@ -60,6 +63,9 @@ export function itemFromContent(
       gapped: content.gapped ?? undefined,
       tokens: content.tokens ?? undefined,
       turns: content.turns ?? undefined,
+      ...(task.words
+        ? { minWords: task.words.min, maxWords: task.words.max }
+        : {}),
       ...(window ?? {}),
     },
   };

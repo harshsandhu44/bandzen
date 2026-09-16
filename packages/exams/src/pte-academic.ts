@@ -1,4 +1,4 @@
-import { ONE_PLAY, SECTION_TIMED, task, timed } from './task.ts';
+import { ONE_PLAY, SECTION_TIMED, task, timed, withWords } from './task.ts';
 import type { ExamDefinition } from './types.ts';
 
 /**
@@ -117,27 +117,35 @@ export const PTE_ACADEMIC = {
       timed(10, 40),
       ONE_PLAY,
     ),
-    task(
-      'speaking_writing',
-      'summarize_written_text',
-      'Summarize Written Text',
-      'text',
-      'text',
-      'essay',
-      'writing_model',
-      ['reading', 'writing'],
-      timed(0, 600),
+    withWords(
+      task(
+        'speaking_writing',
+        'summarize_written_text',
+        'Summarize Written Text',
+        'text',
+        'text',
+        'essay',
+        'writing_model',
+        ['reading', 'writing'],
+        timed(0, 600),
+      ),
+      5,
+      75,
     ),
-    task(
-      'speaking_writing',
-      'write_essay',
-      'Write Essay',
-      'text',
-      'text',
-      'essay',
-      'writing_model',
-      ['writing'],
-      timed(0, 1200),
+    withWords(
+      task(
+        'speaking_writing',
+        'write_essay',
+        'Write Essay',
+        'text',
+        'text',
+        'essay',
+        'writing_model',
+        ['writing'],
+        timed(0, 1200),
+      ),
+      200,
+      300,
     ),
     task(
       'reading',
@@ -189,17 +197,21 @@ export const PTE_ACADEMIC = {
       'exact_match',
       ['reading'],
     ),
-    task(
-      'listening',
-      'summarize_spoken_text',
-      'Summarize Spoken Text',
-      'audio',
-      'text',
-      'essay',
-      'writing_model',
-      ['listening', 'writing'],
-      timed(0, 600),
-      ONE_PLAY,
+    withWords(
+      task(
+        'listening',
+        'summarize_spoken_text',
+        'Summarize Spoken Text',
+        'audio',
+        'text',
+        'essay',
+        'writing_model',
+        ['listening', 'writing'],
+        timed(0, 600),
+        ONE_PLAY,
+      ),
+      50,
+      70,
     ),
     task(
       'listening',

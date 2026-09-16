@@ -11,6 +11,13 @@ import type {
 
 export const SECTION_TIMED: TimingRule = { scope: 'section' };
 
+/** The word range a written task demands. Reads better than an 11th argument. */
+export const withWords = (
+  t: TaskDefinition,
+  min: number,
+  max: number,
+): TaskDefinition => ({ ...t, words: { min, max } });
+
 /** Plays once, starts itself: every PTE audio task, and most of TOEFL's. */
 export const ONE_PLAY: TaskAudioPolicy = { plays: 1, autoplay: true };
 

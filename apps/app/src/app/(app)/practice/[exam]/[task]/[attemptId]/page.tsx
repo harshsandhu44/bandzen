@@ -4,7 +4,11 @@ import { requireContentRole, requireUserId } from '@/lib/auth';
 import { getExamTaskAttempt } from '@/lib/db/queries';
 import { runnerItems, sessionMinutes } from '@/lib/task-session';
 import { TaskRunner } from '@/components/exam/task-runner';
-import { saveExamTaskAnswer, submitExamTaskSession } from '../actions';
+import {
+  saveExamTaskAnswer,
+  saveExamTaskRecording,
+  submitExamTaskSession,
+} from '../actions';
 
 export const metadata = { title: 'Practice task', robots: { index: false } };
 
@@ -38,6 +42,7 @@ export default async function TaskAttemptPage({
       minutes={sessionMinutes(exam, task, items.length)}
       autoSubmit={data.attempt.kind !== 'practice'}
       saveAction={saveExamTaskAnswer}
+      uploadAction={saveExamTaskRecording}
       submitAction={submitExamTaskSession}
     />
   );

@@ -23,6 +23,12 @@ export type ResponseRendererProps = {
   item: TaskItem;
   value: string;
   onChange: (value: string) => void;
+  /**
+   * Store a recorded take and return its URL, or null if it could not be
+   * stored. Only the recording renderers use it, and only an attempt supplies
+   * it — the task lab has nowhere to put one.
+   */
+  onUpload?: (blob: Blob) => Promise<string | null>;
 };
 
 const parseList = (value: string): string[] => {
@@ -121,8 +127,16 @@ export function TextInput({ label, value, onChange }: ResponseRendererProps) {
   );
 }
 
-export function Essay({ label, value, onChange }: ResponseRendererProps) {
+export function Essay({ item, label, value, onChange }: ResponseRendererProps) {
   const words = value.trim() ? value.trim().split(/\s+/).length : 0;
+  const { minWords, maxWords } = item;
+  // Shown, never enforced. PTE penalises a response outside the range rather
+  // than refusing it, and a textarea that stops accepting words mid-sentence
+  // would be a worse test than the real one.
+  const outside =
+    words > 0 &&
+    ((minWords != null && words < minWords) ||
+      (maxWords != null && words > maxWords));
   return (
     <div className="space-y-2">
       <Textarea
@@ -132,8 +146,16 @@ export function Essay({ label, value, onChange }: ResponseRendererProps) {
         rows={12}
         className="text-sm md:text-sm"
       />
-      <p className="font-mono text-xs text-muted-foreground tabular-nums">
+      <p
+        className={cn(
+          'font-mono text-xs tabular-nums',
+          outside ? 'text-destructive' : 'text-muted-foreground',
+        )}
+      >
         {words} words
+        {minWords != null && maxWords != null
+          ? ` · ${minWords}\u2013${maxWords} expected`
+          : null}
       </p>
     </div>
   );

@@ -25,11 +25,10 @@ type SaveInput = { attemptId: string; taskId: string; value: string };
  * the difference here is that answers go to the database and the item set is
  * fixed by the attempt rather than by whatever the CMS holds right now.
  *
- * ponytail: `recording` and `conversation` answers are object URLs, which are
- * worthless once the tab closes, so they are not autosaved yet. #93 wires the
- * take to R2 and removes this guard.
+ * A recording persists through its own upload, which writes `audio_url`
+ * directly, so its answer is not sent through autosave as well — the URL is
+ * already stored by the time the renderer reports it.
  */
-const UPLOADS_PENDING = new Set(['recording', 'conversation']);
 
 export function TaskRunner({
   attemptId,
@@ -39,6 +38,7 @@ export function TaskRunner({
   minutes,
   autoSubmit,
   saveAction,
+  uploadAction,
   submitAction,
 }: {
   attemptId: string;
@@ -49,6 +49,10 @@ export function TaskRunner({
   minutes: number | null;
   autoSubmit: boolean;
   saveAction: (input: SaveInput) => Promise<void>;
+  /** Stores a recorded take. Absent for task types that never record one. */
+  uploadAction?: (
+    formData: FormData,
+  ) => Promise<{ ok: boolean; url: string | null }>;
   submitAction: (formData: FormData) => void;
 }) {
   const [answers, setAnswers] = useState<Record<string, string>>(() =>
@@ -68,9 +72,19 @@ export function TaskRunner({
 
   const change = (taskId: string, value: string) => {
     setAnswers((a) => ({ ...a, [taskId]: value }));
-    if (!UPLOADS_PENDING.has(task.renderer)) {
+    if (task.renderer !== 'recording') {
       schedule(taskId, { attemptId, taskId, value });
     }
+  };
+
+  const upload = async (taskId: string, blob: Blob) => {
+    if (!uploadAction) return null;
+    const fd = new FormData();
+    fd.set('attemptId', attemptId);
+    fd.set('taskId', taskId);
+    fd.set('audio', new File([blob], 'take.wav', { type: 'audio/wav' }));
+    const result = await uploadAction(fd);
+    return result.ok ? result.url : null;
   };
 
   return (
@@ -101,6 +115,9 @@ export function TaskRunner({
             item={current.item}
             value={answers[current.taskId] ?? ''}
             onChange={(v) => change(current.taskId, v)}
+            onUpload={
+              uploadAction ? (blob) => upload(current.taskId, blob) : undefined
+            }
           />
         </div>
       }

@@ -638,3 +638,66 @@ export function findSlugClashes(slugs: string[], existing: Set<string>) {
   }
   return [...clashes];
 }
+
+// ---------------------------------------------------------------------------
+// PTE Academic
+//
+// Deliberately NOT bands. Pearson scores each productive task on its own
+// traits out of a few points and combines them by a weighting it does not
+// publish, so the model is asked for the traits it can actually judge and the
+// Bandzen estimate is assembled from those (#96). What comes back is
+// evidence, not a PTE score.
+// ---------------------------------------------------------------------------
+
+export const PTE_WRITING_TRAITS = [
+  'Content',
+  'Form',
+  'Grammar',
+  'Vocabulary',
+  'Spelling',
+  'Development',
+] as const;
+
+export const PTE_SPEAKING_TRAITS = [
+  'Content',
+  'Oral fluency',
+  'Pronunciation',
+] as const;
+
+const pteTrait = <T extends readonly [string, ...string[]]>(names: T) =>
+  z.array(
+    z.object({
+      name: z.enum(names),
+      score: z.number().describe('0-5, whole points.'),
+      comment: z.string(),
+    }),
+  );
+
+export const pteWritingEvaluationSchema = z.object({
+  traits: pteTrait(PTE_WRITING_TRAITS),
+  annotations: z.array(
+    z.object({
+      quote: z.string().describe('Verbatim extract from the response.'),
+      kind: z.enum(['good', 'grammar', 'development']),
+      comment: z.string(),
+    }),
+  ),
+  strengths: z.array(z.string()),
+  weaknesses: z.array(z.string()),
+});
+
+export const pteSpeakingEvaluationSchema = z.object({
+  traits: pteTrait(PTE_SPEAKING_TRAITS),
+  annotations: z.array(
+    z.object({
+      quote: z.string().describe('Verbatim words the candidate said.'),
+      kind: z.enum(['good', 'vocabulary', 'fluency']),
+      comment: z.string(),
+    }),
+  ),
+  strengths: z.array(z.string()),
+  weaknesses: z.array(z.string()),
+});
+
+export type PteWritingEvaluation = z.infer<typeof pteWritingEvaluationSchema>;
+export type PteSpeakingEvaluation = z.infer<typeof pteSpeakingEvaluationSchema>;

@@ -30,6 +30,7 @@ import {
   evaluatorFor,
   modelAssessment,
   objectiveAssessment,
+  type AssessmentResult,
 } from '@bandzen/exams/scoring';
 import { preparationWrites, type PreparationValues } from '@/lib/enrollment';
 import { union } from 'drizzle-orm/pg-core';
@@ -1125,6 +1126,18 @@ export async function submitExamTaskAttempt(userId: string, attemptId: string) {
     .where(eq(examTaskResponses.attemptId, attemptId));
 
   const evaluator = evaluatorFor(attempt.examKey, attempt.taskType);
+
+  // A model-graded task type stays on `grading`: the caller kicks the grader
+  // off in `after()`, and `gradeExamTask` is what moves it to a terminal
+  // status. Closing it here would be a finished attempt with nothing in it.
+  if (evaluator.kind === 'model') {
+    return {
+      id: attemptId,
+      mockAttemptId: attempt.mockAttemptId,
+      needsModel: true,
+    };
+  }
+
   const marked = evaluator.mark
     ? rows.reduce(
         (acc, row) => {
@@ -1162,7 +1175,55 @@ export async function submitExamTaskAttempt(userId: string, attemptId: string) {
     })
     .where(eq(attempts.id, attemptId))
     .returning({ id: attempts.id, mockAttemptId: attempts.mockAttemptId });
-  return row ?? null;
+  return row ? { ...row, needsModel: false } : null;
+}
+
+/**
+ * One exam-task attempt as its grader needs it: the items, what the candidate
+ * answered, and the transcript of anything they were played.
+ *
+ * Takes no userId — like `loadForGrading`, it only ever runs for an attempt
+ * `submitExamTaskAttempt` has already claimed. The transcript is read here
+ * because the grader is server-side; it never travels to a browser mid-attempt.
+ */
+export async function loadExamTaskForGrading(attemptId: string) {
+  const [attempt] = await db
+    .select()
+    .from(attempts)
+    .where(eq(attempts.id, attemptId));
+  if (!attempt?.taskType) return null;
+
+  const items = await db
+    .select({
+      taskId: examTasks.id,
+      content: examTasks.content,
+      value: examTaskResponses.value,
+      audioUrl: examTaskResponses.audioUrl,
+      transcript: examTaskAnswers.transcript,
+    })
+    .from(examTaskResponses)
+    .innerJoin(examTasks, eq(examTasks.id, examTaskResponses.taskId))
+    .leftJoin(
+      examTaskAnswers,
+      eq(examTaskAnswers.taskId, examTaskResponses.taskId),
+    )
+    .where(eq(examTaskResponses.attemptId, attemptId))
+    .orderBy(sql`(${examTasks.content} ->> 'difficulty')::int`, examTasks.slug);
+
+  return { attempt, items };
+}
+
+/** Close a model-graded exam-task attempt with what the grader produced. */
+export async function writeExamTaskAssessment(
+  attemptId: string,
+  assessment: AssessmentResult,
+) {
+  const [row] = await db
+    .update(attempts)
+    .set({ status: 'complete', submittedAt: new Date(), assessment })
+    .where(eq(attempts.id, attemptId))
+    .returning({ userId: attempts.userId });
+  return row?.userId ?? null;
 }
 
 /**

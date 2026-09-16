@@ -1,94 +1,86 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { buildSpeakingMessages, buildWritingMessages } from './messages.ts';
+import {
+  pteSpeakingEvaluationSchema,
+  pteWritingEvaluationSchema,
+} from '@bandzen/ai/schemas';
+import {
+  buildPteSpeakingMessages,
+  buildPteWritingMessages,
+} from './messages.ts';
+import { PTE_SPEAKING_RUBRIC, PTE_WRITING_RUBRIC } from './pte-rubrics.ts';
 
-const clip = (promptId: string) => ({
-  promptId,
-  bytes: new Uint8Array([1, 2, 3]),
-});
-
-test('writing: rubric is first, so the prefix cache applies', () => {
-  const [first] = buildWritingMessages({
-    task: 2,
-    promptText: 'Some prompt.',
-    wordCount: 250,
-    body: 'Some essay.',
+test('the rubric leads every PTE request, or prompt caching stops applying', () => {
+  const writing = buildPteWritingMessages({
+    taskLabel: 'Summarize Written Text',
+    prompt: 'Summarise the passage in one sentence.',
+    words: { min: 5, max: 75 },
+    wordCount: 40,
+    body: 'Cities that reopen buried rivers cool their streets.',
   });
-  assert.equal(first.role, 'system');
-  assert.match(String(first.content), /^You are an experienced IELTS Writing/);
-});
+  assert.equal(writing[0]!.role, 'system');
+  assert.equal(writing[0]!.content, PTE_WRITING_RUBRIC);
 
-test('writing: the candidate response carries task, prompt and word count', () => {
-  const [, user] = buildWritingMessages({
-    task: 1,
-    promptText: 'Describe the chart.',
-    wordCount: 42,
-    body: 'The chart shows.',
+  const speaking = buildPteSpeakingMessages({
+    taskLabel: 'Read Aloud',
+    prompt: 'Read the text aloud.',
+    stimulusText: 'Urban rivers were once buried under roads.',
+    transcript: null,
+    audio: null,
   });
-  const content = String(user.content);
-  assert.match(content, /^Task 1\./);
-  assert.match(content, /Describe the chart\./);
-  assert.match(content, /\(42 words\)/);
-  assert.match(content, /The chart shows\./);
+  assert.equal(speaking[0]!.role, 'system');
+  assert.equal(speaking[0]!.content, PTE_SPEAKING_RUBRIC);
 });
 
-test('speaking: rubric first, response shape second', () => {
-  const [rubric, shape] = buildSpeakingMessages([], []);
-  assert.equal(rubric.role, 'system');
-  assert.match(
-    String(rubric.content),
-    /^You are an experienced IELTS Speaking/,
-  );
-  assert.equal(shape.role, 'system');
-  assert.match(String(shape.content), /Reply with ONE JSON object/);
+test('the required word range reaches the writing grader', () => {
+  const [, user] = buildPteWritingMessages({
+    taskLabel: 'Write Essay',
+    prompt: 'Discuss.',
+    words: { min: 200, max: 300 },
+    wordCount: 120,
+    body: 'Short.',
+  });
+  assert.match(String(user!.content), /200-300 words/);
+  assert.match(String(user!.content), /120 words/);
 });
 
-test('speaking: each answered prompt is followed by its audio', () => {
-  const [, , user] = buildSpeakingMessages(
-    [{ promptId: 'p1', part: 1, text: 'Where are you from?' }],
-    [clip('p1')],
-  );
-  const content = user.content as Array<{ type: string; text?: string }>;
-  assert.equal(content.length, 2);
-  assert.equal(content[0].type, 'text');
-  assert.match(content[0].text!, /^Part 1 — examiner: Where are you from\?$/);
-  assert.equal(content[1].type, 'input_audio');
+test('a missing take is an explicit gap, never a silent omission', () => {
+  const [, user] = buildPteSpeakingMessages({
+    taskLabel: 'Repeat Sentence',
+    prompt: 'Repeat the sentence.',
+    stimulusText: null,
+    transcript: 'The library closes at five.',
+    audio: null,
+  });
+  const parts = user!.content as Array<{ type: string; text?: string }>;
+  assert.ok(parts.some((p) => p.text?.includes('did not record an answer')));
+  // The transcript is context for the grader, server-side only.
+  assert.ok(parts.some((p) => p.text?.includes('The library closes at five.')));
 });
 
-test('speaking: an unanswered prompt becomes a visible gap, not an omission', () => {
-  const [, , user] = buildSpeakingMessages(
-    [
-      { promptId: 'p1', part: 1, text: 'A' },
-      { promptId: 'p2', part: 3, text: 'B' },
-    ],
-    [clip('p1')],
-  );
-  const content = user.content as Array<{ type: string; text?: string }>;
-  // p1 text + p1 audio, p2 text + gap, then the coverage warning.
-  assert.equal(content.length, 5);
-  assert.equal(content[3].text, '[No response recorded for this prompt.]');
-  assert.match(content[4].text!, /answered 1 of 2 prompts/);
-  assert.match(content[2].text!, /^Part 3 \(discussion\)/);
-});
+test('PTE evaluations are traits out of five, not bands', () => {
+  const writing = pteWritingEvaluationSchema.parse({
+    traits: [{ name: 'Content', score: 4, comment: 'Covers the key points.' }],
+    annotations: [],
+    strengths: ['Accurate'],
+    weaknesses: ['Long'],
+  });
+  assert.equal(writing.traits[0]!.score, 4);
 
-test('speaking: a fully answered test gets no coverage warning', () => {
-  const [, , user] = buildSpeakingMessages(
-    [{ promptId: 'p1', part: 2, text: 'A' }],
-    [clip('p1')],
-  );
-  const content = user.content as unknown[];
-  assert.equal(content.length, 2);
-});
+  const speaking = pteSpeakingEvaluationSchema.parse({
+    traits: [{ name: 'Oral fluency', score: 3, comment: 'Some hesitation.' }],
+    annotations: [],
+    strengths: [],
+    weaknesses: [],
+  });
+  assert.equal(speaking.traits[0]!.name, 'Oral fluency');
 
-test('speaking: prompts are walked in order, not clip order', () => {
-  const [, , user] = buildSpeakingMessages(
-    [
-      { promptId: 'p1', part: 1, text: 'first' },
-      { promptId: 'p2', part: 2, text: 'second' },
-    ],
-    [clip('p2'), clip('p1')],
+  assert.throws(() =>
+    pteWritingEvaluationSchema.parse({
+      traits: [{ name: 'Fluency and Coherence', score: 4, comment: 'no' }],
+      annotations: [],
+      strengths: [],
+      weaknesses: [],
+    }),
   );
-  const content = user.content as Array<{ text?: string }>;
-  assert.match(content[0].text!, /first/);
-  assert.match(content[2].text!, /second/);
 });

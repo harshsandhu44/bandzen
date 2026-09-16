@@ -1,0 +1,118 @@
+[
+  {
+    "slug": "pte-read-aloud-city-rivers",
+    "title": "Read Aloud: city rivers",
+    "examKey": "pte_academic",
+    "examVersion": "2025-08-07",
+    "taskType": "read_aloud",
+    "prompt": "Look at the text below. In 35 seconds you must read this text aloud as naturally and as clearly as possible. You have 35 seconds to read aloud.",
+    "stimulus": {
+      "text": "Urban rivers were once buried beneath roads to make room for traffic. Several cities have since reopened them, finding that open water cools nearby streets, slows flooding after heavy rain, and draws people back to districts that had been neglected for decades."
+    },
+    "difficulty": 3
+  },
+  {
+    "slug": "pte-repeat-sentence-library-hours",
+    "title": "Repeat Sentence: library hours",
+    "examKey": "pte_academic",
+    "examVersion": "2025-08-07",
+    "taskType": "repeat_sentence",
+    "prompt": "You will hear a sentence. Please repeat the sentence exactly as you hear it. You will hear the sentence only once.",
+    "stimulus": {
+      "audioUrl": "https://pub-fbae5ca09eba4fd0820da2b390dd7ca0.r2.dev/exam-tasks/pte-repeat-sentence-library-hours.mp3"
+    },
+    "transcript": "The main library closes at five on Friday during the vacation.",
+    "difficulty": 2
+  },
+  {
+    "slug": "pte-describe-image-restorations",
+    "title": "Describe Image: river restorations per year",
+    "examKey": "pte_academic",
+    "examVersion": "2025-08-07",
+    "taskType": "describe_image",
+    "prompt": "Look at the chart below. In 25 seconds, please speak into the microphone and describe in detail what the chart is showing. You will have 40 seconds to give your response.",
+    "stimulus": {
+      "imageUrl": "data:image/svg+xml;utf8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%20320%20180%22%3E%3Crect%20width%3D%22320%22%20height%3D%22180%22%20fill%3D%22%23f4f4f5%22%2F%3E%3Cg%20fill%3D%22%232563eb%22%3E%3Crect%20x%3D%2240%22%20y%3D%2290%22%20width%3D%2240%22%20height%3D%2270%22%2F%3E%3Crect%20x%3D%22110%22%20y%3D%2250%22%20width%3D%2240%22%20height%3D%22110%22%2F%3E%3Crect%20x%3D%22180%22%20y%3D%22110%22%20width%3D%2240%22%20height%3D%2250%22%2F%3E%3Crect%20x%3D%22250%22%20y%3D%2230%22%20width%3D%2240%22%20height%3D%22130%22%2F%3E%3C%2Fg%3E%3Cg%20font-family%3D%22sans-serif%22%20font-size%3D%2211%22%20fill%3D%22%233f3f46%22%20text-anchor%3D%22middle%22%3E%3Ctext%20x%3D%2260%22%20y%3D%22175%22%3E2019%3C%2Ftext%3E%3Ctext%20x%3D%22130%22%20y%3D%22175%22%3E2020%3C%2Ftext%3E%3Ctext%20x%3D%22200%22%20y%3D%22175%22%3E2021%3C%2Ftext%3E%3Ctext%20x%3D%22270%22%20y%3D%22175%22%3E2022%3C%2Ftext%3E%3Ctext%20x%3D%22160%22%20y%3D%2218%22%3ERiver%20restorations%20per%20year%3C%2Ftext%3E%3C%2Fg%3E%3C%2Fsvg%3E",
+      "imageAlt": "Bar chart of river restorations per year from 2019 to 2022, rising to a peak in 2022 with a dip in 2021"
+    },
+    "difficulty": 3
+  },
+  {
+    "slug": "pte-retell-lecture-heat-islands",
+    "title": "Re-tell Lecture: urban heat islands",
+    "examKey": "pte_academic",
+    "examVersion": "2025-08-07",
+    "taskType": "retell_lecture",
+    "prompt": "You will hear a lecture. After listening to the lecture, in 10 seconds, please speak into the microphone and retell what you have just heard in your own words. You will have 40 seconds to give your response.",
+    "stimulus": {
+      "text": "A short lecture on why cities are warmer than the countryside around them.",
+      "audioUrl": "https://pub-fbae5ca09eba4fd0820da2b390dd7ca0.r2.dev/exam-tasks/pte-retell-lecture-heat-islands.mp3"
+    },
+    "transcript": "Cities are consistently warmer than the countryside around them, and the difference can reach several degrees on a still summer night. The reason is mostly material. Asphalt and concrete absorb heat through the day and release it slowly after dark, while the countryside cools quickly. Add waste heat from vehicles and air conditioning, and remove the trees whose shade and evaporation once did the cooling, and you have what is called an urban heat island. The remedies are unglamorous but effective: more tree cover, lighter roof surfaces, and open water where a city can afford the space.",
+    "difficulty": 4
+  },
+  {
+    "slug": "pte-answer-short-question-season",
+    "title": "Answer Short Question: coldest season",
+    "examKey": "pte_academic",
+    "examVersion": "2025-08-07",
+    "taskType": "answer_short_question",
+    "prompt": "You will hear a question. Please give a simple and short answer. Often just one or a few words is enough.",
+    "stimulus": {
+      "audioUrl": "https://pub-fbae5ca09eba4fd0820da2b390dd7ca0.r2.dev/exam-tasks/pte-answer-short-question-season.mp3"
+    },
+    "transcript": "In the northern hemisphere, which season is generally the coldest?",
+    "difficulty": 1
+  },
+  {
+    "slug": "pte-summarize-group-discussion-transport",
+    "title": "Summarize Group Discussion: campus transport",
+    "examKey": "pte_academic",
+    "examVersion": "2025-08-07",
+    "taskType": "summarize_group_discussion",
+    "prompt": "You will hear a discussion. After listening, summarise in your own words what the speakers said. You will have two minutes to give your response.",
+    "stimulus": {
+      "audioUrl": "https://pub-fbae5ca09eba4fd0820da2b390dd7ca0.r2.dev/exam-tasks/pte-summarize-group-discussion-transport.mp3"
+    },
+    "transcript": "Priya: The car park is full by nine every morning, and people are circling for twenty minutes. Marcus: I'd rather we spent the money on the bus service than build another deck. A deck just fills up again. Priya: That's fair, but the bus doesn't run early enough for the first lectures. Marcus: Then we change the timetable before we pour concrete. Priya: Agreed, and if we add secure bike storage at the same time, we take some pressure off both.",
+    "difficulty": 4
+  },
+  {
+    "slug": "pte-respond-to-a-situation-late-assignment",
+    "title": "Respond to a Situation: a late assignment",
+    "examKey": "pte_academic",
+    "examVersion": "2025-08-07",
+    "taskType": "respond_to_a_situation",
+    "prompt": "You will hear a situation. In 10 seconds, please speak into the microphone and respond as though you were speaking to the person described. You will have 40 seconds to give your response.",
+    "stimulus": {
+      "text": "You have been ill for a week and will miss an assignment deadline. Speak to your tutor.",
+      "audioUrl": "https://pub-fbae5ca09eba4fd0820da2b390dd7ca0.r2.dev/exam-tasks/pte-respond-to-a-situation-late-assignment.mp3"
+    },
+    "transcript": "You have been unwell for a week and you will not finish your assignment by Friday. Your tutor is in her office. Explain the situation and ask for an extension.",
+    "difficulty": 3
+  },
+  {
+    "slug": "pte-summarize-written-text-rivers",
+    "title": "Summarize Written Text: reopening buried rivers",
+    "examKey": "pte_academic",
+    "examVersion": "2025-08-07",
+    "taskType": "summarize_written_text",
+    "prompt": "Read the passage below and summarise it using one sentence. Type your response in the box at the bottom of the screen. You have 10 minutes to finish this task. Your response will be judged on the quality of your writing and on how well it presents the key points in the passage.",
+    "stimulus": {
+      "text": "For most of the twentieth century, city planners treated rivers as obstacles. Watercourses that had shaped settlement for centuries were culverted, paved over and turned into roads, on the reasoning that a buried river took up no land and carried away waste without complaint.\n\nThat reasoning has not aged well. Buried rivers still flood, but they do so through drains and basements rather than across a floodplain, and the damage is more expensive. Covered channels also lose the cooling that open water provides, which matters more in each successive hot summer.\n\nA number of cities have now reversed the work. Seoul removed an elevated motorway to uncover the Cheonggyecheon, and found that surrounding streets ran several degrees cooler. The projects are slow and costly, and their benefits accrue over decades rather than electoral cycles, which is the main reason more cities have not attempted them."
+    },
+    "difficulty": 3
+  },
+  {
+    "slug": "pte-write-essay-public-transport",
+    "title": "Write Essay: free public transport",
+    "examKey": "pte_academic",
+    "examVersion": "2025-08-07",
+    "taskType": "write_essay",
+    "prompt": "Some cities have made public transport free at the point of use, arguing that the benefits to congestion and air quality outweigh the lost fare revenue. Others argue that the money is better spent making the service more frequent and reliable. Discuss both views and give your own opinion. Write 200-300 words.",
+    "stimulus": {
+      "text": "You will have 20 minutes to plan, write and revise an essay about the topic below. Your response will be judged on how well you develop a position, organise your ideas, present supporting details, and control the elements of standard written English."
+    },
+    "difficulty": 3
+  }
+]
