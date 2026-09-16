@@ -15,8 +15,8 @@
   },
   "dependencies": {
     "@bandzen/exams": "workspace:*",
-    "@neondatabase/serverless": "^1.1.0",
     "drizzle-orm": "^0.45.2",
+    "postgres": "^3.4.9",
     "server-only": "^0.0.1"
   },
   "devDependencies": {

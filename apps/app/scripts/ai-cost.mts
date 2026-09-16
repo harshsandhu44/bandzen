@@ -1,7 +1,7 @@
 import { existsSync } from 'node:fs';
 if (existsSync('.env.local')) process.loadEnvFile('.env.local');
 
-import { neon } from '@neondatabase/serverless';
+import { sql } from './sql.mts';
 import { PRICING_VERSION } from '@bandzen/ai/runtime/pricing';
 
 /**
@@ -30,8 +30,6 @@ import { PRICING_VERSION } from '@bandzen/ai/runtime/pricing';
  * Window defaults to 30 days: `pnpm --filter @bandzen/app analytics:ai-cost`
  * Override with `--days 90`.
  */
-
-const sql = neon(process.env.DATABASE_URL!);
 
 const i = process.argv.indexOf('--days');
 const DAYS = i === -1 ? 30 : Number(process.argv[i + 1]);

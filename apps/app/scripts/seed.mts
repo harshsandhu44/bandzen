@@ -9,20 +9,15 @@
  */
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
-import { neon } from '@neondatabase/serverless';
+import { sql } from './sql.mts';
 
 const file =
   process.argv[2] ?? join(import.meta.dirname, '..', 'content', 'seed.sql');
-const url = process.env.DATABASE_URL;
-if (!url)
-  throw new Error('Missing DATABASE_URL. Try: node --env-file=.env.local ...');
-
-const sql = neon(url);
 const text = readFileSync(file, 'utf8');
 
 // The generator emits one statement per `;` at end of line, wrapped in a
-// begin/commit it does not need here -- neon's http driver is autocommit per
-// statement, so strip the transaction markers and run them in order.
+// begin/commit it does not need here -- each statement is sent on its own, so
+// strip the transaction markers and run them in order.
 //
 // Leading `--` comment lines are stripped from each statement rather than used
 // to filter it out: the generator labels every passage insert with a comment,
@@ -39,7 +34,7 @@ const statements = text
 console.log(`Applying ${statements.length} statement(s) from ${file}`);
 for (const [i, statement] of statements.entries()) {
   try {
-    await sql.query(statement);
+    await sql.unsafe(statement);
   } catch (error) {
     console.error(`\nStatement ${i + 1} failed:\n${statement.slice(0, 300)}\n`);
     throw error;

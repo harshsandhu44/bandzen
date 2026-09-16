@@ -1,7 +1,7 @@
 import { existsSync } from 'node:fs';
 if (existsSync('.env.local')) process.loadEnvFile('.env.local');
 
-import { neon } from '@neondatabase/serverless';
+import { sql } from './sql.mts';
 import { awardsEarned } from '../src/lib/awards.ts';
 
 /**
@@ -21,7 +21,6 @@ import { awardsEarned } from '../src/lib/awards.ts';
  */
 
 const apply = process.argv.includes('--apply');
-const sql = neon(process.env.DATABASE_URL!);
 
 const profiles = (await sql`
   SELECT user_id, timezone FROM profiles

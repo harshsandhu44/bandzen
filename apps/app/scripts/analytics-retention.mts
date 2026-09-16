@@ -1,7 +1,7 @@
 import { existsSync } from 'node:fs';
 if (existsSync('.env.local')) process.loadEnvFile('.env.local');
 
-import { neon } from '@neondatabase/serverless';
+import { sql } from './sql.mts';
 
 /**
  * Read-only. "Are candidates coming back?" — the habit question the activation
@@ -21,8 +21,6 @@ import { neon } from '@neondatabase/serverless';
  *
  * Run: pnpm --filter @bandzen/app analytics:retention
  */
-
-const sql = neon(process.env.DATABASE_URL!);
 
 // Activity = a completed unit of work. Practice attempts, finished lessons and
 // coach messages are the three plain sources; mock/diagnostic sections are the

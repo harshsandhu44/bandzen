@@ -12,17 +12,12 @@
  * run's unpublish step catches its own previous output too, and the upsert
  * republishes the same 40 slugs rather than colliding on them.
  */
-import { neon } from '@neondatabase/serverless';
+import { sql } from './sql.mts';
 import { READING_LESSONS } from './lesson-content/reading.ts';
 import { WRITING_LESSONS } from './lesson-content/writing.ts';
 import { LISTENING_LESSONS } from './lesson-content/listening.ts';
 import { SPEAKING_LESSONS } from './lesson-content/speaking.ts';
 import type { LessonSeed } from './lesson-content/types.ts';
-
-const url = process.env.DATABASE_URL;
-if (!url)
-  throw new Error('Missing DATABASE_URL. Try: node --env-file=.env.local ...');
-const sql = neon(url);
 
 const ALL_LESSONS: LessonSeed[] = [
   ...READING_LESSONS,
