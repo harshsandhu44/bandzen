@@ -85,6 +85,13 @@ export function sampleTask(
         'The benefits arrive over decades.',
       ];
       break;
+    case 'token_select':
+      item.prompt = 'Mark the words that differ from what you heard.';
+      item.tokens =
+        'Open water cools nearby streets and slows flooding after heavy rain'.split(
+          ' ',
+        );
+      break;
     case 'sentence_builder':
       item.prompt = 'Make a sentence from the words.';
       item.tokens = ['the', 'river', 'reopened', 'city', 'its'];

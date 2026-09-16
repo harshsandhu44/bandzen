@@ -141,6 +141,14 @@ export default async function TaskReviewPage({
                 ok: isAnswerCorrect(key.split('|'), given[i]),
               }))
             : null;
+        // Marked words come back as positions; show the words themselves,
+        // because a list of numbers tells the candidate nothing.
+        const markedWords =
+          task.renderer === 'token_select'
+            ? given
+                .map((at) => row.content.tokens?.[Number(at)])
+                .filter((word): word is string => Boolean(word))
+            : null;
         return (
           <Panel
             key={row.taskId}
@@ -154,6 +162,14 @@ export default async function TaskReviewPage({
                   {row.value || row.audioUrl || '—'}
                 </dd>
               </div>
+              {markedWords ? (
+                <div>
+                  <dt className="text-muted-foreground">Words you marked</dt>
+                  <dd className="font-mono text-xs">
+                    {markedWords.length ? markedWords.join(' · ') : '—'}
+                  </dd>
+                </div>
+              ) : null}
               {gaps ? (
                 <div>
                   <dt className="text-muted-foreground">Gaps</dt>

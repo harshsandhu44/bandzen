@@ -23,6 +23,9 @@ test('every task of every exam gets a sample its renderer can draw', () => {
         case 'fill_blank':
           assert.ok(item.gapped?.includes('___'), where);
           break;
+        case 'token_select':
+          assert.ok((item.tokens?.length ?? 0) >= 2, where);
+          break;
         case 'fill_blank_select': {
           const gaps = (item.gapped ?? '').split('___').length - 1;
           assert.ok(gaps >= 1, where);

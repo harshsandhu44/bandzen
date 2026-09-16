@@ -12,6 +12,7 @@ import {
   Reorder,
   SentenceBuilder,
   TextInput,
+  TokenSelect,
   type ResponseRendererProps,
 } from './responses';
 
@@ -33,6 +34,7 @@ export const RESPONSE_RENDERERS: Record<
   fill_blank_select: FillBlankSelect,
   fill_blank_drag: FillBlankDrag,
   reorder: Reorder,
+  token_select: TokenSelect,
   sentence_builder: SentenceBuilder,
   recording: Recording,
   conversation: Conversation,

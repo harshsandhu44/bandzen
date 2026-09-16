@@ -1,7 +1,7 @@
 'use client';
 
 import { ArrowDown, ArrowUp } from 'lucide-react';
-import { useState } from 'react';
+import { Fragment, useState } from 'react';
 import { AnswerChoices } from '@bandzen/ui/components/answer-choices';
 import { Button } from '@bandzen/ui/components/button';
 import { Checkbox } from '@bandzen/ui/components/checkbox';
@@ -404,6 +404,61 @@ export function FillBlankDrag({
         ))}
       </div>
     </div>
+  );
+}
+
+/**
+ * Running text whose words can each be marked — PTE's Highlight Incorrect
+ * Words, where the transcript on screen differs from what was read out and the
+ * candidate marks every word that does not match.
+ *
+ * The answer is the positions of the marked words, not the words themselves:
+ * the same word may appear twice and only one of them be wrong. Each word is a
+ * real button with `aria-pressed`, so this works by keyboard and is announced
+ * as a toggle rather than as decorated text.
+ */
+export function TokenSelect({
+  label,
+  item,
+  value,
+  onChange,
+}: ResponseRendererProps) {
+  const tokens = item.tokens ?? [];
+  const marked = new Set(parseList(value));
+
+  const toggle = (i: number) => {
+    const next = new Set(marked);
+    const at = String(i);
+    if (next.has(at)) next.delete(at);
+    else next.add(at);
+    // Sorted numerically so the stored answer does not depend on the order
+    // the candidate happened to click in.
+    onChange(JSON.stringify([...next].sort((a, b) => Number(a) - Number(b))));
+  };
+
+  return (
+    <p aria-label={label} className="text-sm leading-9">
+      {/* A real space between the words, not a margin: this is running text,
+          and a screen reader reading it continuously — or anyone copying it —
+          would otherwise get "Openwaterwarms". */}
+      {tokens.map((word, i) => (
+        <Fragment key={i}>
+          <button
+            type="button"
+            aria-pressed={marked.has(String(i))}
+            onClick={() => toggle(i)}
+            className={cn(
+              'px-1',
+              marked.has(String(i))
+                ? 'bg-primary/15 text-foreground underline decoration-primary decoration-2'
+                : 'hover:bg-muted',
+            )}
+          >
+            {word}
+          </button>{' '}
+        </Fragment>
+      ))}
+    </p>
   );
 }
 

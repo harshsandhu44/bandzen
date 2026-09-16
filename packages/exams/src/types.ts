@@ -45,6 +45,7 @@ export const RENDERERS = [
   'fill_blank_select',
   'fill_blank_drag',
   'reorder',
+  'token_select',
   'sentence_builder',
   'recording',
   'conversation',

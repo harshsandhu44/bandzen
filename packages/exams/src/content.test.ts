@@ -335,3 +335,59 @@ test('a word bank must cover every gap, and may hold distractors', () => {
     ).some((i) => i.includes('in the word bank')),
   );
 });
+
+test('marked-words answers are positions in the text', () => {
+  const complete = {
+    stimulus: {
+      text: null,
+      audioUrl: 'https://r2.test/a.mp3',
+      imageUrl: null,
+      imageAlt: null,
+    },
+    tokens: ['Open', 'water', 'warms', 'nearby', 'roads'],
+  };
+  const key = {
+    answer: ['2', '4'],
+    transcript: 'Open water cools nearby streets',
+  };
+  assert.deepEqual(
+    check(
+      'pte_academic',
+      'highlight_incorrect_words',
+      complete,
+      key,
+      'publish',
+    ),
+    [],
+  );
+
+  assert.ok(
+    check(
+      'pte_academic',
+      'highlight_incorrect_words',
+      { ...complete, tokens: ['Open'] },
+      key,
+      'publish',
+    ).some((i) => i.includes('at least two words to mark')),
+  );
+
+  // A position past the end of the text can never be matched.
+  assert.ok(
+    check(
+      'pte_academic',
+      'highlight_incorrect_words',
+      complete,
+      { ...key, answer: ['2', '9'] },
+      'publish',
+    ).some((i) => i.includes('positions in the text')),
+  );
+  assert.ok(
+    check(
+      'pte_academic',
+      'highlight_incorrect_words',
+      complete,
+      { ...key, answer: ['warms'] },
+      'publish',
+    ).some((i) => i.includes('positions in the text')),
+  );
+});
