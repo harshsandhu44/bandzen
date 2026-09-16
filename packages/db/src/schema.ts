@@ -159,8 +159,8 @@ export const profiles = pgTable('profiles', {
   activeExamKey: examKey('active_exam_key'),
   /**
    * @deprecated Legacy IELTS-only fields, superseded by `exam_enrollments`.
-   * Still dual-written for IELTS so a rollback reads current data; nothing
-   * reads them. Dropped in a follow-up once the enrollment model has shipped.
+   * Nothing reads or writes them any more; they are dropped in the follow-up
+   * migration, which is the only reason they are still declared here.
    */
   examType: testFormat('exam_type'),
   targetBand: numeric('target_band', {
@@ -169,11 +169,7 @@ export const profiles = pgTable('profiles', {
     mode: 'number',
   }),
   testDate: date('test_date'),
-  /**
-   * What the candidate says their level is at sign-up. Null is a real answer —
-   * "I don't know" is the case the diagnostic exists for — so it stays
-   * separate from the measured bands, which only ever come from attempts.
-   */
+  /** @deprecated Legacy, superseded by `exam_enrollments.self_assessed_score`. */
   selfAssessedBand: numeric('self_assessed_band', {
     precision: 2,
     scale: 1,
@@ -722,7 +718,7 @@ export const attempts = pgTable(
      * Display-only — nothing in grading reads it.
      */
     playback: jsonb('playback').$type<ListeningPlayback | null>(),
-    /** @deprecated IELTS-only; dual-written, read `score`. */
+    /** @deprecated IELTS-only; no longer written, read `score`. */
     band: numeric('band', { precision: 2, scale: 1, mode: 'number' }),
     /** The result on the attempt's own exam scale. */
     score: numeric('score', { precision: 5, scale: 1, mode: 'number' }),
@@ -827,11 +823,7 @@ export const reports = pgTable('reports', {
   attemptId: uuid('attempt_id')
     .primaryKey()
     .references(() => attempts.id, { onDelete: 'cascade' }),
-  /**
-   * @deprecated IELTS-only; dual-written, read `score`. Nullable because it is
-   * `numeric(2,1)` and cannot hold a score on any other exam's scale — a PTE
-   * 79 does not fit. Non-IELTS grading writes `score` and leaves this null.
-   */
+  /** @deprecated IELTS-only; no longer written, read `score`. */
   band: numeric('band', { precision: 2, scale: 1, mode: 'number' }),
   score: numeric('score', { precision: 5, scale: 1, mode: 'number' }),
   criteria: jsonb('criteria').$type<Criterion[]>().notNull().default([]),
