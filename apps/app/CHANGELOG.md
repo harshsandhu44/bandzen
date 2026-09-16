@@ -1,3 +1,10 @@
+## app [1.25.1](https://github.com/harshsandhu44/bandzen/compare/app@1.25.0...app@1.25.1) (2026-09-16)
+
+
+### Bug Fixes
+
+* **app:** start the diagnostic when a profile already exists ([#128](https://github.com/harshsandhu44/bandzen/issues/128)) ([5951452](https://github.com/harshsandhu44/bandzen/commit/59514520e0cf654772ce23fe2641ce228d66a51d))
+
 # app [1.25.0](https://github.com/harshsandhu44/bandzen/compare/app@1.24.2...app@1.25.0) (2026-09-16)
 
 
