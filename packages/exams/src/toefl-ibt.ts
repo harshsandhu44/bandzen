@@ -1,4 +1,4 @@
-import { task, timed } from './task.ts';
+import { mins, task, timed } from './task.ts';
 import type { ExamDefinition } from './types.ts';
 
 /**
@@ -15,6 +15,7 @@ export const TOEFL_IBT = {
   name: 'TOEFL iBT',
   version: '2026-01-21',
   source: 'https://www.ets.org/toefl/test-takers/ibt/about/content.html',
+  duration: 'About 2 hr',
   variants: [],
   scoreScale: { label: 'Band', min: 1, max: 6, step: 0.5 },
   targetRange: { min: 3, max: 6, step: 0.5 },
@@ -26,8 +27,18 @@ export const TOEFL_IBT = {
       skills: ['listening'],
       minutes: null,
     },
-    { key: 'writing', label: 'Writing', skills: ['writing'], minutes: 23 },
-    { key: 'speaking', label: 'Speaking', skills: ['speaking'], minutes: 8 },
+    {
+      key: 'writing',
+      label: 'Writing',
+      skills: ['writing'],
+      minutes: mins(23),
+    },
+    {
+      key: 'speaking',
+      label: 'Speaking',
+      skills: ['speaking'],
+      minutes: mins(8),
+    },
   ],
   tasks: [
     task(

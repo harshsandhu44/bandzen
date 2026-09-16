@@ -2,6 +2,7 @@ import type {
   EvaluatorKey,
   RendererKey,
   ResponseType,
+  SectionMinutes,
   Skill,
   Stimulus,
   TaskAudioPolicy,
@@ -11,12 +12,22 @@ import type {
 
 export const SECTION_TIMED: TimingRule = { scope: 'section' };
 
+/** A section's clock: one number where it is fixed, two where it varies. */
+export const mins = (min: number, max = min): SectionMinutes => ({ min, max });
+
 /** The word range a written task demands. Reads better than an 11th argument. */
 export const withWords = (
   t: TaskDefinition,
   min: number,
   max: number,
 ): TaskDefinition => ({ ...t, words: { min, max } });
+
+/** How many items of this type the real test runs. Same shape as `withWords`. */
+export const withItems = (
+  t: TaskDefinition,
+  min: number,
+  max = min,
+): TaskDefinition => ({ ...t, items: { min, max } });
 
 /** Plays once, starts itself: every PTE audio task, and most of TOEFL's. */
 export const ONE_PLAY: TaskAudioPolicy = { plays: 1, autoplay: true };

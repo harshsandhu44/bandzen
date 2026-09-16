@@ -9,9 +9,9 @@ import type { Skill } from './types.ts';
  * Pearson does not publish how its traits and raw marks combine into a score,
  * so this cannot reproduce it and does not pretend to. What it does is honest
  * and calibratable: turn each task into a fraction of what it was worth, share
- * that fraction across the skills the task actually measures — PTE's tasks are
- * integrated by design, so Read Aloud counts towards reading AND speaking —
- * and map the weighted result onto 10-90.
+ * that fraction across the skills the task actually measures — eight of PTE's
+ * 22 types are integrated, so Repeat Sentence counts towards listening AND
+ * speaking — and map the weighted result onto 10-90.
  *
  * Every number this produces is a Bandzen estimate. `PTE_SCORING_VERSION` is
  * stamped alongside it so a later comparison against real results knows which
@@ -121,6 +121,11 @@ export function pteWeakestTaskTypes(
  * Overall is the mean of the skills actually measured, not of four assumed
  * ones — a candidate who sat only Reading gets a Reading estimate and no
  * invented Listening score.
+ *
+ * The mean is a placeholder. Pearson's score guide says outright that the
+ * overall score is not an average of the communicative skills scores, and does
+ * not publish what it is instead, so closing that gap needs paired real
+ * results rather than a better reading of the guide — see issue #121.
  */
 export function pteScoreReport(
   outcomes: readonly TaskOutcome[],
