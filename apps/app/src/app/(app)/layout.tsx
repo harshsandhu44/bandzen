@@ -1,6 +1,5 @@
 import Link from 'next/link';
 import { cookies } from 'next/headers';
-import { currentUser } from '@clerk/nextjs/server';
 import {
   Sidebar,
   SidebarContent,
@@ -12,7 +11,7 @@ import {
 } from '@bandzen/ui/components/sidebar';
 import { Wordmark } from '@bandzen/ui/components/wordmark';
 import { Toaster } from '@bandzen/ui/components/sonner';
-import { requireUserId } from '@/lib/auth';
+import { currentUser, requireUserId } from '@/lib/auth';
 import { examLabel } from '@bandzen/exams/registry';
 import {
   essayAllowance,
@@ -129,7 +128,7 @@ export default async function AppLayout({ children }: LayoutProps<'/'>) {
 
       <SidebarInset>
         <TopBar
-          email={user?.primaryEmailAddress?.emailAddress ?? null}
+          email={user?.email ?? null}
           testDays={testDays}
           essaysLeft={quota.unlimited || !hasContent ? null : quota.remaining}
           activeExam={

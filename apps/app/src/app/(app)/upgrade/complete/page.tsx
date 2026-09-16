@@ -16,7 +16,7 @@ export const metadata = { title: 'Confirming your payment' };
  * entitlement.
  *
  * Confirming in a page render rather than a route handler is deliberate — a
- * route handler could not read the Clerk session the guard depends on without
+ * route handler could not read the session the guard depends on without
  * duplicating the whole gate.
  */
 export default async function CheckoutCompletePage(

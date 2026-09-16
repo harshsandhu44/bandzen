@@ -116,7 +116,7 @@ export async function POST(request: Request) {
 }
 
 /**
- * The Clerk id we set as `external_customer_id` when the checkout was made.
+ * The user id we set as `external_customer_id` when the checkout was made.
  *
  * Every caller of this is a subscription or an order — nothing else in the
  * switch reaches it — so there is no such thing as a miss here that does not

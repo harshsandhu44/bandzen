@@ -1,6 +1,4 @@
 import Link from 'next/link';
-import { SignOutButton } from '@clerk/nextjs';
-import { currentUser } from '@clerk/nextjs/server';
 import { Button } from '@bandzen/ui/components/button';
 import {
   Tabs,
@@ -14,7 +12,8 @@ import { Version } from '@bandzen/ui/components/version';
 import { PageHeader } from '@/components/app/primitives';
 import { PreparationForm } from '@/components/app/preparation-form';
 import { DOCS_URL } from '../nav-links';
-import { requireUserId } from '@/lib/auth';
+import { currentUser, requireUserId } from '@/lib/auth';
+import { signOut } from '@/app/(auth)/actions';
 import { EXAM_KEYS } from '@bandzen/exams/registry';
 import {
   examHasContent,
@@ -163,9 +162,7 @@ export default async function SettingsPage() {
           <dl className="divide-y divide-border border-y border-border">
             <div className="flex items-baseline justify-between gap-4 py-3">
               <dt className="text-sm text-muted-foreground">Email</dt>
-              <dd className="font-mono text-xs">
-                {user?.primaryEmailAddress?.emailAddress ?? '—'}
-              </dd>
+              <dd className="font-mono text-xs">{user?.email ?? '—'}</dd>
             </div>
             <div className="flex items-center justify-between gap-4 py-3">
               <dt className="text-sm text-muted-foreground">Appearance</dt>
@@ -202,18 +199,11 @@ export default async function SettingsPage() {
             </div>
           </dl>
 
-          {/* Identity is Clerk's; name, password and email changes belong
-              there rather than in a second half-implemented account screen. */}
-          <p className="text-xs text-muted-foreground">
-            Your name, email address and password are managed by your Bandzen
-            sign-in and are changed there.
-          </p>
-
-          <SignOutButton>
-            <Button type="button" variant="outline" size="sm">
+          <form action={signOut}>
+            <Button type="submit" variant="outline" size="sm">
               Sign out
             </Button>
-          </SignOutButton>
+          </form>
         </TabsContent>
       </Tabs>
     </div>

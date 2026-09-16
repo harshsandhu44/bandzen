@@ -1,9 +1,9 @@
 'use client';
 
 import Link from 'next/link';
-import { usePathname, useRouter } from 'next/navigation';
+import { usePathname } from 'next/navigation';
 import { Fragment, useTransition } from 'react';
-import { useClerk } from '@clerk/nextjs';
+import { signOut } from '@/app/(auth)/actions';
 import { Check, ChevronDown } from 'lucide-react';
 import {
   DropdownMenu,
@@ -102,9 +102,8 @@ export function TopBar({
   exams: readonly { key: string; label: string }[];
 }) {
   const pathname = usePathname();
-  const router = useRouter();
-  const { signOut } = useClerk();
   const [switching, startSwitch] = useTransition();
+  const [, startSignOut] = useTransition();
 
   if (isExamRunner(pathname)) return null;
 
@@ -246,7 +245,7 @@ export function TopBar({
               Documentation
             </DropdownMenuItem>
             <DropdownMenuSeparator />
-            <DropdownMenuItem onClick={() => signOut(() => router.push('/'))}>
+            <DropdownMenuItem onClick={() => startSignOut(() => signOut())}>
               Sign out
             </DropdownMenuItem>
           </DropdownMenuContent>

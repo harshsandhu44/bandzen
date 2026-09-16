@@ -1,18 +1,44 @@
 import 'server-only';
 
-import { auth, clerkClient } from '@clerk/nextjs/server';
 import { notFound, redirect } from 'next/navigation';
+import { createClient } from '@/lib/supabase/server';
+import { getProfile } from '@/lib/db/queries';
 
 /**
- * The user id every query is scoped by. proxy.ts already blocks unauthenticated
- * requests, so reaching the redirect here means something is misconfigured
- * rather than that a real visitor is signed out — but failing closed is the
- * only acceptable behaviour either way.
+ * The user id every query is scoped by.
+ *
+ * `getUser()` rather than `getSession()`: the session is read straight off a
+ * cookie the browser could have written, whereas this asks the auth server to
+ * verify the token. Cheap, and it is the difference between a check and a
+ * decoration.
  */
 export async function requireUserId(): Promise<string> {
-  const { userId } = await auth();
-  if (!userId) redirect('/sign-in');
-  return userId;
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) redirect('/sign-in');
+  return user.id;
+}
+
+/**
+ * The account behind the session, in the shape the screens actually use: an
+ * email for the settings page and the Polar checkout, a first name for the
+ * dashboard greeting. Normalised here so `user_metadata` — which is whatever
+ * sign-up happened to write — is read in one place rather than five.
+ */
+export async function currentUser() {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) return null;
+  const firstName = user.user_metadata?.first_name;
+  return {
+    id: user.id,
+    email: user.email ?? null,
+    firstName: typeof firstName === 'string' && firstName ? firstName : null,
+  };
 }
 
 const ADMIN_EMAILS = new Set(
@@ -28,14 +54,17 @@ const ADMIN_EMAILS = new Set(
  * A student who stumbles onto the URL gets a 404, not a redirect loop.
  */
 export async function requireContentRole(): Promise<void> {
-  const { userId } = await auth();
-  if (!userId) notFound();
-  const user = await (await clerkClient()).users.getUser(userId);
-  const role = user.publicMetadata.role;
-  const email = user.primaryEmailAddress?.emailAddress?.toLowerCase();
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) notFound();
+
+  const profile = await getProfile(user.id);
+  const email = (profile?.email ?? user.email)?.toLowerCase();
   const ok =
-    role === 'admin' ||
-    role === 'teacher' ||
+    profile?.role === 'admin' ||
+    profile?.role === 'teacher' ||
     (!!email && ADMIN_EMAILS.has(email));
   if (!ok) notFound();
 }

@@ -1,5 +1,5 @@
 import { after } from 'next/server';
-import { auth } from '@clerk/nextjs/server';
+import { currentUser } from '@/lib/auth';
 import { z } from 'zod';
 import { runAIStream } from '@bandzen/ai/runtime/stream';
 import { buildCoachContext, COACH_SYSTEM, MAX_TURNS } from '@/lib/ai/coach';
@@ -25,8 +25,8 @@ import type { TutorAction } from '@/lib/ai/tutor-tools';
  * rather than a signed-in person and the raw body has to be verified before it
  * is parsed. Neither is a precedent for moving other writes off actions.
  *
- * It authenticates itself with `auth()`, exactly as every page does. The proxy
- * hydrates the session but does not gate, so this is the gate.
+ * It authenticates itself, exactly as every page does. The proxy refreshes the
+ * session but does not gate, so this is the gate.
  */
 
 const bodySchema = z.object({
@@ -42,8 +42,9 @@ const bodySchema = z.object({
 });
 
 export async function POST(request: Request) {
-  const { userId } = await auth();
-  if (!userId) return new Response('Unauthorized', { status: 401 });
+  const user = await currentUser();
+  if (!user) return new Response('Unauthorized', { status: 401 });
+  const userId = user.id;
 
   const parsed = bodySchema.safeParse(await request.json().catch(() => null));
   if (!parsed.success) return new Response('Bad request', { status: 400 });
