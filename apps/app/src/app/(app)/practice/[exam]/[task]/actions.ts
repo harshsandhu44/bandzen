@@ -1,7 +1,10 @@
 'use server';
 
+import { after } from 'next/server';
 import { notFound, redirect } from 'next/navigation';
 import { getExam, getTask } from '@bandzen/exams/registry';
+import { uploadObject } from '@bandzen/storage/r2';
+import { gradeExamTask } from '@/lib/ai/grade-exam-task';
 import { requireContentRole, requireUserId } from '@/lib/auth';
 import {
   createExamTaskAttempt,
@@ -70,6 +73,47 @@ export async function saveExamTaskAnswer(input: {
   });
 }
 
+/**
+ * Store one recorded take against its task.
+ *
+ * The same contract the Speaking module keeps: the WAV is posted the moment
+ * the recording stops, so a refresh mid-session loses nothing, and R2 gets a
+ * fresh key every time so re-recording never races a stale CDN copy.
+ *
+ * The RIFF/WAVE header is checked at this trust boundary because a
+ * header-only or malformed file is exactly the "recording came back empty"
+ * bug, and it is cheaper to reject it here than to hand it to a grader.
+ */
+export async function saveExamTaskRecording(
+  formData: FormData,
+): Promise<{ ok: boolean; url: string | null }> {
+  await requireContentRole();
+  const userId = await requireUserId();
+  const attemptId = String(formData.get('attemptId') ?? '');
+  const taskId = String(formData.get('taskId') ?? '');
+  const file = formData.get('audio');
+
+  if (!attemptId || !taskId || !(file instanceof File) || file.size === 0) {
+    return { ok: false, url: null };
+  }
+
+  const bytes = Buffer.from(await file.arrayBuffer());
+  const isWav =
+    bytes.length > 44 &&
+    bytes.toString('ascii', 0, 4) === 'RIFF' &&
+    bytes.toString('ascii', 8, 12) === 'WAVE';
+  if (!isWav) return { ok: false, url: null };
+
+  const url = await uploadObject({
+    key: `exam-tasks/${crypto.randomUUID()}.wav`,
+    body: bytes,
+    contentType: 'audio/wav',
+  });
+
+  await saveExamTaskResponse(userId, attemptId, taskId, { audioUrl: url });
+  return { ok: true, url };
+}
+
 export async function submitExamTaskSession(formData: FormData) {
   await requireContentRole();
   const attemptId = String(formData.get('attemptId') ?? '');
@@ -78,6 +122,10 @@ export async function submitExamTaskSession(formData: FormData) {
   const userId = await requireUserId();
   const graded = await submitExamTaskAttempt(userId, attemptId);
   if (!graded) throw new Error('Attempt not found');
+
+  // Hand back the review page immediately and grade past the response, the
+  // same shape `submitEssay` and `submitSpeakingAttempt` use.
+  if (graded.needsModel) after(() => gradeExamTask(attemptId));
 
   // The review URL is rebuilt from the attempt row rather than from a hidden
   // field, so a hand-edited form cannot send someone into another task's review.

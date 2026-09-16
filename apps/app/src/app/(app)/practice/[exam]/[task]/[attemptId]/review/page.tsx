@@ -5,7 +5,7 @@ import { evaluatorFor } from '@bandzen/exams/scoring';
 import { Button } from '@bandzen/ui/components/button';
 import { Eyebrow, PageHeader, Panel } from '@/components/app/primitives';
 import { requireContentRole, requireUserId } from '@/lib/auth';
-import { getExamTaskReview } from '@/lib/db/queries';
+import { getAttempt, getExamTaskReview } from '@/lib/db/queries';
 
 export const metadata = { title: 'Task review', robots: { index: false } };
 
@@ -20,6 +20,27 @@ export default async function TaskReviewPage({
   if (!exam || !task) notFound();
 
   const userId = await requireUserId();
+
+  // A model-graded task is still being marked when the candidate arrives here.
+  // Say so rather than 404ing, and say it without a fake percentage.
+  const pending = await getAttempt(userId, attemptId);
+  if (pending?.status === 'grading') {
+    return (
+      <div className="max-w-2xl space-y-6">
+        <PageHeader
+          eyebrow={`${exam.name} · ${task.label}`}
+          title="Marking your answer"
+          description="A grader is working through it. This page will show the result once it is done."
+        />
+        <Panel headingId="grading" title="In progress">
+          <p className="text-sm text-muted-foreground">
+            Reload in a moment. Nothing is lost if you close this page.
+          </p>
+        </Panel>
+      </div>
+    );
+  }
+
   // Refuses an attempt still in progress, so the keys below cannot be read
   // before it is over.
   const data = await getExamTaskReview(userId, attemptId);

@@ -6,25 +6,31 @@ import { Button } from '@bandzen/ui/components/button';
 import { startPcmRecording, type PcmRecorder } from '@/lib/pcm-recorder';
 import type { ResponseRendererProps } from './responses';
 
-type Phase = 'idle' | 'prep' | 'recording' | 'done' | 'failed';
+type Phase = 'idle' | 'prep' | 'recording' | 'uploading' | 'done' | 'failed';
 
 /**
  * One-shot recording: an optional preparation countdown, then a capped
  * recording that stops itself, and no second take — which is how PTE, TOEFL
  * and DET speaking tasks run. Reuses the Speaking module's PCM recorder, so it
- * produces the same 16 kHz WAV the graders accept. The answer is an object URL
- * for the take; uploading it is the attempt's business, not the renderer's.
+ * produces the same 16 kHz WAV the graders accept.
+ *
+ * The take is uploaded the moment it stops, the same "never lose work"
+ * contract the Speaking module keeps, and the answer becomes its stored URL.
+ * Without an `onUpload` — the task lab, which has nowhere to put one — it
+ * falls back to an object URL that lives only as long as the tab.
  */
 function OneShot({
   prepSeconds,
   responseSeconds,
   url,
   onDone,
+  onUpload,
 }: {
   prepSeconds: number;
   responseSeconds: number;
   url: string;
   onDone: (url: string) => void;
+  onUpload?: (blob: Blob) => Promise<string | null>;
 }) {
   const [phase, setPhase] = useState<Phase>(url ? 'done' : 'idle');
   const [left, setLeft] = useState(0);
@@ -32,6 +38,13 @@ function OneShot({
   const deadline = useRef(0);
   const recorder = useRef<PcmRecorder | null>(null);
   const stream = useRef<MediaStream | null>(null);
+  // Held in a ref, not a dependency: the runner rebuilds this callback on
+  // every render, and re-running the countdown effect would restart the clock
+  // mid-recording.
+  const upload = useRef(onUpload);
+  useEffect(() => {
+    upload.current = onUpload;
+  }, [onUpload]);
 
   const release = () => {
     stream.current?.getTracks().forEach((t) => t.stop());
@@ -48,10 +61,20 @@ function OneShot({
       try {
         const { wav, peak } = await r.stop();
         if (peak < 0.002) throw new Error('silent');
+        if (!upload.current) {
+          setPhase('done');
+          onDone(URL.createObjectURL(wav));
+          return;
+        }
+        setPhase('uploading');
+        const stored = await upload.current(wav);
+        // There is no second take, so a failed upload has to say so rather
+        // than leaving a take that looks saved and is not.
+        if (!stored) throw new Error('upload');
         setPhase('done');
-        onDone(URL.createObjectURL(wav));
+        onDone(stored);
       } catch {
-        setError('Nothing was recorded. Check the microphone.');
+        setError('That take was not saved. Check your microphone and network.');
         setPhase('failed');
       } finally {
         release();
@@ -139,6 +162,11 @@ function OneShot({
           </Button>
         </div>
       ) : null}
+      {phase === 'uploading' ? (
+        <p role="status" className="font-mono text-sm text-muted-foreground">
+          Saving your answer…
+        </p>
+      ) : null}
       {phase === 'done' && url ? (
         <audio controls src={url} className="w-full max-w-sm" />
       ) : null}
@@ -154,13 +182,19 @@ function OneShot({
   );
 }
 
-export function Recording({ item, value, onChange }: ResponseRendererProps) {
+export function Recording({
+  item,
+  value,
+  onChange,
+  onUpload,
+}: ResponseRendererProps) {
   return (
     <OneShot
       prepSeconds={item.prepSeconds ?? 0}
       responseSeconds={item.responseSeconds ?? 60}
       url={value}
       onDone={onChange}
+      onUpload={onUpload}
     />
   );
 }
@@ -171,7 +205,12 @@ export function Recording({ item, value, onChange }: ResponseRendererProps) {
  * appears only once the previous one is answered. The answer is a JSON array of
  * take URLs, one per turn.
  */
-export function Conversation({ item, value, onChange }: ResponseRendererProps) {
+export function Conversation({
+  item,
+  value,
+  onChange,
+  onUpload,
+}: ResponseRendererProps) {
   let takes: string[] = [];
   try {
     takes = JSON.parse(value || '[]') as string[];
@@ -195,6 +234,7 @@ export function Conversation({ item, value, onChange }: ResponseRendererProps) {
             prepSeconds={item.prepSeconds ?? 0}
             responseSeconds={item.responseSeconds ?? 45}
             url={takes[i] ?? ''}
+            onUpload={onUpload}
             onDone={(url) => {
               const next = [...takes];
               next[i] = url;

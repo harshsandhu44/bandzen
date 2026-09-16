@@ -1,6 +1,7 @@
 import type { ExamKey } from '@bandzen/exams/registry';
 import { WRITING_RUBRIC } from './rubric.ts';
 import { SPEAKING_RUBRIC } from './speaking-rubric.ts';
+import { PTE_SPEAKING_RUBRIC, PTE_WRITING_RUBRIC } from './pte-rubrics.ts';
 
 export type RubricFamily = 'writing' | 'speaking';
 
@@ -13,6 +14,10 @@ export type RubricFamily = 'writing' | 'speaking';
 const RUBRICS: Partial<Record<ExamKey, Partial<Record<RubricFamily, string>>>> =
   {
     ielts: { writing: WRITING_RUBRIC, speaking: SPEAKING_RUBRIC },
+    pte_academic: {
+      writing: PTE_WRITING_RUBRIC,
+      speaking: PTE_SPEAKING_RUBRIC,
+    },
   };
 
 export function rubricFor(exam: ExamKey, family: RubricFamily): string {

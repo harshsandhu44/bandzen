@@ -115,3 +115,107 @@ export function buildSpeakingMessages(
     { role: 'user', content },
   ];
 }
+
+/**
+ * Spelled out in the prompt because the audio grader accepts no
+ * `response_format`. Same reason as `SPEAKING_RESPONSE_SHAPE`.
+ */
+export const PTE_SPEAKING_RESPONSE_SHAPE = `Reply with ONE JSON object and nothing else — no prose, no code fence. Shape:
+
+{
+  "traits": [
+    { "name": "Content", "score": <number, 0-5>, "comment": <string> },
+    { "name": "Oral fluency", "score": <number, 0-5>, "comment": <string> },
+    { "name": "Pronunciation", "score": <number, 0-5>, "comment": <string> }
+  ],
+  "annotations": [
+    { "quote": <verbatim words the candidate said>, "kind": "good" | "vocabulary" | "fluency", "comment": <string> }
+  ],
+  "strengths": [<string>, <string>],
+  "weaknesses": [<string>, <string>]
+}
+
+All three traits, in that order. Two to five annotations.`;
+
+/**
+ * One PTE written task. The rubric stays first and byte-identical, so the
+ * cached prefix is shared by every Summarize Written Text and every essay.
+ * The task label and its word range go in the user turn, below the cache
+ * boundary, because they differ per task type.
+ */
+export function buildPteWritingMessages(work: {
+  taskLabel: string;
+  prompt: string;
+  words: { min: number; max: number } | null;
+  wordCount: number;
+  body: string;
+}): ChatCompletionMessageParam[] {
+  const range = work.words
+    ? `Required length: ${work.words.min}-${work.words.max} words.`
+    : 'No stated length.';
+  return [
+    { role: 'system', content: rubricFor('pte_academic', 'writing') },
+    {
+      role: 'user',
+      content: `TASK: ${work.taskLabel}. ${range}\n\nPROMPT\n${work.prompt}\n\nCANDIDATE RESPONSE (${work.wordCount} words)\n${work.body}`,
+    },
+  ];
+}
+
+/**
+ * One PTE spoken task: the instruction, whatever the candidate was shown or
+ * heard, and their single take as audio. Scored from what the model hears —
+ * Oral fluency and Pronunciation cannot be judged from a transcript.
+ */
+export function buildPteSpeakingMessages(work: {
+  taskLabel: string;
+  prompt: string;
+  /** The text the candidate read or was shown, when the task has one. */
+  stimulusText: string | null;
+  /** What the candidate was played, when the task has audio. Server-side only. */
+  transcript: string | null;
+  audio: Uint8Array | null;
+}): ChatCompletionMessageParam[] {
+  const content: Array<
+    | { type: 'text'; text: string }
+    | { type: 'input_audio'; input_audio: { data: string; format: 'wav' } }
+  > = [
+    {
+      type: 'text',
+      text: `TASK: ${work.taskLabel}.\n\nINSTRUCTION\n${work.prompt}`,
+    },
+  ];
+  if (work.stimulusText) {
+    content.push({
+      type: 'text',
+      text: `TEXT THE CANDIDATE WAS SHOWN\n${work.stimulusText}`,
+    });
+  }
+  if (work.transcript) {
+    content.push({
+      type: 'text',
+      text: `WHAT THE CANDIDATE HEARD\n${work.transcript}`,
+    });
+  }
+  content.push(
+    work.audio
+      ? {
+          type: 'input_audio' as const,
+          input_audio: {
+            data: Buffer.from(work.audio).toString('base64'),
+            format: 'wav' as const,
+          },
+        }
+      : {
+          type: 'text' as const,
+          // An explicit gap, never a silent omission: a grader that cannot see
+          // the candidate said nothing has no way to mark the task incomplete.
+          text: 'The candidate did not record an answer to this task.',
+        },
+  );
+  return [
+    { role: 'system', content: rubricFor('pte_academic', 'speaking') },
+    { role: 'user', content },
+    { role: 'system', content: PTE_SPEAKING_RESPONSE_SHAPE },
+  ];
+}

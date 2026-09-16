@@ -114,6 +114,12 @@ export type TaskDefinition = {
   timing: TimingRule;
   /** Only for a task with audio, and only where the format constrains it. */
   audio?: TaskAudioPolicy;
+  /**
+   * The response length the format demands. A property of the task, not of the
+   * item: PTE asks for 5-75 words in Summarize Written Text whatever the
+   * passage is.
+   */
+  words?: { min: number; max: number };
   measuredSkills: readonly Skill[];
   renderer: RendererKey;
   evaluator: EvaluatorKey;
