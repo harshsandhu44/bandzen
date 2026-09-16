@@ -484,7 +484,7 @@ export async function mockContentExclusions(userId: string) {
     // task1 / speakingTest are nullable — a diagnostic sits Task 2 only, and a
     // backfilled legacy diagnostic has no speaking test.
     if (m.writingTask1PromptId) promptIds.add(m.writingTask1PromptId);
-    promptIds.add(m.writingTask2PromptId);
+    if (m.writingTask2PromptId) promptIds.add(m.writingTask2PromptId);
     if (m.speakingTestId) speakingTestIds.add(m.speakingTestId);
   }
 
@@ -2076,8 +2076,11 @@ export async function getMockWritingTest(
 
   const promptIds = [
     ...(mock.writingTask1PromptId ? [mock.writingTask1PromptId] : []),
-    mock.writingTask2PromptId,
+    ...(mock.writingTask2PromptId ? [mock.writingTask2PromptId] : []),
   ];
+  // An exam-task sitting has no IELTS prompts, so there is no writing section
+  // of this shape to load.
+  if (!promptIds.length) return null;
 
   const [rows, promptRows] = await Promise.all([
     getMockSectionAttempts(userId, mockAttemptId, 'writing'),

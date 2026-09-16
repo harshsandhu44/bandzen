@@ -125,6 +125,12 @@ export async function enterMockSection(formData: FormData) {
   );
 
   if (position === 'writing') {
+    // Every IELTS sitting has a Task 2 prompt. The column is nullable only
+    // because an exam-task sitting has no IELTS prompts at all, and such a
+    // sitting never reaches this branch.
+    const task2PromptId = mock.writingTask2PromptId;
+    if (!task2PromptId) notFound();
+
     // A mock has Task 1 + Task 2; a diagnostic has Task 2 only.
     if (mock.writingTask1PromptId != null) {
       const task1 =
@@ -136,12 +142,12 @@ export async function enterMockSection(formData: FormData) {
           promptId: mock.writingTask1PromptId,
           mockAttemptId,
         }));
-      if (!existing.some((r) => r.promptId === mock.writingTask2PromptId)) {
+      if (!existing.some((r) => r.promptId === task2PromptId)) {
         await createAttempt({
           userId,
           module: 'writing',
           kind: sectionKind,
-          promptId: mock.writingTask2PromptId,
+          promptId: task2PromptId,
           mockAttemptId,
         });
       }
@@ -154,7 +160,7 @@ export async function enterMockSection(formData: FormData) {
         userId,
         module: 'writing',
         kind: sectionKind,
-        promptId: mock.writingTask2PromptId,
+        promptId: task2PromptId,
         mockAttemptId,
       }));
     redirect(`/writing/${row.id}`);

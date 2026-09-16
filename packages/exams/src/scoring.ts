@@ -2,6 +2,8 @@ import { getTask } from './registry.ts';
 import type { EvaluatorKey, ExamKey, ScoreScale, Skill } from './types.ts';
 
 export * from './ielts-scoring.ts';
+export * from './pte-scoring.ts';
+export { formatScore, roundToScale } from './scale.ts';
 
 /**
  * The one result shape every grader produces, deterministic or model-based,
@@ -35,18 +37,6 @@ export type ExamScoreReport = {
 
 /** How every result that is not an official score is labelled, everywhere. */
 export const ESTIMATE_NOTE = 'Bandzen estimate, not an official score';
-
-/** Onto the scale: clamped to its range and snapped to its step. */
-export function roundToScale(scale: ScoreScale, n: number): number {
-  const stepped =
-    scale.min + Math.round((n - scale.min) / scale.step) * scale.step;
-  return Math.min(scale.max, Math.max(scale.min, stepped));
-}
-
-/** Half-step scales show one decimal (7.0); whole-step scales show none (79). */
-export function formatScore(scale: ScoreScale, n: number): string {
-  return n.toFixed(Number.isInteger(scale.step) ? 0 : 1);
-}
 
 /** Equal credit to each skill a task measures. */
 export function evenContributions(

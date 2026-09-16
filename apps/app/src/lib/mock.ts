@@ -10,6 +10,7 @@
  * should have to pull in just to test `mockPosition`.
  */
 
+import { examSkills, getExam } from '@bandzen/exams/registry';
 import type { Skill } from './db/schema';
 
 /** Which kind of sitting a `mock_attempts` row is. Mirrors the `sitting_kind` enum. */
@@ -22,6 +23,17 @@ export const MOCK_ORDER: readonly Skill[] = [
   'writing',
   'speaking',
 ];
+
+/**
+ * The order a sitting runs its skills in, which is the order the exam itself
+ * declares its sections. PTE opens with Speaking & Writing and closes with
+ * Listening — the opposite end of the test from IELTS — so this cannot be one
+ * constant. `examSkills` already returns them in section order.
+ */
+export function sittingOrder(examKey: string): readonly Skill[] {
+  const exam = getExam(examKey);
+  return exam ? examSkills(exam) : MOCK_ORDER;
+}
 
 export type MockChild = { module: Skill; status: string };
 
@@ -44,8 +56,11 @@ export const DIAGNOSTIC_TRACKS = 2;
  * Every sitting — mock and diagnostic alike — runs all four skills; the
  * diagnostic is only shorter in content, not in scope.
  */
-export function mockPosition(children: readonly MockChild[]): Skill | null {
-  for (const skill of MOCK_ORDER) {
+export function mockPosition(
+  children: readonly MockChild[],
+  examKey = 'ielts',
+): Skill | null {
+  for (const skill of sittingOrder(examKey)) {
     const rows = children.filter((c) => c.module === skill);
     if (rows.length === 0) return skill;
     if (rows.some((r) => r.status === 'in_progress')) return skill;
