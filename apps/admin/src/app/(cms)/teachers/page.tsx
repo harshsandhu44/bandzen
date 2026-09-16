@@ -1,4 +1,4 @@
-import { clerkClient } from '@clerk/nextjs/server';
+import { listStaff } from '@bandzen/db/queries';
 import { Button } from '@bandzen/ui/components/button';
 import {
   EmptyState,
@@ -12,22 +12,12 @@ import { revokeRole } from './actions';
 
 export const metadata = { title: 'Teachers' };
 
-type Role = 'admin' | 'teacher';
-
 export default async function TeachersPage() {
   await requireAdmin();
 
-  const clerk = await clerkClient();
-  // ponytail: single page of up to 100 users. Add pagination if this product
-  // ever has more staff than that — nothing here suggests it will soon.
-  const { data: users } = await clerk.users.getUserList({ limit: 100 });
-  const staff = users
-    .map((u) => ({
-      id: u.id,
-      email: u.primaryEmailAddress?.emailAddress ?? '(no email)',
-      role: u.publicMetadata.role as Role | undefined,
-    }))
-    .filter((u): u is { id: string; email: string; role: Role } => !!u.role);
+  // Only people who hold a role, straight from the profile table -- the old
+  // version paged every user out of the auth API and filtered them here.
+  const staff = await listStaff();
 
   return (
     <div className="max-w-2xl space-y-8">
@@ -51,15 +41,15 @@ export default async function TeachersPage() {
           <ul className="divide-y divide-border">
             {staff.map((person) => (
               <li
-                key={person.id}
+                key={person.userId}
                 className="flex items-center justify-between gap-4 py-3"
               >
                 <div>
-                  <p className="text-sm">{person.email}</p>
+                  <p className="text-sm">{person.email ?? '(no email)'}</p>
                   <Eyebrow>{person.role}</Eyebrow>
                 </div>
                 <form action={revokeRole}>
-                  <input type="hidden" name="userId" value={person.id} />
+                  <input type="hidden" name="userId" value={person.userId} />
                   <Button type="submit" variant="ghost" size="sm">
                     Revoke
                   </Button>

@@ -1,5 +1,4 @@
 import Link from 'next/link';
-import { clerkClient } from '@clerk/nextjs/server';
 import { Button } from '@bandzen/ui/components/button';
 import {
   contentCounts,
@@ -15,6 +14,7 @@ import {
   SectionHeader,
 } from '@bandzen/ui/components/primitives';
 import { requireAdminOrTeacher } from '@/lib/auth';
+import { resolveEditorEmails } from '@/lib/editor-email';
 import { StatusBadge } from '@/components/status-badge';
 
 export const metadata = { title: 'Overview' };
@@ -71,22 +71,14 @@ export default async function OverviewPage() {
     listNeedsAttention(),
   ]);
 
-  // One Clerk call for the whole feed: `updatedBy` is a raw userId, and rows
+  // One query for the whole feed: `updatedBy` is a raw userId, and rows
   // backfilled before the CMS existed have none.
   const editorIds = [
     ...new Set(
       recent.map((r) => r.updatedBy).filter((id): id is string => !!id),
     ),
   ];
-  const emailById = new Map<string, string>();
-  if (editorIds.length > 0) {
-    const { data } = await (
-      await clerkClient()
-    ).users.getUserList({ userId: editorIds });
-    for (const user of data) {
-      emailById.set(user.id, user.primaryEmailAddress?.emailAddress ?? user.id);
-    }
-  }
+  const emailById = await resolveEditorEmails(editorIds);
 
   return (
     <div className="max-w-4xl space-y-8">

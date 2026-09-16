@@ -1,7 +1,7 @@
 'use server';
 
-import { clerkClient } from '@clerk/nextjs/server';
 import { revalidatePath } from 'next/cache';
+import { setRole, setRoleByEmail } from '@bandzen/db/queries';
 import { requireAdmin } from '@/lib/auth';
 
 export type GrantFormState = { error: string | null };
@@ -20,16 +20,13 @@ export async function grantRole(
     return { error: 'Enter an email and pick a role.' };
   }
 
-  const clerk = await clerkClient();
-  const { data } = await clerk.users.getUserList({ emailAddress: [email] });
-  const user = data[0];
-  if (!user) {
+  const granted = await setRoleByEmail(email, role);
+  if (!granted) {
     return {
-      error: `No Clerk user with email ${email} — they need to sign up first.`,
+      error: `No account with email ${email} — they need to sign up first.`,
     };
   }
 
-  await clerk.users.updateUserMetadata(user.id, { publicMetadata: { role } });
   revalidatePath('/teachers');
   return { error: null };
 }
@@ -40,9 +37,6 @@ export async function revokeRole(formData: FormData) {
   const userId = String(formData.get('userId') ?? '');
   if (!userId) return;
 
-  const clerk = await clerkClient();
-  await clerk.users.updateUserMetadata(userId, {
-    publicMetadata: { role: null },
-  });
+  await setRole(userId, null);
   revalidatePath('/teachers');
 }
