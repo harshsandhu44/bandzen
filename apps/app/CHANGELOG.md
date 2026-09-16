@@ -1,3 +1,10 @@
+## app [1.24.2](https://github.com/harshsandhu44/bandzen/compare/app@1.24.1...app@1.24.2) (2026-09-16)
+
+
+### Bug Fixes
+
+* **app:** scoring, sitting and calibration correctness ([#125](https://github.com/harshsandhu44/bandzen/issues/125)) ([272d37c](https://github.com/harshsandhu44/bandzen/commit/272d37cfad0119e84abdff2426c4fc95136d1eb1)), closes [#123](https://github.com/harshsandhu44/bandzen/issues/123)
+
 ## app [1.24.1](https://github.com/harshsandhu44/bandzen/compare/app@1.24.0...app@1.24.1) (2026-09-16)
 
 
