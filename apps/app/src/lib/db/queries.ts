@@ -118,6 +118,8 @@ export const getProfile = cache(async function getProfile(userId: string) {
   const [row] = await db
     .select({
       userId: profiles.userId,
+      email: profiles.email,
+      role: profiles.role,
       studyMinutes: profiles.studyMinutes,
       timezone: profiles.timezone,
       onboardingCompletedAt: profiles.onboardingCompletedAt,
@@ -146,8 +148,8 @@ export const getProfile = cache(async function getProfile(userId: string) {
 export type Profile = NonNullable<Awaited<ReturnType<typeof getProfile>>>;
 
 /**
- * Two writes, no transaction (neon-http has none). The enrollment goes first so
- * `active_exam_key` never points at a row that does not exist yet.
+ * Two writes, no transaction. The enrollment goes first so `active_exam_key`
+ * never points at a row that does not exist yet.
  */
 export async function upsertProfile(userId: string, values: PreparationValues) {
   const { enrollment, profile } = preparationWrites(values);
@@ -2753,8 +2755,8 @@ export async function listAwards(userId: string): Promise<Award[]> {
  *
  * `onConflictDoNothing` is doing real work: the caller passes every award the
  * log justifies, not just the new ones, so this is called with awards already
- * held on every single activity. It also means the neon-http driver's lack of
- * transactions costs nothing here — a write that fails is simply retried, in
+ * held on every single activity. It also means writing these without a
+ * transaction costs nothing here — a write that fails is simply retried, in
  * full, by the next thing the candidate does.
  */
 export async function recordAwards(userId: string, awardIds: string[]) {
