@@ -816,12 +816,19 @@ export const reports = pgTable('reports', {
 });
 
 /**
- * A real score a candidate reports back from the actual exam.
+ * A real score a candidate reports back from the actual exam, paired with what
+ * Bandzen had guessed.
  *
  * Deliberately its own table, and deliberately never joined into an estimate:
  * the whole point of collecting these is to compare Bandzen's guess against
  * the truth later, and a column on `reports` would invite something to average
  * the two together.
+ *
+ * The estimate is frozen here rather than recomputed at comparison time. A
+ * sitting's estimate is assembled from its assessments on every page load, so
+ * a change to the scoring arithmetic — or a re-grade — silently rewrites what
+ * the candidate was actually shown. A calibration row that moved with the code
+ * it is meant to calibrate would measure nothing.
  */
 export const officialScores = pgTable(
   'official_scores',
@@ -835,6 +842,21 @@ export const officialScores = pgTable(
       mode: 'number',
     }).notNull(),
     takenOn: date('taken_on'),
+    /**
+     * The sitting this is the truth for. Null when a candidate volunteers a
+     * score outside a result page, which is still worth having.
+     */
+    mockAttemptId: uuid('mock_attempt_id').references(() => mockAttempts.id, {
+      onDelete: 'set null',
+    }),
+    /** What Bandzen estimated for that sitting, as it stood at this moment. */
+    estimatedScore: numeric('estimated_score', {
+      precision: 5,
+      scale: 1,
+      mode: 'number',
+    }),
+    /** The arithmetic that produced it — `PTE_SCORING_VERSION` and its kin. */
+    scoringVersion: text('scoring_version'),
     createdAt: timestamp('created_at', { withTimezone: true })
       .notNull()
       .defaultNow(),

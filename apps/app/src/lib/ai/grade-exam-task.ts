@@ -6,7 +6,7 @@ import {
   writeExamTaskAssessment,
 } from '@/lib/db/queries';
 import { capture } from '@/lib/analytics';
-import { getTask } from '@bandzen/exams/registry';
+import { getTask, type Skill } from '@bandzen/exams/registry';
 import {
   measuredSkillsFor,
   type AssessmentResult,
@@ -58,12 +58,17 @@ export async function gradeExamTask(attemptId: string) {
   const startedAt = Date.now();
   let gradedUserId: string | null = null;
   let ok = false;
+  // Hoisted for the `finally`: the analytics event should say which skill was
+  // graded, and every PTE speaking task was landing in the Writing funnel.
+  // Not named `module` — Next reserves that identifier.
+  let gradedModule: Skill = 'writing';
   try {
     const work = await loadExamTaskForGrading(attemptId);
     if (!work) throw new Error('Attempt or items missing');
 
     const { attempt } = work;
     const { taskType } = attempt;
+    gradedModule = attempt.module;
     if (!taskType) throw new Error('Attempt has no task type');
     const task = getTask(attempt.examKey, taskType);
     if (!task) throw new Error(`Unknown task ${taskType}`);
@@ -176,7 +181,7 @@ export async function gradeExamTask(attemptId: string) {
   } finally {
     if (gradedUserId) {
       await capture(gradedUserId, 'attempt_graded', {
-        module: 'writing',
+        module: gradedModule,
         attempt_id: attemptId,
         outcome: ok ? 'graded' : 'failed',
         duration_ms: Date.now() - startedAt,

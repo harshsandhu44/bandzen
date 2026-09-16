@@ -49,7 +49,7 @@ export default async function MockResultPage({
             number here that is not a guess. */}
         <OfficialScoreForm
           scale={scoreScaleFor(taskSitting.mock.examKey)}
-          action={saveOfficialScore}
+          action={saveOfficialScore.bind(null, mockAttemptId)}
           recorded={recorded.map((r) => ({
             score: r.score,
             takenOn: r.takenOn,

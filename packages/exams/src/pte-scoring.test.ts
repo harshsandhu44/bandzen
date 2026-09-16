@@ -55,6 +55,25 @@ test('a task nobody marked is not a task marked zero', () => {
     }),
     null,
   );
+  // An objective task whose marking failed: the denominator is there, the
+  // numerator is not. Scored 0/10 before, which reads as ten wrong answers.
+  assert.equal(
+    taskFraction({
+      taskType: 'x',
+      dimensions: { correct: null, total: 10 },
+      measuredSkills: [],
+    }),
+    null,
+  );
+  // And none of that swallows a real zero.
+  assert.equal(
+    taskFraction({
+      taskType: 'x',
+      dimensions: { correct: 0, total: 10 },
+      measuredSkills: [],
+    }),
+    0,
+  );
 });
 
 test('an integrated task counts towards every skill it measures', () => {

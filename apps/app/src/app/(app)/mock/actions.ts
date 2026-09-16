@@ -11,6 +11,7 @@ import {
   createMockAttempt,
   getProfile,
   listPublishedExamTasks,
+  getExamTasksByIds,
   getMockAttempt,
   getMockSectionAttempts,
   getMockSiblings,
@@ -154,9 +155,13 @@ export async function enterMockSection(formData: FormData) {
   // soon as no row for a skill is `in_progress`, so a half-built section would
   // be treated as finished and the rest of it skipped.
   if (mock.taskIds) {
-    const published = await listPublishedExamTasks(mock.examKey);
-    const ids = tasksForSkill(mock.examKey, published, mock.taskIds, position);
-    const byId = new Map(published.map((t) => [t.id, t]));
+    // By id, not by what is published: the sitting locked these when it
+    // started, and unpublishing one in the CMS afterwards must not quietly
+    // drop it from a section the candidate has not reached yet — or, if it was
+    // the only item of its type, skip that task type's attempt row entirely.
+    const chosen = await getExamTasksByIds(mock.taskIds);
+    const ids = tasksForSkill(mock.examKey, chosen, mock.taskIds, position);
+    const byId = new Map(chosen.map((t) => [t.id, t]));
 
     const grouped = new Map<string, string[]>();
     for (const id of ids) {

@@ -43,8 +43,12 @@ export type TaskOutcome = {
  */
 export function taskFraction(outcome: TaskOutcome): number | null {
   const { correct, total } = outcome.dimensions;
-  if (typeof total === 'number' && total > 0) {
-    return Math.min(1, Math.max(0, (correct ?? 0) / total));
+  // Both halves, not just the denominator. A marked task writes them together,
+  // so `total` with a null `correct` is a task that was never marked — and
+  // `correct ?? 0` would have scored it a flat zero, which is the one answer
+  // this function exists to avoid giving.
+  if (typeof total === 'number' && total > 0 && typeof correct === 'number') {
+    return Math.min(1, Math.max(0, correct / total));
   }
   const traits = Object.entries(outcome.dimensions)
     .filter(([name]) => name !== 'correct' && name !== 'total')
