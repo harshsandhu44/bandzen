@@ -157,24 +157,6 @@ export const profiles = pgTable('profiles', {
    * until they tell us. The enrollment holds the target, date and variant.
    */
   activeExamKey: examKey('active_exam_key'),
-  /**
-   * @deprecated Legacy IELTS-only fields, superseded by `exam_enrollments`.
-   * Nothing reads or writes them any more; they are dropped in the follow-up
-   * migration, which is the only reason they are still declared here.
-   */
-  examType: testFormat('exam_type'),
-  targetBand: numeric('target_band', {
-    precision: 2,
-    scale: 1,
-    mode: 'number',
-  }),
-  testDate: date('test_date'),
-  /** @deprecated Legacy, superseded by `exam_enrollments.self_assessed_score`. */
-  selfAssessedBand: numeric('self_assessed_band', {
-    precision: 2,
-    scale: 1,
-    mode: 'number',
-  }),
   /** Minutes a day they say they can study. Drives today's goal. */
   studyMinutes: integer('study_minutes'),
   /** IANA zone, captured from the browser so "today" means their today. */
@@ -718,8 +700,6 @@ export const attempts = pgTable(
      * Display-only — nothing in grading reads it.
      */
     playback: jsonb('playback').$type<ListeningPlayback | null>(),
-    /** @deprecated IELTS-only; no longer written, read `score`. */
-    band: numeric('band', { precision: 2, scale: 1, mode: 'number' }),
     /** The result on the attempt's own exam scale. */
     score: numeric('score', { precision: 5, scale: 1, mode: 'number' }),
     /**
@@ -823,8 +803,6 @@ export const reports = pgTable('reports', {
   attemptId: uuid('attempt_id')
     .primaryKey()
     .references(() => attempts.id, { onDelete: 'cascade' }),
-  /** @deprecated IELTS-only; no longer written, read `score`. */
-  band: numeric('band', { precision: 2, scale: 1, mode: 'number' }),
   score: numeric('score', { precision: 5, scale: 1, mode: 'number' }),
   criteria: jsonb('criteria').$type<Criterion[]>().notNull().default([]),
   annotations: jsonb('annotations').$type<Annotation[]>().notNull().default([]),
