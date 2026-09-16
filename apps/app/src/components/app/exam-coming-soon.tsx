@@ -1,5 +1,8 @@
 import Link from 'next/link';
-import type { ExamDefinition } from '@bandzen/exams/registry';
+import {
+  sectionMinutesLabel,
+  type ExamDefinition,
+} from '@bandzen/exams/registry';
 import { formatScore } from '@bandzen/exams/scoring';
 import { Button } from '@bandzen/ui/components/button';
 import { Eyebrow, Panel } from '@/components/app/primitives';
@@ -66,7 +69,9 @@ export function ExamComingSoon({
                 <span>{section.label}</span>
                 <span className="text-xs text-muted-foreground">
                   {tasks.length} task {tasks.length === 1 ? 'type' : 'types'}
-                  {section.minutes ? ` · ${section.minutes} min` : ''}
+                  {sectionMinutesLabel(section)
+                    ? ` · ${sectionMinutesLabel(section)}`
+                    : ''}
                 </span>
               </li>
             );

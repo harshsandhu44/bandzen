@@ -36,11 +36,14 @@ export function ExamTaskSittingResult({
   sections,
   scale,
   target,
+  items,
 }: {
   examName: string;
   sections: SectionRow[];
   scale: ScoreScale;
   target: number | null;
+  /** What this sitting ran, against what the real format runs. */
+  items: { sat: number; full: number };
 }) {
   const marked = sections
     .map((s) => s.assessment)
@@ -126,6 +129,16 @@ export function ExamTaskSittingResult({
             Weakest first. Your study plan opens these.
           </p>
         </Panel>
+      ) : null}
+
+      {/* What the estimate was made from. A score assembled from a quarter of
+          the format's questions is a weaker guess than one assembled from all
+          of them, and the candidate is the one who should know that. */}
+      {items.sat < items.full ? (
+        <p className="text-xs text-muted-foreground">
+          Estimated from the {items.sat} questions you sat. A real {examName}{' '}
+          runs {items.full}.
+        </p>
       ) : null}
 
       <Eyebrow>Estimate {PTE_SCORING_VERSION}</Eyebrow>
