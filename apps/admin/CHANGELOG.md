@@ -1,3 +1,10 @@
+# admin [0.15.0](https://github.com/harshsandhu44/bandzen/compare/admin@0.14.0...admin@0.15.0) (2026-09-16)
+
+
+### Features
+
+* **app:** migrate auth and database to Supabase ([#127](https://github.com/harshsandhu44/bandzen/issues/127)) ([809335f](https://github.com/harshsandhu44/bandzen/commit/809335f32d7a2021056339d5cea0b2c914cbc009)), closes [#126](https://github.com/harshsandhu44/bandzen/issues/126)
+
 # admin [0.14.0](https://github.com/harshsandhu44/bandzen/compare/admin@0.13.0...admin@0.14.0) (2026-09-15)
 
 
