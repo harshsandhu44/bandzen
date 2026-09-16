@@ -1,3 +1,10 @@
+## app [1.23.1](https://github.com/harshsandhu44/bandzen/compare/app@1.23.0...app@1.23.1) (2026-09-16)
+
+
+### Bug Fixes
+
+* **app:** ship the legacy IELTS column write removal ([#118](https://github.com/harshsandhu44/bandzen/issues/118)) ([6a4f1a3](https://github.com/harshsandhu44/bandzen/commit/6a4f1a3472416e237d07e3113f3c4a988c5c1fec)), closes [#116](https://github.com/harshsandhu44/bandzen/issues/116) [#117](https://github.com/harshsandhu44/bandzen/issues/117) [#109](https://github.com/harshsandhu44/bandzen/issues/109)
+
 # app [1.23.0](https://github.com/harshsandhu44/bandzen/compare/app@1.22.0...app@1.23.0) (2026-09-16)
 
 
