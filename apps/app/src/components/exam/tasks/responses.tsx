@@ -291,8 +291,10 @@ export function FillBlankSelect({
     next[i] = v;
     onChange(JSON.stringify(next));
   };
+  // A div rather than a p: `Select` wraps its control in a div, which is
+  // invalid inside a paragraph and breaks hydration.
   return (
-    <p className="text-sm leading-9">
+    <div className="text-sm leading-9">
       {parts.map((part, i) => (
         <span key={i}>
           {part}
@@ -313,7 +315,7 @@ export function FillBlankSelect({
           ) : null}
         </span>
       ))}
-    </p>
+    </div>
   );
 }
 

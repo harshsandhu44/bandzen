@@ -1027,6 +1027,34 @@ export async function createExamTaskAttempt(values: {
 }
 
 /**
+ * This candidate's open practice session of one task type, if any. Resuming it
+ * is what stops a second click on Start from stacking up abandoned attempts —
+ * the same thing `findInProgress` does for the IELTS modules. Sitting sections
+ * are excluded: those are the sitting's to create and resume.
+ */
+export async function findInProgressExamTask(
+  userId: string,
+  examKey: ExamKey,
+  taskType: string,
+) {
+  return firstRow(
+    await db
+      .select({ id: attempts.id })
+      .from(attempts)
+      .where(
+        and(
+          eq(attempts.userId, userId),
+          eq(attempts.status, 'in_progress'),
+          eq(attempts.examKey, examKey),
+          eq(attempts.taskType, taskType),
+          isNull(attempts.mockAttemptId),
+        ),
+      )
+      .limit(1),
+  );
+}
+
+/**
  * An exam-task attempt as its runner needs it: the items in their locked
  * order, with the answers so far.
  *

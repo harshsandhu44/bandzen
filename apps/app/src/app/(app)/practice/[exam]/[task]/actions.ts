@@ -8,6 +8,7 @@ import { gradeExamTask } from '@/lib/ai/grade-exam-task';
 import { requireContentRole, requireUserId } from '@/lib/auth';
 import {
   createExamTaskAttempt,
+  findInProgressExamTask,
   getAttempt,
   getPublishedExamTasks,
   saveExamTaskResponse,
@@ -39,6 +40,11 @@ export async function startExamTaskAttempt(formData: FormData) {
   if (!exam || !task) notFound();
 
   const userId = await requireUserId();
+
+  // Resume rather than stack up abandoned attempts on the same task type.
+  const existing = await findInProgressExamTask(userId, exam.key, task.key);
+  if (existing) redirect(`/practice/${exam.key}/${task.key}/${existing.id}`);
+
   const items = await getPublishedExamTasks(
     exam.key,
     task.key,
