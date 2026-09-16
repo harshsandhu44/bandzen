@@ -33,18 +33,6 @@ export function preparationWrites(values: PreparationValues) {
     ...profile
   } = values;
 
-  // ponytail: the legacy IELTS profile columns are dual-written so a rollback
-  // reads current data. Delete this with the columns in the drop follow-up.
-  const legacy =
-    examKey === 'ielts'
-      ? {
-          examType: examVariant as 'academic' | 'general' | null | undefined,
-          targetBand: targetScore,
-          selfAssessedBand: selfAssessedScore,
-          testDate,
-        }
-      : {};
-
   return {
     enrollment: {
       examKey,
@@ -56,6 +44,6 @@ export function preparationWrites(values: PreparationValues) {
     },
     // Only a save that names its exam moves the active one — the diagnostic's
     // target-and-date save must not switch a PTE candidate back to IELTS.
-    profile: { ...profile, ...legacy, activeExamKey: values.examKey },
+    profile: { ...profile, activeExamKey: values.examKey },
   };
 }

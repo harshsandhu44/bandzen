@@ -92,7 +92,7 @@ type Case = {
 
 async function writingCases(): Promise<Case[]> {
   const rows = (await sql`
-    select a.id, r.band, r.criteria, e.body, e.word_count, wp.task, wp.prompt_text
+    select a.id, r.score as band, r.criteria, e.body, e.word_count, wp.task, wp.prompt_text
       from reports r
       join attempts a on a.id = r.attempt_id
       join essays e on e.attempt_id = a.id
@@ -118,7 +118,7 @@ async function writingCases(): Promise<Case[]> {
 
 async function speakingCases(): Promise<Case[]> {
   const attemptRows = (await sql`
-    select a.id, a.speaking_test_id, r.band, r.criteria
+    select a.id, a.speaking_test_id, r.score as band, r.criteria
       from reports r
       join attempts a on a.id = r.attempt_id
      where a.module = 'speaking' and a.status = 'complete' and r.model <> 'none'

@@ -936,10 +936,6 @@ function attemptVariant(values: {
   )`;
 }
 
-// ponytail: `band` is dual-written beside `score` so a rollback reads current
-// data. Inline `score` and delete this with the column in the drop follow-up.
-const scored = (band: number) => ({ band, score: band });
-
 type AttemptIdentity = Pick<
   Attempt,
   'examKey' | 'examVersion' | 'taskType' | 'module'
@@ -964,7 +960,7 @@ const objectiveResult = (
   // sitting, not per item, so its estimate is assembled there instead.
   const band = attempt.examKey === 'ielts' ? readingBand(correct, total) : null;
   return {
-    ...(band == null ? { band: null, score: null } : scored(band)),
+    score: band,
     assessment: objectiveAssessment({
       ...identity(attempt),
       correct,
@@ -2524,7 +2520,6 @@ export async function latestReport(userId: string, module?: Skill) {
     await db
       .select({
         attemptId: reports.attemptId,
-        band: reports.band,
         criteria: reports.criteria,
         strengths: reports.strengths,
         weaknesses: reports.weaknesses,
@@ -2574,7 +2569,10 @@ export async function writeReport(
     model: string;
   },
 ) {
-  const report = { ...values, score: values.band };
+  // `band` is what the IELTS grader produced; `score` is the only column it is
+  // stored in now.
+  const { band, ...rest } = values;
+  const report = { ...rest, score: band };
   await db
     .insert(reports)
     .values({ attemptId, ...report })
@@ -2609,7 +2607,7 @@ export async function writeReport(
     .update(attempts)
     .set({
       status: 'complete',
-      ...scored(values.band),
+      score: values.band,
       assessment,
       submittedAt: new Date(),
     })
