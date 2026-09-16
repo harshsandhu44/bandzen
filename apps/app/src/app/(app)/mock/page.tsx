@@ -10,14 +10,17 @@ import {
   latestOpenMock,
   mockAllowance,
 } from '@/lib/db/queries';
+import { getExam } from '@bandzen/exams/registry';
 import { MOCK_DURATION_LABEL } from '@/lib/timing';
 import { startMock } from './actions';
 
 export const metadata = { title: 'Mock test' };
 
 /**
- * The full four-skill mock: one continuous sitting, Listening → Reading →
- * Writing → Speaking, real IELTS order and real IELTS lockstep. Pro-only,
+ * The full mock: one continuous sitting in the exam's own order, with its own
+ * lockstep. IELTS runs Listening → Reading → Writing → Speaking; PTE opens
+ * with Speaking & Writing and closes with Listening, so every word on this
+ * page comes from the exam definition rather than from a constant. Pro-only,
  * capped at one a week — see `entitlements.ts#canStartMock` for why the cap
  * applies even to Pro.
  */
@@ -30,6 +33,17 @@ export default async function MockPage() {
     getProfile(userId),
   ]);
 
+  const exam = getExam(profile?.examKey ?? 'ielts');
+  const parts = exam?.sections.map((s) => s.label).join(' · ') ?? '';
+  const minutes =
+    exam?.sections.reduce((total, s) => total + (s.minutes ?? 0), 0) ?? 0;
+  // IELTS keeps its measured label, which includes the gaps between sections.
+  const duration =
+    exam?.key === 'ielts' || !minutes
+      ? MOCK_DURATION_LABEL
+      : `About ${Math.floor(minutes / 60)} hr ${minutes % 60} min`;
+  const scoreNoun = exam?.scoreScale.label.toLowerCase() ?? 'score';
+
   if (!pro) {
     await capture(userId, 'pro_feature_locked', { surface: 'mock' });
   } else if (!open && !cap.allowed) {
@@ -41,14 +55,14 @@ export default async function MockPage() {
       <PageHeader
         eyebrow="Timed test"
         title="Full mock test"
-        description="Listening, Reading, Writing and Speaking, back to back, exactly as the real test runs. One overall band at the end."
+        description={`${parts}, back to back, exactly as the real test runs. One overall ${scoreNoun} at the end.`}
       />
 
       <Panel headingId="mock-heading" title="Mock test">
         <dl className="grid grid-cols-2 divide-x divide-y divide-border border-b border-border sm:grid-cols-4 sm:divide-y-0">
           {[
-            ['Sections', 'Listening · Reading · Writing · Speaking'],
-            ['Duration', MOCK_DURATION_LABEL],
+            ['Sections', parts],
+            ['Duration', duration],
             ['Rules', 'No going back once a section is submitted'],
             ['Status', open ? 'In progress' : 'Not started'],
           ].map(([label, value]) => (
