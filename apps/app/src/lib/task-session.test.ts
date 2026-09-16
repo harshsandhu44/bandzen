@@ -18,6 +18,7 @@ const content = (over: Partial<TaskContent> = {}): TaskContent => ({
   },
   options: null,
   gapped: null,
+  gapOptions: null,
   tokens: ['second', 'first'],
   turns: null,
   timing: null,

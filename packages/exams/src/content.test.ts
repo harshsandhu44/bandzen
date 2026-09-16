@@ -8,6 +8,7 @@ const empty: TaskContent = {
   stimulus: { text: null, audioUrl: null, imageUrl: null, imageAlt: null },
   options: null,
   gapped: null,
+  gapOptions: null,
   tokens: null,
   turns: null,
   timing: null,
@@ -220,5 +221,117 @@ test('an image needs the image and alt text; a graded task takes no key', () => 
       'import',
     ),
     ['at least one examiner turn'],
+  );
+});
+
+const GAPPED = 'Open water ___ streets and slows ___ over ___.';
+
+test('dropdown blanks need choices at every gap', () => {
+  const complete = {
+    stimulus: {
+      text: 'A passage.',
+      audioUrl: null,
+      imageUrl: null,
+      imageAlt: null,
+    },
+    gapped: GAPPED,
+    gapOptions: [
+      ['cools', 'heats'],
+      ['flooding', 'traffic'],
+      ['decades', 'minutes'],
+    ],
+  };
+  const answer = ['cools', 'flooding', 'decades'];
+  assert.deepEqual(
+    check(
+      'pte_academic',
+      'reading_writing_fill_in_the_blanks',
+      complete,
+      { answer },
+      'publish',
+    ),
+    [],
+  );
+
+  assert.ok(
+    check(
+      'pte_academic',
+      'reading_writing_fill_in_the_blanks',
+      { ...complete, gapOptions: null },
+      { answer },
+      'publish',
+    ).some((i) => i.includes('one list of choices per gap (3)')),
+  );
+
+  assert.ok(
+    check(
+      'pte_academic',
+      'reading_writing_fill_in_the_blanks',
+      {
+        ...complete,
+        gapOptions: [
+          ['cools'],
+          ['flooding', 'traffic'],
+          ['decades', 'minutes'],
+        ],
+      },
+      { answer },
+      'publish',
+    ).some((i) => i.includes('at least two choices at every gap')),
+  );
+
+  // A gap whose key is not among its own choices can never be answered.
+  assert.ok(
+    check(
+      'pte_academic',
+      'reading_writing_fill_in_the_blanks',
+      complete,
+      { answer: ['warms', 'flooding', 'decades'] },
+      'publish',
+    ).some((i) => i.includes('among their gap')),
+  );
+});
+
+test('a word bank must cover every gap, and may hold distractors', () => {
+  const complete = {
+    stimulus: {
+      text: 'A passage.',
+      audioUrl: null,
+      imageUrl: null,
+      imageAlt: null,
+    },
+    gapped: GAPPED,
+    options: ['cools', 'flooding', 'decades', 'heats', 'traffic'],
+  };
+  const answer = ['cools', 'flooding', 'decades'];
+  assert.deepEqual(
+    check(
+      'pte_academic',
+      'reading_fill_in_the_blanks',
+      complete,
+      { answer },
+      'publish',
+    ),
+    [],
+  );
+
+  assert.ok(
+    check(
+      'pte_academic',
+      'reading_fill_in_the_blanks',
+      { ...complete, options: ['cools', 'flooding'] },
+      { answer },
+      'publish',
+    ).some((i) => i.includes('word bank covering every gap (3)')),
+  );
+
+  assert.ok(
+    check(
+      'pte_academic',
+      'reading_fill_in_the_blanks',
+      complete,
+      { answer: ['cools', 'flooding', 'centuries'] },
+      'publish',
+    ).some((i) => i.includes('in the word bank')),
   );
 });
