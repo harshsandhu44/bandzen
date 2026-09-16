@@ -1,8 +1,13 @@
-import { scoreScaleFor } from '@bandzen/exams/registry';
+import { getExam, scoreScaleFor } from '@bandzen/exams/registry';
 import { notFound } from 'next/navigation';
 import { requireUserId } from '@/lib/auth';
-import { getMockResult, getProfile } from '@/lib/db/queries';
+import {
+  getExamTaskSitting,
+  getMockResult,
+  getProfile,
+} from '@/lib/db/queries';
 import { SittingResult } from '@/components/exam/sitting-result';
+import { ExamTaskSittingResult } from '@/components/exam/exam-task-sitting-result';
 
 export const metadata = { title: 'Mock test result' };
 
@@ -12,10 +17,27 @@ export default async function MockResultPage({
   const { mockAttemptId } = await params;
   const userId = await requireUserId();
 
-  const [data, profile] = await Promise.all([
-    getMockResult(userId, mockAttemptId),
+  const [taskSitting, profile] = await Promise.all([
+    getExamTaskSitting(userId, mockAttemptId),
     getProfile(userId),
   ]);
+
+  // A sitting built from exam tasks has none of IELTS's four modules, so it
+  // has its own result rather than empty slots in IELTS's.
+  if (taskSitting) {
+    return (
+      <div className="max-w-2xl space-y-8">
+        <ExamTaskSittingResult
+          examName={getExam(taskSitting.mock.examKey)?.name ?? 'Exam'}
+          sections={taskSitting.sections}
+          scale={scoreScaleFor(taskSitting.mock.examKey)}
+          target={profile?.targetScore ?? null}
+        />
+      </div>
+    );
+  }
+
+  const data = await getMockResult(userId, mockAttemptId);
   if (!data) notFound();
 
   return (

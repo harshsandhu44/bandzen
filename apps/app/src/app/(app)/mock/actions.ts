@@ -6,7 +6,11 @@ import { capture } from '@/lib/analytics';
 import { requireUserId } from '@/lib/auth';
 import {
   createAttempt,
+  createExamTaskAttempt,
+  createExamTaskSitting,
   createMockAttempt,
+  getProfile,
+  listPublishedExamTasks,
   getMockAttempt,
   getMockSectionAttempts,
   getMockSiblings,
@@ -18,10 +22,21 @@ import {
   pickRandomSpeakingTest,
   pickRandomTracks,
 } from '@/lib/db/queries';
+import { getExam } from '@bandzen/exams/registry';
 import { mockPosition, mockSectionUrl } from '@/lib/mock';
+import { composeSitting, tasksForSkill } from '@/lib/exam-sitting';
 
 const PASSAGES_PER_MOCK = 3;
 const TRACKS_PER_MOCK = 4;
+
+/**
+ * Items per task type in a sitting built from exam tasks.
+ *
+ * Pearson does not publish how many of each type a real PTE test contains, and
+ * candidate reports vary, so this is a configuration rather than a claim. One
+ * of each is what the QA bank can currently fill.
+ */
+const ITEMS_PER_TASK_TYPE = 1;
 
 /**
  * Start (or resume) a full four-skill mock.
@@ -38,7 +53,33 @@ export async function startMock() {
   const open = await latestOpenMock(userId);
   if (open) {
     const siblings = await getMockSiblings(userId, open.id);
-    redirect(mockSectionUrl(open.id, mockPosition(siblings)));
+    redirect(
+      mockSectionUrl(open.id, mockPosition(siblings, open.examKey), open.kind),
+    );
+  }
+
+  const profile = await getProfile(userId);
+  const exam = getExam(profile?.examKey ?? 'ielts');
+  if (!exam) notFound();
+
+  // An exam whose content is task items composes its sitting from those, in
+  // the order the exam declares them. IELTS's four content tables follow below.
+  if (exam.key !== 'ielts') {
+    const cap = await mockAllowance(userId);
+    if (!cap.allowed) redirect('/upgrade?from=mock_wall');
+
+    const published = await listPublishedExamTasks(exam.key);
+    const taskIds = composeSitting(exam, published, ITEMS_PER_TASK_TYPE);
+    if (!taskIds.length) notFound();
+
+    const sitting = await createExamTaskSitting({
+      userId,
+      examKey: exam.key,
+      examVersion: exam.version,
+      taskIds,
+    });
+    after(() => capture(userId, 'mock_started', { kind: sitting.kind }));
+    redirect(`/mock/${sitting.id}/next`);
   }
 
   // The gate, and the only one on this path — same shape as the essay wall.
@@ -114,8 +155,49 @@ export async function enterMockSection(formData: FormData) {
   }
 
   const siblings = await getMockSiblings(userId, mockAttemptId);
-  const position = mockPosition(siblings);
+  const position = mockPosition(siblings, mock.examKey);
   if (!position) redirect(mockSectionUrl(mockAttemptId, null, mock.kind));
+
+  // A task sitting creates every one of the section's rows at once, one per
+  // task type. Lazily creating them would break the sequencer: it advances as
+  // soon as no row for a skill is `in_progress`, so a half-built section would
+  // be treated as finished and the rest of it skipped.
+  if (mock.taskIds) {
+    const published = await listPublishedExamTasks(mock.examKey);
+    const ids = tasksForSkill(mock.examKey, published, mock.taskIds, position);
+    const byId = new Map(published.map((t) => [t.id, t]));
+
+    const grouped = new Map<string, string[]>();
+    for (const id of ids) {
+      const taskType = byId.get(id)?.taskType;
+      if (taskType)
+        grouped.set(taskType, [...(grouped.get(taskType) ?? []), id]);
+    }
+
+    const existing = await getMockSectionAttempts(
+      userId,
+      mockAttemptId,
+      position,
+    );
+    const already = new Set(existing.map((r) => r.taskType));
+    for (const [taskType, taskIds] of grouped) {
+      if (already.has(taskType)) continue;
+      await createExamTaskAttempt({
+        userId,
+        examKey: mock.examKey,
+        examVersion: mock.examVersion,
+        taskType,
+        module: position,
+        taskIds,
+        mockAttemptId,
+      });
+    }
+
+    const rows = await getMockSectionAttempts(userId, mockAttemptId, position);
+    const next = rows.find((r) => r.status === 'in_progress') ?? rows[0];
+    if (!next?.taskType) notFound();
+    redirect(`/practice/${mock.examKey}/${next.taskType}/${next.id}`);
+  }
 
   const sectionKind = mock.kind;
   const existing = await getMockSectionAttempts(

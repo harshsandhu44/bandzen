@@ -49,6 +49,7 @@ import {
   lessonProgress,
   listeningTracks,
   mockAttempts,
+  officialScores,
   passages,
   profiles,
   questionAnswers,
@@ -1002,6 +1003,112 @@ export async function createAttempt(values: {
     await db.insert(essays).values({ attemptId: row.id }).onConflictDoNothing();
   }
   return row;
+}
+
+/**
+ * A real score the candidate reports back from the actual exam.
+ *
+ * Kept apart from every estimate on purpose: this is the only number in the
+ * system that is not a guess, and the point of storing it is to measure the
+ * guesses against it later. Nothing averages the two.
+ */
+export async function recordOfficialScore(values: {
+  userId: string;
+  examKey: ExamKey;
+  examVersion: string;
+  score: number;
+  takenOn: string | null;
+}) {
+  const [row] = await db.insert(officialScores).values(values).returning({
+    id: officialScores.id,
+  });
+  return row ?? null;
+}
+
+/** This candidate's reported real scores for one exam, newest first. */
+export async function listOfficialScores(userId: string, examKey: ExamKey) {
+  return db
+    .select()
+    .from(officialScores)
+    .where(
+      and(
+        eq(officialScores.userId, userId),
+        eq(officialScores.examKey, examKey),
+      ),
+    )
+    .orderBy(desc(officialScores.createdAt));
+}
+
+// ---------------------------------------------------------------------------
+// Exam-task sittings
+//
+// A sitting whose content is a list of task items rather than IELTS's four
+// tables. The engine around it — position, lockstep, the interstitial — is the
+// same one; only the content and the order differ.
+// ---------------------------------------------------------------------------
+
+/** Every published item of an exam, for a sitting to be composed from. */
+export async function listPublishedExamTasks(examKey: ExamKey) {
+  return db
+    .select({
+      id: examTasks.id,
+      slug: examTasks.slug,
+      taskType: examTasks.taskType,
+      section: examTasks.section,
+    })
+    .from(examTasks)
+    .where(
+      and(eq(examTasks.examKey, examKey), eq(examTasks.status, 'published')),
+    )
+    .orderBy(examTasks.taskType, examTasks.slug);
+}
+
+/**
+ * Start a sitting over a fixed list of task items.
+ *
+ * The list is locked in here, for the same reason a practice session's is: a
+ * sitting that re-picked on every page load would not be the test the
+ * candidate started. The IELTS content columns stay empty — this sitting has
+ * no passages, tracks or prompts of its own.
+ */
+export async function createExamTaskSitting(values: {
+  userId: string;
+  examKey: ExamKey;
+  examVersion: string;
+  taskIds: string[];
+}) {
+  const [row] = await db
+    .insert(mockAttempts)
+    .values({
+      userId: values.userId,
+      kind: 'mock',
+      examKey: values.examKey,
+      examVersion: values.examVersion,
+      readingPassageIds: [],
+      listeningTrackIds: [],
+      writingTask1PromptId: null,
+      writingTask2PromptId: null,
+      speakingTestId: null,
+      taskIds: values.taskIds,
+    })
+    .returning();
+  if (!row) throw new Error('Could not create sitting');
+  return row;
+}
+
+/** A finished exam-task sitting and every section attempt under it. */
+export async function getExamTaskSitting(userId: string, sittingId: string) {
+  const mock = await getMockAttempt(userId, sittingId);
+  if (!mock?.taskIds) return null;
+
+  const rows = await db
+    .select()
+    .from(attempts)
+    .where(
+      and(eq(attempts.userId, userId), eq(attempts.mockAttemptId, sittingId)),
+    );
+
+  return { mock, sections: rows };
 }
 
 // ---------------------------------------------------------------------------
