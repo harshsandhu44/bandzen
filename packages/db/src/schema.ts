@@ -641,11 +641,18 @@ export const mockAttempts = pgTable(
     writingTask1PromptId: uuid('writing_task1_prompt_id').references(
       () => writingPrompts.id,
     ),
-    writingTask2PromptId: uuid('writing_task2_prompt_id')
-      .notNull()
-      .references(() => writingPrompts.id),
+    /** Null for a sitting whose content is exam tasks rather than IELTS prompts. */
+    writingTask2PromptId: uuid('writing_task2_prompt_id').references(
+      () => writingPrompts.id,
+    ),
     /** Null only on legacy diagnostics backfilled from the old 2-skill chain. */
     speakingTestId: uuid('speaking_test_id').references(() => speakingTests.id),
+    /**
+     * An exam-task sitting's content, locked in at the start: every item it
+     * will sit, in order. Null for IELTS, whose content is the four columns
+     * above. Picked once so a refresh cannot re-pick from a bank that grew.
+     */
+    taskIds: jsonb('task_ids').$type<string[] | null>(),
     startedAt: timestamp('started_at', { withTimezone: true })
       .notNull()
       .defaultNow(),
@@ -820,8 +827,12 @@ export const reports = pgTable('reports', {
   attemptId: uuid('attempt_id')
     .primaryKey()
     .references(() => attempts.id, { onDelete: 'cascade' }),
-  /** @deprecated IELTS-only; dual-written, read `score`. */
-  band: numeric('band', { precision: 2, scale: 1, mode: 'number' }).notNull(),
+  /**
+   * @deprecated IELTS-only; dual-written, read `score`. Nullable because it is
+   * `numeric(2,1)` and cannot hold a score on any other exam's scale — a PTE
+   * 79 does not fit. Non-IELTS grading writes `score` and leaves this null.
+   */
+  band: numeric('band', { precision: 2, scale: 1, mode: 'number' }),
   score: numeric('score', { precision: 5, scale: 1, mode: 'number' }),
   criteria: jsonb('criteria').$type<Criterion[]>().notNull().default([]),
   annotations: jsonb('annotations').$type<Annotation[]>().notNull().default([]),
@@ -833,6 +844,33 @@ export const reports = pgTable('reports', {
     .notNull()
     .defaultNow(),
 });
+
+/**
+ * A real score a candidate reports back from the actual exam.
+ *
+ * Deliberately its own table, and deliberately never joined into an estimate:
+ * the whole point of collecting these is to compare Bandzen's guess against
+ * the truth later, and a column on `reports` would invite something to average
+ * the two together.
+ */
+export const officialScores = pgTable(
+  'official_scores',
+  {
+    id: uuid('id').primaryKey().defaultRandom(),
+    userId: text('user_id').notNull(),
+    ...examOwnership(),
+    score: numeric('score', {
+      precision: 5,
+      scale: 1,
+      mode: 'number',
+    }).notNull(),
+    takenOn: date('taken_on'),
+    createdAt: timestamp('created_at', { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+  },
+  (t) => [index('official_scores_user_idx').on(t.userId, t.examKey)],
+);
 
 /**
  * One recorded answer to a Speaking prompt. The Speaking analogue of
@@ -1148,6 +1186,7 @@ export type Profile = typeof profiles.$inferSelect;
 export type ExamEnrollment = typeof examEnrollments.$inferSelect;
 export type ExamTask = typeof examTasks.$inferSelect;
 export type ExamTaskResponse = typeof examTaskResponses.$inferSelect;
+export type OfficialScore = typeof officialScores.$inferSelect;
 export type LessonProgress = typeof lessonProgress.$inferSelect;
 export type Award = typeof awards.$inferSelect;
 export type Subscription = typeof subscriptions.$inferSelect;

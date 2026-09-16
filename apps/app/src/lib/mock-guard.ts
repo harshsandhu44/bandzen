@@ -29,7 +29,7 @@ export async function assertMockSection(userId: string, attempt: Attempt) {
   if (!mock) redirect('/');
 
   const siblings = await getMockSiblings(userId, attempt.mockAttemptId);
-  const position = mockPosition(siblings);
+  const position = mockPosition(siblings, mock.examKey);
 
   if (attempt.status === 'in_progress' && position === attempt.module) return;
 
@@ -53,7 +53,7 @@ export async function finishSittingSection(
   if (!mock) redirect('/');
 
   const siblings = await getMockSiblings(userId, mockAttemptId);
-  const position = mockPosition(siblings);
+  const position = mockPosition(siblings, mock.examKey);
 
   if (!position) await submitMockAttempt(userId, mockAttemptId);
 

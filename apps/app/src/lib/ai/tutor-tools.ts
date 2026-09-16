@@ -38,7 +38,8 @@ import {
 
 /** What a tool handed back, kept so the route can offer it as a real CTA. */
 export type TutorAction = {
-  kind: 'lesson' | 'reading' | 'writing' | 'listening';
+  /** `exam_task` is a PTE/TOEFL/DET task type rather than a piece of content. */
+  kind: 'lesson' | 'reading' | 'writing' | 'listening' | 'exam_task';
   id: string;
   label: string;
   href: string;
@@ -216,7 +217,7 @@ export function tutorTools(userId: string) {
   };
 }
 
-/** The id out of a PlanTarget, whichever of the four shapes it is. */
+/** The id out of a PlanTarget, whichever shape it is. */
 function idOf(target: NonNullable<Parameters<typeof targetHref>[0]['target']>) {
   switch (target.kind) {
     case 'reading':
@@ -227,5 +228,7 @@ function idOf(target: NonNullable<Parameters<typeof targetHref>[0]['target']>) {
       return target.trackId;
     case 'lesson':
       return target.lessonId;
+    case 'exam_task':
+      return target.taskType;
   }
 }

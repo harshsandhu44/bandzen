@@ -62,15 +62,29 @@ test('the answer key never reaches the runner', () => {
   assert.equal('transcript' in item!.item, false);
 });
 
-test('a task-timed session adds its items up; a section-timed one is untimed', () => {
+test('a written task-timed session adds its items up; a section-timed one is untimed', () => {
   const pte = getExam('pte_academic')!;
-  // Read Aloud: 35s to prepare, 40s to speak -> 75s each.
+  // Summarize Written Text: ten minutes each.
   assert.equal(
-    sessionMinutes(pte, getTask('pte_academic', 'read_aloud')!, 4),
-    5,
+    sessionMinutes(pte, getTask('pte_academic', 'summarize_written_text')!, 2),
+    20,
   );
   assert.equal(
     sessionMinutes(pte, getTask('pte_academic', 'reorder_paragraphs')!, 3),
+    null,
+  );
+});
+
+test('a recording task has no page clock — the recorder owns its window', () => {
+  const pte = getExam('pte_academic')!;
+  // With one, Repeat Sentence's fifteen seconds auto-submitted the task before
+  // the candidate could begin speaking.
+  assert.equal(
+    sessionMinutes(pte, getTask('pte_academic', 'read_aloud')!, 4),
+    null,
+  );
+  assert.equal(
+    sessionMinutes(pte, getTask('pte_academic', 'repeat_sentence')!, 1),
     null,
   );
 });

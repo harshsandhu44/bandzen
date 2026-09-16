@@ -1,8 +1,16 @@
-import { scoreScaleFor } from '@bandzen/exams/registry';
+import { getExam, scoreScaleFor } from '@bandzen/exams/registry';
 import { notFound } from 'next/navigation';
 import { requireUserId } from '@/lib/auth';
-import { getMockResult, getProfile } from '@/lib/db/queries';
+import {
+  getExamTaskSitting,
+  getMockResult,
+  getProfile,
+  listOfficialScores,
+} from '@/lib/db/queries';
 import { SittingResult } from '@/components/exam/sitting-result';
+import { ExamTaskSittingResult } from '@/components/exam/exam-task-sitting-result';
+import { OfficialScoreForm } from '@/components/exam/official-score-form';
+import { saveOfficialScore } from './actions';
 
 export const metadata = { title: 'Mock test result' };
 
@@ -12,10 +20,38 @@ export default async function MockResultPage({
   const { mockAttemptId } = await params;
   const userId = await requireUserId();
 
-  const [data, profile] = await Promise.all([
-    getMockResult(userId, mockAttemptId),
+  const [taskSitting, profile] = await Promise.all([
+    getExamTaskSitting(userId, mockAttemptId),
     getProfile(userId),
   ]);
+
+  // A sitting built from exam tasks has none of IELTS's four modules, so it
+  // has its own result rather than empty slots in IELTS's.
+  if (taskSitting) {
+    const recorded = await listOfficialScores(userId, taskSitting.mock.examKey);
+    return (
+      <div className="max-w-2xl space-y-8">
+        <ExamTaskSittingResult
+          examName={getExam(taskSitting.mock.examKey)?.name ?? 'Exam'}
+          sections={taskSitting.sections}
+          scale={scoreScaleFor(taskSitting.mock.examKey)}
+          target={profile?.targetScore ?? null}
+        />
+        {/* Kept below the estimate and visually apart from it: this is the one
+            number here that is not a guess. */}
+        <OfficialScoreForm
+          scale={scoreScaleFor(taskSitting.mock.examKey)}
+          action={saveOfficialScore}
+          recorded={recorded.map((r) => ({
+            score: r.score,
+            takenOn: r.takenOn,
+          }))}
+        />
+      </div>
+    );
+  }
+
+  const data = await getMockResult(userId, mockAttemptId);
   if (!data) notFound();
 
   return (

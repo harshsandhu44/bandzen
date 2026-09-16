@@ -5,7 +5,7 @@ import { evaluatorFor, isAnswerCorrect } from '@bandzen/exams/scoring';
 import { Button } from '@bandzen/ui/components/button';
 import { cn } from '@bandzen/ui/lib/utils';
 import { Eyebrow, PageHeader, Panel } from '@/components/app/primitives';
-import { requireContentRole, requireUserId } from '@/lib/auth';
+import { requireUserId } from '@/lib/auth';
 import { getAttempt, getExamTaskReview } from '@/lib/db/queries';
 
 export const metadata = { title: 'Task review', robots: { index: false } };
@@ -24,7 +24,6 @@ function parts(value: string | null): string[] {
 export default async function TaskReviewPage({
   params,
 }: PageProps<'/practice/[exam]/[task]/[attemptId]/review'>) {
-  await requireContentRole();
   const { exam: examKey, task: taskKey, attemptId } = await params;
 
   const exam = getExam(examKey);

@@ -14,6 +14,30 @@ import { enterMockSection } from '@/app/(app)/mock/actions';
  * there regardless of what the URL says.
  */
 
+/**
+ * What each exam's parts are called and what they ask of the candidate. PTE's
+ * sittings open with Speaking and close with Listening, and its audio plays
+ * once throughout, so IELTS's copy would be wrong in both order and substance.
+ */
+const PTE_COPY: Record<Skill, { title: string; body: string }> = {
+  speaking: {
+    title: 'Speaking starts now',
+    body: 'Read Aloud, Repeat Sentence, Describe Image and Re-tell Lecture. One take each, with a short preparation window, and any recording plays once.',
+  },
+  writing: {
+    title: 'Writing starts now',
+    body: 'Summarize Written Text in a single sentence, then the essay. Each has its own clock and its own word range.',
+  },
+  reading: {
+    title: 'Reading starts now',
+    body: 'Blanks to fill, paragraphs to re-order and multiple choice. Some blanks offer a drop-down, others a bank of words with more words than gaps.',
+  },
+  listening: {
+    title: 'Listening starts now',
+    body: 'Every recording plays once. Some tasks ask you to write what you heard, others to mark the words that differ from it.',
+  },
+};
+
 const SECTION_COPY: Record<
   'mock' | 'diagnostic',
   Record<Skill, { title: string; body: string }>
@@ -70,10 +94,14 @@ export async function SittingInterstitial({
   }
 
   const siblings = (await getMockSiblings(userId, sittingId)) as MockChild[];
-  const position = mockPosition(siblings);
+  const position = mockPosition(siblings, mock.examKey);
   if (!position) redirect(mockSectionUrl(sittingId, null, mock.kind));
 
-  const copy = SECTION_COPY[mock.kind][position];
+  // A sitting built from exam tasks gets its own exam's copy; IELTS's would
+  // describe passages and recordings this test does not contain.
+  const copy = mock.taskIds
+    ? PTE_COPY[position]
+    : SECTION_COPY[mock.kind][position];
   const eyebrow = mock.kind === 'diagnostic' ? 'Diagnostic' : 'Mock test';
 
   return (

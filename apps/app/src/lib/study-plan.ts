@@ -14,7 +14,9 @@ export type PlanTarget =
   | { kind: 'reading'; passageId: string }
   | { kind: 'writing'; promptId: string }
   | { kind: 'listening'; trackId: string }
-  | { kind: 'lesson'; lessonId: string };
+  | { kind: 'lesson'; lessonId: string }
+  /** An exam whose content is task items rather than passages and prompts. */
+  | { kind: 'exam_task'; taskType: string };
 
 export type PlanTask = {
   day: number;
@@ -41,13 +43,24 @@ export type PlanCatalogue = {
    */
   prompts?: readonly { id: string; task: number }[];
   trackIds?: readonly string[];
+  /** Task types with at least one published item, for exams built from them. */
+  examTaskTypes?: readonly string[];
   /** Lesson slug that teaches a question kind, from src/content/lessons.ts. */
   lessonForKind?: Readonly<Record<string, string>>;
   completedLessonIds?: readonly string[];
 };
 
-/** One schedulable exercise. `task` narrows it to content of that subtype. */
-export type Drill = { label: string; minutes: number; task?: number };
+/**
+ * One schedulable exercise. `task` narrows it to IELTS content of that subtype;
+ * `taskType` names the exam task a drill opens where the exam's content is
+ * task items.
+ */
+export type Drill = {
+  label: string;
+  minutes: number;
+  task?: number;
+  taskType?: string;
+};
 
 /**
  * Everything exam-specific about planning, supplied per exam (see
