@@ -1,3 +1,10 @@
+# app [1.26.0](https://github.com/harshsandhu44/bandzen/compare/app@1.25.7...app@1.26.0) (2026-09-17)
+
+
+### Features
+
+* **app:** collect official skill scores and report PTE calibration ([#137](https://github.com/harshsandhu44/bandzen/issues/137)) ([27c8fbc](https://github.com/harshsandhu44/bandzen/commit/27c8fbc62636957047f037104b06b6019abe1e8c)), closes [#121](https://github.com/harshsandhu44/bandzen/issues/121) [#121](https://github.com/harshsandhu44/bandzen/issues/121)
+
 ## app [1.25.7](https://github.com/harshsandhu44/bandzen/compare/app@1.25.6...app@1.25.7) (2026-09-17)
 
 
