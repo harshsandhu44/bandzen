@@ -18,7 +18,11 @@ import {
 } from 'drizzle-orm';
 import { unionAll } from 'drizzle-orm/pg-core';
 import { db } from './client';
-import { ContentInUseError, PublishValidationError } from './errors';
+import {
+  ContentInUseError,
+  PublishValidationError,
+  guardSatContent,
+} from './errors';
 import {
   examTaskAnswers,
   examTasks,
@@ -584,11 +588,13 @@ export async function updatePassage(
   updatedBy: string,
 ) {
   return firstRow(
-    await db
-      .update(passages)
-      .set({ ...input, updatedBy, updatedAt: new Date() })
-      .where(eq(passages.id, id))
-      .returning(),
+    await guardSatContent(
+      db
+        .update(passages)
+        .set({ ...input, updatedBy, updatedAt: new Date() })
+        .where(eq(passages.id, id))
+        .returning(),
+    ),
   );
 }
 
@@ -660,7 +666,7 @@ export async function deletePassage(id: string) {
       `Cannot delete: ${n} attempt(s) reference this passage. Unpublish it instead.`,
     );
   }
-  await db.delete(passages).where(eq(passages.id, id));
+  await guardSatContent(db.delete(passages).where(eq(passages.id, id)));
 }
 
 export async function createQuestion(
@@ -713,21 +719,25 @@ export async function updateQuestion(
   let question: Question | null = null;
   if (Object.keys(questionFields).length > 0) {
     question = await firstRow(
-      await db
-        .update(questions)
-        .set(questionFields)
-        .where(eq(questions.id, id))
-        .returning(),
+      await guardSatContent(
+        db
+          .update(questions)
+          .set(questionFields)
+          .where(eq(questions.id, id))
+          .returning(),
+      ),
     );
   }
   if (answer) {
-    await db
-      .insert(questionAnswers)
-      .values({ questionId: id, answer })
-      .onConflictDoUpdate({
-        target: questionAnswers.questionId,
-        set: { answer },
-      });
+    await guardSatContent(
+      db
+        .insert(questionAnswers)
+        .values({ questionId: id, answer })
+        .onConflictDoUpdate({
+          target: questionAnswers.questionId,
+          set: { answer },
+        }),
+    );
   }
   return (
     question ??
@@ -738,7 +748,185 @@ export async function updateQuestion(
 }
 
 export async function deleteQuestion(id: string) {
-  await db.delete(questions).where(eq(questions.id, id));
+  await guardSatContent(db.delete(questions).where(eq(questions.id, id)));
+}
+
+// ---------------------------------------------------------------------------
+// CMS — sat content (#120)
+//
+// Once a candidate has sat an item it is that item's final revision: the
+// database refuses edits and deletes (migration 0033). A fix is a duplicate —
+// a new draft under a new slug — which the editor publishes in its place.
+// ---------------------------------------------------------------------------
+
+export type SatContentTable =
+  | 'exam_tasks'
+  | 'passages'
+  | 'listening_tracks'
+  | 'writing_prompts'
+  | 'speaking_tests';
+
+/** Whether any attempt references this item — the same test the trigger applies. */
+export async function isContentSat(table: SatContentTable, id: string) {
+  const [row] = await db.execute<{ sat: boolean }>(
+    sql`select public.content_is_sat(${table}, jsonb_build_object('id', ${id}::text)) as sat`,
+  );
+  return row?.sat === true;
+}
+
+type Tx = Parameters<Parameters<typeof db.transaction>[0]>[0];
+
+/** `slug-v2`, `slug-v3`, … — the first one not already taken in `table`. */
+async function nextSlug(tx: Tx, table: SatContentTable, slug: string) {
+  const base = slug.replace(/-v\d+$/, '');
+  const rows = await tx.execute<{ slug: string }>(
+    sql`select slug from ${sql.identifier(table)} where slug like ${`${base}-v%`}`,
+  );
+  const taken = new Set(rows.map((r) => r.slug));
+  let n = 2;
+  while (taken.has(`${base}-v${n}`)) n += 1;
+  return `${base}-v${n}`;
+}
+
+async function copyQuestions(
+  tx: Tx,
+  from: { passageId: string } | { trackId: string },
+  to: { passageId: string } | { trackId: string },
+) {
+  const rows = await tx
+    .select({ question: questions, answer: questionAnswers.answer })
+    .from(questions)
+    .leftJoin(questionAnswers, eq(questionAnswers.questionId, questions.id))
+    .where(
+      'passageId' in from
+        ? eq(questions.passageId, from.passageId)
+        : eq(questions.trackId, from.trackId),
+    );
+  for (const { question, answer } of rows) {
+    const [copy] = await tx
+      .insert(questions)
+      .values({
+        ...question,
+        id: undefined,
+        passageId: undefined,
+        trackId: undefined,
+        ...to,
+      })
+      .returning({ id: questions.id });
+    if (copy && answer) {
+      await tx.insert(questionAnswers).values({ questionId: copy.id, answer });
+    }
+  }
+}
+
+export async function duplicatePassage(id: string, updatedBy: string) {
+  return db.transaction(async (tx) => {
+    const [row] = await tx.select().from(passages).where(eq(passages.id, id));
+    if (!row) return null;
+    const [copy] = await tx
+      .insert(passages)
+      .values({
+        ...row,
+        // undefined = the column default: a fresh id and timestamps.
+        id: undefined,
+        createdAt: undefined,
+        updatedAt: undefined,
+        slug: await nextSlug(tx, 'passages', row.slug),
+        status: 'draft',
+        updatedBy,
+      })
+      .returning();
+    await copyQuestions(tx, { passageId: id }, { passageId: copy!.id });
+    return copy!;
+  });
+}
+
+export async function duplicateTrack(id: string, updatedBy: string) {
+  return db.transaction(async (tx) => {
+    const [row] = await tx
+      .select()
+      .from(listeningTracks)
+      .where(eq(listeningTracks.id, id));
+    if (!row) return null;
+    const [copy] = await tx
+      .insert(listeningTracks)
+      .values({
+        ...row,
+        // undefined = the column default: a fresh id and timestamps.
+        id: undefined,
+        createdAt: undefined,
+        updatedAt: undefined,
+        slug: await nextSlug(tx, 'listening_tracks', row.slug),
+        status: 'draft',
+        generationError: null,
+        generationStartedAt: null,
+        updatedBy,
+      })
+      .returning();
+    await copyQuestions(tx, { trackId: id }, { trackId: copy!.id });
+    return copy!;
+  });
+}
+
+export async function duplicateWritingPrompt(id: string, updatedBy: string) {
+  return db.transaction(async (tx) => {
+    const [row] = await tx
+      .select()
+      .from(writingPrompts)
+      .where(eq(writingPrompts.id, id));
+    if (!row) return null;
+    const [copy] = await tx
+      .insert(writingPrompts)
+      .values({
+        ...row,
+        // undefined = the column default: a fresh id and timestamps.
+        id: undefined,
+        createdAt: undefined,
+        updatedAt: undefined,
+        slug: await nextSlug(tx, 'writing_prompts', row.slug),
+        status: 'draft',
+        updatedBy,
+      })
+      .returning();
+    return copy!;
+  });
+}
+
+export async function duplicateSpeakingTest(id: string, updatedBy: string) {
+  return db.transaction(async (tx) => {
+    const [row] = await tx
+      .select()
+      .from(speakingTests)
+      .where(eq(speakingTests.id, id));
+    if (!row) return null;
+    const [copy] = await tx
+      .insert(speakingTests)
+      .values({
+        ...row,
+        // undefined = the column default: a fresh id and timestamps.
+        id: undefined,
+        createdAt: undefined,
+        updatedAt: undefined,
+        slug: await nextSlug(tx, 'speaking_tests', row.slug),
+        status: 'draft',
+        generationError: null,
+        generationStartedAt: null,
+        updatedBy,
+      })
+      .returning();
+    const prompts = await tx
+      .select()
+      .from(speakingPrompts)
+      .where(eq(speakingPrompts.testId, id));
+    if (prompts.length > 0) {
+      await tx
+        .insert(speakingPrompts)
+        .values(
+          prompts.map((p) => ({ ...p, id: undefined, testId: copy!.id })),
+        );
+    }
+    return copy!;
+  });
 }
 
 // ---------------------------------------------------------------------------
@@ -843,11 +1031,13 @@ export async function updateTrack(
   updatedBy: string,
 ) {
   return firstRow(
-    await db
-      .update(listeningTracks)
-      .set({ ...input, updatedBy, updatedAt: new Date() })
-      .where(eq(listeningTracks.id, id))
-      .returning(),
+    await guardSatContent(
+      db
+        .update(listeningTracks)
+        .set({ ...input, updatedBy, updatedAt: new Date() })
+        .where(eq(listeningTracks.id, id))
+        .returning(),
+    ),
   );
 }
 
@@ -951,7 +1141,9 @@ export async function deleteTrack(id: string) {
       `Cannot delete: ${n} attempt(s) reference this track. Unpublish it instead.`,
     );
   }
-  await db.delete(listeningTracks).where(eq(listeningTracks.id, id));
+  await guardSatContent(
+    db.delete(listeningTracks).where(eq(listeningTracks.id, id)),
+  );
 }
 
 // ---------------------------------------------------------------------------
@@ -1031,11 +1223,13 @@ export async function updateSpeakingTest(
   updatedBy: string,
 ) {
   return firstRow(
-    await db
-      .update(speakingTests)
-      .set({ ...input, updatedBy, updatedAt: new Date() })
-      .where(eq(speakingTests.id, id))
-      .returning(),
+    await guardSatContent(
+      db
+        .update(speakingTests)
+        .set({ ...input, updatedBy, updatedAt: new Date() })
+        .where(eq(speakingTests.id, id))
+        .returning(),
+    ),
   );
 }
 
@@ -1069,16 +1263,20 @@ export async function updateSpeakingPrompt(
   }>,
 ) {
   return firstRow(
-    await db
-      .update(speakingPrompts)
-      .set(input)
-      .where(eq(speakingPrompts.id, id))
-      .returning(),
+    await guardSatContent(
+      db
+        .update(speakingPrompts)
+        .set(input)
+        .where(eq(speakingPrompts.id, id))
+        .returning(),
+    ),
   );
 }
 
 export async function deleteSpeakingPrompt(id: string) {
-  await db.delete(speakingPrompts).where(eq(speakingPrompts.id, id));
+  await guardSatContent(
+    db.delete(speakingPrompts).where(eq(speakingPrompts.id, id)),
+  );
 }
 
 /** The fields the CMS generate route reads to decide what to synthesize. */
@@ -1175,7 +1373,9 @@ export async function deleteSpeakingTest(id: string) {
       `Cannot delete: ${n} attempt(s) reference this test. Unpublish it instead.`,
     );
   }
-  await db.delete(speakingTests).where(eq(speakingTests.id, id));
+  await guardSatContent(
+    db.delete(speakingTests).where(eq(speakingTests.id, id)),
+  );
 }
 
 // ---------------------------------------------------------------------------
@@ -1243,11 +1443,13 @@ export async function updateWritingPrompt(
   updatedBy: string,
 ) {
   return firstRow(
-    await db
-      .update(writingPrompts)
-      .set({ ...input, updatedBy, updatedAt: new Date() })
-      .where(eq(writingPrompts.id, id))
-      .returning(),
+    await guardSatContent(
+      db
+        .update(writingPrompts)
+        .set({ ...input, updatedBy, updatedAt: new Date() })
+        .where(eq(writingPrompts.id, id))
+        .returning(),
+    ),
   );
 }
 
@@ -1284,7 +1486,9 @@ export async function deleteWritingPrompt(id: string) {
       `Cannot delete: ${n} attempt(s) reference this prompt. Unpublish it instead.`,
     );
   }
-  await db.delete(writingPrompts).where(eq(writingPrompts.id, id));
+  await guardSatContent(
+    db.delete(writingPrompts).where(eq(writingPrompts.id, id)),
+  );
 }
 
 // ---------------------------------------------------------------------------
@@ -1963,9 +2167,12 @@ export async function unpublishExamTask(id: string, updatedBy: string) {
   );
 }
 
-/** Nothing references an exam task yet, so a draft deletes outright. */
+/**
+ * A task nobody has sat deletes outright, key and all. One a candidate has sat
+ * is refused by the database (#120) and surfaces as ContentInUseError.
+ */
 export async function deleteExamTask(id: string) {
-  await db.delete(examTasks).where(eq(examTasks.id, id));
+  await guardSatContent(db.delete(examTasks).where(eq(examTasks.id, id)));
 }
 
 /**

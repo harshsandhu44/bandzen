@@ -9,7 +9,7 @@ import {
   unpublishExamTask,
   getExamTaskAdmin,
 } from '@bandzen/db/queries';
-import { PublishValidationError } from '@bandzen/db/errors';
+import { ContentInUseError, PublishValidationError } from '@bandzen/db/errors';
 import { requireAdminOrTeacher } from '@/lib/auth';
 import { runBulk } from '@/lib/bulk';
 import type { ActionResult } from '@/lib/action-result';
@@ -54,7 +54,12 @@ export async function deleteExamTaskAction(
   if (task?.status === 'published') {
     return { error: 'Unpublish it before deleting.' };
   }
-  await deleteExamTask(id);
+  try {
+    await deleteExamTask(id);
+  } catch (e) {
+    if (e instanceof ContentInUseError) return { error: e.message };
+    throw e;
+  }
   await recordContentEvent('exam-task', id, userId, 'deleted');
   revalidatePath('/tasks');
   redirect('/tasks');

@@ -13,6 +13,7 @@ import {
   deleteQuestion,
   getPassageAdmin,
   recordContentEvent,
+  duplicatePassage,
 } from '@bandzen/db/queries';
 import { ContentInUseError, PublishValidationError } from '@bandzen/db/errors';
 import { requireAdminOrTeacher } from '@/lib/auth';
@@ -184,4 +185,14 @@ export async function bulkDeletePassagesAction(
   const result = await runBulk(ids, (id) => deletePassage(id), 'Deleted');
   revalidatePath('/passages');
   return result;
+}
+
+/** Sat content is locked (#120); a fix starts from a fresh draft copy. */
+export async function duplicatePassageAction(formData: FormData) {
+  const { userId } = await requireAdminOrTeacher();
+  const copy = await duplicatePassage(String(formData.get('id') ?? ''), userId);
+  if (!copy) throw new Error('That passage no longer exists.');
+  await recordContentEvent('passage', copy.id, userId, 'created');
+  revalidatePath('/passages');
+  redirect(`/passages/${copy.id}`);
 }

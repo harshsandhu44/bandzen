@@ -9,6 +9,7 @@ import {
   unpublishWritingPrompt,
   deleteWritingPrompt,
   recordContentEvent,
+  duplicateWritingPrompt,
 } from '@bandzen/db/queries';
 import { ContentInUseError, PublishValidationError } from '@bandzen/db/errors';
 import { requireAdminOrTeacher } from '@/lib/auth';
@@ -129,4 +130,17 @@ export async function bulkDeletePromptsAction(
   const result = await runBulk(ids, (id) => deleteWritingPrompt(id), 'Deleted');
   revalidatePath('/writing-prompts');
   return result;
+}
+
+/** Sat content is locked (#120); a fix starts from a fresh draft copy. */
+export async function duplicateWritingPromptAction(formData: FormData) {
+  const { userId } = await requireAdminOrTeacher();
+  const copy = await duplicateWritingPrompt(
+    String(formData.get('id') ?? ''),
+    userId,
+  );
+  if (!copy) throw new Error('That prompt no longer exists.');
+  await recordContentEvent('writing-prompt', copy.id, userId, 'created');
+  revalidatePath('/writing-prompts');
+  redirect(`/writing-prompts/${copy.id}`);
 }

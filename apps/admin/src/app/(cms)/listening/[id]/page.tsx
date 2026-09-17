@@ -1,5 +1,9 @@
 import { notFound } from 'next/navigation';
-import { getTrackAdmin, checkTrackCompleteness } from '@bandzen/db/queries';
+import {
+  getTrackAdmin,
+  checkTrackCompleteness,
+  isContentSat,
+} from '@bandzen/db/queries';
 import { Button } from '@bandzen/ui/components/button';
 import { Field } from '@bandzen/ui/components/field';
 import { PageHeader, Panel } from '@bandzen/ui/components/primitives';
@@ -14,6 +18,7 @@ import {
   publishTrackAction,
   unpublishTrackAction,
   deleteTrackAction,
+  duplicateTrackAction,
 } from '../actions';
 import { GenerationStatus } from './generation-status';
 import { TrackEditor } from './track-editor';
@@ -29,9 +34,10 @@ export default async function EditTrackPage({
   const track = await getTrackAdmin(id);
   if (!track) notFound();
 
-  const [issues, editor] = await Promise.all([
+  const [issues, editor, sat] = await Promise.all([
     checkTrackCompleteness(id),
     resolveEditorEmail(track.updatedBy),
+    isContentSat('listening_tracks', id),
   ]);
 
   const defaults: TrackFormValues = {
@@ -84,6 +90,7 @@ export default async function EditTrackPage({
             publishAction={publishTrackAction}
             unpublishAction={unpublishTrackAction}
             deleteAction={deleteTrackAction}
+            duplicateAction={sat ? duplicateTrackAction : undefined}
           />
         }
       >
@@ -151,7 +158,7 @@ export default async function EditTrackPage({
           </Panel>
         ) : null}
 
-        <TrackEditor id={track.id} defaults={defaults} />
+        <TrackEditor id={track.id} defaults={defaults} locked={sat} />
       </EditorShell>
     </div>
   );

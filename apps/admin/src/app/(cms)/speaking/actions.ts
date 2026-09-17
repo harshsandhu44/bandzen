@@ -13,6 +13,7 @@ import {
   updateSpeakingPrompt,
   updateSpeakingTest,
   recordContentEvent,
+  duplicateSpeakingTest,
 } from '@bandzen/db/queries';
 import { ContentInUseError, PublishValidationError } from '@bandzen/db/errors';
 import { requireAdminOrTeacher } from '@/lib/auth';
@@ -184,4 +185,17 @@ export async function bulkDeleteTestsAction(
   const result = await runBulk(ids, (id) => deleteSpeakingTest(id), 'Deleted');
   revalidatePath('/speaking');
   return result;
+}
+
+/** Sat content is locked (#120); a fix starts from a fresh draft copy. */
+export async function duplicateTestAction(formData: FormData) {
+  const { userId } = await requireAdminOrTeacher();
+  const copy = await duplicateSpeakingTest(
+    String(formData.get('id') ?? ''),
+    userId,
+  );
+  if (!copy) throw new Error('That test no longer exists.');
+  await recordContentEvent('speaking-test', copy.id, userId, 'created');
+  revalidatePath('/speaking');
+  redirect(`/speaking/${copy.id}`);
 }

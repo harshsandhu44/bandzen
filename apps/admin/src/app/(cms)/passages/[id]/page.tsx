@@ -1,5 +1,9 @@
 import { notFound } from 'next/navigation';
-import { getPassageAdmin, checkPassageCompleteness } from '@bandzen/db/queries';
+import {
+  getPassageAdmin,
+  checkPassageCompleteness,
+  isContentSat,
+} from '@bandzen/db/queries';
 import { PageHeader } from '@bandzen/ui/components/primitives';
 import { requireAdminOrTeacher } from '@/lib/auth';
 import { StatusBadge } from '@/components/status-badge';
@@ -10,6 +14,7 @@ import {
   publishPassageAction,
   unpublishPassageAction,
   deletePassageAction,
+  duplicatePassageAction,
 } from '../actions';
 import { PassageEditor } from './passage-editor';
 import type { PassageFormValues } from './schema';
@@ -24,9 +29,10 @@ export default async function EditPassagePage({
   const passage = await getPassageAdmin(id);
   if (!passage) notFound();
 
-  const [issues, editor] = await Promise.all([
+  const [issues, editor, sat] = await Promise.all([
     checkPassageCompleteness(id),
     resolveEditorEmail(passage.updatedBy),
+    isContentSat('passages', id),
   ]);
 
   const defaults: PassageFormValues = {
@@ -75,10 +81,11 @@ export default async function EditPassagePage({
             publishAction={publishPassageAction}
             unpublishAction={unpublishPassageAction}
             deleteAction={deletePassageAction}
+            duplicateAction={sat ? duplicatePassageAction : undefined}
           />
         }
       >
-        <PassageEditor id={passage.id} defaults={defaults} />
+        <PassageEditor id={passage.id} defaults={defaults} locked={sat} />
       </EditorShell>
     </div>
   );

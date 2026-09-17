@@ -2,6 +2,7 @@ import { notFound } from 'next/navigation';
 import {
   getSpeakingTestAdmin,
   checkSpeakingTestCompleteness,
+  isContentSat,
 } from '@bandzen/db/queries';
 import { PageHeader, Panel } from '@bandzen/ui/components/primitives';
 import { requireAdminOrTeacher } from '@/lib/auth';
@@ -13,6 +14,7 @@ import {
   publishTestAction,
   unpublishTestAction,
   deleteTestAction,
+  duplicateTestAction,
 } from '../actions';
 import { GenerationStatus } from './generation-status';
 import { SpeakingEditor } from './speaking-editor';
@@ -28,9 +30,10 @@ export default async function EditSpeakingTestPage({
   const test = await getSpeakingTestAdmin(id);
   if (!test) notFound();
 
-  const [issues, editor] = await Promise.all([
+  const [issues, editor, sat] = await Promise.all([
     checkSpeakingTestCompleteness(id),
     resolveEditorEmail(test.updatedBy),
+    isContentSat('speaking_tests', id),
   ]);
 
   const pending = test.prompts.filter((p) => !p.audioUrl).length;
@@ -80,6 +83,7 @@ export default async function EditSpeakingTestPage({
             publishAction={publishTestAction}
             unpublishAction={unpublishTestAction}
             deleteAction={deleteTestAction}
+            duplicateAction={sat ? duplicateTestAction : undefined}
           />
         }
       >
@@ -98,6 +102,7 @@ export default async function EditSpeakingTestPage({
           id={test.id}
           defaults={defaults}
           audioByPromptId={audioByPromptId}
+          locked={sat}
         />
       </EditorShell>
     </div>
