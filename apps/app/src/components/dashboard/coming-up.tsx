@@ -2,7 +2,7 @@ import Link from 'next/link';
 import { Panel } from '@/components/app/primitives';
 import { TaskStatus } from '@/components/app/status';
 import { MODULE_LABEL } from '@/lib/modules';
-import { targetHref, type PlanTask } from '@/lib/study-plan';
+import { targetHref, type PlanTaskState } from '@/lib/study-plan';
 
 /**
  * The rest of the plan, grouped by day.
@@ -26,11 +26,11 @@ export function ComingUp({
   today,
   heading = 'Coming up',
 }: {
-  plan: readonly PlanTask[];
+  plan: readonly PlanTaskState[];
   today: string;
   heading?: string;
 }) {
-  const byDay = new Map<string, PlanTask[]>();
+  const byDay = new Map<string, PlanTaskState[]>();
   for (const task of plan) {
     if (task.date <= today) continue;
     byDay.set(task.date, [...(byDay.get(task.date) ?? []), task]);
@@ -60,14 +60,19 @@ export function ComingUp({
                       key={`${date}-${i}`}
                       className="flex items-center gap-3 py-3"
                     >
-                      <TaskStatus status="pending" />
+                      {/* A future task opened early is done on its own day. */}
+                      <TaskStatus status={task.status} />
                       <div className="min-w-0 flex-1">
                         <p className="text-sm">{task.label}</p>
                         <p className="text-xs text-muted-foreground tabular-nums">
                           {MODULE_LABEL[task.skill]} · {task.minutes} min
                         </p>
                       </div>
-                      {href ? (
+                      {task.status === 'completed' ? (
+                        <span className="font-mono text-[0.6875rem] tracking-[0.18em] text-muted-foreground uppercase">
+                          Done
+                        </span>
+                      ) : href ? (
                         <Link
                           href={href}
                           className="text-xs text-muted-foreground underline-offset-4 hover:text-foreground hover:underline"

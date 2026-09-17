@@ -65,6 +65,8 @@ export default async function ListeningPage({
       : undefined;
 
   const trackId = one(sp.track);
+  // The plan assignment the link came from, passed on to the Start action.
+  const assignmentId = one(sp.a);
 
   const [tracks, quota] = await Promise.all([
     listTracks({ kind, difficulty, id: trackId }),
@@ -183,6 +185,9 @@ export default async function ListeningPage({
                   {inner}
                   <form action={startListeningAttempt}>
                     <input type="hidden" name="trackId" value={t.id} />
+                    {assignmentId ? (
+                      <input type="hidden" name="a" value={assignmentId} />
+                    ) : null}
                     <Button type="submit" variant="outline" size="sm">
                       Start
                     </Button>

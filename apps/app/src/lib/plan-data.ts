@@ -1,11 +1,10 @@
 import 'server-only';
 
+import { getExam } from '@bandzen/exams/registry';
 import { lessonForKindMap } from '@/content/lessons';
 import { dayBounds } from '@/lib/dates';
 import {
   accuracyByQuestionKind,
-  attemptsSubmittedOn,
-  latestAttemptInProgress,
   latestBand,
   latestReport,
   latestScoreReports,
@@ -14,15 +13,19 @@ import {
   listTracks,
   listWritingPrompts,
   publishedExamTaskTypes,
+  syncPlanLedger,
 } from '@/lib/db/queries';
 import type { Profile } from '@/lib/db/queries';
 import { planStrategyFor } from '@/lib/plan-strategies';
 import {
+  COMMIT_DAYS,
+  assignmentTasks,
   buildPlan,
-  derivePlanState,
-  tasksOn,
+  planProgress,
+  targetAvailable,
   testDayState,
   type PlanInput,
+  type PlanTaskState,
 } from '@/lib/study-plan';
 
 /**
@@ -32,8 +35,9 @@ import {
  * the same eight queries, in about thirty identical lines. That duplication is
  * why the two pages drifted into showing the same thing. One caller now.
  *
- * Nothing is cached: the plan is recalculated per request on purpose, so
- * finishing a test changes today rather than next week.
+ * The next week comes from the ledger (#131): written the first time it is
+ * read, and after that only moved by what the candidate does. Beyond it the
+ * plan is still projected fresh per request.
  */
 
 /**
@@ -71,7 +75,6 @@ export async function loadPlanData(
     report,
     kindAccuracy,
     listeningAccuracy,
-    doneToday,
     lessons,
     passages,
     prompts,
@@ -79,7 +82,6 @@ export async function loadPlanData(
     lessonForKind,
     examTaskTypes,
     scoreReports,
-    inProgress,
   ] = await Promise.all([
     latestBand(userId, 'reading', examKey),
     latestBand(userId, 'writing', examKey),
@@ -88,7 +90,6 @@ export async function loadPlanData(
     latestReport(userId, 'writing'),
     accuracyByQuestionKind(userId, 'reading', examKey),
     accuracyByQuestionKind(userId, 'listening', examKey),
-    attemptsSubmittedOn(userId, examKey, start, end),
     listLessonProgress(userId),
     listPassages(),
     listWritingPrompts(),
@@ -98,13 +99,9 @@ export async function loadPlanData(
     examKey === 'pte_academic'
       ? latestScoreReports(userId, examKey, 1)
       : Promise.resolve([]),
-    latestAttemptInProgress(userId, examKey),
   ]);
 
   const completedLessonIds = lessons.map((l) => l.lessonId);
-  const lessonsCompletedToday = lessons
-    .filter((l) => l.completedAt >= start && l.completedAt < end)
-    .map((l) => l.lessonId);
 
   const planInput: PlanInput | null = strategy && {
     strategy,
@@ -130,21 +127,53 @@ export async function loadPlanData(
       examTaskTypes,
       lessonForKind,
       completedLessonIds,
-      lessonsCompletedToday,
     },
   };
 
-  const plan = planInput ? buildPlan(planInput) : [];
+  let plan: PlanTaskState[] = [];
+  if (planInput) {
+    const catalogue = planInput.catalogue!;
+    const rows = await syncPlanLedger({
+      userId,
+      examKey,
+      examVersion: profile.examVersion ?? getExam(examKey)!.version,
+      today,
+      dayStart: start,
+      dayEnd: end,
+      isAvailable: (kind, id) => targetAvailable(kind, id, catalogue),
+      plan: (assignedTargetIds) =>
+        buildPlan({
+          ...planInput,
+          catalogue: { ...catalogue, assignedTargetIds },
+          // Named once, on the first plan ever committed; not on every new day.
+          weaknesses: assignedTargetIds.length
+            ? undefined
+            : planInput.weaknesses,
+        }),
+    });
+    const committed = assignmentTasks(rows, planInput.strategy, today).filter(
+      (t) => t.date >= today,
+    );
+    // Past the commit window the plan stays a projection, with no ids.
+    const lastCommitted = committed.at(-1)?.date ?? today;
+    const projected = buildPlan({
+      ...planInput,
+      catalogue: {
+        ...catalogue,
+        assignedTargetIds: rows.map((r) => r.targetId),
+      },
+    })
+      .filter((t) => t.date > lastCommitted && t.day > COMMIT_DAYS)
+      .map((t): PlanTaskState => ({
+        ...t,
+        id: null,
+        status: 'pending',
+        carriedFrom: null,
+      }));
+    plan = [...committed, ...projected];
+  }
 
-  const progress = derivePlanState(
-    tasksOn(plan, today),
-    {
-      completedToday: doneToday,
-      completedLessonIds,
-      inProgress,
-    },
-    profile.studyMinutes,
-  );
+  const progress = planProgress(plan, today, profile.studyMinutes);
 
   // PTE's overall is its latest sitting report's, the same number the result
   // page shows — not a mean re-derived here on IELTS's half-band grid.

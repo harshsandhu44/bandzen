@@ -2,10 +2,17 @@ import assert from 'node:assert/strict';
 import { test } from 'node:test';
 import { IELTS_PLAN } from './plan-strategies.ts';
 import {
+  assignmentTasks,
   buildPlan,
-  derivePlanState,
   nextAction,
+  planProgress,
+  rollForward,
+  targetAvailable,
+  targetFromRef,
+  targetRef,
+  tasksToCommit,
   testDayState,
+  type AssignmentRow,
   type PlanInput,
   type PlanStrategy,
 } from './study-plan.ts';
@@ -336,31 +343,6 @@ test('an unread lesson for the weakest kind is taught before it is drilled', () 
   assert.deepEqual(drills[0]?.target, { kind: 'reading', passageId: 'p1' });
 });
 
-test('a lesson finished today keeps its slot, shown done', () => {
-  const plan = buildPlan(
-    ielts({
-      readingBand: 6,
-      writingBand: 7,
-      targetBand: 8,
-      testDate: null,
-      today: TODAY,
-      weakKinds: ['matching_headings'],
-      catalogue: {
-        ...CATALOGUE,
-        lessonForKind: { matching_headings: 'reading-matching-headings' },
-        completedLessonIds: ['reading-matching-headings'],
-        lessonsCompletedToday: ['reading-matching-headings'],
-      },
-    }),
-  );
-  const lesson = plan.find((t) => t.target?.kind === 'lesson')!;
-  const { tasks } = derivePlanState([lesson], {
-    completedToday: [],
-    completedLessonIds: ['reading-matching-headings'],
-  });
-  assert.equal(tasks[0]?.status, 'completed');
-});
-
 test('a lesson already read is not taught again', () => {
   const plan = buildPlan(
     ielts({
@@ -383,86 +365,158 @@ test('a lesson already read is not taught again', () => {
   );
 });
 
-test('task state comes from attempts, and counts them one for one', () => {
-  const tasks = buildPlan(
+const row = (over: Partial<AssignmentRow>): AssignmentRow => ({
+  id: 'a1',
+  date: TODAY,
+  originalDate: TODAY,
+  slot: 0,
+  skill: 'reading',
+  targetKind: 'passage',
+  targetId: 'p1',
+  label: 'Full passage, timed',
+  minutes: 40,
+  status: 'pending',
+  ...over,
+});
+
+test('a lesson already assigned is not scheduled again', () => {
+  const plan = buildPlan(
     ielts({
-      readingBand: 7,
-      writingBand: 6.5,
+      readingBand: 6,
+      writingBand: 7,
       targetBand: 8,
       testDate: null,
       today: TODAY,
-      catalogue: CATALOGUE,
+      weakKinds: ['matching_headings'],
+      catalogue: {
+        ...CATALOGUE,
+        lessonForKind: { matching_headings: 'reading-matching-headings' },
+        assignedTargetIds: ['reading-matching-headings'],
+      },
     }),
-  ).slice(0, 3); // reading, writing, reading
-
-  const { tasks: stated, minutesDone } = derivePlanState(tasks, {
-    // Real IELTS attempts carry a task type; they still complete skill tasks.
-    completedToday: [
-      { module: 'reading', kind: 'practice', taskType: 'reading_passage' },
-    ],
-    completedLessonIds: [],
-    inProgress: { module: 'writing', taskType: 'writing_task_2' },
-  });
-
-  assert.equal(stated[0]?.status, 'completed');
-  assert.equal(stated[1]?.status, 'active');
-  // One reading attempt completes one reading task, not both.
-  assert.equal(stated[2]?.status, 'pending');
-  assert.equal(minutesDone, tasks[0]!.minutes);
-});
-
-test('an exam task drill completes only on a practice attempt at that task type', () => {
-  const drill = (taskType: string, day: number) => ({
-    day,
-    date: '2026-09-01',
-    skill: 'speaking' as const,
-    label: taskType,
-    minutes: 10,
-    target: { kind: 'exam_task' as const, taskType },
-    href: null,
-  });
-  const tasks = [
-    drill('repeat_sentence', 1),
-    drill('repeat_sentence', 2),
-    { ...drill('read_aloud', 3), skill: 'reading' as const, target: null },
-  ];
-
-  const { tasks: stated } = derivePlanState(tasks, {
-    completedToday: [
-      // Same skill, other task: does not finish a Repeat Sentence drill.
-      { module: 'speaking', kind: 'practice', taskType: 'read_aloud' },
-      // A mock's child never ticks a drill.
-      { module: 'speaking', kind: 'mock', taskType: 'repeat_sentence' },
-      { module: 'speaking', kind: 'practice', taskType: 'repeat_sentence' },
-    ],
-    completedLessonIds: [],
-    inProgress: { module: 'speaking', taskType: 'read_aloud' },
-  });
-
-  assert.deepEqual(
-    stated.map((t) => t.status),
-    // An open Read Aloud attempt does not make a Repeat Sentence drill Resume.
-    ['completed', 'pending', 'pending'],
+  );
+  assert.equal(
+    plan.some((t) => t.target?.kind === 'lesson'),
+    false,
   );
 });
 
-test('the goal falls back to what the plan asks for', () => {
-  const tasks = buildPlan(
+test('new work prefers content never assigned, then the longest ago', () => {
+  const pick = (assignedTargetIds: string[]) =>
+    buildPlan(
+      ielts({
+        readingBand: 6,
+        writingBand: 8,
+        targetBand: 8,
+        testDate: null,
+        today: TODAY,
+        catalogue: {
+          ...CATALOGUE,
+          passageIds: ['p1', 'p2', 'p3'],
+          assignedTargetIds,
+        },
+      }),
+    ).find((t) => t.skill === 'reading')?.target;
+  // Crossing midnight no longer restarts at the first passage.
+  assert.deepEqual(pick(['p1']), { kind: 'reading', passageId: 'p2' });
+  assert.deepEqual(pick(['p2', 'p1', 'p3']), {
+    kind: 'reading',
+    passageId: 'p2',
+  });
+});
+
+test('only empty days inside the window are committed, slotted in order', () => {
+  const plan = buildPlan(
     ielts({
       readingBand: 7,
-      writingBand: 6.5,
+      writingBand: 7,
       targetBand: 8,
       testDate: null,
       today: TODAY,
       catalogue: CATALOGUE,
     }),
-  ).slice(0, 2);
+  );
+  const fresh = tasksToCommit(plan, [row({ date: '2026-09-02' })], TODAY);
+  assert.deepEqual(
+    fresh.map((t) => [t.date, t.slot]),
+    [
+      ['2026-09-01', 0],
+      ['2026-09-03', 0],
+      ['2026-09-04', 0],
+      ['2026-09-05', 0],
+      ['2026-09-06', 0],
+      ['2026-09-07', 0],
+    ],
+  );
+});
 
-  const evidence = { completedToday: [], completedLessonIds: [] };
-  const total = tasks[0]!.minutes + tasks[1]!.minutes;
+test('missed work rolls to today after what today holds, keeping its id', () => {
+  const moves = rollForward(
+    [
+      row({ id: 'late2', date: '2026-08-31', slot: 0 }),
+      row({ id: 'late1', date: '2026-08-30', slot: 0, status: 'in_progress' }),
+      row({ id: 'done', date: '2026-08-30', slot: 1, status: 'completed' }),
+      row({ id: 'skipped', date: '2026-08-29', status: 'skipped' }),
+      row({ id: 'today', date: TODAY, slot: 0 }),
+    ],
+    TODAY,
+  );
+  assert.deepEqual(moves, [
+    { id: 'late1', date: TODAY, slot: 1 },
+    { id: 'late2', date: TODAY, slot: 2 },
+  ]);
+});
 
-  assert.equal(derivePlanState(tasks, evidence).minutesGoal, total);
-  assert.equal(derivePlanState(tasks, evidence, 60).minutesGoal, 60);
+test('ledger rows render with their state, link and carry-over', () => {
+  const tasks = assignmentTasks(
+    [
+      row({
+        id: 'b',
+        slot: 1,
+        status: 'in_progress',
+        originalDate: '2026-08-30',
+      }),
+      row({ id: 'a', slot: 0, status: 'completed' }),
+      row({ id: 'c', slot: 2, status: 'skipped' }),
+      row({ id: 'd', date: '2026-09-02', originalDate: '2026-09-02' }),
+    ],
+    IELTS_PLAN,
+    TODAY,
+  );
+  assert.deepEqual(
+    tasks.map((t) => [t.id, t.status, t.carriedFrom]),
+    [
+      ['a', 'completed', null],
+      ['b', 'active', '2026-08-30'],
+      ['d', 'pending', null],
+    ],
+  );
+  assert.equal(tasks[0]!.href, '/reading?passage=p1&a=a');
+
+  const progress = planProgress(tasks, TODAY);
+  assert.equal(progress.tasks.length, 2);
+  assert.equal(progress.minutesDone, 40);
+  assert.equal(progress.minutesGoal, 80);
+  assert.equal(planProgress(tasks, TODAY, 60).minutesGoal, 60);
+});
+
+test('a committed target counts as available only while it is published', () => {
+  assert.equal(targetAvailable('passage', 'p1', CATALOGUE), true);
+  assert.equal(targetAvailable('passage', 'gone', CATALOGUE), false);
+  assert.equal(
+    targetAvailable('task_type', 'read_aloud', {
+      examTaskTypes: ['read_aloud'],
+    }),
+    true,
+  );
+  assert.deepEqual(targetFromRef('prompt', 'w1'), {
+    kind: 'writing',
+    promptId: 'w1',
+  });
+  assert.deepEqual(targetRef({ kind: 'exam_task', taskType: 'x' }), {
+    targetKind: 'task_type',
+    targetId: 'x',
+  });
 });
 
 test('a drill is not scheduled for a task with no prompts', () => {

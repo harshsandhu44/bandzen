@@ -17,6 +17,7 @@ import {
   completeExamTaskItem,
   createExamTaskAttempt,
   findInProgressExamTask,
+  linkAttemptToAssignment,
   getAttempt,
   getMockSectionAttempts,
   getPublishedExamTasks,
@@ -46,9 +47,21 @@ export async function startExamTaskAttempt(formData: FormData) {
 
   const userId = await requireUserId();
 
+  // The plan assignment this was opened from, if any (#131).
+  const assignmentId = String(formData.get('a') ?? '') || null;
+  const planTarget = { targetKind: 'task_type', targetId: task.key } as const;
+
   // Resume rather than stack up abandoned attempts on the same task type.
   const existing = await findInProgressExamTask(userId, exam.key, task.key);
-  if (existing) redirect(`/practice/${exam.key}/${task.key}/${existing.id}`);
+  if (existing) {
+    await linkAttemptToAssignment(
+      userId,
+      existing.id,
+      assignmentId,
+      planTarget,
+    );
+    redirect(`/practice/${exam.key}/${task.key}/${existing.id}`);
+  }
 
   const items = await getPublishedExamTasks(
     exam.key,
@@ -68,6 +81,7 @@ export async function startExamTaskAttempt(formData: FormData) {
     module: skillForTaskType(exam.key, task.key)!,
     taskIds: items.map((i) => i.id),
   });
+  await linkAttemptToAssignment(userId, attempt.id, assignmentId, planTarget);
 
   redirect(`/practice/${exam.key}/${task.key}/${attempt.id}`);
 }

@@ -720,6 +720,15 @@ export const attempts = pgTable(
     mockAttemptId: uuid('mock_attempt_id').references(() => mockAttempts.id, {
       onDelete: 'cascade',
     }),
+    /**
+     * The study-plan assignment this attempt was started from, when it was
+     * (#131). Set only after checking the assignment is this user's, in this
+     * exam, for exactly this content.
+     */
+    planAssignmentId: uuid('plan_assignment_id').references(
+      (): AnyPgColumn => planAssignments.id,
+      { onDelete: 'set null' },
+    ),
     rawScore: integer('raw_score'),
     total: integer('total'),
     /**
@@ -1142,6 +1151,73 @@ export const resources = pgTable('resources', {
 });
 
 /** Which lessons a candidate has finished. */
+export const planAssignmentStatus = pgEnum('plan_assignment_status', [
+  'pending',
+  'in_progress',
+  'completed',
+  'skipped',
+  'deferred',
+]);
+
+/** What an assignment opens: a content row by id, a lesson by slug, or an exam task type. */
+export const planTargetKind = pgEnum('plan_target_kind', [
+  'passage',
+  'prompt',
+  'track',
+  'lesson',
+  'task_type',
+]);
+
+/**
+ * One committed study-plan task (#131). The planner is still the rule engine
+ * in `study-plan.ts`; this is the part of its output a candidate has been
+ * shown as a commitment. The next seven days are written the first time
+ * they are read and never rewritten by a page render, so a reload, a new
+ * score or midnight cannot quietly change what Today and Coming up say.
+ *
+ * `date` is the candidate's local calendar day. `original_date` is where it
+ * was first scheduled; a missed task rolls forward keeping its id, so the
+ * two differ exactly when work was carried over.
+ */
+export const planAssignments = pgTable(
+  'plan_assignments',
+  {
+    id: uuid('id').primaryKey().defaultRandom(),
+    userId: uuid('user_id').notNull(),
+    ...examOwnership(),
+    date: date('date').notNull(),
+    originalDate: date('original_date').notNull(),
+    /** Order within the day. */
+    slot: integer('slot').notNull(),
+    skill: attemptModule('skill').notNull(),
+    targetKind: planTargetKind('target_kind').notNull(),
+    targetId: text('target_id').notNull(),
+    label: text('label').notNull(),
+    minutes: integer('minutes').notNull(),
+    status: planAssignmentStatus('status').notNull().default('pending'),
+    /** The attempt that finished it. Lessons complete with no attempt. */
+    attemptId: uuid('attempt_id'),
+    completedAt: timestamp('completed_at', { withTimezone: true }),
+    revision: integer('revision').notNull().default(1),
+    /** `PLANNER_VERSION`: which rules produced it. */
+    plannerVersion: text('planner_version').notNull(),
+    createdAt: timestamp('created_at', { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+    updatedAt: timestamp('updated_at', { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+  },
+  (t) => [
+    uniqueIndex('plan_assignments_day_slot_key').on(
+      t.userId,
+      t.examKey,
+      t.date,
+      t.slot,
+    ),
+  ],
+);
+
 export const lessonProgress = pgTable(
   'lesson_progress',
   {

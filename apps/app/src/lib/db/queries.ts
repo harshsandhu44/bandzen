@@ -7,11 +7,9 @@ import {
   desc,
   eq,
   gt,
-  gte,
   inArray,
   isNotNull,
   isNull,
-  lt,
   ne,
   sql,
 } from 'drizzle-orm';
@@ -38,6 +36,15 @@ import {
 import { sittingReportState } from '@/lib/exam-sitting';
 import { preparationWrites, type PreparationValues } from '@/lib/enrollment';
 import { union } from 'drizzle-orm/pg-core';
+import {
+  PLANNER_VERSION,
+  rollForward,
+  targetRef,
+  tasksToCommit,
+  type AssignmentRow,
+  type PlanTask,
+  type TargetKind,
+} from '@/lib/study-plan';
 import { db } from './index';
 import {
   accessRequests,
@@ -54,6 +61,7 @@ import {
   lessonProgress,
   listeningTracks,
   mockAttempts,
+  planAssignments,
   officialScores,
   passages,
   profiles,
@@ -2596,59 +2604,201 @@ export async function latestDiagnostic(userId: string) {
 // can never disagree with the attempt behind it.
 // ---------------------------------------------------------------------------
 
+// ---------------------------------------------------------------------------
+// Study-plan ledger (#131)
+// ---------------------------------------------------------------------------
+
+const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
 /**
- * Attempts this user submitted on a given calendar day, in their own zone.
- *
- * The comparison is done on a timestamp range rather than by casting the
- * column to a date, so the index on (user_id, submitted_at) is still usable.
+ * File an attempt against the plan assignment its link carried. Checked in
+ * the one statement that writes it: the assignment must be this user's, in
+ * the attempt's exam, for exactly this content, and not already finished.
+ * Anything else is silently not linked; the attempt itself is unaffected.
  */
-export async function attemptsSubmittedOn(
+export async function linkAttemptToAssignment(
   userId: string,
-  examKey: ExamKey,
-  dayStart: Date,
-  dayEnd: Date,
+  attemptId: string,
+  assignmentId: string | null | undefined,
+  target: { targetKind: TargetKind; targetId: string },
 ) {
-  return db
-    .select({
-      id: attempts.id,
-      module: attempts.module,
-      kind: attempts.kind,
-      taskType: attempts.taskType,
-    })
-    .from(attempts)
-    .where(
-      and(
-        eq(attempts.userId, userId),
-        eq(attempts.examKey, examKey),
-        eq(attempts.status, 'complete'),
-        gte(attempts.submittedAt, dayStart),
-        lt(attempts.submittedAt, dayEnd),
-      ),
-    );
+  if (!assignmentId || !UUID.test(assignmentId)) return;
+  await db.execute(sql`
+    update attempts a set plan_assignment_id = pa.id
+      from plan_assignments pa
+     where a.id = ${attemptId} and a.user_id = ${userId}
+       and a.plan_assignment_id is null
+       and pa.id = ${assignmentId} and pa.user_id = ${userId}
+       and pa.exam_key = a.exam_key
+       and pa.target_kind = ${target.targetKind}
+       and pa.target_id = ${target.targetId}
+       and pa.status in ('pending', 'in_progress')
+  `);
 }
 
 /**
- * The newest attempt this user has open in one exam, for the plan's Resume
- * state. Only practice: a mock or diagnostic section resumes from its sitting.
+ * Bring one exam's ledger up to date for today, then return it.
+ *
+ * In order, under a per-user lock so two renders cannot both commit a day:
+ * 1. Practice attempts that arrived without a link, still open or finished
+ *    today, are filed against today's pending assignment for the same exact
+ *    content, if there is one. Never a mock, never another skill's task.
+ * 2. Assignment state follows the attempts filed against it, and lessons
+ *    complete by slug.
+ * 3. Unfinished work from earlier days rolls forward to today.
+ * 4. Pending work whose content is no longer published is dropped, so its
+ *    day is planned again.
+ * 5. Days in the commit window with nothing on them are planned and written.
+ *    Committed days are never rewritten here.
  */
-export async function latestAttemptInProgress(
-  userId: string,
-  examKey: ExamKey,
-) {
-  const [row] = await db
-    .select({ module: attempts.module, taskType: attempts.taskType })
-    .from(attempts)
-    .where(
-      and(
-        eq(attempts.userId, userId),
-        eq(attempts.examKey, examKey),
-        eq(attempts.status, 'in_progress'),
-        eq(attempts.kind, 'practice'),
-      ),
-    )
-    .orderBy(desc(attempts.startedAt))
-    .limit(1);
-  return row ?? null;
+export async function syncPlanLedger(input: {
+  userId: string;
+  examKey: ExamKey;
+  examVersion: string;
+  today: string;
+  dayStart: Date;
+  dayEnd: Date;
+  isAvailable: (kind: TargetKind, id: string) => boolean;
+  /** The planner, given the targets already assigned, oldest first. */
+  plan: (assignedTargetIds: string[]) => PlanTask[];
+}): Promise<AssignmentRow[]> {
+  const { userId, examKey, today } = input;
+  return db.transaction(async (tx) => {
+    await tx.execute(
+      sql`select pg_advisory_xact_lock(hashtextextended(${`plan:${userId}:${examKey}`}, 0))`,
+    );
+
+    // 1. Unlinked attempts at exactly today's content.
+    const loose = await tx.execute<{
+      id: string;
+      kind: TargetKind;
+      target_id: string;
+    }>(sql`
+      select a.id,
+             case when a.passage_id is not null then 'passage'
+                  when a.prompt_id is not null then 'prompt'
+                  when a.track_id is not null then 'track'
+                  else 'task_type' end as kind,
+             coalesce(a.passage_id::text, a.prompt_id::text, a.track_id::text, a.task_type) as target_id
+        from attempts a
+       where a.user_id = ${userId} and a.exam_key = ${examKey}
+         and a.kind = 'practice' and a.plan_assignment_id is null
+         and (a.status in ('in_progress', 'grading')
+              or (a.status = 'complete' and a.submitted_at >= ${input.dayStart.toISOString()} and a.submitted_at < ${input.dayEnd.toISOString()}))
+       order by a.started_at
+    `);
+    for (const a of loose) {
+      if (!a.target_id) continue;
+      await tx.execute(sql`
+        update attempts set plan_assignment_id = (
+          select pa.id from plan_assignments pa
+           where pa.user_id = ${userId} and pa.exam_key = ${examKey}
+             and pa.date = ${today} and pa.status = 'pending'
+             and pa.target_kind = ${a.kind} and pa.target_id = ${a.target_id}
+             and not exists (select 1 from attempts x where x.plan_assignment_id = pa.id)
+           order by pa.slot limit 1)
+        where id = ${a.id}
+      `);
+    }
+
+    // 2. State from the evidence filed against each assignment.
+    await tx.execute(sql`
+      update plan_assignments pa
+         set status = (case when a.status = 'complete' then 'completed' else 'in_progress' end)::plan_assignment_status,
+             attempt_id = a.id,
+             completed_at = case when a.status = 'complete' then a.submitted_at end,
+             updated_at = now()
+        from attempts a
+       where a.plan_assignment_id = pa.id
+         and pa.user_id = ${userId} and pa.exam_key = ${examKey}
+         and pa.status in ('pending', 'in_progress')
+         and a.status in ('in_progress', 'grading', 'complete')
+    `);
+    await tx.execute(sql`
+      update plan_assignments pa
+         set status = 'completed', completed_at = lp.completed_at, updated_at = now()
+        from lesson_progress lp join lessons l on l.id = lp.lesson_id
+       where lp.user_id = ${userId}
+         and pa.user_id = ${userId} and pa.exam_key = ${examKey}
+         and pa.target_kind = 'lesson' and pa.target_id = l.slug
+         and pa.status in ('pending', 'in_progress')
+    `);
+
+    const read = () =>
+      tx
+        .select({
+          id: planAssignments.id,
+          date: planAssignments.date,
+          originalDate: planAssignments.originalDate,
+          slot: planAssignments.slot,
+          skill: planAssignments.skill,
+          targetKind: planAssignments.targetKind,
+          targetId: planAssignments.targetId,
+          label: planAssignments.label,
+          minutes: planAssignments.minutes,
+          status: planAssignments.status,
+        })
+        .from(planAssignments)
+        .where(
+          and(
+            eq(planAssignments.userId, userId),
+            eq(planAssignments.examKey, examKey),
+          ),
+        )
+        .orderBy(planAssignments.date, planAssignments.slot);
+
+    let rows = await read();
+
+    // 3. Carry missed work over.
+    for (const move of rollForward(rows, today)) {
+      await tx
+        .update(planAssignments)
+        .set({ date: move.date, slot: move.slot, updatedAt: new Date() })
+        .where(eq(planAssignments.id, move.id));
+    }
+
+    // 4. Drop pending work nothing can open any more.
+    const gone = rows
+      .filter(
+        (r) =>
+          r.status === 'pending' &&
+          !input.isAvailable(r.targetKind, r.targetId),
+      )
+      .map((r) => r.id);
+    if (gone.length) {
+      await tx.delete(planAssignments).where(inArray(planAssignments.id, gone));
+    }
+
+    // 5. Commit the days that hold nothing.
+    rows = await read();
+    const fresh = tasksToCommit(
+      input.plan(rows.map((r) => r.targetId)),
+      rows,
+      today,
+    );
+    if (fresh.length) {
+      await tx
+        .insert(planAssignments)
+        .values(
+          fresh.map((t) => ({
+            userId,
+            examKey,
+            examVersion: input.examVersion,
+            date: t.date,
+            originalDate: t.date,
+            slot: t.slot,
+            skill: t.skill,
+            ...targetRef(t.target),
+            label: t.label,
+            minutes: t.minutes,
+            plannerVersion: PLANNER_VERSION,
+          })),
+        )
+        .onConflictDoNothing();
+      rows = await read();
+    }
+    return rows;
+  });
 }
 
 /**

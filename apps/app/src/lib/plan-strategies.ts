@@ -10,13 +10,24 @@ import type { PlanStrategy, PlanTarget } from './study-plan.ts';
 
 /**
  * Rotate through what is available so two consecutive days on one skill do
- * not hand back the same material. An empty list yields null, and the task
- * renders without a Continue button rather than with one that goes nowhere.
+ * not hand back the same material. Content never assigned comes first, then
+ * whatever was assigned longest ago, so nothing repeats until the pool is
+ * spent. An empty list yields null, and the skill is not scheduled.
  */
-function pick<T>(items: readonly T[] | undefined, nth: number): T | null {
+function pick<T>(
+  items: readonly T[] | undefined,
+  nth: number,
+  idOf: (item: T) => string,
+  assigned: readonly string[] = [],
+): T | null {
   if (!items?.length) return null;
-  return items[nth % items.length]!;
+  const ordered = [...items].sort(
+    (a, b) => assigned.lastIndexOf(idOf(a)) - assigned.lastIndexOf(idOf(b)),
+  );
+  return ordered[nth % ordered.length]!;
 }
+
+const same = (id: string) => id;
 
 export const IELTS_PLAN: PlanStrategy = {
   // Speaking is Pro-only and never drilled here.
@@ -57,18 +68,33 @@ export const IELTS_PLAN: PlanStrategy = {
     catalogue.prompts.some((p) => p.task === drill.task),
   targetFor(skill, drill, catalogue, nth): PlanTarget | null {
     if (skill === 'reading') {
-      const passageId = pick(catalogue?.passageIds, nth);
+      const passageId = pick(
+        catalogue?.passageIds,
+        nth,
+        same,
+        catalogue?.assignedTargetIds,
+      );
       return passageId ? { kind: 'reading', passageId } : null;
     }
     if (skill === 'listening') {
-      const trackId = pick(catalogue?.trackIds, nth);
+      const trackId = pick(
+        catalogue?.trackIds,
+        nth,
+        same,
+        catalogue?.assignedTargetIds,
+      );
       return trackId ? { kind: 'listening', trackId } : null;
     }
     if (skill === 'writing') {
       // Rotate within the drill's own task, so the prompt that opens is the
       // kind of exercise the label just promised.
       const forTask = catalogue?.prompts?.filter((p) => p.task === drill.task);
-      const prompt = pick(forTask, nth);
+      const prompt = pick(
+        forTask,
+        nth,
+        (p) => p.id,
+        catalogue?.assignedTargetIds,
+      );
       return prompt ? { kind: 'writing', promptId: prompt.id } : null;
     }
     return null;
