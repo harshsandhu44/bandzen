@@ -3,6 +3,7 @@ import { Progress } from '@bandzen/ui/components/progress';
 import { Panel } from '@/components/app/primitives';
 import { TaskStatus } from '@/components/app/status';
 import { MODULE_LABEL } from '@/lib/modules';
+import { PlanMenu, TaskMenu } from '@/components/dashboard/plan-controls';
 import { targetHref, type PlanProgress } from '@/lib/study-plan';
 
 /**
@@ -13,7 +14,13 @@ import { targetHref, type PlanProgress } from '@/lib/study-plan';
  * timer: we do not watch how long anyone sits on a page, so claiming a
  * "minutes studied" figure that included reading time would be invented.
  */
-export function TodaysPlan({ progress }: { progress: PlanProgress }) {
+export function TodaysPlan({
+  progress,
+  today,
+}: {
+  progress: PlanProgress;
+  today: string;
+}) {
   const { tasks, minutesDone, minutesGoal, dailyMinutes } = progress;
   const over = dailyMinutes != null ? minutesGoal - dailyMinutes : 0;
 
@@ -22,9 +29,12 @@ export function TodaysPlan({ progress }: { progress: PlanProgress }) {
       headingId="today-heading"
       title="Today"
       action={
-        <p className="font-metric text-metric-sm text-muted-foreground">
-          {minutesDone} / {minutesGoal} min
-        </p>
+        <div className="flex items-center gap-2">
+          <p className="font-metric text-metric-sm text-muted-foreground">
+            {minutesDone} / {minutesGoal} min
+          </p>
+          <PlanMenu />
+        </div>
       }
     >
       <Progress
@@ -77,6 +87,14 @@ export function TodaysPlan({ progress }: { progress: PlanProgress }) {
                 >
                   {task.status === 'active' ? 'Resume' : 'Start'}
                 </Link>
+              ) : null}
+              {task.id && task.status === 'pending' ? (
+                <TaskMenu
+                  id={task.id}
+                  label={task.label}
+                  date={task.date}
+                  today={today}
+                />
               ) : null}
             </li>
           );

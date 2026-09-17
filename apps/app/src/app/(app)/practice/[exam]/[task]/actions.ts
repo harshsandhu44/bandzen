@@ -5,6 +5,7 @@ import { notFound, redirect } from 'next/navigation';
 import { getExam, getTask } from '@bandzen/exams/registry';
 import { uploadObject } from '@bandzen/storage/r2';
 import { gradeExamTask } from '@/lib/ai/grade-exam-task';
+import { capture } from '@/lib/analytics';
 import { requireUserId } from '@/lib/auth';
 import {
   expireMockSectionIfDue,
@@ -82,6 +83,13 @@ export async function startExamTaskAttempt(formData: FormData) {
     taskIds: items.map((i) => i.id),
   });
   await linkAttemptToAssignment(userId, attempt.id, assignmentId, planTarget);
+  after(() =>
+    capture(userId, 'attempt_started', {
+      module: skillForTaskType(exam.key, task.key)!,
+      exam_key: exam.key,
+      task_type: task.key,
+    }),
+  );
 
   redirect(`/practice/${exam.key}/${task.key}/${attempt.id}`);
 }

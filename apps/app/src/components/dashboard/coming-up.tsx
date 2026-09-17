@@ -2,6 +2,7 @@ import Link from 'next/link';
 import { Panel } from '@/components/app/primitives';
 import { TaskStatus } from '@/components/app/status';
 import { MODULE_LABEL } from '@/lib/modules';
+import { TaskMenu } from '@/components/dashboard/plan-controls';
 import { targetHref, type PlanTaskState } from '@/lib/study-plan';
 
 /**
@@ -79,6 +80,14 @@ export function ComingUp({
                         >
                           Open
                         </Link>
+                      ) : null}
+                      {task.id && task.status === 'pending' ? (
+                        <TaskMenu
+                          id={task.id}
+                          label={task.label}
+                          date={task.date}
+                          today={today}
+                        />
                       ) : null}
                     </li>
                   );

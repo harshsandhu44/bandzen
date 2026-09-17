@@ -34,6 +34,7 @@ import {
   type AssessmentResult,
 } from '@bandzen/exams/scoring';
 import { sittingReportState } from '@/lib/exam-sitting';
+import { todayIso } from '@/lib/dates';
 import { preparationWrites, type PreparationValues } from '@/lib/enrollment';
 import { union } from 'drizzle-orm/pg-core';
 import {
@@ -62,6 +63,8 @@ import {
   listeningTracks,
   mockAttempts,
   planAssignments,
+  planRevisionReason,
+  planRevisions,
   officialScores,
   passages,
   profiles,
@@ -145,6 +148,7 @@ export const getProfile = cache(async function getProfile(userId: string) {
       targetScore: examEnrollments.targetScore,
       selfAssessedScore: examEnrollments.selfAssessedScore,
       testDate: examEnrollments.testDate,
+      planPausedAt: examEnrollments.planPausedAt,
     })
     .from(profiles)
     .leftJoin(
@@ -665,7 +669,7 @@ export async function getMockResult(userId: string, mockAttemptId: string) {
 
 /** Speaking is the last section — this is what closes the sitting and frees the weekly cap. */
 export async function submitMockAttempt(userId: string, mockAttemptId: string) {
-  await db
+  const closed = await db
     .update(mockAttempts)
     .set({ submittedAt: new Date() })
     .where(
@@ -674,7 +678,10 @@ export async function submitMockAttempt(userId: string, mockAttemptId: string) {
         eq(mockAttempts.userId, userId),
         isNull(mockAttempts.submittedAt),
       ),
-    );
+    )
+    .returning({ examKey: mockAttempts.examKey });
+  // A finished sitting is a new measurement: re-plan work not yet started (#131).
+  if (closed[0]) await replanPlan(userId, closed[0].examKey, 'new_score');
 }
 
 export async function coachAllowance(userId: string) {
@@ -1263,7 +1270,7 @@ export async function finalizeExamTaskSitting(mockAttemptId: string) {
     .map((c) => c.assessment)
     .filter((a): a is AssessmentResult => a != null);
   const report = pteScoreReport(outcomes);
-  await db
+  const written = await db
     .insert(examScoreReports)
     .values({
       mockAttemptId,
@@ -1276,7 +1283,11 @@ export async function finalizeExamTaskSitting(mockAttemptId: string) {
       sections: report.sections,
       taskTypes: pteWeakestTaskTypes(outcomes),
     })
-    .onConflictDoNothing();
+    .onConflictDoNothing()
+    .returning({ id: examScoreReports.mockAttemptId });
+  // A new score re-plans the work not yet started (#131). Only the first time:
+  // a report already written is not new.
+  if (written.length) await replanPlan(mock.userId, mock.examKey, 'new_score');
   return state;
 }
 
@@ -2637,6 +2648,212 @@ export async function linkAttemptToAssignment(
   `);
 }
 
+type Tx = Parameters<Parameters<typeof db.transaction>[0]>[0];
+type PlanRevisionReason = (typeof planRevisionReason.enumValues)[number];
+
+/** One writer per candidate's exam plan at a time; released with the transaction. */
+async function lockPlan(tx: Tx, userId: string, examKey: ExamKey) {
+  await tx.execute(
+    sql`select pg_advisory_xact_lock(hashtextextended(${`plan:${userId}:${examKey}`}, 0))`,
+  );
+}
+
+async function currentRevision(tx: Tx, userId: string, examKey: ExamKey) {
+  const [row] = await tx
+    .select({
+      revision: sql<number>`coalesce(max(${planRevisions.revision}), 1)`,
+    })
+    .from(planRevisions)
+    .where(
+      and(eq(planRevisions.userId, userId), eq(planRevisions.examKey, examKey)),
+    );
+  return Number(row?.revision ?? 1);
+}
+
+/** Append why the plan changed. Revision 1 is the plan as first committed. */
+async function recordRevision(
+  tx: Tx,
+  userId: string,
+  examKey: ExamKey,
+  reason: PlanRevisionReason,
+  detail: string | null = null,
+) {
+  await tx.insert(planRevisions).values({
+    userId,
+    examKey,
+    reason,
+    detail,
+    revision: (await currentRevision(tx, userId, examKey)) + 1,
+  });
+}
+
+/**
+ * Throw away pending work nobody has started from `from` onwards, record why,
+ * and let the next plan read commit those days afresh from current scores and
+ * settings. Finished, started, skipped and past work is history and stays.
+ * An automatic replan that changed nothing records nothing.
+ */
+export async function replanPlan(
+  userId: string,
+  examKey: ExamKey,
+  reason: PlanRevisionReason,
+  opts: { includeToday?: boolean; detail?: string } = {},
+) {
+  const profile = await getProfile(userId);
+  const today = todayIso(profile?.timezone);
+  await db.transaction(async (tx) => {
+    await lockPlan(tx, userId, examKey);
+    const dropped = await tx
+      .delete(planAssignments)
+      .where(
+        and(
+          eq(planAssignments.userId, userId),
+          eq(planAssignments.examKey, examKey),
+          eq(planAssignments.status, 'pending'),
+          opts.includeToday
+            ? sql`${planAssignments.date} >= ${today}`
+            : sql`${planAssignments.date} > ${today}`,
+          sql`not exists (select 1 from attempts a where a.plan_assignment_id = ${planAssignments.id})`,
+        ),
+      )
+      .returning({ id: planAssignments.id });
+    const requested = reason === 'user_replan' || reason === 'resumed';
+    if (dropped.length || requested) {
+      await recordRevision(tx, userId, examKey, reason, opts.detail ?? null);
+    }
+  });
+}
+
+/** The newest reason this exam's plan changed, if it ever has. */
+export async function latestPlanRevision(userId: string, examKey: ExamKey) {
+  const [row] = await db
+    .select({
+      reason: planRevisions.reason,
+      detail: planRevisions.detail,
+      createdAt: planRevisions.createdAt,
+    })
+    .from(planRevisions)
+    .where(
+      and(eq(planRevisions.userId, userId), eq(planRevisions.examKey, examKey)),
+    )
+    .orderBy(desc(planRevisions.revision))
+    .limit(1);
+  return row ?? null;
+}
+
+/** Skip one pending task of this candidate's, keeping it as history. */
+export async function skipAssignment(
+  userId: string,
+  assignmentId: string,
+  reason: string | null,
+) {
+  const [row] = await db
+    .update(planAssignments)
+    .set({ status: 'skipped', skipReason: reason, updatedAt: new Date() })
+    .where(
+      and(
+        eq(planAssignments.id, assignmentId),
+        eq(planAssignments.userId, userId),
+        eq(planAssignments.status, 'pending'),
+      ),
+    )
+    .returning({
+      skill: planAssignments.skill,
+      examKey: planAssignments.examKey,
+    });
+  return row ?? null;
+}
+
+/**
+ * Move one pending task to another day, after whatever that day holds. Same
+ * row, same id: its `original_date` still says when it was first due.
+ */
+export async function moveAssignment(
+  userId: string,
+  assignmentId: string,
+  date: string,
+) {
+  return db.transaction(async (tx) => {
+    const [row] = await tx
+      .select({
+        examKey: planAssignments.examKey,
+        skill: planAssignments.skill,
+      })
+      .from(planAssignments)
+      .where(
+        and(
+          eq(planAssignments.id, assignmentId),
+          eq(planAssignments.userId, userId),
+          eq(planAssignments.status, 'pending'),
+        ),
+      );
+    if (!row) return null;
+    await lockPlan(tx, userId, row.examKey);
+    const [{ slot }] = await tx
+      .select({
+        slot: sql<number>`coalesce(max(${planAssignments.slot}), -1) + 1`,
+      })
+      .from(planAssignments)
+      .where(
+        and(
+          eq(planAssignments.userId, userId),
+          eq(planAssignments.examKey, row.examKey),
+          eq(planAssignments.date, date),
+        ),
+      );
+    await tx
+      .update(planAssignments)
+      .set({ date, slot: Number(slot), updatedAt: new Date() })
+      .where(eq(planAssignments.id, assignmentId));
+    return row;
+  });
+}
+
+/**
+ * Pause or resume one exam's plan. Resuming closes what fell due while it was
+ * paused as skipped, rather than piling it onto today, and replans from today.
+ */
+export async function setPlanPaused(
+  userId: string,
+  examKey: ExamKey,
+  paused: boolean,
+) {
+  await db
+    .update(examEnrollments)
+    .set({ planPausedAt: paused ? new Date() : null, updatedAt: new Date() })
+    .where(
+      and(
+        eq(examEnrollments.userId, userId),
+        eq(examEnrollments.examKey, examKey),
+      ),
+    );
+  if (paused) {
+    await db.transaction(async (tx) => {
+      await lockPlan(tx, userId, examKey);
+      await recordRevision(tx, userId, examKey, 'paused');
+    });
+    return;
+  }
+  const profile = await getProfile(userId);
+  const today = todayIso(profile?.timezone);
+  await db
+    .update(planAssignments)
+    .set({
+      status: 'skipped',
+      skipReason: 'plan paused',
+      updatedAt: new Date(),
+    })
+    .where(
+      and(
+        eq(planAssignments.userId, userId),
+        eq(planAssignments.examKey, examKey),
+        eq(planAssignments.status, 'pending'),
+        sql`${planAssignments.date} < ${today}`,
+      ),
+    );
+  await replanPlan(userId, examKey, 'resumed', { includeToday: true });
+}
+
 /**
  * Bring one exam's ledger up to date for today, then return it.
  *
@@ -2651,6 +2868,9 @@ export async function linkAttemptToAssignment(
  *    day is planned again.
  * 5. Days in the commit window with nothing on them are planned and written.
  *    Committed days are never rewritten here.
+ *
+ * A paused plan still records what was done (1–2) but neither moves nor adds
+ * work. Moving or dropping work records a revision saying why.
  */
 export async function syncPlanLedger(input: {
   userId: string;
@@ -2661,15 +2881,18 @@ export async function syncPlanLedger(input: {
   dayEnd: Date;
   /** The candidate's daily minutes and study days, for spreading missed work. */
   pace: { dailyMinutes: number | null; studyDays: readonly number[] };
+  paused: boolean;
   isAvailable: (kind: TargetKind, id: string) => boolean;
   /** The planner, given the targets already assigned, oldest first. */
   plan: (assignedTargetIds: string[]) => PlanTask[];
-}): Promise<AssignmentRow[]> {
+}): Promise<{
+  rows: AssignmentRow[];
+  /** Skills of assignments this sync saw finished, for analytics. */
+  completed: Skill[];
+}> {
   const { userId, examKey, today } = input;
   return db.transaction(async (tx) => {
-    await tx.execute(
-      sql`select pg_advisory_xact_lock(hashtextextended(${`plan:${userId}:${examKey}`}, 0))`,
-    );
+    await lockPlan(tx, userId, examKey);
 
     // 1. Unlinked attempts at exactly today's content.
     const loose = await tx.execute<{
@@ -2705,7 +2928,7 @@ export async function syncPlanLedger(input: {
     }
 
     // 2. State from the evidence filed against each assignment.
-    await tx.execute(sql`
+    const completed = await tx.execute<{ skill: Skill; status: string }>(sql`
       update plan_assignments pa
          set status = (case when a.status = 'complete' then 'completed' else 'in_progress' end)::plan_assignment_status,
              attempt_id = a.id,
@@ -2716,8 +2939,9 @@ export async function syncPlanLedger(input: {
          and pa.user_id = ${userId} and pa.exam_key = ${examKey}
          and pa.status in ('pending', 'in_progress')
          and a.status in ('in_progress', 'grading', 'complete')
+      returning pa.skill, pa.status
     `);
-    await tx.execute(sql`
+    const lessonsDone = await tx.execute<{ skill: Skill }>(sql`
       update plan_assignments pa
          set status = 'completed', completed_at = lp.completed_at, updated_at = now()
         from lesson_progress lp join lessons l on l.id = lp.lesson_id
@@ -2725,6 +2949,7 @@ export async function syncPlanLedger(input: {
          and pa.user_id = ${userId} and pa.exam_key = ${examKey}
          and pa.target_kind = 'lesson' and pa.target_id = l.slug
          and pa.status in ('pending', 'in_progress')
+      returning pa.skill, pa.status
     `);
 
     const read = () =>
@@ -2740,6 +2965,7 @@ export async function syncPlanLedger(input: {
           label: planAssignments.label,
           minutes: planAssignments.minutes,
           status: planAssignments.status,
+          revision: planAssignments.revision,
         })
         .from(planAssignments)
         .where(
@@ -2750,14 +2976,30 @@ export async function syncPlanLedger(input: {
         )
         .orderBy(planAssignments.date, planAssignments.slot);
 
+    const finished = [
+      ...completed.filter((r) => r.status === 'completed'),
+      ...lessonsDone,
+    ].map((r) => r.skill);
+
     let rows = await read();
+    if (input.paused) return { rows, completed: finished };
 
     // 3. Carry missed work over.
-    for (const move of rollForward(rows, today, input.pace)) {
+    const moves = rollForward(rows, today, input.pace);
+    for (const move of moves) {
       await tx
         .update(planAssignments)
         .set({ date: move.date, slot: move.slot, updatedAt: new Date() })
         .where(eq(planAssignments.id, move.id));
+    }
+    if (moves.length) {
+      await recordRevision(
+        tx,
+        userId,
+        examKey,
+        'missed_work',
+        `${moves.length} carried over`,
+      );
     }
 
     // 4. Drop pending work nothing can open any more.
@@ -2770,14 +3012,23 @@ export async function syncPlanLedger(input: {
       .map((r) => r.id);
     if (gone.length) {
       await tx.delete(planAssignments).where(inArray(planAssignments.id, gone));
+      await recordRevision(
+        tx,
+        userId,
+        examKey,
+        'content_unavailable',
+        `${gone.length} replaced`,
+      );
     }
 
     // 5. Commit the days that hold nothing.
     rows = await read();
+    const revision = await currentRevision(tx, userId, examKey);
     const fresh = tasksToCommit(
       input.plan(rows.map((r) => r.targetId)),
       rows,
       today,
+      revision,
     );
     if (fresh.length) {
       await tx
@@ -2794,13 +3045,14 @@ export async function syncPlanLedger(input: {
             ...targetRef(t.target),
             label: t.label,
             minutes: t.minutes,
+            revision,
             plannerVersion: PLANNER_VERSION,
           })),
         )
         .onConflictDoNothing();
       rows = await read();
     }
-    return rows;
+    return { rows, completed: finished };
   });
 }
 

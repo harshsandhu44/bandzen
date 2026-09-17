@@ -377,6 +377,7 @@ const row = (over: Partial<AssignmentRow>): AssignmentRow => ({
   label: 'Full passage, timed',
   minutes: 40,
   status: 'pending',
+  revision: 1,
   ...over,
 });
 
@@ -449,6 +450,24 @@ test('only empty days inside the window are committed, slotted in order', () => 
       ['2026-09-07', 0],
     ],
   );
+});
+
+test('a skip from before a replan does not hold its day empty', () => {
+  const plan = buildPlan(
+    ielts({
+      readingBand: 7,
+      writingBand: 7,
+      targetBand: 8,
+      testDate: null,
+      today: TODAY,
+      catalogue: CATALOGUE,
+    }),
+  );
+  const skipped = row({ status: 'skipped', revision: 1 });
+  assert.equal(tasksToCommit(plan, [skipped], TODAY, 1)[0]?.date, '2026-09-02');
+  const fresh = tasksToCommit(plan, [skipped], TODAY, 2)[0];
+  assert.equal(fresh?.date, TODAY);
+  assert.equal(fresh?.slot, 1, 'after the skipped row, not on top of it');
 });
 
 test('missed work rolls to today after what today holds, keeping its id', () => {

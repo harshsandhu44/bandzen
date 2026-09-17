@@ -232,6 +232,8 @@ export const examEnrollments = pgTable(
       mode: 'number',
     }),
     testDate: date('test_date'),
+    /** Set while the candidate has paused this exam's study plan (#131). */
+    planPausedAt: timestamp('plan_paused_at', { withTimezone: true }),
     createdAt: timestamp('created_at', { withTimezone: true })
       .notNull()
       .defaultNow(),
@@ -1200,6 +1202,8 @@ export const planAssignments = pgTable(
     label: text('label').notNull(),
     minutes: integer('minutes').notNull(),
     status: planAssignmentStatus('status').notNull().default('pending'),
+    /** What the candidate said when skipping it, if anything. */
+    skipReason: text('skip_reason'),
     /** The attempt that finished it. Lessons complete with no attempt. */
     attemptId: uuid('attempt_id'),
     completedAt: timestamp('completed_at', { withTimezone: true }),
@@ -1219,6 +1223,43 @@ export const planAssignments = pgTable(
       t.examKey,
       t.date,
       t.slot,
+    ),
+  ],
+);
+
+export const planRevisionReason = pgEnum('plan_revision_reason', [
+  'settings_changed',
+  'new_score',
+  'user_replan',
+  'missed_work',
+  'content_unavailable',
+  'paused',
+  'resumed',
+]);
+
+/**
+ * Why one exam's plan changed, append-only (#131). Every automatic or
+ * requested change to committed work writes one, and assignments committed
+ * afterwards carry its number in `plan_assignments.revision`.
+ */
+export const planRevisions = pgTable(
+  'plan_revisions',
+  {
+    id: uuid('id').primaryKey().defaultRandom(),
+    userId: uuid('user_id').notNull(),
+    examKey: examKey('exam_key').notNull(),
+    revision: integer('revision').notNull(),
+    reason: planRevisionReason('reason').notNull(),
+    detail: text('detail'),
+    createdAt: timestamp('created_at', { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+  },
+  (t) => [
+    uniqueIndex('plan_revisions_user_exam_revision_key').on(
+      t.userId,
+      t.examKey,
+      t.revision,
     ),
   ],
 );

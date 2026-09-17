@@ -31,7 +31,14 @@ export type AnalyticsEvent =
   | 'report_viewed'
   | 'lesson_completed'
   | 'coach_message_sent'
-  | 'mock_started';
+  | 'mock_started'
+  // Study plan controls (#131).
+  | 'plan_assignment_completed'
+  | 'plan_assignment_skipped'
+  | 'plan_assignment_deferred'
+  | 'plan_paused'
+  | 'plan_resumed'
+  | 'plan_replanned';
 
 type PropertyValue = string | number | boolean | null;
 

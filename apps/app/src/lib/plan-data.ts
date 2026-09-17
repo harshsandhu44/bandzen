@@ -1,11 +1,14 @@
 import 'server-only';
 
+import { after } from 'next/server';
 import { getExam } from '@bandzen/exams/registry';
+import { capture } from '@/lib/analytics';
 import { lessonForKindMap } from '@/content/lessons';
 import { dayBounds } from '@/lib/dates';
 import {
   accuracyByQuestionKind,
   latestBand,
+  latestPlanRevision,
   latestReport,
   latestScoreReports,
   listLessonProgress,
@@ -136,13 +139,14 @@ export async function loadPlanData(
   let plan: PlanTaskState[] = [];
   if (planInput) {
     const catalogue = planInput.catalogue!;
-    const rows = await syncPlanLedger({
+    const { rows, completed } = await syncPlanLedger({
       userId,
       examKey,
       examVersion: profile.examVersion ?? getExam(examKey)!.version,
       today,
       dayStart: start,
       dayEnd: end,
+      paused: profile.planPausedAt != null,
       pace: {
         dailyMinutes: profile.studyMinutes,
         studyDays: profile.studyDays,
@@ -158,6 +162,18 @@ export async function loadPlanData(
             : planInput.weaknesses,
         }),
     });
+    if (completed.length) {
+      after(() =>
+        Promise.all(
+          completed.map((skill) =>
+            capture(userId, 'plan_assignment_completed', {
+              skill,
+              exam_key: examKey,
+            }),
+          ),
+        ),
+      );
+    }
     const committed = assignmentTasks(rows, planInput.strategy, today).filter(
       (t) => t.date >= today,
     );
@@ -180,6 +196,9 @@ export async function loadPlanData(
     plan = [...committed, ...projected];
   }
 
+  const latestRevision = planInput
+    ? await latestPlanRevision(userId, examKey)
+    : null;
   const progress = planProgress(plan, today, profile.studyMinutes);
 
   // PTE's overall is its latest sitting report's, the same number the result
@@ -195,6 +214,14 @@ export async function loadPlanData(
     progress,
     testDay: testDayState(today, profile.testDate),
     restDay: !isStudyDay(today, profile.studyDays),
+    paused: profile.planPausedAt != null,
+    // Said once: only on the day the plan last changed.
+    revision:
+      latestRevision &&
+      latestRevision.createdAt >= start &&
+      latestRevision.createdAt < end
+        ? latestRevision
+        : null,
     estimated,
     readingBand,
     writingBand,
