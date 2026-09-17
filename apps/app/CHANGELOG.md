@@ -1,3 +1,10 @@
+## app [1.25.4](https://github.com/harshsandhu44/bandzen/compare/app@1.25.3...app@1.25.4) (2026-09-17)
+
+
+### Bug Fixes
+
+* **app:** store one immutable PTE score report per finished sitting ([#133](https://github.com/harshsandhu44/bandzen/issues/133)) ([4bb08ba](https://github.com/harshsandhu44/bandzen/commit/4bb08bad4e26306f0006f26aaf0ac92277a6bae0))
+
 ## app [1.25.3](https://github.com/harshsandhu44/bandzen/compare/app@1.25.2...app@1.25.3) (2026-09-17)
 
 
