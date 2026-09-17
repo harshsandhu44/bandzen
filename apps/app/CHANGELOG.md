@@ -1,3 +1,10 @@
+# app [1.29.0](https://github.com/harshsandhu44/bandzen/compare/app@1.28.0...app@1.29.0) (2026-09-17)
+
+
+### Features
+
+* **app:** let candidates skip, move, pause and replan their study plan ([#142](https://github.com/harshsandhu44/bandzen/issues/142)) ([cb92702](https://github.com/harshsandhu44/bandzen/commit/cb92702e80ccaf3534c5dfb753e4ce775bc0bf3b)), closes [#131](https://github.com/harshsandhu44/bandzen/issues/131)
+
 # app [1.28.0](https://github.com/harshsandhu44/bandzen/compare/app@1.27.0...app@1.28.0) (2026-09-17)
 
 
