@@ -1,3 +1,10 @@
+# app [1.27.0](https://github.com/harshsandhu44/bandzen/compare/app@1.26.1...app@1.27.0) (2026-09-17)
+
+
+### Features
+
+* **app:** commit the study plan to a ledger and complete tasks exactly ([#140](https://github.com/harshsandhu44/bandzen/issues/140)) ([d2d1d9f](https://github.com/harshsandhu44/bandzen/commit/d2d1d9f2bb26dda085c9589573584ab76ea99f66)), closes [#131](https://github.com/harshsandhu44/bandzen/issues/131)
+
 ## app [1.26.1](https://github.com/harshsandhu44/bandzen/compare/app@1.26.0...app@1.26.1) (2026-09-17)
 
 
