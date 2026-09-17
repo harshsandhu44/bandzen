@@ -1,3 +1,10 @@
+## app [1.25.6](https://github.com/harshsandhu44/bandzen/compare/app@1.25.5...app@1.25.6) (2026-09-17)
+
+
+### Bug Fixes
+
+* **app:** scope PTE plan completion, placement and Progress to the exam and task type ([#135](https://github.com/harshsandhu44/bandzen/issues/135)) ([8bd0632](https://github.com/harshsandhu44/bandzen/commit/8bd0632a94bd07b78cafd6772250adf85be7be49)), closes [#130](https://github.com/harshsandhu44/bandzen/issues/130)
+
 ## app [1.25.5](https://github.com/harshsandhu44/bandzen/compare/app@1.25.4...app@1.25.5) (2026-09-17)
 
 
