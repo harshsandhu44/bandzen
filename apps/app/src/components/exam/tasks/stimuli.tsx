@@ -3,8 +3,18 @@ import type { ComponentType } from 'react';
 import type { StimulusData } from '@/lib/task-content';
 import { TaskAudio } from './task-audio';
 
-/** Every stimulus takes the item's data; only audio reads the task's policy. */
-export type StimulusProps = { data: StimulusData; audio?: TaskAudioPolicy };
+/**
+ * Every stimulus takes the item's data; only audio reads the task's policy.
+ * `alreadyPlayed`, `onStart` and `onEnded` are how a mock keeps a single play
+ * single across remounts: the runner owns them, the player only reports.
+ */
+export type StimulusProps = {
+  data: StimulusData;
+  audio?: TaskAudioPolicy;
+  alreadyPlayed?: boolean;
+  onStart?: () => void;
+  onEnded?: () => void;
+};
 
 function Text({ data }: StimulusProps) {
   if (!data.text) return null;
@@ -17,14 +27,26 @@ function Text({ data }: StimulusProps) {
   );
 }
 
-function Audio({ data, audio }: StimulusProps) {
+function Audio({
+  data,
+  audio,
+  alreadyPlayed,
+  onStart,
+  onEnded,
+}: StimulusProps) {
   if (!data.audioUrl) {
     return <p className="text-sm text-muted-foreground">No audio attached.</p>;
   }
   // No policy means an ordinary player with a full transport, which is what
   // IELTS practice wants: the point there is going back over the bit you missed.
   return audio ? (
-    <TaskAudio src={data.audioUrl} policy={audio} />
+    <TaskAudio
+      src={data.audioUrl}
+      policy={audio}
+      alreadyPlayed={alreadyPlayed}
+      onStart={onStart}
+      onEnded={onEnded}
+    />
   ) : (
     <audio controls preload="none" src={data.audioUrl} className="w-full" />
   );
@@ -44,11 +66,12 @@ function ImageStimulus({ data }: StimulusProps) {
   );
 }
 
-function Mixed({ data, audio }: StimulusProps) {
+function Mixed(props: StimulusProps) {
+  const { data } = props;
   return (
     <div className="space-y-6">
       <ImageStimulus data={data} />
-      {data.audioUrl !== undefined ? <Audio data={data} audio={audio} /> : null}
+      {data.audioUrl ? <Audio {...props} /> : null}
       <Text data={data} />
     </div>
   );

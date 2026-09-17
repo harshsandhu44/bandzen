@@ -88,6 +88,19 @@ export function useAutosave<T>(
     for (const key of keys) void flush(key);
   }, [flush]);
 
+  /**
+   * Save everything still waiting on its debounce, and wait for it. Called
+   * before anything that ends the candidate's chance to change an answer — a
+   * mock step, or a submit — so a keystroke inside the debounce window is not
+   * dropped on the floor.
+   */
+  const flushAll = useCallback(async () => {
+    const keys = [...timers.current.keys()];
+    for (const key of keys) clearTimeout(timers.current.get(key));
+    timers.current.clear();
+    await Promise.all(keys.map((key) => flush(key)));
+  }, [flush]);
+
   useEffect(() => {
     const pending = timers.current;
     return () => {
@@ -104,5 +117,5 @@ export function useAutosave<T>(
     return () => window.removeEventListener('beforeunload', warn);
   }, [status]);
 
-  return { status, schedule, retryFailed };
+  return { status, schedule, retryFailed, flushAll };
 }

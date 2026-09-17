@@ -40,8 +40,12 @@ export function TaskShell({
   status,
   onRetry,
   timer,
+  beforeSubmit,
   navItems,
+  currentId,
+  locked = false,
   onJump,
+  step,
   submitAction,
 }: {
   attemptId: string;
@@ -56,8 +60,15 @@ export function TaskShell({
   status: AutosaveStatus;
   onRetry: () => void;
   timer?: { startedAt: string; minutes: number; autoSubmit: boolean };
+  /** Awaited before a clock-driven submit, so pending saves land first. */
+  beforeSubmit?: () => Promise<void>;
   navItems: NavItem[];
+  currentId?: string;
+  /** A mock: the navigator shows progress but cannot be used to jump. */
+  locked?: boolean;
   onJump: (id: string) => void;
+  /** Shown instead of submit while there are items still to come. */
+  step?: ReactNode;
   submitAction: (formData: FormData) => void;
 }) {
   const isMobile = useIsMobile();
@@ -98,7 +109,10 @@ export function TaskShell({
               minutes={timer.minutes}
               onExpire={() => {
                 setTimeUp(true);
-                if (timer.autoSubmit) autoFormRef.current?.requestSubmit();
+                if (!timer.autoSubmit) return;
+                void (beforeSubmit?.() ?? Promise.resolve())
+                  .catch(() => {})
+                  .then(() => autoFormRef.current?.requestSubmit());
               }}
             />
           ) : null}
@@ -153,17 +167,21 @@ export function TaskShell({
 
       <ExamNavigator
         items={navItems}
+        currentId={currentId}
         onJump={onJump}
+        disabled={locked}
         answeredCount={answered}
         total={total}
       >
-        <SubmitConfirm
-          action={submitAction}
-          attemptId={attemptId}
-          unanswered={total - answered}
-          total={total}
-          unsaved={status === 'failed'}
-        />
+        {step ?? (
+          <SubmitConfirm
+            action={submitAction}
+            attemptId={attemptId}
+            unanswered={total - answered}
+            total={total}
+            unsaved={status === 'failed'}
+          />
+        )}
       </ExamNavigator>
 
       <form ref={autoFormRef} action={submitAction} className="hidden">

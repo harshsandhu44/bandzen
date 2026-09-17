@@ -5,12 +5,23 @@
  * for why those stay out of it.
  */
 
+import { after } from 'next/server';
 import { redirect } from 'next/navigation';
+import { getExam, getTask } from '@bandzen/exams/registry';
+import { gradeExamTask } from './ai/grade-exam-task';
 import {
+  getExamTasksByIds,
   getMockAttempt,
+  getMockSectionAttempts,
   getMockSiblings,
+  submitExamTaskAttempt,
   submitMockAttempt,
 } from './db/queries';
+import {
+  DEADLINE_GRACE_SECONDS,
+  mockSectionDeadline,
+  mockSectionMinutes,
+} from './task-session';
 import type { Attempt } from './db/schema';
 import { mockPosition, mockSectionUrl } from './mock';
 
@@ -58,4 +69,72 @@ export async function finishSittingSection(
   if (!position) await submitMockAttempt(userId, mockAttemptId);
 
   redirect(mockSectionUrl(mockAttemptId, position, mock.kind));
+}
+
+/**
+ * The shared clock of the mock section `attempt` belongs to, or null where its
+ * task keeps its own window (or it is not a mock at all).
+ *
+ * Derived, not stored: a section's attempts are all created the moment the
+ * candidate enters it, so the earliest of their start times IS the section's
+ * start, and moving from one task type to the next cannot reset it.
+ */
+export async function mockSectionClock(userId: string, attempt: Attempt) {
+  if (!attempt.mockAttemptId || !attempt.taskType) return null;
+  const task = getTask(attempt.examKey, attempt.taskType);
+  const exam = getExam(attempt.examKey);
+  if (!task || !exam || task.timing.scope !== 'section') return null;
+
+  const [mock, siblings] = await Promise.all([
+    getMockAttempt(userId, attempt.mockAttemptId),
+    getMockSectionAttempts(userId, attempt.mockAttemptId, attempt.module),
+  ]);
+  if (!mock?.taskIds) return null;
+
+  const items = await getExamTasksByIds(mock.taskIds);
+  const minutes = mockSectionMinutes(
+    exam,
+    task.section,
+    items.filter((i) => i.section === task.section).length,
+  );
+  if (minutes == null) return null;
+
+  const startedAt = new Date(
+    Math.min(...siblings.map((s) => s.startedAt.getTime())),
+  );
+  return {
+    startedAt,
+    minutes,
+    deadline: mockSectionDeadline(startedAt, minutes),
+  };
+}
+
+/**
+ * Close a mock section whose clock ran out: every section-timed attempt still
+ * open in it is submitted as it stands, then the sitting moves on. Runs once
+ * the grace for in-flight autosaves has passed, so an answer saved on the
+ * last second still counts.
+ */
+export async function expireMockSectionIfDue(userId: string, attempt: Attempt) {
+  const clock = await mockSectionClock(userId, attempt);
+  if (!clock || !attempt.mockAttemptId) return;
+  const closesAt = clock.deadline.getTime() + DEADLINE_GRACE_SECONDS * 1000;
+  if (Date.now() < closesAt) return;
+
+  const siblings = await getMockSectionAttempts(
+    userId,
+    attempt.mockAttemptId,
+    attempt.module,
+  );
+  for (const sibling of siblings) {
+    if (sibling.status !== 'in_progress' || !sibling.taskType) continue;
+    if (
+      getTask(sibling.examKey, sibling.taskType)?.timing.scope !== 'section'
+    ) {
+      continue;
+    }
+    const submitted = await submitExamTaskAttempt(userId, sibling.id);
+    if (submitted?.needsModel) after(() => gradeExamTask(sibling.id));
+  }
+  await finishSittingSection(userId, attempt.mockAttemptId);
 }

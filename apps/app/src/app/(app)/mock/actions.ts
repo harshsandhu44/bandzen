@@ -189,7 +189,13 @@ export async function enterMockSection(formData: FormData) {
       });
     }
 
-    const rows = await getMockSectionAttempts(userId, mockAttemptId, position);
+    // In the exam's own task order, which is the order the real test runs
+    // them in — not whatever order the rows come back from the database.
+    const order = (taskType: string | null) =>
+      getExam(mock.examKey)?.tasks.findIndex((t) => t.key === taskType) ?? -1;
+    const rows = (
+      await getMockSectionAttempts(userId, mockAttemptId, position)
+    ).sort((a, b) => order(a.taskType) - order(b.taskType));
     const next = rows.find((r) => r.status === 'in_progress') ?? rows[0];
     if (!next?.taskType) notFound();
     redirect(`/practice/${mock.examKey}/${next.taskType}/${next.id}`);

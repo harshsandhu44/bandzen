@@ -3,6 +3,11 @@ import assert from 'node:assert/strict';
 import { getExam, getTask } from '@bandzen/exams/registry';
 import type { TaskContent } from '@bandzen/exams/content';
 import {
+  acceptsWrite,
+  isSpentRecording,
+  mockResumeIndex,
+  mockSectionDeadline,
+  mockSectionMinutes,
   runnerItems,
   sessionMinutes,
   type SavedTaskRow,
@@ -87,4 +92,58 @@ test('a recording task has no page clock — the recorder owns its window', () =
     sessionMinutes(pte, getTask('pte_academic', 'repeat_sentence')!, 1),
     null,
   );
+});
+
+test('a mock resumes at the first item not yet moved past', () => {
+  const at = new Date();
+  assert.equal(
+    mockResumeIndex([{ completedAt: null }, { completedAt: null }]),
+    0,
+  );
+  assert.equal(
+    mockResumeIndex([{ completedAt: at }, { completedAt: null }]),
+    1,
+  );
+  // All done: stay on the last, where the attempt is submitted.
+  assert.equal(mockResumeIndex([{ completedAt: at }, { completedAt: at }]), 1);
+});
+
+test('a recording started and left without a take is spent, not restarted', () => {
+  const at = new Date();
+  assert.equal(
+    isSpentRecording({ stimulusStartedAt: null, audioUrl: null }),
+    false,
+  );
+  assert.equal(
+    isSpentRecording({ stimulusStartedAt: at, audioUrl: null }),
+    true,
+  );
+  assert.equal(
+    isSpentRecording({
+      stimulusStartedAt: at,
+      audioUrl: 'https://r2.test/t.wav',
+    }),
+    false,
+  );
+});
+
+test('a short mock gets its share of the section clock, rounded up', () => {
+  const pte = getExam('pte_academic')!;
+  // Reading's full length is 15 items at the guide's minimums, 30 minutes max.
+  assert.equal(mockSectionMinutes(pte, 'reading', 15), 30);
+  assert.equal(mockSectionMinutes(pte, 'reading', 5), 10);
+  assert.equal(mockSectionMinutes(pte, 'reading', 1), 2);
+  // Never more than the whole section.
+  assert.equal(mockSectionMinutes(pte, 'reading', 40), 30);
+  assert.equal(mockSectionMinutes(pte, 'nope', 5), null);
+});
+
+test('crossing task types keeps one clock: the deadline is fixed at section entry', () => {
+  const entered = new Date('2026-09-17T10:00:00Z');
+  const deadline = mockSectionDeadline(entered, 10);
+  assert.equal(deadline.toISOString(), '2026-09-17T10:10:00.000Z');
+  // An autosave already in flight at the deadline still lands.
+  assert.equal(acceptsWrite(new Date('2026-09-17T10:10:04Z'), deadline), true);
+  assert.equal(acceptsWrite(new Date('2026-09-17T10:10:06Z'), deadline), false);
+  assert.equal(acceptsWrite(new Date(), null), true);
 });
