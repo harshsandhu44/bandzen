@@ -48,6 +48,11 @@ export type PlanCatalogue = {
   /** Lesson slug that teaches a question kind, from src/content/lessons.ts. */
   lessonForKind?: Readonly<Record<string, string>>;
   completedLessonIds?: readonly string[];
+  /**
+   * Of those, the ones finished today. They keep their slot so Today shows
+   * them done rather than dropping them the moment they are finished.
+   */
+  lessonsCompletedToday?: readonly string[];
 };
 
 /**
@@ -111,21 +116,43 @@ export type PlanInput = {
   /** Question kinds with the worst accuracy, worst first. */
   weakKinds?: readonly string[];
   catalogue?: PlanCatalogue;
-  /** Injected so the output is testable. */
-  today?: Date;
+  /**
+   * The candidate's own calendar date (ISO), from `todayIso(profile.timezone)`.
+   * Required: a server clock is UTC, and a plan anchored on it lands on the
+   * wrong day for anyone whose local date differs.
+   */
+  today: string;
 };
 
 const MAX_DAYS = 14;
 const DAY_MS = 86_400_000;
 
-const iso = (d: Date) => d.toISOString().slice(0, 10);
+/** Calendar arithmetic on ISO dates, done in UTC so no offset can shift a day. */
+const addDays = (isoDate: string, days: number) =>
+  new Date(Date.parse(`${isoDate}T00:00:00Z`) + days * DAY_MS)
+    .toISOString()
+    .slice(0, 10);
 
 /** Whole days from `from` to `to`, floored at 0. */
-function daysUntil(from: Date, to: string): number {
+function daysUntil(from: string, to: string): number {
   const target = Date.parse(`${to}T00:00:00Z`);
   if (Number.isNaN(target)) return 0;
-  const start = Date.parse(`${iso(from)}T00:00:00Z`);
+  const start = Date.parse(`${from}T00:00:00Z`);
   return Math.max(0, Math.round((target - start) / DAY_MS));
+}
+
+/**
+ * Where the booked test sits relative to today: its day, already behind the
+ * candidate, or ahead (null, including when none is booked). An empty plan
+ * on exam day or after it should say why.
+ */
+export function testDayState(
+  today: string,
+  testDate: string | null,
+): 'exam_day' | 'passed' | null {
+  if (!testDate) return null;
+  if (testDate === today) return 'exam_day';
+  return testDate < today ? 'passed' : null;
 }
 
 const scoreOf = (input: PlanInput, skill: Skill) => input.scores[skill] ?? null;
@@ -162,9 +189,13 @@ function lessonFirst(input: PlanInput): PlanTarget | null {
   const { lessonForKind, completedLessonIds } = input.catalogue ?? {};
   if (!lessonForKind) return null;
 
+  const doneToday = input.catalogue?.lessonsCompletedToday ?? [];
   for (const kind of input.weakKinds ?? []) {
     const lessonId = lessonForKind[kind];
-    if (lessonId && !completedLessonIds?.includes(lessonId)) {
+    if (
+      lessonId &&
+      (!completedLessonIds?.includes(lessonId) || doneToday.includes(lessonId))
+    ) {
       return { kind: 'lesson', lessonId };
     }
   }
@@ -172,8 +203,7 @@ function lessonFirst(input: PlanInput): PlanTarget | null {
 }
 
 export function buildPlan(input: PlanInput): PlanTask[] {
-  const { strategy, catalogue } = input;
-  const today = input.today ?? new Date();
+  const { strategy, catalogue, today } = input;
 
   const horizon = input.testDate
     ? Math.min(MAX_DAYS, daysUntil(today, input.testDate))
@@ -181,24 +211,33 @@ export function buildPlan(input: PlanInput): PlanTask[] {
 
   if (horizon <= 0) return [];
 
-  const weakest = weakestSkill(input);
-  const measured = measuredSkills(input);
-  // The skills the rotation cycles, in a stable order.
-  const rotation: Skill[] = measured.length
-    ? measured
-    : [...strategy.startingRotation];
-  const others = weakest ? rotation.filter((s) => s !== weakest) : [];
-  const tasks: PlanTask[] = [];
-
   // A drill may only be scheduled if the catalogue can satisfy it: the plan
   // once booked "Task 1 summary, full timing" against a library of Task 2
   // prompts, so the label promised one exercise and Continue opened another.
-  // If nothing qualifies, every drill stays rather than the skill vanishing.
-  const drillsFor = (skill: Skill) => {
-    const all = strategy.drills[skill] ?? [];
-    const ok = all.filter((d) => strategy.canSchedule(skill, d, catalogue));
-    return ok.length ? ok : all;
-  };
+  // A skill with nothing schedulable drops out of the rotation instead of
+  // spending a day on a task with nothing behind it.
+  const drillsFor = (skill: Skill) =>
+    (strategy.drills[skill] ?? []).filter(
+      (d) =>
+        strategy.canSchedule(skill, d, catalogue) &&
+        strategy.targetFor(skill, d, catalogue, 0) != null,
+    );
+  const schedulable = (skills: readonly Skill[]) =>
+    skills.filter((s) => drillsFor(s).length > 0);
+
+  const weakest = weakestSkill(input);
+  const measured = measuredSkills(input);
+  // Before anything is measured, the exam's opening rotation. After, every
+  // plannable skill: one measured score must not drop the unmeasured ones,
+  // which still need a baseline.
+  const rotation = schedulable(
+    measured.length ? strategy.plannable : strategy.startingRotation,
+  );
+  const lead = weakest && rotation.includes(weakest) ? weakest : null;
+  const others = lead ? rotation.filter((s) => s !== lead) : [];
+  const tasks: PlanTask[] = [];
+  if (!rotation.length) return tasks;
+
   const cursors = new Map<Skill, number>();
   let otherCursor = 0;
 
@@ -209,24 +248,24 @@ export function buildPlan(input: PlanInput): PlanTask[] {
     // With a clear gap the weakest skill takes two days in three, the third
     // cycling through the rest; otherwise an even rotation.
     let skill: Skill;
-    if (weakest && others.length) {
-      skill = day % 3 === 0 ? others[otherCursor++ % others.length]! : weakest;
-    } else if (weakest) {
-      skill = weakest;
+    if (lead && others.length) {
+      skill = day % 3 === 0 ? others[otherCursor++ % others.length]! : lead;
+    } else if (lead) {
+      skill = lead;
     } else {
       skill = rotation[(day - 1) % rotation.length]!;
     }
 
     // Day 1 is today, not tomorrow. A plan whose first task lands tomorrow
     // leaves the dashboard with nothing to put under "Today".
-    const date = new Date(today.getTime() + (day - 1) * DAY_MS);
+    const date = addDays(today, day - 1);
 
     if (skill === strategy.lessonSkill && pendingLesson) {
       const lesson = pendingLesson;
       pendingLesson = null;
       tasks.push({
         day,
-        date: iso(date),
+        date,
         skill,
         label: 'Learn the technique before drilling it',
         minutes: 15,
@@ -237,7 +276,6 @@ export function buildPlan(input: PlanInput): PlanTask[] {
     }
 
     const drills = drillsFor(skill);
-    if (!drills.length) continue;
     const nth = cursors.get(skill) ?? 0;
     cursors.set(skill, nth + 1);
     const drill = drills[nth % drills.length]!;
@@ -245,7 +283,7 @@ export function buildPlan(input: PlanInput): PlanTask[] {
 
     tasks.push({
       day,
-      date: iso(date),
+      date,
       skill,
       // The first graded-skill task names the actual weakness the grader
       // found, so the plan reads as a response to the report, not a template.
@@ -276,14 +314,18 @@ export function nextAction(input: PlanInput): string {
   const { strategy } = input;
   const measured = measuredSkills(input);
   if (!measured.length) return strategy.noEstimateAction;
+  // At target means every skill the plan covers is measured and at it. One
+  // strong skill says nothing about the ones still below.
+  if (
+    input.targetScore != null &&
+    measured.length === strategy.plannable.length &&
+    measured.every((s) => scoreOf(input, s)! >= input.targetScore!)
+  ) {
+    return `You are at your target ${strategy.scoreNoun} in practice. Keep it warm.`;
+  }
   const weakest = weakestSkill(input);
   if (weakest) {
     return `${SKILL_LABEL[weakest]} is holding your ${strategy.scoreNoun} back.`;
-  }
-  if (input.targetScore != null) {
-    const best = Math.max(...measured.map((s) => scoreOf(input, s)!));
-    if (best >= input.targetScore)
-      return `You are at your target ${strategy.scoreNoun} in practice. Keep it warm.`;
   }
   return 'Your skills are close. Keep the rotation even.';
 }
@@ -318,8 +360,8 @@ export type PlanEvidence = {
     taskType: string | null;
   }[];
   completedLessonIds: readonly string[];
-  /** The module of an attempt left open, if any. */
-  moduleInProgress?: Skill | null;
+  /** An attempt left open, if any: what the task it belongs to would match. */
+  inProgress?: { module: Skill; taskType: string | null } | null;
 };
 
 /**
@@ -332,8 +374,9 @@ export type PlanEvidence = {
  * - An exam task drill matches only a **practice** attempt at the same task
  *   type. Read Aloud does not finish a Repeat Sentence drill just because both
  *   are Speaking, and a mock's children never tick drills.
- * - Anything else matches by skill, and only attempts with no task type — the
- *   IELTS passages, prompts and tracks the skill-level tasks open.
+ * - Anything else matches by skill. IELTS attempts carry a task type too
+ *   (`reading_passage`, `writing_task_2`), so the skill key is counted for
+ *   every attempt; an exam's plan is all one kind of task or the other.
  */
 export function derivePlanState(
   tasks: PlanTask[],
@@ -341,13 +384,11 @@ export function derivePlanState(
   goalMinutes?: number | null,
 ): PlanProgress {
   const remaining = new Map<string, number>();
+  const count = (key: string) =>
+    remaining.set(key, (remaining.get(key) ?? 0) + 1);
   for (const a of evidence.completedToday) {
-    const key = a.taskType
-      ? a.kind === 'practice'
-        ? `task:${a.taskType}`
-        : null
-      : `skill:${a.module}`;
-    if (key) remaining.set(key, (remaining.get(key) ?? 0) + 1);
+    count(`skill:${a.module}`);
+    if (a.taskType && a.kind === 'practice') count(`task:${a.taskType}`);
   }
 
   let activeTaken = false;
@@ -370,7 +411,13 @@ export function derivePlanState(
 
     // Only one task is ever active: the first unfinished one, and only when a
     // matching attempt is genuinely open.
-    if (!activeTaken && evidence.moduleInProgress === task.skill) {
+    const open = evidence.inProgress;
+    const openMatches =
+      open &&
+      (task.target?.kind === 'exam_task'
+        ? open.taskType === task.target.taskType
+        : open.module === task.skill);
+    if (!activeTaken && openMatches) {
       activeTaken = true;
       return { ...task, status: 'active' };
     }

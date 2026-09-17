@@ -1,3 +1,4 @@
+import Link from 'next/link';
 import { redirect } from 'next/navigation';
 import { Card, CardContent } from '@bandzen/ui/components/card';
 import { examSkills, getExam } from '@bandzen/exams/registry';
@@ -91,6 +92,7 @@ export default async function DashboardPage() {
     planInput,
     plan,
     progress,
+    testDay,
     estimated,
     measured,
     report,
@@ -155,6 +157,21 @@ export default async function DashboardPage() {
       {next ? <ContinuePlan task={next} /> : null}
 
       {planInput ? <p className="text-sm">{nextAction(planInput)}</p> : null}
+
+      {/* The plan stops at the test date; say so rather than going quiet. */}
+      {testDay === 'exam_day' ? (
+        <p className="text-sm text-muted-foreground">
+          It is exam day, so nothing is scheduled. Good luck.
+        </p>
+      ) : testDay === 'passed' ? (
+        <p className="text-sm text-muted-foreground">
+          Your test date has passed.{' '}
+          <Link href="/settings" className="underline underline-offset-4">
+            Update it
+          </Link>{' '}
+          to plan again.
+        </p>
+      ) : null}
 
       <div className="grid gap-4 lg:grid-cols-12 lg:items-start">
         <div className="space-y-4 lg:col-span-7">

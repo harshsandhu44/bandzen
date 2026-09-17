@@ -5,6 +5,7 @@ import {
   buildPlan,
   derivePlanState,
   nextAction,
+  testDayState,
   type PlanInput,
   type PlanStrategy,
 } from './study-plan.ts';
@@ -34,7 +35,13 @@ function ielts({
   };
 }
 
-const TODAY = new Date('2026-09-01T10:00:00Z');
+const TODAY = '2026-09-01';
+
+const CATALOGUE = {
+  passageIds: ['p1', 'p2'],
+  // Task 2 only, which is what is actually seeded today.
+  prompts: [{ id: 'w1', task: 2 }],
+};
 
 test('the plan runs from today up to the day before the exam', () => {
   const plan = buildPlan(
@@ -44,6 +51,7 @@ test('the plan runs from today up to the day before the exam', () => {
       targetBand: 8,
       testDate: '2026-09-06',
       today: TODAY,
+      catalogue: CATALOGUE,
     }),
   );
   assert.equal(plan.length, 5);
@@ -60,6 +68,7 @@ test('a test date in the past yields no tasks rather than negative days', () => 
       targetBand: 8,
       testDate: '2026-08-01',
       today: TODAY,
+      catalogue: CATALOGUE,
     }),
   );
   assert.deepEqual(plan, []);
@@ -73,6 +82,7 @@ test('no test date runs a fortnight', () => {
       targetBand: 8,
       testDate: null,
       today: TODAY,
+      catalogue: CATALOGUE,
     }),
   );
   assert.equal(plan.length, 14);
@@ -86,6 +96,7 @@ test('a clear gap skews two days in three to the weaker skill', () => {
       targetBand: 8,
       testDate: null,
       today: TODAY,
+      catalogue: CATALOGUE,
     }),
   );
   const writing = plan.filter((t) => t.skill === 'writing').length;
@@ -101,6 +112,7 @@ test('bands within half a band alternate evenly', () => {
       targetBand: 8,
       testDate: null,
       today: TODAY,
+      catalogue: CATALOGUE,
     }),
   );
   const writing = plan.filter((t) => t.skill === 'writing').length;
@@ -115,6 +127,7 @@ test('the first writing task names the reported weakness', () => {
       targetBand: 8,
       testDate: null,
       today: TODAY,
+      catalogue: CATALOGUE,
       weaknesses: ['paragraphs assert without supporting'],
     }),
   );
@@ -132,6 +145,7 @@ test('nextAction reports no estimate before any attempt', () => {
       writingBand: null,
       targetBand: 8,
       testDate: null,
+      today: TODAY,
     }),
   );
   assert.match(line, /diagnostic/i);
@@ -144,6 +158,7 @@ test('nextAction names the weaker skill', () => {
       writingBand: 6,
       targetBand: 8,
       testDate: null,
+      today: TODAY,
     }),
   );
   assert.match(line, /^Writing/);
@@ -157,6 +172,7 @@ test('nextAction names Listening when it is the weakest measured skill', () => {
       listeningBand: 5.5,
       targetBand: 8,
       testDate: null,
+      today: TODAY,
     }),
   );
   assert.match(line, /^Listening/);
@@ -171,7 +187,7 @@ test('a measured Listening band puts listening drills in the rotation', () => {
       targetBand: 8,
       testDate: null,
       today: TODAY,
-      catalogue: { trackIds: ['t1', 't2'] },
+      catalogue: { ...CATALOGUE, trackIds: ['t1', 't2'] },
     }),
   );
   const listening = plan.filter((t) => t.skill === 'listening');
@@ -180,12 +196,6 @@ test('a measured Listening band puts listening drills in the rotation', () => {
   assert.deepEqual(listening[0]?.target, { kind: 'listening', trackId: 't1' });
   assert.deepEqual(listening[1]?.target, { kind: 'listening', trackId: 't2' });
 });
-
-const CATALOGUE = {
-  passageIds: ['p1', 'p2'],
-  // Task 2 only, which is what is actually seeded today.
-  prompts: [{ id: 'w1', task: 2 }],
-};
 
 test('tasks resolve to something the Continue button can open', () => {
   const plan = buildPlan(
@@ -211,7 +221,7 @@ test('tasks resolve to something the Continue button can open', () => {
   });
 });
 
-test('an empty catalogue yields no target rather than a broken link', () => {
+test('an empty catalogue schedules nothing rather than dead tasks', () => {
   const plan = buildPlan(
     ielts({
       readingBand: 7,
@@ -221,10 +231,81 @@ test('an empty catalogue yields no target rather than a broken link', () => {
       today: TODAY,
     }),
   );
-  assert.equal(
-    plan.every((t) => t.target === null),
-    true,
+  assert.deepEqual(plan, []);
+});
+
+test('a skill with no material drops out instead of holding empty days', () => {
+  const plan = buildPlan(
+    ielts({
+      readingBand: 7,
+      writingBand: 6.5,
+      targetBand: 8,
+      testDate: null,
+      today: TODAY,
+      catalogue: { passageIds: ['p1'] },
+    }),
   );
+  assert.equal(plan.length, 14);
+  assert.ok(plan.every((t) => t.skill === 'reading' && t.href));
+});
+
+test('dates follow the local date passed in, not the server clock', () => {
+  // 23:30 in Auckland on 1 Sept is still 31 Aug in UTC.
+  const plan = buildPlan(
+    ielts({
+      readingBand: 7,
+      writingBand: 7,
+      targetBand: 8,
+      testDate: '2026-09-03',
+      today: '2026-09-01',
+      catalogue: CATALOGUE,
+    }),
+  );
+  assert.deepEqual(
+    plan.map((t) => t.date),
+    ['2026-09-01', '2026-09-02'],
+  );
+});
+
+test('unmeasured skills stay in the rotation once one is measured', () => {
+  const plan = buildPlan(
+    ielts({
+      readingBand: 6,
+      writingBand: null,
+      targetBand: 8,
+      testDate: null,
+      today: TODAY,
+      catalogue: { ...CATALOGUE, trackIds: ['t1'] },
+    }),
+  );
+  assert.deepEqual(
+    new Set(plan.map((t) => t.skill)),
+    new Set(['listening', 'reading', 'writing']),
+  );
+});
+
+test('at target needs every plannable skill measured and at it', () => {
+  const at = (listeningBand: number | null) =>
+    nextAction(
+      ielts({
+        readingBand: 8,
+        writingBand: 8,
+        listeningBand,
+        targetBand: 7.5,
+        testDate: null,
+        today: TODAY,
+      }),
+    );
+  assert.match(at(8), /at your target/);
+  assert.doesNotMatch(at(null), /at your target/);
+  assert.doesNotMatch(at(6), /at your target/);
+});
+
+test('the test date sets an explicit exam-day state', () => {
+  assert.equal(testDayState('2026-09-01', '2026-09-01'), 'exam_day');
+  assert.equal(testDayState('2026-09-02', '2026-09-01'), 'passed');
+  assert.equal(testDayState('2026-09-01', '2026-09-10'), null);
+  assert.equal(testDayState('2026-09-01', null), null);
 });
 
 test('an unread lesson for the weakest kind is taught before it is drilled', () => {
@@ -253,6 +334,31 @@ test('an unread lesson for the weakest kind is taught before it is drilled', () 
   assert.equal(plan.filter((t) => t.target?.kind === 'lesson').length, 1);
   const drills = plan.filter((t) => t.target?.kind === 'reading');
   assert.deepEqual(drills[0]?.target, { kind: 'reading', passageId: 'p1' });
+});
+
+test('a lesson finished today keeps its slot, shown done', () => {
+  const plan = buildPlan(
+    ielts({
+      readingBand: 6,
+      writingBand: 7,
+      targetBand: 8,
+      testDate: null,
+      today: TODAY,
+      weakKinds: ['matching_headings'],
+      catalogue: {
+        ...CATALOGUE,
+        lessonForKind: { matching_headings: 'reading-matching-headings' },
+        completedLessonIds: ['reading-matching-headings'],
+        lessonsCompletedToday: ['reading-matching-headings'],
+      },
+    }),
+  );
+  const lesson = plan.find((t) => t.target?.kind === 'lesson')!;
+  const { tasks } = derivePlanState([lesson], {
+    completedToday: [],
+    completedLessonIds: ['reading-matching-headings'],
+  });
+  assert.equal(tasks[0]?.status, 'completed');
 });
 
 test('a lesson already read is not taught again', () => {
@@ -290,9 +396,12 @@ test('task state comes from attempts, and counts them one for one', () => {
   ).slice(0, 3); // reading, writing, reading
 
   const { tasks: stated, minutesDone } = derivePlanState(tasks, {
-    completedToday: [{ module: 'reading', kind: 'practice', taskType: null }],
+    // Real IELTS attempts carry a task type; they still complete skill tasks.
+    completedToday: [
+      { module: 'reading', kind: 'practice', taskType: 'reading_passage' },
+    ],
     completedLessonIds: [],
-    moduleInProgress: 'writing',
+    inProgress: { module: 'writing', taskType: 'writing_task_2' },
   });
 
   assert.equal(stated[0]?.status, 'completed');
@@ -325,14 +434,14 @@ test('an exam task drill completes only on a practice attempt at that task type'
       // A mock's child never ticks a drill.
       { module: 'speaking', kind: 'mock', taskType: 'repeat_sentence' },
       { module: 'speaking', kind: 'practice', taskType: 'repeat_sentence' },
-      // An exam task attempt never ticks a skill-level task either.
-      { module: 'reading', kind: 'practice', taskType: 'reorder_paragraphs' },
     ],
     completedLessonIds: [],
+    inProgress: { module: 'speaking', taskType: 'read_aloud' },
   });
 
   assert.deepEqual(
     stated.map((t) => t.status),
+    // An open Read Aloud attempt does not make a Repeat Sentence drill Resume.
     ['completed', 'pending', 'pending'],
   );
 });
@@ -345,6 +454,7 @@ test('the goal falls back to what the plan asks for', () => {
       targetBand: 8,
       testDate: null,
       today: TODAY,
+      catalogue: CATALOGUE,
     }),
   ).slice(0, 2);
 
