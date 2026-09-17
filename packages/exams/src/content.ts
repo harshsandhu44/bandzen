@@ -164,7 +164,13 @@ export function taskContentIssues(
   // How it is marked.
   const answer = key.answer ?? [];
   if (MODEL_EVALUATORS.has(task.evaluator)) {
-    if (answer.length) issues.push('no answer key (a grader marks this task)');
+    // A correct-or-incorrect spoken answer is matched against its accepted
+    // forms in code, so it needs them; everything else a grader reads freely.
+    if (task.scoring?.mode === 'binary') {
+      if (publish && !answer.length) issues.push('the accepted answers');
+    } else if (answer.length) {
+      issues.push('no answer key (a grader marks this task)');
+    }
     return issues;
   }
   if (!answer.length) {

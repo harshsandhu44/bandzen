@@ -62,6 +62,7 @@
       "audioUrl": "https://pub-fbae5ca09eba4fd0820da2b390dd7ca0.r2.dev/exam-tasks/pte-answer-short-question-season.mp3"
     },
     "transcript": "In the northern hemisphere, which season is generally the coldest?",
+    "answer": ["winter"],
     "difficulty": 1
   },
   {

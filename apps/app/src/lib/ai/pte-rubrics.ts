@@ -1,118 +1,313 @@
 /**
- * PTE Academic's productive-task rubrics, as static prompt prefixes.
+ * PTE Academic's model-graded rubrics, one static prompt prefix per task type.
  *
  * Same rule as the IELTS pair: each string is the FIRST thing in its grading
  * request and never varies between calls, which is what makes OpenAI's
- * automatic prompt caching apply. Interpolating anything per-candidate above
- * or inside these silently costs full price on every call, and nothing in the
- * response will say so.
+ * automatic prompt caching apply. The strings are assembled from shared parts
+ * once, at module load, so every call for a task type sends identical bytes.
+ * Interpolating anything per-candidate above or inside these silently costs
+ * full price on every call, and nothing in the response will say so.
  *
- * These are deliberately NOT band descriptors. Pearson scores each task on
- * its own traits out of a small number of points and combines them by a
- * weighting it does not publish, so the model is asked for the traits it can
- * actually judge and Bandzen's estimate is assembled from those. What comes
- * back here is evidence, not a PTE score.
+ * Each rubric asks only for the traits a model marks, on the scale Pearson's
+ * Test Taker Score Guide (July 2025) publishes for that task. Form, Read Aloud
+ * and Repeat Sentence Content, and Answer Short Question are marked in code
+ * from the task's contract in `@bandzen/exams`, and the gates are applied
+ * there too — a model is never asked whether a response scores anything.
  */
 
-export const PTE_WRITING_RUBRIC = `You are an experienced PTE Academic rater. You score to Pearson's published
-trait definitions and you do not inflate scores to be encouraging.
+const PREAMBLE = `You are an experienced PTE Academic rater. You score to Pearson's published
+trait scales for this task type and you do not inflate scores to be
+encouraging. Use whole points only, and never go above a trait's maximum.`;
 
-You will be given a task instruction and a candidate's written response. Score
-each trait below from 0 to 5, where 5 is the standard of a candidate scoring
-at the top of the PTE range and 0 is a response that fails the trait entirely.
-Use whole points only.
+const SPOKEN = `You will be given the task instruction, whatever the candidate was shown or
+heard, and the candidate's answer as audio. Listen to the whole answer. The
+candidate has ONE take and a short preparation window, so normal hesitation
+at the very start is not itself a fault. Judge the answer as delivered.
 
-Judge only what is in front of you. Do not reward length for its own sake and
-do not penalise a short response that does everything the task asked.
+A regional or non-native accent is NOT a fault in itself.`;
 
-## Content
+const WRITTEN = `You will be given the task instruction, the source where there is one, and
+the candidate's written response. Length and form are checked separately:
+do not mark them and do not let them move another trait.`;
 
-- 5: Deals with all aspects of the prompt accurately and relevantly; every key
-  point the source or question requires is present.
-- 3: Deals with the prompt but omits or misrepresents a key point, or includes
-  material the prompt did not call for.
-- 1: Addresses the prompt only tangentially; most required content is missing.
-- 0: Does not address the prompt, or reproduces the prompt without response.
+const PRONUNCIATION = `## Pronunciation (0-5)
 
-## Form
+- 5 Highly proficient: all vowels and consonants easily understood by regular
+  speakers; assimilation and deletions appropriate to continuous speech;
+  word and sentence stress fully appropriate.
+- 4 Advanced: vowels and consonants clear and unambiguous; a few minor
+  distortions do not affect intelligibility; all words easily understandable.
+- 3 Good: most vowels and consonants correct; some consistent errors make a
+  few words unclear.
+- 2 Intermediate: some sounds consistently mispronounced; at least 2/3 of
+  speech intelligible, though listeners may need to adjust to the accent.
+- 1 Intrusive: many sounds mispronounced; listeners may have difficulty with
+  about 1/3 of the words; stress placed in a non-English manner.
+- 0 Non-English: pronunciation seems characteristic of another language; more
+  than 1/2 of the speech may be unintelligible.`;
 
-- 5: Within the required length and in the required form. For Summarize
-  Written Text this means ONE single sentence of 5 to 75 words; for an essay,
-  200 to 300 words in paragraphs.
-- 2: Slightly outside the required length or form.
-- 0: Badly outside the required length, not in the required form, in capitals,
-  or with no punctuation.
+const ORAL_FLUENCY = `## Oral fluency (0-5)
 
-## Grammar
+- 5 Highly proficient: smooth rhythm and phrasing; no hesitations, repetitions,
+  false starts or phonological simplifications.
+- 4 Advanced: acceptable rhythm with appropriate phrasing; no more than one
+  hesitation, one repetition or a false start.
+- 3 Good: acceptable speed but may be uneven; more than one hesitation, but most
+  words in continuous phrases; no long pauses; not staccato.
+- 2 Intermediate: uneven or staccato; at least one smooth three-word run; no
+  more than two or three hesitations; at most one long pause.
+- 1 Limited: irregular phrasing; multiple hesitations, repetitions or false
+  starts make it notably uneven; one or two long pauses.
+- 0 Disfluent: slow and laboured; most words isolated; more than one long pause.`;
 
-- 5: Correct grammatical structures throughout; errors are rare and do not
-  affect meaning.
-- 3: Some grammatical errors, but meaning is never obscured.
-- 1: Frequent errors that obscure meaning in places.
-- 0: Almost no control of grammatical structure.
+const GRAMMAR_SUMMARY = `## Grammar (0-2)
 
-## Vocabulary
+- 2: correct grammatical structure.
+- 1: grammatical errors, but no hindrance to communication.
+- 0: defective grammatical structure which could hinder communication.`;
 
-- 5: Precise, appropriate word choice with good range; collocation is natural.
-- 3: Adequate range; occasional imprecision or awkward collocation.
-- 1: Limited range; repeated imprecision that affects clarity.
-- 0: Vocabulary is inadequate for the task.
+const VOCABULARY_SUMMARY = `## Vocabulary (0-2)
 
-## Spelling
+- 2: appropriate choice of words.
+- 1: lexical errors, but no hindrance to communication.
+- 0: defective word choice which could hinder communication.`;
 
-- 5: Correct throughout. Be consistent about British or American conventions
-  but do not penalise either.
-- 3: Occasional errors.
-- 1: Frequent errors.
-- 0: Spelling prevents the response from being read.
+const SPELLING = `## Spelling (0-2)
 
-## Development, structure and coherence (essays only)
+- 2: correct spelling. Do not penalise either British or American conventions.
+- 1: one spelling error.
+- 0: more than one spelling error.`;
 
-- 5: Good development with a clear introduction, body and conclusion; logical
-  progression and effective linking.
-- 3: Adequate structure, but progression or linking is mechanical in places.
-- 1: Little structure; ideas do not follow each other.
-- 0: Disjointed.
+const SUMMARY_CONTENT = (source: string) => `## Content (0-4)
 
-Quote only phrases that appear verbatim in the candidate's response.`;
+- 4: the ${source} is summarised comprehensively; paraphrasing is used
+  effectively; all main ideas correctly identified and synthesised concisely
+  and coherently; extraneous detail removed.
+- 3: summarised adequately; paraphrasing used but not consistently well; main
+  ideas identified with minor omissions; ideas connected but not efficiently
+  synthesised.
+- 2: summarised partially; some main ideas identified, but relies heavily on
+  repeating excerpts of the ${source} rather than reformulating.
+- 1: disconnected ideas or excerpts without context or synthesis; main ideas
+  omitted or misrepresented.
+- 0: too limited to assign a higher score; shows no comprehension of the
+  ${source}.`;
 
-export const PTE_SPEAKING_RUBRIC = `You are an experienced PTE Academic rater. You score to Pearson's published
-trait definitions and you do not inflate scores to be encouraging.
+const OPEN_CONTENT = (what: string, levels: string) => `## Content (0-6)
 
-You will be given a task instruction and the candidate's spoken answer as
-audio. Listen to the whole answer. Score each trait below from 0 to 5 using
-whole points only.
+Judge how fully and accurately the response ${what}, the range and precision
+of its language, and how well its ideas connect.
 
-The candidate has ONE take and a short preparation window, so normal
-hesitation at the start of a response is not itself a fault. Judge the answer
-as delivered.
+${levels}
 
-## Content
+Pre-prepared or memorised material that does not deal with this prompt is
+irrelevant and scores 0.`;
 
-- 5: Covers what the task asked for, accurately. For Repeat Sentence and Write
-  from Dictation style tasks this means every word; for a description or
-  retelling, all the key elements of the source.
-- 3: Covers most of what was asked; some elements missing or inaccurate.
-- 1: Covers little of what was asked.
-- 0: Unrelated to the task, or nothing intelligible was said.
+const JSON_NOTE = `Quote only words that actually appear in the response.`;
 
-## Oral fluency
+const join = (...parts: string[]) => parts.join('\n\n');
 
-- 5: Smooth, effortful-free speech at a natural rate, with appropriate
-  phrasing. No hesitation, repetition or false starts that disrupt the flow.
-- 3: Mostly smooth, but with hesitations, repetitions or uneven rate that
-  interrupt the flow in places.
-- 1: Halting throughout; frequent pausing, repetition or false starts.
-- 0: Speech is so disjointed that it cannot be followed.
+/** Read Aloud and Repeat Sentence: Content is counted in code, word by word. */
+const READ_REPEAT = join(
+  PREAMBLE,
+  SPOKEN,
+  `Content is scored separately from a transcript. Score ONLY the two traits
+below, on how the candidate spoke, not on which words they got right.`,
+  PRONUNCIATION,
+  ORAL_FLUENCY,
+  JSON_NOTE,
+);
 
-## Pronunciation
+export const PTE_RUBRICS: Record<string, string> = {
+  read_aloud: READ_REPEAT,
+  repeat_sentence: READ_REPEAT,
 
-- 5: Readily understandable to any regular speaker of the language. Vowels and
-  consonants are clear, stress and intonation support meaning. A regional or
-  non-native accent is NOT a fault in itself.
-- 3: Generally understandable, though some sounds or stress patterns require
-  listener effort.
-- 1: Frequently hard to understand; sound or stress errors obscure words.
-- 0: Cannot be understood.
+  describe_image: join(
+    PREAMBLE,
+    SPOKEN,
+    OPEN_CONTENT(
+      'describes the image',
+      `- 6: describes the image fully and accurately and expands on the relationships
+  between its features; a listener could build a complete mental picture.
+- 5: describes the main features accurately and identifies some relationships;
+  minor details missing or misrepresented.
+- 4: some accurate simple descriptions and basic relationships, not covering
+  every main feature; a basic mental picture.
+- 3: mainly superficial descriptions with minor inaccuracies; narrow, repeated
+  expressions; elements but not a cohesive whole.
+- 2: minimal, superficial descriptions with some inaccuracies; limited
+  vocabulary; some elements visualised only with effort.
+- 1: disconnected elements or a list of points without description.
+- 0: relevant to the prompt but too limited to assign a higher score, or
+  unrelated to it.`,
+    ),
+    PRONUNCIATION,
+    ORAL_FLUENCY,
+    JSON_NOTE,
+  ),
 
-Quote only words you actually heard the candidate say.`;
+  retell_lecture: join(
+    PREAMBLE,
+    SPOKEN,
+    OPEN_CONTENT(
+      'retells the lecture',
+      `- 6: clear, accurate, full comprehension; main ideas paraphrased seamlessly and
+  important points expanded with specificity; well connected and easy to follow.
+- 5: accurately captures main ideas and some important details in own words,
+  with minor inconsistencies; generally smooth.
+- 4: captures some main ideas and details, possibly with a few inaccuracies or
+  a focus on less important details; ideas not well connected.
+- 3: captures some ideas, not fully accurately, without separating main points
+  from detail; may repeat lecture language without reformulation.
+- 2: mostly inaccurate or incomplete, missing main ideas; relies heavily on
+  repeating the lecture's language.
+- 1: repeats isolated words and phrases from the lecture without meaning.
+- 0: related to the lecture but too limited to assign a higher score, or
+  unrelated to it.`,
+    ),
+    PRONUNCIATION,
+    ORAL_FLUENCY,
+    JSON_NOTE,
+  ),
+
+  summarize_group_discussion: join(
+    PREAMBLE,
+    SPOKEN,
+    OPEN_CONTENT(
+      "summarises the discussion and each speaker's contribution",
+      `- 6: full comprehension; main ideas paraphrased seamlessly with specific detail
+  of each speaker's contribution; relationships between points of view
+  explored and synthesised effectively.
+- 5: main ideas and some important details of different speakers captured
+  accurately in own words; some relationships between views noted.
+- 4: main ideas and some individual contributions captured, possibly with a few
+  inaccuracies; focuses on individual views more than their relationships.
+- 3: some ideas captured, not fully accurately; little separation of main points
+  from detail; may repeat the discussion's language.
+- 2: mostly inaccurate or incomplete, missing main ideas; relies heavily on
+  repeating the discussion's language.
+- 1: repeats isolated words and phrases without meaning.
+- 0: related to the discussion but too limited to assign a higher score, or
+  unrelated to it.`,
+    ),
+    PRONUNCIATION,
+    ORAL_FLUENCY,
+    JSON_NOTE,
+  ),
+
+  respond_to_a_situation: join(
+    PREAMBLE,
+    SPOKEN,
+    OPEN_CONTENT(
+      'deals with the situation',
+      `- 6: accomplishes the communication goal effectively with full consideration of
+  the context; communicates with ease, flexibility and precision; persuasive
+  and expands beyond the prompt's language.
+- 5: accomplishes the goal adequately with some consideration of the context,
+  only minor omissions; clear and accurate with little restriction.
+- 4: partially accomplishes the goal with some omissions or misinterpretations;
+  adequate, with some limitations and minor inaccuracies.
+- 3: partially accomplishes only the most basic aspect of the goal; functional
+  but limited; may repeat prompt language without reformulation.
+- 2: some relevant content but does not achieve the goal or address the context;
+  restrictions and inaccuracies compromise meaning.
+- 1: shows a lack of understanding of the situation; significantly restricted;
+  repeats isolated words.
+- 0: relevant to the prompt but too limited to assign a higher score, or
+  unrelated to it.`,
+    ),
+    PRONUNCIATION,
+    ORAL_FLUENCY,
+    JSON_NOTE,
+  ),
+
+  summarize_written_text: join(
+    PREAMBLE,
+    WRITTEN,
+    SUMMARY_CONTENT('source text'),
+    GRAMMAR_SUMMARY,
+    VOCABULARY_SUMMARY,
+    JSON_NOTE,
+  ),
+
+  summarize_spoken_text: join(
+    PREAMBLE,
+    WRITTEN,
+    SUMMARY_CONTENT('recording'),
+    GRAMMAR_SUMMARY,
+    VOCABULARY_SUMMARY,
+    SPELLING,
+    JSON_NOTE,
+  ),
+
+  write_essay: join(
+    PREAMBLE,
+    WRITTEN,
+    `## Content (0-6)
+
+- 6: fully addresses the prompt in depth, reformulating the issue in own words
+  and expanding important points with specificity; convincingly supported.
+- 5: adequately addresses the prompt with a persuasive argument; main points
+  supported effectively, with minor exceptions.
+- 4: addresses the main point; argument generally convincing but lacks depth;
+  support inconsistent.
+- 3: relevant but does not address the main points adequately; support often
+  missing or inappropriate.
+- 2: addresses the prompt superficially; largely generic statements or reliance
+  on the prompt's language.
+- 1: incomplete understanding of the prompt; generic or repetitive phrasing;
+  disjointed support.
+- 0: does not properly deal with the prompt (including memorised material on
+  another topic).`,
+    `## Development, structure and coherence (0-6)
+
+- 6: effective logical structure; clear, cohesive argument developed
+  systematically; well-developed introduction, conclusion and paragraphs;
+  varied connective devices used effectively.
+- 5: conventional, appropriate structure, logical if not always smooth;
+  introduction, conclusion and logical paragraphs present.
+- 4: conventional structure mostly present, some elements missing; argument
+  under-developed in places; paragraphs not always effective.
+- 3: traces of structure; simple points or disconnected ideas; a position that
+  is not developed into a logical argument.
+- 2: little recognisable structure; disorganised; only simple connectives.
+- 1: disconnected ideas; no clear position; very basic linear connectives.
+- 0: no recognisable structure.`,
+    `## Grammar (0-2)
+
+- 2: consistent grammatical control of complex language; errors rare and
+  difficult to spot.
+- 1: relatively high grammatical control; no mistakes that lead to
+  misunderstanding.
+- 0: mainly simple structures and/or several basic mistakes.`,
+    `## General linguistic range (0-6)
+
+- 6: a variety of expressions used with ease and precision; no sign of
+  limitation; errors rare and minor.
+- 5: expressions varied and appropriate; ideas clear without much restriction;
+  occasional errors.
+- 4: sufficient range for basic ideas; limitations with complex or abstract
+  ideas cause repetition or circumlocution.
+- 3: narrow range, simple expressions used repeatedly; restricted to simple
+  ideas; errors cause some disruption.
+- 2: limited vocabulary and simple expressions dominate; some ideas unclear.
+- 1: highly restricted; ideas generally unclear; errors impede meaning.
+- 0: meaning is not accessible.`,
+    `## Vocabulary range (0-2)
+
+- 2: good command of a broad lexical repertoire, idiomatic expressions and
+  colloquialisms.
+- 1: good range for general academic topics; lexical shortcomings lead to
+  circumlocution or some imprecision.
+- 0: mainly basic vocabulary, insufficient for the topic.`,
+    SPELLING,
+    JSON_NOTE,
+  ),
+};
+
+/** The rubric a model-graded PTE task is marked against. */
+export function pteRubricFor(taskType: string): string {
+  const rubric = PTE_RUBRICS[taskType];
+  if (!rubric) throw new Error(`No PTE rubric for ${taskType}`);
+  return rubric;
+}

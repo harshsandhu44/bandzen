@@ -4,61 +4,84 @@ import {
   pteSpeakingEvaluationSchema,
   pteWritingEvaluationSchema,
 } from '@bandzen/ai/schemas';
+import { getExam } from '@bandzen/exams/registry';
 import {
   buildPteSpeakingMessages,
   buildPteWritingMessages,
 } from './messages.ts';
-import { PTE_SPEAKING_RUBRIC, PTE_WRITING_RUBRIC } from './pte-rubrics.ts';
+import { PTE_RUBRICS, pteRubricFor } from './pte-rubrics.ts';
 
-test('the rubric leads every PTE request, or prompt caching stops applying', () => {
+test('the task rubric leads every PTE request, or prompt caching stops applying', () => {
   const writing = buildPteWritingMessages({
+    taskType: 'summarize_written_text',
     taskLabel: 'Summarize Written Text',
     prompt: 'Summarise the passage in one sentence.',
-    words: { min: 5, max: 75 },
-    wordCount: 40,
+    source: 'Urban rivers were once buried under roads.',
+    traits: ['Content', 'Grammar', 'Vocabulary'],
+    wordCount: 8,
     body: 'Cities that reopen buried rivers cool their streets.',
   });
   assert.equal(writing[0]!.role, 'system');
-  assert.equal(writing[0]!.content, PTE_WRITING_RUBRIC);
+  assert.equal(writing[0]!.content, pteRubricFor('summarize_written_text'));
 
   const speaking = buildPteSpeakingMessages({
-    taskLabel: 'Read Aloud',
-    prompt: 'Read the text aloud.',
-    stimulusText: 'Urban rivers were once buried under roads.',
+    taskType: 'describe_image',
+    taskLabel: 'Describe Image',
+    prompt: 'Describe the image.',
+    stimulusText: null,
     transcript: null,
-    audio: null,
+    traits: ['Content', 'Pronunciation', 'Oral fluency'],
+    audio: new Uint8Array([1, 2, 3]),
   });
   assert.equal(speaking[0]!.role, 'system');
-  assert.equal(speaking[0]!.content, PTE_SPEAKING_RUBRIC);
+  assert.equal(speaking[0]!.content, pteRubricFor('describe_image'));
+  // The per-task response shape goes last, below the cached prefix.
+  assert.match(String(speaking.at(-1)!.content), /"Oral fluency"/);
 });
 
-test('the required word range reaches the writing grader', () => {
+test('every model-graded PTE task has a rubric naming each trait it asks for', () => {
+  const pte = getExam('pte_academic')!;
+  for (const task of pte.tasks.filter((t) =>
+    t.scoring?.traits.some((trait) => trait.source === 'model'),
+  )) {
+    const rubric = pteRubricFor(task.key);
+    for (const trait of task.scoring!.traits) {
+      if (trait.source !== 'model') continue;
+      assert.match(
+        rubric,
+        new RegExp(`## ${trait.key} \\(0-${trait.max}\\)`),
+        `${task.key}: ${trait.key}`,
+      );
+    }
+    // Code marks these; a rubric scale for them invites the model to.
+    for (const trait of task.scoring!.traits) {
+      if (trait.source === 'model') continue;
+      assert.doesNotMatch(
+        rubric,
+        new RegExp(`## ${trait.key} \\(`),
+        `${task.key}: ${trait.key}`,
+      );
+    }
+  }
+  assert.equal(PTE_RUBRICS.answer_short_question, undefined);
+  assert.throws(() => pteRubricFor('reorder_paragraphs'), /No PTE rubric/);
+});
+
+test('the source reaches the summary grader', () => {
   const [, user] = buildPteWritingMessages({
-    taskLabel: 'Write Essay',
-    prompt: 'Discuss.',
-    words: { min: 200, max: 300 },
-    wordCount: 120,
-    body: 'Short.',
+    taskType: 'summarize_spoken_text',
+    taskLabel: 'Summarize Spoken Text',
+    prompt: 'Summarise the lecture.',
+    source: 'The lecture was about glaciers.',
+    traits: ['Content'],
+    wordCount: 55,
+    body: 'Glaciers.',
   });
-  assert.match(String(user!.content), /200-300 words/);
-  assert.match(String(user!.content), /120 words/);
+  assert.match(String(user!.content), /The lecture was about glaciers\./);
+  assert.match(String(user!.content), /55 words/);
 });
 
-test('a missing take is an explicit gap, never a silent omission', () => {
-  const [, user] = buildPteSpeakingMessages({
-    taskLabel: 'Repeat Sentence',
-    prompt: 'Repeat the sentence.',
-    stimulusText: null,
-    transcript: 'The library closes at five.',
-    audio: null,
-  });
-  const parts = user!.content as Array<{ type: string; text?: string }>;
-  assert.ok(parts.some((p) => p.text?.includes('did not record an answer')));
-  // The transcript is context for the grader, server-side only.
-  assert.ok(parts.some((p) => p.text?.includes('The library closes at five.')));
-});
-
-test('PTE evaluations are traits out of five, not bands', () => {
+test('PTE evaluations carry named traits, not bands', () => {
   const writing = pteWritingEvaluationSchema.parse({
     traits: [{ name: 'Content', score: 4, comment: 'Covers the key points.' }],
     annotations: [],
@@ -77,7 +100,7 @@ test('PTE evaluations are traits out of five, not bands', () => {
 
   assert.throws(() =>
     pteWritingEvaluationSchema.parse({
-      traits: [{ name: 'Fluency and Coherence', score: 4, comment: 'no' }],
+      band: 7,
       annotations: [],
       strengths: [],
       weaknesses: [],

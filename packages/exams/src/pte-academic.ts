@@ -5,9 +5,10 @@ import {
   task,
   timed,
   withItems,
+  withScoring,
   withWords,
 } from './task.ts';
-import type { ExamDefinition } from './types.ts';
+import type { ExamDefinition, ScoringTrait, TaskScoring } from './types.ts';
 
 /**
  * PTE Academic after the 7 August 2025 update, which added Summarize Group
@@ -33,6 +34,91 @@ import type { ExamDefinition } from './types.ts';
  * items (Reading, most of Listening) share the section clock. Calibrate against
  * the official practice test before building a timed PTE mock.
  */
+// ---------------------------------------------------------------------------
+// Raw scoring, per task type, from the guide's "Traits scored" column
+// (pp. 15-44) and its Pronunciation and Oral Fluency criteria (pp. 45-46).
+//
+// Only the published raw rules live here. How raw scores become 10-90 is not
+// published and is Bandzen's estimate, in `pte-scoring.ts`.
+// ---------------------------------------------------------------------------
+
+const byModel = (key: string, max: number): ScoringTrait => ({
+  key,
+  max,
+  source: 'model',
+});
+/** Pearson: a zero for Content or Form means no score points for the response. */
+const gate = (t: ScoringTrait): ScoringTrait => ({ ...t, gate: true });
+
+const FLUENCY = byModel('Oral fluency', 5);
+const PRONUNCIATION = byModel('Pronunciation', 5);
+
+/** Describe Image, Re-tell Lecture, Summarize Group Discussion, Respond to a Situation. */
+const OPEN_SPEAKING: TaskScoring = {
+  mode: 'partial',
+  traits: [gate(byModel('Content', 6)), PRONUNCIATION, FLUENCY],
+};
+
+const READ_ALOUD: TaskScoring = {
+  mode: 'partial',
+  traits: [
+    // One point per word of the text, less one per replaced, omitted or
+    // inserted word.
+    gate({ key: 'Content', max: 'reference_words', source: 'deterministic' }),
+    PRONUNCIATION,
+    FLUENCY,
+  ],
+};
+
+const REPEAT_SENTENCE: TaskScoring = {
+  mode: 'partial',
+  traits: [
+    gate({ key: 'Content', max: 3, source: 'deterministic' }),
+    PRONUNCIATION,
+    FLUENCY,
+  ],
+};
+
+/** Correct or incorrect: "appropriate word choice in response". */
+const ANSWER_SHORT_QUESTION: TaskScoring = {
+  mode: 'binary',
+  traits: [{ key: 'Vocabulary', max: 1, source: 'deterministic' }],
+};
+
+const SUMMARIZE_WRITTEN_TEXT: TaskScoring = {
+  mode: 'partial',
+  traits: [
+    gate(byModel('Content', 4)),
+    gate({ key: 'Form', max: 1, source: 'deterministic' }),
+    byModel('Grammar', 2),
+    byModel('Vocabulary', 2),
+  ],
+};
+
+const WRITE_ESSAY: TaskScoring = {
+  mode: 'partial',
+  traits: [
+    gate(byModel('Content', 6)),
+    gate({ key: 'Form', max: 2, source: 'deterministic' }),
+    byModel('Development, structure and coherence', 6),
+    byModel('Grammar', 2),
+    byModel('General linguistic range', 6),
+    byModel('Vocabulary range', 2),
+    byModel('Spelling', 2),
+  ],
+};
+
+const SUMMARIZE_SPOKEN_TEXT: TaskScoring = {
+  mode: 'partial',
+  traits: [
+    gate(byModel('Content', 4)),
+    gate({ key: 'Form', max: 2, source: 'deterministic' }),
+    byModel('Grammar', 2),
+    byModel('Vocabulary', 2),
+    byModel('Spelling', 2),
+  ],
+};
+
 export const PTE_ACADEMIC = {
   key: 'pte_academic',
   name: 'PTE Academic',
@@ -64,151 +150,178 @@ export const PTE_ACADEMIC = {
     },
   ],
   tasks: [
-    withItems(
-      task(
-        'speaking_writing',
-        'read_aloud',
-        'Read Aloud',
-        'text',
-        'audio',
-        'recording',
-        'speaking_model',
-        ['speaking'],
-        timed(35, 40),
-      ),
-      6,
-      7,
-    ),
-    withItems(
-      task(
-        'speaking_writing',
-        'repeat_sentence',
-        'Repeat Sentence',
-        'audio',
-        'audio',
-        'recording',
-        'speaking_model',
-        ['listening', 'speaking'],
-        timed(0, 15),
-        ONE_PLAY,
-      ),
-      10,
-      12,
-    ),
-    withItems(
-      task(
-        'speaking_writing',
-        'describe_image',
-        'Describe Image',
-        'image',
-        'audio',
-        'recording',
-        'speaking_model',
-        ['speaking'],
-        timed(25, 40),
-      ),
-      5,
-      6,
-    ),
-    withItems(
-      task(
-        'speaking_writing',
-        'retell_lecture',
-        'Re-tell Lecture',
-        'mixed',
-        'audio',
-        'recording',
-        'speaking_model',
-        ['listening', 'speaking'],
-        timed(10, 40),
-        ONE_PLAY,
-      ),
-      2,
-      3,
-    ),
-    withItems(
-      task(
-        'speaking_writing',
-        'answer_short_question',
-        'Answer Short Question',
-        'audio',
-        'audio',
-        'recording',
-        'speaking_model',
-        ['listening'],
-        timed(0, 10),
-        ONE_PLAY,
-      ),
-      5,
-      6,
-    ),
-    withItems(
-      task(
-        'speaking_writing',
-        'summarize_group_discussion',
-        'Summarize Group Discussion',
-        'audio',
-        'audio',
-        'recording',
-        'speaking_model',
-        ['listening', 'speaking'],
-        timed(10, 120),
-        ONE_PLAY,
-      ),
-      2,
-      3,
-    ),
-    withItems(
-      task(
-        'speaking_writing',
-        'respond_to_a_situation',
-        'Respond to a Situation',
-        'mixed',
-        'audio',
-        'recording',
-        'speaking_model',
-        ['speaking'],
-        timed(10, 40),
-        ONE_PLAY,
-      ),
-      2,
-      3,
-    ),
-    withItems(
-      withWords(
+    withScoring(
+      withItems(
         task(
           'speaking_writing',
-          'summarize_written_text',
-          'Summarize Written Text',
+          'read_aloud',
+          'Read Aloud',
           'text',
-          'text',
-          'essay',
-          'writing_model',
-          ['reading', 'writing'],
-          timed(0, 600),
+          'audio',
+          'recording',
+          'speaking_model',
+          ['speaking'],
+          timed(35, 40),
+        ),
+        6,
+        7,
+      ),
+      READ_ALOUD,
+    ),
+    withScoring(
+      withItems(
+        task(
+          'speaking_writing',
+          'repeat_sentence',
+          'Repeat Sentence',
+          'audio',
+          'audio',
+          'recording',
+          'speaking_model',
+          ['listening', 'speaking'],
+          timed(0, 15),
+          ONE_PLAY,
+        ),
+        10,
+        12,
+      ),
+      REPEAT_SENTENCE,
+    ),
+    withScoring(
+      withItems(
+        task(
+          'speaking_writing',
+          'describe_image',
+          'Describe Image',
+          'image',
+          'audio',
+          'recording',
+          'speaking_model',
+          ['speaking'],
+          timed(25, 40),
         ),
         5,
-        75,
+        6,
       ),
-      2,
+      OPEN_SPEAKING,
     ),
-    withItems(
-      withWords(
+    withScoring(
+      withItems(
         task(
           'speaking_writing',
-          'write_essay',
-          'Write Essay',
-          'text',
-          'text',
-          'essay',
-          'writing_model',
-          ['writing'],
-          timed(0, 1200),
+          'retell_lecture',
+          'Re-tell Lecture',
+          'mixed',
+          'audio',
+          'recording',
+          'speaking_model',
+          ['listening', 'speaking'],
+          timed(10, 40),
+          ONE_PLAY,
         ),
-        200,
-        300,
+        2,
+        3,
       ),
-      1,
+      OPEN_SPEAKING,
+    ),
+    withScoring(
+      withItems(
+        task(
+          'speaking_writing',
+          'answer_short_question',
+          'Answer Short Question',
+          'audio',
+          'audio',
+          'recording',
+          'speaking_model',
+          ['listening'],
+          timed(0, 10),
+          ONE_PLAY,
+        ),
+        5,
+        6,
+      ),
+      ANSWER_SHORT_QUESTION,
+    ),
+    withScoring(
+      withItems(
+        task(
+          'speaking_writing',
+          'summarize_group_discussion',
+          'Summarize Group Discussion',
+          'audio',
+          'audio',
+          'recording',
+          'speaking_model',
+          ['listening', 'speaking'],
+          timed(10, 120),
+          ONE_PLAY,
+        ),
+        2,
+        3,
+      ),
+      OPEN_SPEAKING,
+    ),
+    withScoring(
+      withItems(
+        task(
+          'speaking_writing',
+          'respond_to_a_situation',
+          'Respond to a Situation',
+          'mixed',
+          'audio',
+          'recording',
+          'speaking_model',
+          ['speaking'],
+          timed(10, 40),
+          ONE_PLAY,
+        ),
+        2,
+        3,
+      ),
+      OPEN_SPEAKING,
+    ),
+    withScoring(
+      withItems(
+        withWords(
+          task(
+            'speaking_writing',
+            'summarize_written_text',
+            'Summarize Written Text',
+            'text',
+            'text',
+            'essay',
+            'writing_model',
+            ['reading', 'writing'],
+            timed(0, 600),
+          ),
+          5,
+          75,
+        ),
+        2,
+      ),
+      SUMMARIZE_WRITTEN_TEXT,
+    ),
+    withScoring(
+      withItems(
+        withWords(
+          task(
+            'speaking_writing',
+            'write_essay',
+            'Write Essay',
+            'text',
+            'text',
+            'essay',
+            'writing_model',
+            ['writing'],
+            timed(0, 1200),
+          ),
+          200,
+          300,
+        ),
+        1,
+      ),
+      WRITE_ESSAY,
     ),
     withItems(
       task(
@@ -280,24 +393,27 @@ export const PTE_ACADEMIC = {
       2,
       3,
     ),
-    withItems(
-      withWords(
-        task(
-          'listening',
-          'summarize_spoken_text',
-          'Summarize Spoken Text',
-          'audio',
-          'text',
-          'essay',
-          'writing_model',
-          ['listening', 'writing'],
-          timed(0, 600),
-          ONE_PLAY,
+    withScoring(
+      withItems(
+        withWords(
+          task(
+            'listening',
+            'summarize_spoken_text',
+            'Summarize Spoken Text',
+            'audio',
+            'text',
+            'essay',
+            'writing_model',
+            ['listening', 'writing'],
+            timed(0, 600),
+            ONE_PLAY,
+          ),
+          50,
+          70,
         ),
-        50,
-        70,
+        1,
       ),
-      1,
+      SUMMARIZE_SPOKEN_TEXT,
     ),
     withItems(
       task(

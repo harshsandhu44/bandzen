@@ -92,6 +92,31 @@ export type TaskAudioPolicy = {
   startDelaySeconds?: number;
 };
 
+/**
+ * One trait a board scores a response on, as its score guide publishes it.
+ *
+ * `max` is the trait's top mark, or `reference_words` where the board ties it
+ * to the item — PTE's Read Aloud Content is worth one point per word of the
+ * text read. `source` says who marks it: code, from the response itself, or a
+ * model, from a rubric. `gate` is a trait whose zero voids the whole response,
+ * as PTE's Content and Form do.
+ */
+export type ScoringTrait = {
+  key: string;
+  max: number | 'reference_words';
+  source: 'model' | 'deterministic';
+  gate?: true;
+};
+
+/**
+ * How a model-graded task's raw score is built. `binary` is correct or
+ * incorrect, one point or none; `partial` sums its traits.
+ */
+export type TaskScoring = {
+  mode: 'binary' | 'partial';
+  traits: readonly ScoringTrait[];
+};
+
 export type ScoreScale = {
   /** What the number is called on this exam's own score report. */
   label: 'Band' | 'Score';
@@ -141,6 +166,11 @@ export type TaskDefinition = {
   measuredSkills: readonly Skill[];
   renderer: RendererKey;
   evaluator: EvaluatorKey;
+  /**
+   * The published raw-scoring rules of a model-graded task. Absent on a
+   * deterministic task, whose marks are its evaluator's `correct` of `total`.
+   */
+  scoring?: TaskScoring;
 };
 
 export type ExamDefinition = {
