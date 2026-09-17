@@ -1,3 +1,10 @@
+## admin [0.15.2](https://github.com/harshsandhu44/bandzen/compare/admin@0.15.1...admin@0.15.2) (2026-09-17)
+
+
+### Bug Fixes
+
+* **admin:** persist generated listening audio and voice dialogues per speaker ([#144](https://github.com/harshsandhu44/bandzen/issues/144)) ([32b5cdc](https://github.com/harshsandhu44/bandzen/commit/32b5cdc14dbaac46bfdf4011bf8a5d224b261ab9)), closes [#143](https://github.com/harshsandhu44/bandzen/issues/143)
+
 ## admin [0.15.1](https://github.com/harshsandhu44/bandzen/compare/admin@0.15.0...admin@0.15.1) (2026-09-17)
 
 
