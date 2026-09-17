@@ -1,3 +1,10 @@
+## app [1.29.1](https://github.com/harshsandhu44/bandzen/compare/app@1.29.0...app@1.29.1) (2026-09-17)
+
+
+### Bug Fixes
+
+* **admin:** persist generated listening audio and voice dialogues per speaker ([#144](https://github.com/harshsandhu44/bandzen/issues/144)) ([32b5cdc](https://github.com/harshsandhu44/bandzen/commit/32b5cdc14dbaac46bfdf4011bf8a5d224b261ab9)), closes [#143](https://github.com/harshsandhu44/bandzen/issues/143)
+
 # app [1.29.0](https://github.com/harshsandhu44/bandzen/compare/app@1.28.0...app@1.29.0) (2026-09-17)
 
 
