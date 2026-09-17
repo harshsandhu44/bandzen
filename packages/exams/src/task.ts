@@ -7,6 +7,7 @@ import type {
   Stimulus,
   TaskAudioPolicy,
   TaskDefinition,
+  TaskScoring,
   TimingRule,
 } from './types.ts';
 
@@ -28,6 +29,12 @@ export const withItems = (
   min: number,
   max = min,
 ): TaskDefinition => ({ ...t, items: { min, max } });
+
+/** A model-graded task's published raw-scoring rules. Same shape as `withWords`. */
+export const withScoring = (
+  t: TaskDefinition,
+  scoring: TaskScoring,
+): TaskDefinition => ({ ...t, scoring });
 
 /** Plays once, starts itself: every PTE audio task, and most of TOEFL's. */
 export const ONE_PLAY: TaskAudioPolicy = { plays: 1, autoplay: true };

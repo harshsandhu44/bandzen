@@ -391,3 +391,35 @@ test('marked-words answers are positions in the text', () => {
     ).some((i) => i.includes('positions in the text')),
   );
 });
+
+test('Answer Short Question needs its accepted answers, because code marks it', () => {
+  const audio = {
+    stimulus: {
+      text: null,
+      audioUrl: 'https://a/q.mp3',
+      imageUrl: null,
+      imageAlt: null,
+    },
+  };
+  const transcript = 'What do you call a device that measures temperature?';
+  assert.deepEqual(
+    check(
+      'pte_academic',
+      'answer_short_question',
+      audio,
+      { transcript },
+      'publish',
+    ),
+    ['the accepted answers'],
+  );
+  assert.deepEqual(
+    check(
+      'pte_academic',
+      'answer_short_question',
+      audio,
+      { transcript, answer: ['thermometer'] },
+      'publish',
+    ),
+    [],
+  );
+});

@@ -1393,6 +1393,8 @@ export async function loadExamTaskForGrading(attemptId: string) {
       content: examTasks.content,
       value: examTaskResponses.value,
       audioUrl: examTaskResponses.audioUrl,
+      // Answer Short Question's accepted answers, matched in code.
+      answer: examTaskAnswers.answer,
       transcript: examTaskAnswers.transcript,
     })
     .from(examTaskResponses)

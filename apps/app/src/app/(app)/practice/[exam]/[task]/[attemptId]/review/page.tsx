@@ -59,6 +59,19 @@ export default async function TaskReviewPage({
 
   const { mark } = evaluatorFor(exam.key, task.key);
   const { rawScore, total } = data.attempt;
+  const dims = data.attempt.assessment?.dimensions;
+  const points =
+    typeof dims?.correct === 'number' && typeof dims.total === 'number'
+      ? { correct: dims.correct, total: dims.total }
+      : null;
+  // Each trait's own maximum, from the task's contract. Read Aloud's Content
+  // is worth the text's length, so it has no fixed "out of".
+  const traitMax = new Map(
+    (task.scoring?.traits ?? []).map((t) => [
+      t.key,
+      typeof t.max === 'number' ? t.max : null,
+    ]),
+  );
 
   return (
     <div className="max-w-3xl space-y-6">
@@ -67,32 +80,36 @@ export default async function TaskReviewPage({
         title={
           mark && total != null
             ? `${rawScore ?? 0} of ${total}`
-            : 'Answers recorded'
+            : points != null
+              ? `${points.correct} of ${points.total} points`
+              : 'Answers recorded'
         }
-        description={
-          mark
-            ? 'Raw marks. A score on this exam\u2019s own scale arrives with the score report.'
-            : 'A model grades this task type. Its score arrives with the score report.'
-        }
+        description="Raw marks, under this task’s published scoring rules. A score on this exam’s own scale arrives with a mock test’s report."
       />
 
-      {/* Model-graded only: a deterministic task's dimensions are correct/total,
-          not traits out of five, and rendering them here would say 2 / 5 for
-          what was actually full marks. */}
+      {/* Model-graded only: a deterministic task's dimensions are its marks,
+          which the heading already shows. Traits are means across the items. */}
       {!mark && data.attempt.assessment ? (
         <Panel headingId="grader" title="What the grader found">
           <div className="space-y-5 text-sm">
             <dl className="grid grid-cols-2 gap-x-6 gap-y-3 sm:grid-cols-3">
-              {Object.entries(data.attempt.assessment.dimensions).map(
-                ([name, score]) => (
-                  <div key={name}>
-                    <dt className="text-muted-foreground">{name}</dt>
-                    <dd className="font-mono tabular-nums">
-                      {score == null ? '\u2014' : `${score} / 5`}
-                    </dd>
-                  </div>
-                ),
-              )}
+              {Object.entries(data.attempt.assessment.dimensions)
+                .filter(([name]) => name !== 'correct' && name !== 'total')
+                .map(([name, score]) => {
+                  const max = traitMax.get(name);
+                  return (
+                    <div key={name}>
+                      <dt className="text-muted-foreground">{name}</dt>
+                      <dd className="font-mono tabular-nums">
+                        {score == null
+                          ? '\u2014'
+                          : max == null
+                            ? score
+                            : `${score} / ${max}`}
+                      </dd>
+                    </div>
+                  );
+                })}
             </dl>
 
             {data.attempt.assessment.strengths.length ? (

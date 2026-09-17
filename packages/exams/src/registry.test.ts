@@ -114,6 +114,74 @@ test('every PTE task credits the skills and runs the count the score guide gives
   }
 });
 
+/**
+ * The guide's "Traits scored" column for every model-graded PTE task, as
+ * `trait: max`. `words` is Read Aloud's Content, whose maximum "depends on the
+ * length of the question prompt". Gates are Content and Form, per p. 8: a zero
+ * for either gives the response no score points.
+ */
+const PTE_TRAITS: Record<string, Record<string, number | 'words'>> = {
+  read_aloud: { Content: 'words', Pronunciation: 5, 'Oral fluency': 5 },
+  repeat_sentence: { Content: 3, Pronunciation: 5, 'Oral fluency': 5 },
+  describe_image: { Content: 6, Pronunciation: 5, 'Oral fluency': 5 },
+  retell_lecture: { Content: 6, Pronunciation: 5, 'Oral fluency': 5 },
+  answer_short_question: { Vocabulary: 1 },
+  summarize_group_discussion: {
+    Content: 6,
+    Pronunciation: 5,
+    'Oral fluency': 5,
+  },
+  respond_to_a_situation: { Content: 6, Pronunciation: 5, 'Oral fluency': 5 },
+  summarize_written_text: { Content: 4, Form: 1, Grammar: 2, Vocabulary: 2 },
+  write_essay: {
+    Content: 6,
+    Form: 2,
+    'Development, structure and coherence': 6,
+    Grammar: 2,
+    'General linguistic range': 6,
+    'Vocabulary range': 2,
+    Spelling: 2,
+  },
+  summarize_spoken_text: {
+    Content: 4,
+    Form: 2,
+    Grammar: 2,
+    Vocabulary: 2,
+    Spelling: 2,
+  },
+};
+
+test('every model-graded PTE task scores the guide\u2019s traits at the guide\u2019s maxima', () => {
+  const pte = getExam('pte_academic')!;
+  const graded = pte.tasks.filter((t) => t.evaluator.endsWith('_model'));
+  assert.deepEqual(
+    graded.map((t) => t.key).sort(),
+    Object.keys(PTE_TRAITS).sort(),
+  );
+  for (const task of graded) {
+    const traits = Object.fromEntries(
+      task.scoring!.traits.map((t) => [
+        t.key,
+        t.max === 'reference_words' ? 'words' : t.max,
+      ]),
+    );
+    assert.deepEqual(traits, PTE_TRAITS[task.key], task.key);
+    for (const t of task.scoring!.traits) {
+      assert.equal(
+        Boolean(t.gate),
+        t.key === 'Content' || t.key === 'Form',
+        `${task.key} ${t.key} gate`,
+      );
+    }
+  }
+  // Deterministic tasks keep their evaluator's marks and carry no contract.
+  assert.ok(
+    pte.tasks
+      .filter((t) => !t.evaluator.endsWith('_model'))
+      .every((t) => !t.scoring),
+  );
+});
+
 test('a PTE sitting is 65 to 85 questions, and its parts are the guide\u2019s', () => {
   const pte = getExam('pte_academic')!;
   const total = (pick: (r: { items: [number, number] }) => number) =>

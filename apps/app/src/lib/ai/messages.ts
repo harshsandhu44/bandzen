@@ -1,5 +1,6 @@
 import type { ChatCompletionMessageParam } from 'openai/resources/chat/completions';
 import type { ExamKey } from '@bandzen/exams/registry';
+import { pteRubricFor } from './pte-rubrics.ts';
 import { rubricFor } from './rubrics.ts';
 
 /**
@@ -118,15 +119,21 @@ export function buildSpeakingMessages(
 
 /**
  * Spelled out in the prompt because the audio grader accepts no
- * `response_format`. Same reason as `SPEAKING_RESPONSE_SHAPE`.
+ * `response_format`. Same reason as `SPEAKING_RESPONSE_SHAPE`. Built from the
+ * task's model traits, and sent LAST, so the rubric prefix stays cacheable.
  */
-export const PTE_SPEAKING_RESPONSE_SHAPE = `Reply with ONE JSON object and nothing else — no prose, no code fence. Shape:
+export function pteSpeakingResponseShape(traits: readonly string[]): string {
+  const rows = traits
+    .map(
+      (name) =>
+        `    { "name": ${JSON.stringify(name)}, "score": <whole number>, "comment": <string> }`,
+    )
+    .join(',\n');
+  return `Reply with ONE JSON object and nothing else — no prose, no code fence. Shape:
 
 {
   "traits": [
-    { "name": "Content", "score": <number, 0-5>, "comment": <string> },
-    { "name": "Oral fluency", "score": <number, 0-5>, "comment": <string> },
-    { "name": "Pronunciation", "score": <number, 0-5>, "comment": <string> }
+${rows}
   ],
   "annotations": [
     { "quote": <verbatim words the candidate said>, "kind": "good" | "vocabulary" | "fluency", "comment": <string> }
@@ -135,29 +142,30 @@ export const PTE_SPEAKING_RESPONSE_SHAPE = `Reply with ONE JSON object and nothi
   "weaknesses": [<string>, <string>]
 }
 
-All three traits, in that order. Two to five annotations.`;
+Exactly these traits, in that order. Two to five annotations.`;
+}
 
 /**
- * One PTE written task. The rubric stays first and byte-identical, so the
- * cached prefix is shared by every Summarize Written Text and every essay.
- * The task label and its word range go in the user turn, below the cache
- * boundary, because they differ per task type.
+ * One PTE written task. The task's rubric stays first and byte-identical, so
+ * the cached prefix is shared by every response to that task type. The label,
+ * the source and the response go in the user turn, below the cache boundary.
  */
 export function buildPteWritingMessages(work: {
+  taskType: string;
   taskLabel: string;
   prompt: string;
-  words: { min: number; max: number } | null;
+  /** The passage summarised, or the transcript of the recording. */
+  source: string | null;
+  traits: readonly string[];
   wordCount: number;
   body: string;
 }): ChatCompletionMessageParam[] {
-  const range = work.words
-    ? `Required length: ${work.words.min}-${work.words.max} words.`
-    : 'No stated length.';
+  const source = work.source ? `\n\nSOURCE\n${work.source}` : '';
   return [
-    { role: 'system', content: rubricFor('pte_academic', 'writing') },
+    { role: 'system', content: pteRubricFor(work.taskType) },
     {
       role: 'user',
-      content: `TASK: ${work.taskLabel}. ${range}\n\nPROMPT\n${work.prompt}\n\nCANDIDATE RESPONSE (${work.wordCount} words)\n${work.body}`,
+      content: `TASK: ${work.taskLabel}. Score these traits: ${work.traits.join('; ')}.\n\nPROMPT\n${work.prompt}${source}\n\nCANDIDATE RESPONSE (${work.wordCount} words)\n${work.body}`,
     },
   ];
 }
@@ -168,13 +176,15 @@ export function buildPteWritingMessages(work: {
  * Oral fluency and Pronunciation cannot be judged from a transcript.
  */
 export function buildPteSpeakingMessages(work: {
+  taskType: string;
   taskLabel: string;
   prompt: string;
   /** The text the candidate read or was shown, when the task has one. */
   stimulusText: string | null;
   /** What the candidate was played, when the task has audio. Server-side only. */
   transcript: string | null;
-  audio: Uint8Array | null;
+  traits: readonly string[];
+  audio: Uint8Array;
 }): ChatCompletionMessageParam[] {
   const content: Array<
     | { type: 'text'; text: string }
@@ -197,25 +207,16 @@ export function buildPteSpeakingMessages(work: {
       text: `WHAT THE CANDIDATE HEARD\n${work.transcript}`,
     });
   }
-  content.push(
-    work.audio
-      ? {
-          type: 'input_audio' as const,
-          input_audio: {
-            data: Buffer.from(work.audio).toString('base64'),
-            format: 'wav' as const,
-          },
-        }
-      : {
-          type: 'text' as const,
-          // An explicit gap, never a silent omission: a grader that cannot see
-          // the candidate said nothing has no way to mark the task incomplete.
-          text: 'The candidate did not record an answer to this task.',
-        },
-  );
+  content.push({
+    type: 'input_audio',
+    input_audio: {
+      data: Buffer.from(work.audio).toString('base64'),
+      format: 'wav',
+    },
+  });
   return [
-    { role: 'system', content: rubricFor('pte_academic', 'speaking') },
+    { role: 'system', content: pteRubricFor(work.taskType) },
     { role: 'user', content },
-    { role: 'system', content: PTE_SPEAKING_RESPONSE_SHAPE },
+    { role: 'system', content: pteSpeakingResponseShape(work.traits) },
   ];
 }

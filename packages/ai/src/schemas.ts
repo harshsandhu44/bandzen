@@ -653,32 +653,22 @@ export function findSlugClashes(slugs: string[], existing: Set<string>) {
 // evidence, not a PTE score.
 // ---------------------------------------------------------------------------
 
-export const PTE_WRITING_TRAITS = [
-  'Content',
-  'Form',
-  'Grammar',
-  'Vocabulary',
-  'Spelling',
-  'Development',
-] as const;
-
-export const PTE_SPEAKING_TRAITS = [
-  'Content',
-  'Oral fluency',
-  'Pronunciation',
-] as const;
-
-const pteTrait = <T extends readonly [string, ...string[]]>(names: T) =>
-  z.array(
-    z.object({
-      name: z.enum(names),
-      score: z.number().describe('0-5, whole points.'),
-      comment: z.string(),
-    }),
-  );
+/**
+ * A PTE trait as a grader returns it. The name is free text rather than an
+ * enum because each task type has its own traits: the grader checks every
+ * name its task's contract asks for came back, and the contract's maximum —
+ * not this schema — bounds the score.
+ */
+const pteTrait = z.array(
+  z.object({
+    name: z.string(),
+    score: z.number().describe('Whole points, 0 to the trait maximum.'),
+    comment: z.string(),
+  }),
+);
 
 export const pteWritingEvaluationSchema = z.object({
-  traits: pteTrait(PTE_WRITING_TRAITS),
+  traits: pteTrait,
   annotations: z.array(
     z.object({
       quote: z.string().describe('Verbatim extract from the response.'),
@@ -691,7 +681,7 @@ export const pteWritingEvaluationSchema = z.object({
 });
 
 export const pteSpeakingEvaluationSchema = z.object({
-  traits: pteTrait(PTE_SPEAKING_TRAITS),
+  traits: pteTrait,
   annotations: z.array(
     z.object({
       quote: z.string().describe('Verbatim words the candidate said.'),
