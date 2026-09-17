@@ -1358,6 +1358,8 @@ export async function getExamTaskAttempt(userId: string, attemptId: string) {
       value: examTaskResponses.value,
       audioUrl: examTaskResponses.audioUrl,
       flagged: examTaskResponses.flagged,
+      stimulusStartedAt: examTaskResponses.stimulusStartedAt,
+      completedAt: examTaskResponses.completedAt,
     })
     .from(examTaskResponses)
     .innerJoin(examTasks, eq(examTasks.id, examTaskResponses.taskId))
@@ -1396,6 +1398,55 @@ export async function saveExamTaskResponse(
       and(
         eq(examTaskResponses.attemptId, attemptId),
         eq(examTaskResponses.taskId, taskId),
+        // A mock item the candidate has moved past is closed: a stale tab
+        // cannot rewrite an answer the navigation no longer allows reaching.
+        isNull(examTaskResponses.completedAt),
+      ),
+    );
+}
+
+/**
+ * Stamp when an item's stimulus began, once. The first stamp wins, so a
+ * second play request or a reload never moves it — which is what makes a
+ * single-play recording single-play across remounts and reloads.
+ */
+export async function markExamTaskStimulusStarted(
+  userId: string,
+  attemptId: string,
+  taskId: string,
+) {
+  const attempt = await getAttempt(userId, attemptId);
+  if (!attempt || attempt.status !== 'in_progress') return;
+
+  await db
+    .update(examTaskResponses)
+    .set({ stimulusStartedAt: new Date() })
+    .where(
+      and(
+        eq(examTaskResponses.attemptId, attemptId),
+        eq(examTaskResponses.taskId, taskId),
+        isNull(examTaskResponses.stimulusStartedAt),
+      ),
+    );
+}
+
+/** Close one mock item: the candidate has moved past it and cannot return. */
+export async function completeExamTaskItem(
+  userId: string,
+  attemptId: string,
+  taskId: string,
+) {
+  const attempt = await getAttempt(userId, attemptId);
+  if (!attempt || attempt.status !== 'in_progress') return;
+
+  await db
+    .update(examTaskResponses)
+    .set({ completedAt: new Date() })
+    .where(
+      and(
+        eq(examTaskResponses.attemptId, attemptId),
+        eq(examTaskResponses.taskId, taskId),
+        isNull(examTaskResponses.completedAt),
       ),
     );
 }

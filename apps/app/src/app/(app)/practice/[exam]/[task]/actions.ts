@@ -6,12 +6,20 @@ import { getExam, getTask } from '@bandzen/exams/registry';
 import { uploadObject } from '@bandzen/storage/r2';
 import { gradeExamTask } from '@/lib/ai/grade-exam-task';
 import { requireUserId } from '@/lib/auth';
-import { finishSittingSection } from '@/lib/mock-guard';
 import {
+  expireMockSectionIfDue,
+  finishSittingSection,
+  mockSectionClock,
+} from '@/lib/mock-guard';
+import { acceptsWrite } from '@/lib/task-session';
+import {
+  completeExamTaskItem,
   createExamTaskAttempt,
   findInProgressExamTask,
   getAttempt,
+  getMockSectionAttempts,
   getPublishedExamTasks,
+  markExamTaskStimulusStarted,
   saveExamTaskResponse,
   submitExamTaskAttempt,
 } from '@/lib/db/queries';
@@ -63,15 +71,46 @@ export async function startExamTaskAttempt(formData: FormData) {
   redirect(`/practice/${exam.key}/${task.key}/${attempt.id}`);
 }
 
+/**
+ * Whether a mock section's clock still allows writes to this attempt. Practice
+ * has no shared clock, so it always does. The grace is what lets an autosave
+ * already in flight when the clock hits zero still land.
+ */
+async function withinSectionClock(userId: string, attemptId: string) {
+  const attempt = await getAttempt(userId, attemptId);
+  if (!attempt?.mockAttemptId) return true;
+  const clock = await mockSectionClock(userId, attempt);
+  return acceptsWrite(new Date(), clock?.deadline ?? null);
+}
+
 export async function saveExamTaskAnswer(input: {
   attemptId: string;
   taskId: string;
   value: string;
 }) {
   const userId = await requireUserId();
+  if (!(await withinSectionClock(userId, input.attemptId))) return;
   await saveExamTaskResponse(userId, input.attemptId, input.taskId, {
     value: input.value,
   });
+}
+
+/** An item's stimulus began: its audio started playing, or it was first shown. */
+export async function startExamTaskStimulus(input: {
+  attemptId: string;
+  taskId: string;
+}) {
+  const userId = await requireUserId();
+  await markExamTaskStimulusStarted(userId, input.attemptId, input.taskId);
+}
+
+/** A mock candidate moves past an item. There is no way back to it. */
+export async function completeExamTaskStep(input: {
+  attemptId: string;
+  taskId: string;
+}) {
+  const userId = await requireUserId();
+  await completeExamTaskItem(userId, input.attemptId, input.taskId);
 }
 
 /**
@@ -94,6 +133,9 @@ export async function saveExamTaskRecording(
   const file = formData.get('audio');
 
   if (!attemptId || !taskId || !(file instanceof File) || file.size === 0) {
+    return { ok: false, url: null };
+  }
+  if (!(await withinSectionClock(userId, attemptId))) {
     return { ok: false, url: null };
   }
 
@@ -135,6 +177,25 @@ export async function submitExamTaskSession(formData: FormData) {
   // review: the candidate is mid-mock, and what comes next is the next task or
   // the next part, not a result they cannot act on yet.
   if (attempt.mockAttemptId) {
+    // A clock that ran out closes every section-timed task still open in the
+    // section, not just the one whose page happened to fire the submit.
+    await expireMockSectionIfDue(userId, attempt);
+    // The next task type in the same part follows straight on: the part's
+    // clock is already running, and an interstitial saying "the clock starts
+    // when you continue" would be untrue.
+    const exam = getExam(attempt.examKey);
+    const order = (taskType: string | null) =>
+      exam?.tasks.findIndex((t) => t.key === taskType) ?? -1;
+    const next = (
+      await getMockSectionAttempts(
+        userId,
+        attempt.mockAttemptId,
+        attempt.module,
+      )
+    )
+      .filter((r) => r.status === 'in_progress' && r.taskType)
+      .sort((a, b) => order(a.taskType) - order(b.taskType))[0];
+    if (next) redirect(`/practice/${next.examKey}/${next.taskType}/${next.id}`);
     await finishSittingSection(userId, attempt.mockAttemptId);
   }
 

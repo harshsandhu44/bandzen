@@ -225,6 +225,13 @@
       "when": 1789615983734,
       "tag": "0031_exam_score_reports",
       "breakpoints": true
+    },
+    {
+      "idx": 32,
+      "version": "7",
+      "when": 1789624956728,
+      "tag": "0032_exam_task_response_progress",
+      "breakpoints": true
     }
   ]
 }

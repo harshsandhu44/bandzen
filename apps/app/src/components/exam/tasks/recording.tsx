@@ -25,16 +25,21 @@ function OneShot({
   url,
   onDone,
   onUpload,
+  auto,
 }: {
   prepSeconds: number;
   responseSeconds: number;
   url: string;
   onDone: (url: string) => void;
   onUpload?: (blob: Blob) => Promise<string | null>;
+  auto?: { ready: boolean; spent: boolean };
 }) {
   const [phase, setPhase] = useState<Phase>(url ? 'done' : 'idle');
   const [left, setLeft] = useState(0);
   const [error, setError] = useState<string | null>(null);
+  // A take that recorded fine but failed to upload. Kept so the candidate can
+  // resend it: there is no second take, so losing the bytes loses the answer.
+  const [unsent, setUnsent] = useState<Blob | null>(null);
   const deadline = useRef(0);
   const recorder = useRef<PcmRecorder | null>(null);
   const stream = useRef<MediaStream | null>(null);
@@ -67,10 +72,15 @@ function OneShot({
           return;
         }
         setPhase('uploading');
-        const stored = await upload.current(wav);
+        const stored = await upload.current(wav).catch(() => null);
         // There is no second take, so a failed upload has to say so rather
         // than leaving a take that looks saved and is not.
-        if (!stored) throw new Error('upload');
+        if (!stored) {
+          setUnsent(wav);
+          setError('Your answer was recorded but not saved. Retry the upload.');
+          setPhase('failed');
+          return;
+        }
         setPhase('done');
         onDone(stored);
       } catch {
@@ -125,13 +135,56 @@ function OneShot({
     setPhase('prep');
   };
 
+  // A mock does not wait for the candidate: preparation starts the moment the
+  // stimulus is over, exactly as the real test's does.
+  const autoReady = Boolean(auto?.ready && !auto.spent);
+  useEffect(() => {
+    if (!autoReady || phase !== 'idle' || url) return;
+    // Scheduled rather than called: starting sets state, and the effect only
+    // decides that it is time to.
+    const id = setTimeout(start, 0);
+    return () => clearTimeout(id);
+    // `start` is recreated each render and only reads props; running this
+    // once per readiness change is the point.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [autoReady, phase, url]);
+
+  const resend = async () => {
+    if (!unsent || !upload.current) return;
+    setError(null);
+    setPhase('uploading');
+    const stored = await upload.current(unsent).catch(() => null);
+    if (!stored) {
+      setError('Still not saved. Check your connection and retry.');
+      setPhase('failed');
+      return;
+    }
+    setUnsent(null);
+    setPhase('done');
+    onDone(stored);
+  };
+
+  if (auto?.spent && !url) {
+    return (
+      <p role="status" className="text-sm text-muted-foreground">
+        This task was started on an earlier visit and cannot be answered again.
+        It stays unanswered — move on to the next one.
+      </p>
+    );
+  }
+
   const finishEarly = () => {
     deadline.current = Date.now();
   };
 
   return (
     <div className="space-y-3">
-      {phase === 'idle' ? (
+      {phase === 'idle' && auto ? (
+        <p role="status" className="font-mono text-sm text-muted-foreground">
+          Recording starts when the audio ends
+        </p>
+      ) : null}
+      {phase === 'idle' && !auto ? (
         <Button type="button" onClick={start}>
           <Mic aria-hidden />
           {prepSeconds
@@ -175,6 +228,11 @@ function OneShot({
           {error}
         </p>
       ) : null}
+      {unsent && phase === 'failed' ? (
+        <Button type="button" variant="outline" size="sm" onClick={resend}>
+          Retry upload
+        </Button>
+      ) : null}
       <p className="text-xs text-muted-foreground">
         One take · {responseSeconds}s to answer
       </p>
@@ -187,6 +245,7 @@ export function Recording({
   value,
   onChange,
   onUpload,
+  auto,
 }: ResponseRendererProps) {
   return (
     <OneShot
@@ -195,6 +254,7 @@ export function Recording({
       url={value}
       onDone={onChange}
       onUpload={onUpload}
+      auto={auto}
     />
   );
 }

@@ -793,6 +793,20 @@ export const examTaskResponses = pgTable(
     value: text('value'),
     audioUrl: text('audio_url'),
     flagged: boolean('flagged').notNull().default(false),
+    /**
+     * When this item's stimulus began: its one audio play started, or — for a
+     * task with no audio — the item was first shown. Stamped once, on the
+     * server, so a reload or a return to the item cannot replay a single-play
+     * recording or restart a preparation window.
+     */
+    stimulusStartedAt: timestamp('stimulus_started_at', {
+      withTimezone: true,
+    }),
+    /**
+     * Stamped when a mock candidate moves past the item. A completed item
+     * accepts no further writes, which is what makes mock navigation one-way.
+     */
+    completedAt: timestamp('completed_at', { withTimezone: true }),
     updatedAt: timestamp('updated_at', { withTimezone: true })
       .notNull()
       .defaultNow(),

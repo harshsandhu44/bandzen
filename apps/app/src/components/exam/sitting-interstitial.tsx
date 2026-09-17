@@ -6,6 +6,7 @@ import { getMockAttempt, getMockSiblings } from '@/lib/db/queries';
 import type { Skill } from '@/lib/db/schema';
 import { mockPosition, mockSectionUrl, type MockChild } from '@/lib/mock';
 import { enterMockSection } from '@/app/(app)/mock/actions';
+import { MicGate } from '@/components/exam/mic-gate';
 
 /**
  * The one interstitial shown before every section of a sitting — mock or
@@ -119,9 +120,15 @@ export async function SittingInterstitial({
         </p>
         <form action={enterMockSection} className="mt-4">
           <input type="hidden" name="mockAttemptId" value={sittingId} />
-          <Button type="submit">
-            Continue <ArrowRight />
-          </Button>
+          {/* A task sitting's spoken part records by itself, so it opens only
+              once the microphone is known to work. */}
+          {mock.taskIds && position === 'speaking' ? (
+            <MicGate />
+          ) : (
+            <Button type="submit">
+              Continue <ArrowRight />
+            </Button>
+          )}
         </form>
       </Panel>
     </div>

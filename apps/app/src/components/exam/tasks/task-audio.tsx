@@ -16,12 +16,25 @@ import { Button } from '@bandzen/ui/components/button';
 export function TaskAudio({
   src,
   policy,
+  alreadyPlayed = false,
+  onStart,
+  onEnded,
 }: {
   src: string;
   policy: TaskAudioPolicy;
+  /**
+   * The server says this stimulus already began on an earlier visit. A mock
+   * passes it so that remounting the player — changing item, reloading —
+   * cannot hand back a play the candidate has used. Treated as every play
+   * spent: a single-play recording interrupted by a reload does not restart.
+   */
+  alreadyPlayed?: boolean;
+  /** Fires as a play begins, so the runner can stamp it before it ends. */
+  onStart?: () => void;
+  onEnded?: () => void;
 }) {
   const ref = useRef<HTMLAudioElement>(null);
-  const [played, setPlayed] = useState(0);
+  const [played, setPlayed] = useState(alreadyPlayed ? policy.plays : 0);
   const [waiting, setWaiting] = useState(policy.startDelaySeconds ?? 0);
   const spent = played >= policy.plays;
 
@@ -48,7 +61,13 @@ export function TaskAudio({
         ref={ref}
         src={src}
         preload="auto"
-        onEnded={() => setPlayed((n) => n + 1)}
+        // Playing, not play: `play` fires before a byte has loaded, and a
+        // stalled network would otherwise spend a play nobody heard.
+        onPlaying={onStart}
+        onEnded={() => {
+          setPlayed((n) => n + 1);
+          onEnded?.();
+        }}
       />
       <div className="flex items-center gap-3">
         {!spent && (!policy.autoplay || played > 0) ? (

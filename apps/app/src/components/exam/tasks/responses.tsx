@@ -29,6 +29,12 @@ export type ResponseRendererProps = {
    * it — the task lab has nowhere to put one.
    */
   onUpload?: (blob: Blob) => Promise<string | null>;
+  /**
+   * Mock rules for a spoken answer: it begins by itself once `ready` (the
+   * stimulus has finished), and a `spent` item — left mid-task on an earlier
+   * visit — gets no second take. Absent in practice and in the task lab.
+   */
+  auto?: { ready: boolean; spent: boolean };
 };
 
 const parseList = (value: string): string[] => {
