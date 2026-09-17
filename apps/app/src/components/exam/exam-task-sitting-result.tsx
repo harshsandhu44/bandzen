@@ -1,9 +1,9 @@
 import { getTask, type ScoreScale } from '@bandzen/exams/registry';
 import { ESTIMATE_NOTE, formatScore } from '@bandzen/exams/scoring';
-import { Button } from '@bandzen/ui/components/button';
 import { Eyebrow, PageHeader, Panel } from '@/components/app/primitives';
 import { ScoreReveal } from '@/components/exam/score-reveal';
 import { GradingWatch } from '@/components/app/grading-watch';
+import { SubmitButton } from '@/components/app/submit-button';
 import type { StoredScoreReport } from '@/lib/db/queries';
 import type { SittingReportState } from '@/lib/exam-sitting';
 
@@ -85,9 +85,13 @@ export function ExamTaskSittingResult({
                   <span>{label(s.taskType)}</span>
                   <form action={retryAction}>
                     <input type="hidden" name="attemptId" value={s.id} />
-                    <Button type="submit" size="sm" variant="outline">
+                    <SubmitButton
+                      size="sm"
+                      variant="outline"
+                      pendingLabel="Marking…"
+                    >
                       Retry marking
-                    </Button>
+                    </SubmitButton>
                   </form>
                 </li>
               ))}

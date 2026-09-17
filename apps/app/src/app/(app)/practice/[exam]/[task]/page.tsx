@@ -1,7 +1,7 @@
 import { notFound } from 'next/navigation';
 import { getExam, getTask, timeLimitSeconds } from '@bandzen/exams/registry';
-import { Button } from '@bandzen/ui/components/button';
 import { Eyebrow, PageHeader, Panel } from '@/components/app/primitives';
+import { SubmitButton } from '@/components/app/submit-button';
 import { requireUserId } from '@/lib/auth';
 import { getPublishedExamTasks } from '@/lib/db/queries';
 import { startExamTaskAttempt } from './actions';
@@ -48,7 +48,7 @@ export default async function TaskStartPage({
                 : null}
               {task.audio ? ' · audio plays once' : null}
             </p>
-            <Button type="submit">Start</Button>
+            <SubmitButton>Start</SubmitButton>
           </form>
         ) : (
           <div className="space-y-2">

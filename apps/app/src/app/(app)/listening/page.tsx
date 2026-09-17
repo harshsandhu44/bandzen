@@ -4,6 +4,7 @@ import { Button } from '@bandzen/ui/components/button';
 import { EmptyState, PageHeader, Panel } from '@/components/app/primitives';
 import { FilterBar } from '@/components/app/filter-bar';
 import { LockedPracticeRow, QuotaMeter } from '@/components/billing/pro';
+import { SubmitButton } from '@/components/app/submit-button';
 import { capture } from '@/lib/analytics';
 import { requireUserId } from '@/lib/auth';
 import {
@@ -188,9 +189,13 @@ export default async function ListeningPage({
                     {assignmentId ? (
                       <input type="hidden" name="a" value={assignmentId} />
                     ) : null}
-                    <Button type="submit" variant="outline" size="sm">
+                    <SubmitButton
+                      variant="outline"
+                      size="sm"
+                      pendingLabel="Opening…"
+                    >
                       Start
-                    </Button>
+                    </SubmitButton>
                   </form>
                 </li>
               );
