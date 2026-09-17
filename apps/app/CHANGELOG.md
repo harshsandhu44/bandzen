@@ -1,3 +1,10 @@
+## app [1.25.5](https://github.com/harshsandhu44/bandzen/compare/app@1.25.4...app@1.25.5) (2026-09-17)
+
+
+### Bug Fixes
+
+* **app:** enforce PTE mock timing, one-way navigation and single-play audio ([#134](https://github.com/harshsandhu44/bandzen/issues/134)) ([7607a37](https://github.com/harshsandhu44/bandzen/commit/7607a37e76c896d7351bbc8e52faa234a6364b99))
+
 ## app [1.25.4](https://github.com/harshsandhu44/bandzen/compare/app@1.25.3...app@1.25.4) (2026-09-17)
 
 
