@@ -253,6 +253,13 @@
       "when": 1789632877276,
       "tag": "0035_plan_assignments",
       "breakpoints": true
+    },
+    {
+      "idx": 36,
+      "version": "7",
+      "when": 1789633563263,
+      "tag": "0036_study_days",
+      "breakpoints": true
     }
   ]
 }

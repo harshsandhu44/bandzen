@@ -35,6 +35,18 @@ export const profileSchema = z
       .int()
       .min(10, 'Give yourself at least ten minutes a day')
       .max(480),
+    // A comma list of ISO weekdays from the day toggles. Missing means every
+    // day, which is what a profile saved before the toggles existed has.
+    studyDays: z.preprocess(
+      (v) =>
+        v == null
+          ? [1, 2, 3, 4, 5, 6, 7]
+          : String(v).split(',').filter(Boolean).map(Number),
+      z
+        .array(z.number().int().min(1).max(7))
+        .min(1, 'Pick at least one day to study')
+        .transform((days) => [...new Set(days)].sort()),
+    ),
     timezone: blankToNull(z.string().max(64)),
   })
   .superRefine((v, ctx) => {
@@ -83,6 +95,7 @@ export function parseProfileForm(formData: FormData) {
     testDate: formData.get('testDate'),
     selfAssessedScore: formData.get('selfAssessedScore'),
     studyMinutes: formData.get('studyMinutes'),
+    studyDays: formData.get('studyDays'),
     timezone: formData.get('timezone'),
   });
 }

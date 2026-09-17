@@ -21,6 +21,7 @@ import {
   COMMIT_DAYS,
   assignmentTasks,
   buildPlan,
+  isStudyDay,
   planProgress,
   targetAvailable,
   testDayState,
@@ -116,6 +117,8 @@ export async function loadPlanData(
     targetScore: profile.targetScore,
     testDate: profile.testDate,
     today,
+    dailyMinutes: profile.studyMinutes,
+    studyDays: profile.studyDays,
     weaknesses: report?.weaknesses ?? undefined,
     weakKinds: [...kindAccuracy]
       .sort((a, b) => a.accuracy - b.accuracy)
@@ -140,6 +143,10 @@ export async function loadPlanData(
       today,
       dayStart: start,
       dayEnd: end,
+      pace: {
+        dailyMinutes: profile.studyMinutes,
+        studyDays: profile.studyDays,
+      },
       isAvailable: (kind, id) => targetAvailable(kind, id, catalogue),
       plan: (assignedTargetIds) =>
         buildPlan({
@@ -187,6 +194,7 @@ export async function loadPlanData(
     plan,
     progress,
     testDay: testDayState(today, profile.testDate),
+    restDay: !isStudyDay(today, profile.studyDays),
     estimated,
     readingBand,
     writingBand,

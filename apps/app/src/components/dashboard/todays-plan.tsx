@@ -14,7 +14,8 @@ import { targetHref, type PlanProgress } from '@/lib/study-plan';
  * "minutes studied" figure that included reading time would be invented.
  */
 export function TodaysPlan({ progress }: { progress: PlanProgress }) {
-  const { tasks, minutesDone, minutesGoal } = progress;
+  const { tasks, minutesDone, minutesGoal, dailyMinutes } = progress;
+  const over = dailyMinutes != null ? minutesGoal - dailyMinutes : 0;
 
   return (
     <Panel
@@ -32,6 +33,12 @@ export function TodaysPlan({ progress }: { progress: PlanProgress }) {
         aria-label="Minutes completed today"
         className="mb-3"
       />
+      {/* Said before starting, not discovered at the end. */}
+      {over > 0 ? (
+        <p className="mb-3 text-xs text-muted-foreground">
+          Today runs {over} min over your {dailyMinutes}-minute day.
+        </p>
+      ) : null}
 
       <ul className="-mb-2.5 divide-y divide-border border-t border-border">
         {tasks.map((task, i) => {

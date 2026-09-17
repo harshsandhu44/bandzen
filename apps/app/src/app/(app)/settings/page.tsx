@@ -87,6 +87,7 @@ export default async function SettingsPage() {
               testDate: profile?.testDate ?? null,
               selfAssessedScore: profile?.selfAssessedScore ?? null,
               studyMinutes: profile?.studyMinutes ?? null,
+              studyDays: profile?.studyDays ?? null,
             }}
           />
         </TabsContent>
