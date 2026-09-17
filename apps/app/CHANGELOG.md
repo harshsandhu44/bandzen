@@ -1,3 +1,10 @@
+## app [1.25.7](https://github.com/harshsandhu44/bandzen/compare/app@1.25.6...app@1.25.7) (2026-09-17)
+
+
+### Bug Fixes
+
+* **admin:** lock content candidates have sat, and duplicate it to change it ([#136](https://github.com/harshsandhu44/bandzen/issues/136)) ([f933a92](https://github.com/harshsandhu44/bandzen/commit/f933a921a923672f532716f535d751c945f6d3b7)), closes [#120](https://github.com/harshsandhu44/bandzen/issues/120) [#120](https://github.com/harshsandhu44/bandzen/issues/120)
+
 ## app [1.25.6](https://github.com/harshsandhu44/bandzen/compare/app@1.25.5...app@1.25.6) (2026-09-17)
 
 
