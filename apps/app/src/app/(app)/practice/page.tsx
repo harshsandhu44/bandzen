@@ -62,7 +62,8 @@ export default async function PracticePage() {
   const [overview, next, diagnostic, taken, pro, openMock, published] =
     await Promise.all([
       practiceOverview(userId, exam),
-      nextPracticeStep(userId),
+      // Its weaknesses and diagnostic are IELTS's; another exam gets neither.
+      exam.key === 'ielts' ? nextPracticeStep(userId) : null,
       latestDiagnostic(userId),
       diagnosticCount(userId),
       isPro(userId),

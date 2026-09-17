@@ -1,8 +1,4 @@
-import {
-  fullLengthItems,
-  getExam,
-  scoreScaleFor,
-} from '@bandzen/exams/registry';
+import { getExam, scoreScaleFor } from '@bandzen/exams/registry';
 import { notFound } from 'next/navigation';
 import { requireUserId } from '@/lib/auth';
 import {
@@ -66,7 +62,7 @@ export default async function MockResultPage({
           target={target}
           items={{
             sat: mock.taskIds?.length ?? 0,
-            full: fullLengthItems(exam!),
+            full: exam?.totalItems ?? null,
           }}
           retryAction={retrySittingGrading}
         />

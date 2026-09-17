@@ -308,8 +308,15 @@ export type PlanProgress = {
  * contradict each other if there is only ever one of them.
  */
 export type PlanEvidence = {
-  /** One entry per completed attempt submitted today. */
-  modulesCompletedToday: readonly Skill[];
+  /**
+   * One entry per completed attempt submitted today, already scoped to the
+   * plan's exam. `taskType` is set on attempts at exam task items.
+   */
+  completedToday: readonly {
+    module: Skill;
+    kind: 'practice' | 'diagnostic' | 'mock';
+    taskType: string | null;
+  }[];
   completedLessonIds: readonly string[];
   /** The module of an attempt left open, if any. */
   moduleInProgress?: Skill | null;
@@ -318,17 +325,29 @@ export type PlanEvidence = {
 /**
  * Label today's tasks against that evidence.
  *
- * A skill's Nth task today completes on its Nth attempt today, so two reading
- * tasks need two reading attempts rather than both lighting up from one.
+ * A task's Nth occurrence today completes on its Nth matching attempt today,
+ * so two reading tasks need two reading attempts rather than both lighting up
+ * from one. What matches depends on the task:
+ *
+ * - An exam task drill matches only a **practice** attempt at the same task
+ *   type. Read Aloud does not finish a Repeat Sentence drill just because both
+ *   are Speaking, and a mock's children never tick drills.
+ * - Anything else matches by skill, and only attempts with no task type — the
+ *   IELTS passages, prompts and tracks the skill-level tasks open.
  */
 export function derivePlanState(
   tasks: PlanTask[],
   evidence: PlanEvidence,
   goalMinutes?: number | null,
 ): PlanProgress {
-  const remaining = new Map<Skill, number>();
-  for (const skill of evidence.modulesCompletedToday) {
-    remaining.set(skill, (remaining.get(skill) ?? 0) + 1);
+  const remaining = new Map<string, number>();
+  for (const a of evidence.completedToday) {
+    const key = a.taskType
+      ? a.kind === 'practice'
+        ? `task:${a.taskType}`
+        : null
+      : `skill:${a.module}`;
+    if (key) remaining.set(key, (remaining.get(key) ?? 0) + 1);
   }
 
   let activeTaken = false;
@@ -339,9 +358,13 @@ export function derivePlanState(
       return { ...task, status: done ? 'completed' : 'pending' };
     }
 
-    const left = remaining.get(task.skill) ?? 0;
+    const key =
+      task.target?.kind === 'exam_task'
+        ? `task:${task.target.taskType}`
+        : `skill:${task.skill}`;
+    const left = remaining.get(key) ?? 0;
     if (left > 0) {
-      remaining.set(task.skill, left - 1);
+      remaining.set(key, left - 1);
       return { ...task, status: 'completed' };
     }
 

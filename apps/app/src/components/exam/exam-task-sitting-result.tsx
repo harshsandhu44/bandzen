@@ -45,7 +45,7 @@ export function ExamTaskSittingResult({
   scale: ScoreScale;
   target: number | null;
   /** What this sitting ran, against what the real format runs. */
-  items: { sat: number; full: number };
+  items: { sat: number; full: { min: number; max: number } | null };
   retryAction: (formData: FormData) => Promise<void>;
 }) {
   const label = (taskType: string | null) =>
@@ -180,10 +180,10 @@ export function ExamTaskSittingResult({
       {/* What the estimate was made from. A score assembled from a quarter of
           the format's questions is a weaker guess than one assembled from all
           of them, and the candidate is the one who should know that. */}
-      {items.sat < items.full ? (
+      {items.full && items.sat < items.full.min ? (
         <p className="text-xs text-muted-foreground">
           Estimated from the {items.sat} questions you sat. A real {examName}{' '}
-          runs {items.full}.
+          runs {items.full.min}–{items.full.max} questions.
         </p>
       ) : null}
 

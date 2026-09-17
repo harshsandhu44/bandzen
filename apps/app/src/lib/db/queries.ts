@@ -2595,15 +2595,22 @@ export async function latestDiagnostic(userId: string) {
  */
 export async function attemptsSubmittedOn(
   userId: string,
+  examKey: ExamKey,
   dayStart: Date,
   dayEnd: Date,
 ) {
   return db
-    .select({ id: attempts.id, module: attempts.module, kind: attempts.kind })
+    .select({
+      id: attempts.id,
+      module: attempts.module,
+      kind: attempts.kind,
+      taskType: attempts.taskType,
+    })
     .from(attempts)
     .where(
       and(
         eq(attempts.userId, userId),
+        eq(attempts.examKey, examKey),
         eq(attempts.status, 'complete'),
         gte(attempts.submittedAt, dayStart),
         lt(attempts.submittedAt, dayEnd),
@@ -2622,7 +2629,11 @@ export async function attemptsSubmittedOn(
  * view); omit it only for a caller that is itself module-aware and will use
  * the `module` each row now carries.
  */
-export async function accuracyByQuestionKind(userId: string, module?: Skill) {
+export async function accuracyByQuestionKind(
+  userId: string,
+  module?: Skill,
+  examKey: ExamKey = 'ielts',
+) {
   const rows = await db
     .select({
       module: attempts.module,
@@ -2638,6 +2649,7 @@ export async function accuracyByQuestionKind(userId: string, module?: Skill) {
       and(
         eq(attempts.userId, userId),
         eq(attempts.status, 'complete'),
+        eq(attempts.examKey, examKey),
         module ? eq(attempts.module, module) : undefined,
       ),
     );
@@ -2712,7 +2724,7 @@ export async function bandHistory(
  * starting and submitting an attempt -- we do not track time on lesson pages,
  * so claiming a "minutes studied" figure that included them would be invented.
  */
-export async function activitySummary(userId: string) {
+export async function activitySummary(userId: string, examKey: ExamKey) {
   const [totals] = await db
     .select({
       attemptCount: count(),
@@ -2720,7 +2732,13 @@ export async function activitySummary(userId: string) {
       questions: sql<number>`coalesce(sum(${attempts.total}), 0)::int`,
     })
     .from(attempts)
-    .where(and(eq(attempts.userId, userId), eq(attempts.status, 'complete')));
+    .where(
+      and(
+        eq(attempts.userId, userId),
+        eq(attempts.examKey, examKey),
+        eq(attempts.status, 'complete'),
+      ),
+    );
 
   const [lessons] = await db
     .select({ value: count() })

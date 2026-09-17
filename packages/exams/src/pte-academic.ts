@@ -126,6 +126,8 @@ export const PTE_ACADEMIC = {
   source:
     'https://www.pearsonpte.com/ctf-assets/yqwtwibiobs4/WUcBAMkYCC9Dj5vs2HfVA/941d88d07ba7c2a5007f7ce1b18eedbf/Score_Guide__Test_Taker__-_PTE_Academic_-_July_2025__web_.pdf',
   duration: 'About 2 hr 15 min',
+  // The guide: "between 65–75 questions in any given test".
+  totalItems: { min: 65, max: 75 },
   variants: [],
   scoreScale: { label: 'Score', min: 10, max: 90, step: 1 },
   targetRange: { min: 30, max: 90, step: 5 },

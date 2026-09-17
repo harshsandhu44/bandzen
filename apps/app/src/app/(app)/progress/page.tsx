@@ -9,7 +9,12 @@ import {
   TabsList,
   TabsTrigger,
 } from '@bandzen/ui/components/tabs';
-import { examSkills, getExam, type ExamKey } from '@bandzen/exams/registry';
+import {
+  examSkills,
+  getExam,
+  getTask,
+  type ExamKey,
+} from '@bandzen/exams/registry';
 import { cn } from '@bandzen/ui/lib/utils';
 import { ExamComingSoon } from '@/components/app/exam-coming-soon';
 import { formatScore } from '@bandzen/exams/scoring';
@@ -108,8 +113,8 @@ export default async function ProgressPage({
   const [history, accuracy, activity, lessons, attempts, pro, awards, reports] =
     await Promise.all([
       bandHistory(userId, undefined, examKey),
-      accuracyByQuestionKind(userId, 'reading'),
-      activitySummary(userId),
+      accuracyByQuestionKind(userId, 'reading', examKey),
+      activitySummary(userId, examKey),
       listLessonProgress(userId),
       listCompletedAttempts(userId, 50, examKey),
       isPro(userId),
@@ -119,6 +124,10 @@ export default async function ProgressPage({
         : Promise.resolve([]),
     ]);
   const scale = exam.scoreScale;
+
+  // The latest sitting's task types, weakest first — PTE's counterpart to the
+  // question-kind matrix, which only IELTS attempts can fill.
+  const taskTypes = reports[0]?.taskTypes ?? [];
 
   // Below MIN_ATTEMPTED a rate is noise, so it cannot name a pattern.
   const ranked = accuracy
@@ -177,14 +186,24 @@ export default async function ProgressPage({
         {examFilter}
         <EmptyState
           title="No results yet"
-          description="Progress is measured from completed attempts. Take the diagnostic and this page starts filling in."
+          // The diagnostic is an IELTS sitting; any other exam starts from
+          // its own practice.
+          description={
+            examKey === 'ielts'
+              ? 'Progress is measured from completed attempts. Take the diagnostic and this page starts filling in.'
+              : 'Progress is measured from completed attempts. Practise a task and this page starts filling in.'
+          }
           action={
             <Button
               size="sm"
               nativeButton={false}
-              render={<Link href="/diagnostic" />}
+              render={
+                <Link
+                  href={examKey === 'ielts' ? '/diagnostic' : '/practice'}
+                />
+              }
             >
-              Take the diagnostic
+              {examKey === 'ielts' ? 'Take the diagnostic' : 'Start practising'}
             </Button>
           }
         />
@@ -254,6 +273,9 @@ export default async function ProgressPage({
             ) : null}
             {ranked.length ? (
               <TabsTrigger value="patterns">Patterns</TabsTrigger>
+            ) : null}
+            {taskTypes.length ? (
+              <TabsTrigger value="tasks">By task type</TabsTrigger>
             ) : null}
           </TabsList>
 
@@ -379,6 +401,29 @@ export default async function ProgressPage({
                   );
                 })}
               </ul>
+            </TabsContent>
+          ) : null}
+
+          {taskTypes.length ? (
+            <TabsContent value="tasks">
+              <ol className="-my-2.5 divide-y divide-border">
+                {taskTypes.map((t) => (
+                  <li
+                    key={t.taskType}
+                    className="flex items-baseline justify-between gap-4 py-2.5"
+                  >
+                    <span className="text-sm">
+                      {getTask(examKey, t.taskType)?.label ?? t.taskType}
+                    </span>
+                    <span className="font-metric text-metric-sm">
+                      {Math.round(t.fraction * 100)}%
+                    </span>
+                  </li>
+                ))}
+              </ol>
+              <p className="mt-4 text-xs text-muted-foreground">
+                From your latest mock test, weakest first.
+              </p>
             </TabsContent>
           ) : null}
         </Tabs>

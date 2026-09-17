@@ -189,6 +189,12 @@ export type ExamDefinition = {
    * board never states.
    */
   duration: string;
+  /**
+   * How many questions one real sitting has, as the board states it. Stated,
+   * not summed from per-task counts: those add up to a wider range than any
+   * version of the test actually runs.
+   */
+  totalItems?: { min: number; max: number };
   /** IELTS Academic/General; empty for exams without variants. */
   variants: readonly { key: string; label: string }[];
   scoreScale: ScoreScale;
