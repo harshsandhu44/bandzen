@@ -1,4 +1,6 @@
 import Link from 'next/link';
+import { Button } from '@bandzen/ui/components/button';
+import { resumePlan } from '@/app/(app)/plan/actions';
 import { redirect } from 'next/navigation';
 import { Card, CardContent } from '@bandzen/ui/components/card';
 import { examSkills, getExam } from '@bandzen/exams/registry';
@@ -33,6 +35,17 @@ import { currentStreak, longestStreak } from '@/lib/awards';
 import { buildInsight } from '@/lib/insight';
 import { loadPlanData } from '@/lib/plan-data';
 import { nextAction } from '@/lib/study-plan';
+
+/** Why the plan last changed, in the dashboard's words. */
+const REVISION_NOTE = {
+  settings_changed: 'your settings changed',
+  new_score: 'a new score came in',
+  user_replan: 'you asked for a new plan',
+  missed_work: 'missed work was carried over',
+  content_unavailable: 'some material was withdrawn and replaced',
+  paused: 'paused',
+  resumed: 'resumed from today',
+} as const;
 
 export const metadata = { title: 'Today' };
 
@@ -94,6 +107,8 @@ export default async function DashboardPage() {
     progress,
     testDay,
     restDay,
+    paused,
+    revision,
     estimated,
     measured,
     report,
@@ -160,6 +175,23 @@ export default async function DashboardPage() {
       {planInput ? <p className="text-sm">{nextAction(planInput)}</p> : null}
 
       {/* The plan stops at the test date; say so rather than going quiet. */}
+      {paused ? (
+        <form action={resumePlan} className="flex flex-wrap items-center gap-3">
+          <p className="text-sm">
+            Your plan is paused. Nothing new is scheduled and nothing rolls
+            over.
+          </p>
+          <Button type="submit" size="sm" variant="outline">
+            Resume plan
+          </Button>
+        </form>
+      ) : revision ? (
+        <p className="text-sm text-muted-foreground">
+          Plan updated: {REVISION_NOTE[revision.reason]}
+          {revision.detail ? ` (${revision.detail})` : ''}.
+        </p>
+      ) : null}
+
       {restDay && !progress.tasks.length ? (
         <p className="text-sm text-muted-foreground">
           Rest day. Nothing is scheduled.
@@ -182,7 +214,9 @@ export default async function DashboardPage() {
 
       <div className="grid gap-4 lg:grid-cols-12 lg:items-start">
         <div className="space-y-4 lg:col-span-7">
-          {progress.tasks.length ? <TodaysPlan progress={progress} /> : null}
+          {progress.tasks.length ? (
+            <TodaysPlan progress={progress} today={today} />
+          ) : null}
           <PerformanceInsight insight={insight} />
           <ScoreOverview
             scale={exam.scoreScale}

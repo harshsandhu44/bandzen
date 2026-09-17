@@ -2,7 +2,7 @@
 
 import { revalidatePath } from 'next/cache';
 import { requireUserId } from '@/lib/auth';
-import { upsertProfile } from '@/lib/db/queries';
+import { replanPlan, upsertProfile } from '@/lib/db/queries';
 import { firstIssue, parseProfileForm } from '@/lib/profile';
 
 export type SettingsState = { error: string | null; saved?: boolean };
@@ -24,6 +24,8 @@ export async function saveSettings(
   if (!parsed.success) return { error: firstIssue(parsed.error) };
 
   await upsertProfile(userId, parsed.data);
+  // New minutes, days, target or date: plan the unstarted days again (#131).
+  await replanPlan(userId, parsed.data.examKey, 'settings_changed');
 
   // The sidebar countdown, the exam menu and every plan read from this profile.
   // A new exam here becomes an enrollment of its own; the old one is kept.
