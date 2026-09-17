@@ -4,6 +4,7 @@ import { getExam } from '@bandzen/exams/registry';
 import {
   composeSitting,
   skillForTaskType,
+  sittingReportState,
   skillsInSitting,
   tasksForSkill,
   type PublishedTask,
@@ -80,4 +81,61 @@ test('a sitting splits into the skills it has content for, in section order', ()
     'ra1',
     'ra2',
   ]);
+});
+
+const marked = (taskType: string, correct: number, total: number) => ({
+  taskType,
+  status: 'complete',
+  assessment: { taskType, dimensions: { correct, total }, measuredSkills: [] },
+});
+
+test('a report is complete only when every locked task type has a readable score', () => {
+  const expected = ['read_aloud', 'reorder_paragraphs'];
+  assert.equal(
+    sittingReportState(expected, [
+      marked('read_aloud', 10, 20),
+      marked('reorder_paragraphs', 0, 4),
+    ]),
+    'complete',
+  );
+  // One still grading: no overall yet.
+  assert.equal(
+    sittingReportState(expected, [
+      marked('read_aloud', 10, 20),
+      { taskType: 'reorder_paragraphs', status: 'grading', assessment: null },
+    ]),
+    'pending',
+  );
+  // A section never reached is pending too, not a silent gap in the report.
+  assert.equal(
+    sittingReportState(expected, [marked('read_aloud', 10, 20)]),
+    'pending',
+  );
+});
+
+test('a failed grader fails the report instead of disappearing from it', () => {
+  const expected = ['read_aloud', 'write_essay'];
+  assert.equal(
+    sittingReportState(expected, [
+      marked('read_aloud', 10, 20),
+      { taskType: 'write_essay', status: 'failed', assessment: null },
+    ]),
+    'failed',
+  );
+  // Finished, but nothing the scorer can read: retryable, not stuck pending.
+  assert.equal(
+    sittingReportState(expected, [
+      marked('read_aloud', 10, 20),
+      {
+        taskType: 'write_essay',
+        status: 'complete',
+        assessment: {
+          taskType: 'write_essay',
+          dimensions: { Content: 5 },
+          measuredSkills: [],
+        },
+      },
+    ]),
+    'failed',
+  );
 });
