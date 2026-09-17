@@ -1,4 +1,4 @@
-import { getExam, scoreScaleFor } from '@bandzen/exams/registry';
+import { examSkills, getExam, scoreScaleFor } from '@bandzen/exams/registry';
 import { notFound } from 'next/navigation';
 import { requireUserId } from '@/lib/auth';
 import {
@@ -72,6 +72,10 @@ export default async function MockResultPage({
         {report ? (
           <OfficialScoreForm
             scale={scoreScaleFor(mock.examKey)}
+            skills={(exam ? examSkills(exam) : []).map((key) => ({
+              key,
+              label: key[0]!.toUpperCase() + key.slice(1),
+            }))}
             action={saveOfficialScore.bind(null, mockAttemptId)}
             recorded={recorded.map((r) => ({
               score: r.score,
