@@ -38,7 +38,7 @@ export async function practiceOverview(
 ): Promise<PracticeModuleOverview[]> {
   const skills = examSkills(exam);
   const [accuracy, ...bands] = await Promise.all([
-    accuracyByQuestionKind(userId),
+    accuracyByQuestionKind(userId, undefined, exam.key),
     ...skills.map((m) => latestBand(userId, m, exam.key)),
   ]);
 

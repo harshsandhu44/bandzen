@@ -11,6 +11,7 @@ import {
   finishSittingSection,
   mockSectionClock,
 } from '@/lib/mock-guard';
+import { skillForTaskType } from '@/lib/exam-sitting';
 import { acceptsWrite } from '@/lib/task-session';
 import {
   completeExamTaskItem,
@@ -61,10 +62,10 @@ export async function startExamTaskAttempt(formData: FormData) {
     examKey: exam.key,
     examVersion: exam.version,
     taskType: task.key,
-    // The skill the attempt counts as. A task measuring several — PTE's are
-    // mostly integrated — records all of them in its assessment; this is only
-    // which column of the dashboard it sits in.
-    module: task.measuredSkills[0]!,
+    // The skill the attempt counts as: the part it is sat in, as a mock files
+    // it, not the first skill it measures, which would put Repeat Sentence
+    // under Listening. Its assessment still records every skill it measures.
+    module: skillForTaskType(exam.key, task.key)!,
     taskIds: items.map((i) => i.id),
   });
 

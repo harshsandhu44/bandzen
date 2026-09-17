@@ -290,7 +290,7 @@ test('task state comes from attempts, and counts them one for one', () => {
   ).slice(0, 3); // reading, writing, reading
 
   const { tasks: stated, minutesDone } = derivePlanState(tasks, {
-    modulesCompletedToday: ['reading'],
+    completedToday: [{ module: 'reading', kind: 'practice', taskType: null }],
     completedLessonIds: [],
     moduleInProgress: 'writing',
   });
@@ -300,6 +300,41 @@ test('task state comes from attempts, and counts them one for one', () => {
   // One reading attempt completes one reading task, not both.
   assert.equal(stated[2]?.status, 'pending');
   assert.equal(minutesDone, tasks[0]!.minutes);
+});
+
+test('an exam task drill completes only on a practice attempt at that task type', () => {
+  const drill = (taskType: string, day: number) => ({
+    day,
+    date: '2026-09-01',
+    skill: 'speaking' as const,
+    label: taskType,
+    minutes: 10,
+    target: { kind: 'exam_task' as const, taskType },
+    href: null,
+  });
+  const tasks = [
+    drill('repeat_sentence', 1),
+    drill('repeat_sentence', 2),
+    { ...drill('read_aloud', 3), skill: 'reading' as const, target: null },
+  ];
+
+  const { tasks: stated } = derivePlanState(tasks, {
+    completedToday: [
+      // Same skill, other task: does not finish a Repeat Sentence drill.
+      { module: 'speaking', kind: 'practice', taskType: 'read_aloud' },
+      // A mock's child never ticks a drill.
+      { module: 'speaking', kind: 'mock', taskType: 'repeat_sentence' },
+      { module: 'speaking', kind: 'practice', taskType: 'repeat_sentence' },
+      // An exam task attempt never ticks a skill-level task either.
+      { module: 'reading', kind: 'practice', taskType: 'reorder_paragraphs' },
+    ],
+    completedLessonIds: [],
+  });
+
+  assert.deepEqual(
+    stated.map((t) => t.status),
+    ['completed', 'pending', 'pending'],
+  );
 });
 
 test('the goal falls back to what the plan asks for', () => {
@@ -313,7 +348,7 @@ test('the goal falls back to what the plan asks for', () => {
     }),
   ).slice(0, 2);
 
-  const evidence = { modulesCompletedToday: [], completedLessonIds: [] };
+  const evidence = { completedToday: [], completedLessonIds: [] };
   const total = tasks[0]!.minutes + tasks[1]!.minutes;
 
   assert.equal(derivePlanState(tasks, evidence).minutesGoal, total);

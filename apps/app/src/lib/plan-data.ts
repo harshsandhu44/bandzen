@@ -83,9 +83,9 @@ export async function loadPlanData(
     latestBand(userId, 'listening', examKey),
     latestBand(userId, 'speaking', examKey),
     latestReport(userId, 'writing'),
-    accuracyByQuestionKind(userId, 'reading'),
-    accuracyByQuestionKind(userId, 'listening'),
-    attemptsSubmittedOn(userId, start, end),
+    accuracyByQuestionKind(userId, 'reading', examKey),
+    accuracyByQuestionKind(userId, 'listening', examKey),
+    attemptsSubmittedOn(userId, examKey, start, end),
     listLessonProgress(userId),
     listPassages(),
     listWritingPrompts(),
@@ -130,7 +130,7 @@ export async function loadPlanData(
   const progress = derivePlanState(
     tasksOn(plan, today),
     {
-      modulesCompletedToday: doneToday.map((a) => a.module),
+      completedToday: doneToday,
       completedLessonIds,
     },
     profile.studyMinutes,

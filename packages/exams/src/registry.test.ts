@@ -191,6 +191,8 @@ test('a PTE sitting is 65 to 85 questions, and its parts are the guide\u2019s', 
     total((r) => r.items[0]),
   );
   assert.equal(fullLengthItems(pte), 65);
+  // The per-task maxima sum past what the guide says a test runs.
+  assert.deepEqual(pte.totalItems, { min: 65, max: 75 });
   assert.equal(
     total((r) => r.items[1]),
     85,
