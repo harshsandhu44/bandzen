@@ -71,7 +71,10 @@ export type PreparationDefaults = {
   testDate: string | null;
   selfAssessedScore: number | null;
   studyMinutes: number | null;
+  studyDays: number[] | null;
 };
+
+const WEEKDAYS = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
 
 export function PreparationForm({
   mode,
@@ -120,6 +123,15 @@ export function PreparationForm({
       : '',
   );
   const [minutes, setMinutes] = useState(String(defaults.studyMinutes ?? 45));
+  const [days, setDays] = useState<number[]>(
+    defaults.studyDays ?? [1, 2, 3, 4, 5, 6, 7],
+  );
+  const toggleDay = (day: number) =>
+    setDays((current) =>
+      current.includes(day)
+        ? current.filter((d) => d !== day)
+        : [...current, day].sort(),
+    );
   const [testDate, setTestDate] = useState(defaults.testDate ?? '');
 
   const { exam, values } = choicesFor(examKey);
@@ -245,6 +257,31 @@ export function PreparationForm({
     />
   );
 
+  // Plain toggles over one hidden field: the plan rests on the days left off.
+  const daysField = (
+    <fieldset className="space-y-3">
+      <legend className="text-sm font-medium">Which days do you study?</legend>
+      <input type="hidden" name="studyDays" value={days.join(',')} />
+      <div className="flex flex-wrap gap-2">
+        {WEEKDAYS.map((label, i) => (
+          <Button
+            key={label}
+            type="button"
+            size="sm"
+            variant={days.includes(i + 1) ? 'default' : 'outline'}
+            aria-pressed={days.includes(i + 1)}
+            onClick={() => toggleDay(i + 1)}
+          >
+            {label}
+          </Button>
+        ))}
+      </div>
+      <p className="text-xs text-muted-foreground">
+        Nothing is scheduled on the others.
+      </p>
+    </fieldset>
+  );
+
   const hiddenTz = (
     <input type="hidden" name="timezone" value={timezone} readOnly />
   );
@@ -258,6 +295,7 @@ export function PreparationForm({
         {targetField}
         {levelField}
         {minutesField}
+        {daysField}
         {dateField}
         <div className="flex items-center gap-4">
           <Button type="submit" disabled={pending}>
@@ -293,7 +331,15 @@ export function PreparationForm({
         },
         { title: `What ${noun} do you need?`, body: targetField },
         { title: 'Where are you now?', body: levelField },
-        { title: 'How much time each day?', body: minutesField },
+        {
+          title: 'How much time each day?',
+          body: (
+            <>
+              {minutesField}
+              {daysField}
+            </>
+          ),
+        },
       ]}
       closing={
         withContent.includes(examKey)
@@ -309,7 +355,10 @@ export function PreparationForm({
         ],
         ['Target', targetBand ? `${exam.scoreScale.label} ${targetBand}` : '—'],
         ['Now', level ? `You estimated ${level}` : 'Not sure yet'],
-        ['Time', `${minutes} min / day`],
+        [
+          'Time',
+          `${minutes} min / day${days.length < 7 ? `, ${days.map((d) => WEEKDAYS[d - 1]).join(' ')}` : ''}`,
+        ],
         ['Exam date', testDate || 'Not set'],
       ]}
     />

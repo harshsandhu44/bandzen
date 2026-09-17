@@ -186,6 +186,11 @@ export const profiles = pgTable('profiles', {
   activeExamKey: examKey('active_exam_key'),
   /** Minutes a day they say they can study. Drives today's goal. */
   studyMinutes: integer('study_minutes'),
+  /** ISO weekdays they study (1 = Monday … 7 = Sunday). The plan rests on the others. */
+  studyDays: integer('study_days')
+    .array()
+    .notNull()
+    .default([1, 2, 3, 4, 5, 6, 7]),
   /** IANA zone, captured from the browser so "today" means their today. */
   timezone: text('timezone'),
   /** Null until onboarding is finished. The dashboard gates on this. */

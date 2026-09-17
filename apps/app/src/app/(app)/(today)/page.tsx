@@ -93,6 +93,7 @@ export default async function DashboardPage() {
     plan,
     progress,
     testDay,
+    restDay,
     estimated,
     measured,
     report,
@@ -159,6 +160,12 @@ export default async function DashboardPage() {
       {planInput ? <p className="text-sm">{nextAction(planInput)}</p> : null}
 
       {/* The plan stops at the test date; say so rather than going quiet. */}
+      {restDay && !progress.tasks.length ? (
+        <p className="text-sm text-muted-foreground">
+          Rest day. Nothing is scheduled.
+        </p>
+      ) : null}
+
       {testDay === 'exam_day' ? (
         <p className="text-sm text-muted-foreground">
           It is exam day, so nothing is scheduled. Good luck.

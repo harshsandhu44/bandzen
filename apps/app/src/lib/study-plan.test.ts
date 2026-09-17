@@ -1,9 +1,10 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
-import { IELTS_PLAN } from './plan-strategies.ts';
+import { IELTS_PLAN, PTE_PLAN } from './plan-strategies.ts';
 import {
   assignmentTasks,
   buildPlan,
+  isStudyDay,
   nextAction,
   planProgress,
   rollForward,
@@ -497,7 +498,116 @@ test('ledger rows render with their state, link and carry-over', () => {
   assert.equal(progress.tasks.length, 2);
   assert.equal(progress.minutesDone, 40);
   assert.equal(progress.minutesGoal, 80);
-  assert.equal(planProgress(tasks, TODAY, 60).minutesGoal, 60);
+  // The candidate's minutes sit beside the plan; they are not its denominator.
+  const withTarget = planProgress(tasks, TODAY, 60);
+  assert.equal(withTarget.minutesGoal, 80);
+  assert.equal(withTarget.dailyMinutes, 60);
+});
+
+const PTE_CATALOGUE = {
+  examTaskTypes: [
+    'read_aloud',
+    'repeat_sentence',
+    'write_essay',
+    'summarize_written_text',
+    'reorder_paragraphs',
+    'write_from_dictation',
+  ],
+};
+
+const minutesByDay = (plan: { date: string; minutes: number }[]) => {
+  const days = new Map<string, number>();
+  for (const t of plan) days.set(t.date, (days.get(t.date) ?? 0) + t.minutes);
+  return days;
+};
+
+test('each day is filled to the daily minutes, within the tolerance', () => {
+  const plan = buildPlan({
+    strategy: PTE_PLAN,
+    scores: {},
+    targetScore: 79,
+    testDate: null,
+    today: TODAY,
+    catalogue: PTE_CATALOGUE,
+    dailyMinutes: 60,
+  });
+  const days = minutesByDay(plan);
+  assert.equal(days.size, 14);
+  for (const minutes of days.values()) {
+    assert.ok(minutes >= 60 && minutes <= 75, `${minutes} min`);
+  }
+  // Completing everything planned is 100%, whatever the daily minutes were.
+  const today = assignmentTasks(
+    plan
+      .filter((t) => t.date === TODAY)
+      .map((t, slot) =>
+        row({
+          id: `t${slot}`,
+          slot,
+          skill: t.skill,
+          ...targetRef(t.target!),
+          minutes: t.minutes,
+          status: 'completed',
+        }),
+      ),
+    PTE_PLAN,
+    TODAY,
+  );
+  const progress = planProgress(today, TODAY, 60);
+  assert.equal(progress.minutesDone, progress.minutesGoal);
+});
+
+test('a task longer than the day still gets its day, alone', () => {
+  const plan = buildPlan(
+    ielts({
+      readingBand: 5,
+      writingBand: 8,
+      targetBand: 8,
+      testDate: null,
+      today: TODAY,
+      catalogue: { passageIds: ['p1'] },
+      dailyMinutes: 20,
+    }),
+  );
+  const first = plan.filter((t) => t.date === TODAY);
+  assert.equal(first.length, 1);
+  assert.equal(first[0]!.minutes, 25);
+});
+
+test('rest days get nothing', () => {
+  const plan = buildPlan(
+    ielts({
+      readingBand: 7,
+      writingBand: 7,
+      targetBand: 8,
+      testDate: null,
+      // 2026-09-01 is a Tuesday; study Monday to Friday only.
+      today: TODAY,
+      catalogue: CATALOGUE,
+      studyDays: [1, 2, 3, 4, 5],
+    }),
+  );
+  assert.equal(isStudyDay('2026-09-05', [1, 2, 3, 4, 5]), false);
+  assert.ok(!plan.some((t) => ['2026-09-05', '2026-09-06'].includes(t.date)));
+  assert.equal(plan.length, 10);
+});
+
+test('missed work spreads over days with room, skipping rest days', () => {
+  const moves = rollForward(
+    [
+      row({ id: 'm1', date: '2026-08-30', minutes: 40 }),
+      row({ id: 'm2', date: '2026-08-31', minutes: 40 }),
+      row({ id: 'today', date: TODAY, minutes: 30 }),
+    ],
+    TODAY,
+    // Tuesday 1 Sept; Wednesday is a rest day.
+    { dailyMinutes: 60, studyDays: [1, 2, 4, 5, 6, 7] },
+  );
+  assert.deepEqual(moves, [
+    // 30 + 40 = 70 fits inside 60 × 1.25.
+    { id: 'm1', date: TODAY, slot: 1 },
+    { id: 'm2', date: '2026-09-03', slot: 0 },
+  ]);
 });
 
 test('a committed target counts as available only while it is published', () => {

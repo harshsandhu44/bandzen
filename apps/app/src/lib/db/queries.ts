@@ -134,6 +134,7 @@ export const getProfile = cache(async function getProfile(userId: string) {
       email: profiles.email,
       role: profiles.role,
       studyMinutes: profiles.studyMinutes,
+      studyDays: profiles.studyDays,
       timezone: profiles.timezone,
       onboardingCompletedAt: profiles.onboardingCompletedAt,
       createdAt: profiles.createdAt,
@@ -2658,6 +2659,8 @@ export async function syncPlanLedger(input: {
   today: string;
   dayStart: Date;
   dayEnd: Date;
+  /** The candidate's daily minutes and study days, for spreading missed work. */
+  pace: { dailyMinutes: number | null; studyDays: readonly number[] };
   isAvailable: (kind: TargetKind, id: string) => boolean;
   /** The planner, given the targets already assigned, oldest first. */
   plan: (assignedTargetIds: string[]) => PlanTask[];
@@ -2750,7 +2753,7 @@ export async function syncPlanLedger(input: {
     let rows = await read();
 
     // 3. Carry missed work over.
-    for (const move of rollForward(rows, today)) {
+    for (const move of rollForward(rows, today, input.pace)) {
       await tx
         .update(planAssignments)
         .set({ date: move.date, slot: move.slot, updatedAt: new Date() })

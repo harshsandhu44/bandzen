@@ -13,6 +13,7 @@ export type PreparationValues = {
   selfAssessedScore?: number | null;
   testDate?: string | null;
   studyMinutes?: number | null;
+  studyDays?: number[];
   timezone?: string | null;
   onboardingCompletedAt?: Date | null;
 };

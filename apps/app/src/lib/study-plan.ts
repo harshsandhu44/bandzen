@@ -123,9 +123,22 @@ export type PlanInput = {
    * wrong day for anyone whose local date differs.
    */
   today: string;
+  /**
+   * The candidate's daily study time. Each day is filled to it: tasks are
+   * added until the day reaches it, never past it by more than a quarter, and
+   * a single task longer than the whole day still gets its day. Null keeps
+   * one task a day.
+   */
+  dailyMinutes?: number | null;
+  /** ISO weekdays (1 = Monday … 7 = Sunday) they study. Absent means every day. */
+  studyDays?: readonly number[];
 };
 
 const MAX_DAYS = 14;
+/** How far past a day's minutes packing may go. */
+export const CAPACITY_TOLERANCE = 1.25;
+/** A backstop on one day's list, whatever the minutes say. */
+const MAX_TASKS_PER_DAY = 6;
 const DAY_MS = 86_400_000;
 
 /** Calendar arithmetic on ISO dates, done in UTC so no offset can shift a day. */
@@ -140,6 +153,13 @@ function daysUntil(from: string, to: string): number {
   if (Number.isNaN(target)) return 0;
   const start = Date.parse(`${from}T00:00:00Z`);
   return Math.max(0, Math.round((target - start) / DAY_MS));
+}
+
+/** Whether a local ISO date falls on one of the candidate's study days. */
+export function isStudyDay(isoDate: string, studyDays?: readonly number[]) {
+  if (!studyDays) return true;
+  const weekday = new Date(`${isoDate}T00:00:00Z`).getUTCDay() || 7;
+  return studyDays.includes(weekday);
 }
 
 /**
@@ -243,63 +263,91 @@ export function buildPlan(input: PlanInput): PlanTask[] {
 
   const cursors = new Map<Skill, number>();
   let otherCursor = 0;
+  // Counts tasks, not days: with several tasks a day the rotation still runs
+  // two in three to the weakest skill across the whole plan.
+  let n = 0;
 
   // Spent on the lesson skill's first slot only; after that the drills take over.
   let pendingLesson = lessonFirst(input);
+  const cap = input.dailyMinutes ?? null;
 
-  for (let day = 1; day <= horizon; day += 1) {
-    // With a clear gap the weakest skill takes two days in three, the third
+  /** The next task the rotation would give, without taking it. */
+  const peek = (day: number, date: string) => {
+    // With a clear gap the weakest skill takes two tasks in three, the third
     // cycling through the rest; otherwise an even rotation.
-    let skill: Skill;
-    if (lead && others.length) {
-      skill = day % 3 === 0 ? others[otherCursor++ % others.length]! : lead;
-    } else if (lead) {
-      skill = lead;
-    } else {
-      skill = rotation[(day - 1) % rotation.length]!;
-    }
-
-    // Day 1 is today, not tomorrow. A plan whose first task lands tomorrow
-    // leaves the dashboard with nothing to put under "Today".
-    const date = addDays(today, day - 1);
+    const usesOther = lead && others.length && n % 3 === 2;
+    const skill: Skill = usesOther
+      ? others[otherCursor % others.length]!
+      : (lead ?? rotation[n % rotation.length]!);
 
     if (skill === strategy.lessonSkill && pendingLesson) {
       const lesson = pendingLesson;
-      pendingLesson = null;
-      tasks.push({
-        day,
-        date,
-        skill,
-        label: 'Learn the technique before drilling it',
-        minutes: 15,
-        target: lesson,
-        href: strategy.href(skill, lesson),
-      });
-      continue;
+      return {
+        usesOther,
+        lesson: true,
+        task: {
+          day,
+          date,
+          skill,
+          label: 'Learn the technique before drilling it',
+          minutes: 15,
+          target: lesson,
+          href: strategy.href(skill, lesson),
+        } satisfies PlanTask,
+      };
     }
 
     const drills = drillsFor(skill);
     const nth = cursors.get(skill) ?? 0;
-    cursors.set(skill, nth + 1);
     const drill = drills[nth % drills.length]!;
     const target = strategy.targetFor(skill, drill, catalogue, nth);
+    return {
+      usesOther,
+      lesson: false,
+      task: {
+        day,
+        date,
+        skill,
+        // The first graded-skill task names the actual weakness the grader
+        // found, so the plan reads as a response to the report, not a template.
+        label:
+          skill === strategy.feedbackSkill &&
+          nth === 0 &&
+          input.weaknesses?.length
+            ? `${drill.label} — focus: ${input.weaknesses[0]}`
+            : drill.label,
+        minutes: drill.minutes,
+        target,
+        href: target ? strategy.href(skill, target) : null,
+      } satisfies PlanTask,
+    };
+  };
 
-    tasks.push({
-      day,
-      date,
-      skill,
-      // The first graded-skill task names the actual weakness the grader
-      // found, so the plan reads as a response to the report, not a template.
-      label:
-        skill === strategy.feedbackSkill &&
-        nth === 0 &&
-        input.weaknesses?.length
-          ? `${drill.label} — focus: ${input.weaknesses[0]}`
-          : drill.label,
-      minutes: drill.minutes,
-      target,
-      href: target ? strategy.href(skill, target) : null,
-    });
+  for (let day = 1; day <= horizon; day += 1) {
+    // Day 1 is today, not tomorrow. A plan whose first task lands tomorrow
+    // leaves the dashboard with nothing to put under "Today".
+    const date = addDays(today, day - 1);
+    if (!isStudyDay(date, input.studyDays)) continue;
+
+    let load = 0;
+    for (let k = 0; k < MAX_TASKS_PER_DAY; k += 1) {
+      const next = peek(day, date);
+      if (
+        load > 0 &&
+        (cap == null ||
+          load >= cap ||
+          load + next.task.minutes > cap * CAPACITY_TOLERANCE)
+      ) {
+        break;
+      }
+      tasks.push(next.task);
+      load += next.task.minutes;
+      n += 1;
+      if (next.usesOther) otherCursor += 1;
+      if (next.lesson) pendingLesson = null;
+      else
+        cursors.set(next.task.skill, (cursors.get(next.task.skill) ?? 0) + 1);
+    }
   }
 
   return tasks;
@@ -417,13 +465,16 @@ export function targetAvailable(
 }
 
 /**
- * Missed work: anything not finished from before today moves to today,
- * after what today already holds, in the order it was due. It keeps its id,
- * so its history survives the move; `originalDate` says it was carried over.
+ * Missed work: anything not finished from before today moves forward, in the
+ * order it was due, to the first study day from today with room for it —
+ * room meaning the day is empty or stays inside its minutes plus tolerance.
+ * It keeps its id, so its history survives the move; `originalDate` says it
+ * was carried over. With no daily minutes, it all lands on today.
  */
 export function rollForward(
   rows: readonly AssignmentRow[],
   today: string,
+  pace: { dailyMinutes?: number | null; studyDays?: readonly number[] } = {},
 ): { id: string; date: string; slot: number }[] {
   const missed = rows
     .filter(
@@ -432,11 +483,37 @@ export function rollForward(
         (r.status === 'pending' || r.status === 'in_progress'),
     )
     .sort((a, b) => a.date.localeCompare(b.date) || a.slot - b.slot);
-  let slot = Math.max(
-    -1,
-    ...rows.filter((r) => r.date === today).map((r) => r.slot),
-  );
-  return missed.map((r) => ({ id: r.id, date: today, slot: ++slot }));
+
+  const load = new Map<string, number>();
+  const slots = new Map<string, number>();
+  for (const r of rows) {
+    if (r.date < today) continue;
+    slots.set(r.date, Math.max(slots.get(r.date) ?? -1, r.slot));
+    if (r.status !== 'skipped' && r.status !== 'deferred') {
+      load.set(r.date, (load.get(r.date) ?? 0) + r.minutes);
+    }
+  }
+
+  const cap = pace.dailyMinutes;
+  return missed.map((r) => {
+    let date = today;
+    for (;;) {
+      const used = load.get(date) ?? 0;
+      if (
+        isStudyDay(date, pace.studyDays) &&
+        (cap == null ||
+          used === 0 ||
+          used + r.minutes <= cap * CAPACITY_TOLERANCE)
+      ) {
+        break;
+      }
+      date = addDays(date, 1);
+    }
+    load.set(date, (load.get(date) ?? 0) + r.minutes);
+    const slot = (slots.get(date) ?? -1) + 1;
+    slots.set(date, slot);
+    return { id: r.id, date, slot };
+  });
 }
 
 /**
@@ -474,7 +551,10 @@ export type PlanTaskState = PlanTask & {
 export type PlanProgress = {
   tasks: PlanTaskState[];
   minutesDone: number;
+  /** Minutes of work planned today: finishing every task reaches it. */
   minutesGoal: number;
+  /** The candidate's own daily minutes, shown beside the plan. */
+  dailyMinutes: number | null;
 };
 
 /**
@@ -517,21 +597,24 @@ export function assignmentTasks(
     });
 }
 
-/** Today's tasks and the minutes they account for. */
+/**
+ * Today's tasks and the minutes they account for. The bar is measured
+ * against what was planned, so doing all of it reads as all of it, even on a
+ * day packed a little past the candidate's own minutes.
+ */
 export function planProgress(
   tasks: readonly PlanTaskState[],
   today: string,
-  goalMinutes?: number | null,
+  dailyMinutes?: number | null,
 ): PlanProgress {
   const todays = tasks.filter((t) => t.date === today);
+  const sum = (list: readonly PlanTaskState[]) =>
+    list.reduce((total, t) => total + t.minutes, 0);
   return {
     tasks: todays,
-    minutesDone: todays
-      .filter((t) => t.status === 'completed')
-      .reduce((sum, t) => sum + t.minutes, 0),
-    // Falls back to what the plan itself asks for, so the bar always has a
-    // denominator even before onboarding records a daily target.
-    minutesGoal: goalMinutes ?? todays.reduce((sum, t) => sum + t.minutes, 0),
+    minutesDone: sum(todays.filter((t) => t.status === 'completed')),
+    minutesGoal: sum(todays),
+    dailyMinutes: dailyMinutes ?? null,
   };
 }
 
