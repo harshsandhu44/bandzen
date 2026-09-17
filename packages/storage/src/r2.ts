@@ -7,7 +7,11 @@
  * Node with the same five `R2_*` env vars; nothing in a browser bundle
  * imports this.
  */
-import { PutObjectCommand, S3Client } from '@aws-sdk/client-s3';
+import {
+  DeleteObjectCommand,
+  PutObjectCommand,
+  S3Client,
+} from '@aws-sdk/client-s3';
 
 function requireEnv(name: string) {
   const value = process.env[name];
@@ -49,4 +53,14 @@ export async function uploadObject(input: {
   );
 
   return `${publicUrl}/${input.key}`;
+}
+
+/**
+ * Removes one object by key. Callers use it to undo an upload whose database
+ * write then failed, so a retry doesn't leave the first MP3 orphaned.
+ */
+export async function deleteObject(key: string): Promise<void> {
+  await r2Client().send(
+    new DeleteObjectCommand({ Bucket: requireEnv('R2_BUCKET'), Key: key }),
+  );
 }

@@ -6,10 +6,11 @@ import {
 } from '@bandzen/db/queries';
 import {
   computePeaks,
-  synthesizeSpeech,
+  synthesizeConversation,
   transcribeAudio,
+  wholeSeconds,
 } from '@bandzen/ai/speech';
-import { uploadObject } from '@bandzen/storage/r2';
+import { deleteObject, uploadObject } from '@bandzen/storage/r2';
 import { requireAdminOrTeacher } from '@/lib/auth';
 
 // TTS of a full transcript, or Whisper of a few minutes of audio, comfortably
@@ -18,7 +19,7 @@ export const maxDuration = 120;
 
 /**
  * Fills in whichever of transcript / audio a track is missing:
- * transcript present, audio absent -> ElevenLabs TTS -> R2.
+ * transcript present, audio absent -> ElevenLabs TTS (per speaker) -> R2.
  * audio present, transcript absent -> fetch the MP3 -> Whisper.
  *
  * The edit page POSTs here on mount when a field is missing, and again when
@@ -58,20 +59,34 @@ export async function POST(
 
   try {
     if (hasTranscript && !hasAudio) {
-      const mp3 = await synthesizeSpeech(track.transcript!);
+      // A dialogue gets a voice per speaker and its "Name:" labels stay silent.
+      // ponytail: no genders — listening_tracks has no `speakers` column, so
+      // every character draws from the female pool (distinct voices, but a
+      // male character sounds female). Add a `speakers` jsonb column if that
+      // gets noticed.
+      const mp3 = await synthesizeConversation(track.transcript!);
+      const key = `listening/${crypto.randomUUID()}.mp3`;
       const [audioUrl, { peaks, durationSeconds }] = await Promise.all([
-        uploadObject({
-          key: `listening/${crypto.randomUUID()}.mp3`,
-          body: mp3,
-          contentType: 'audio/mpeg',
-        }),
+        uploadObject({ key, body: mp3, contentType: 'audio/mpeg' }),
         computePeaks(mp3),
       ]);
-      await updateTrack(
-        id,
-        { audioUrl, peaks, durationSeconds, generationStartedAt: null },
-        userId,
-      );
+      try {
+        await updateTrack(
+          id,
+          {
+            audioUrl,
+            peaks,
+            durationSeconds: wholeSeconds(durationSeconds),
+            generationStartedAt: null,
+            generationError: null,
+          },
+          userId,
+        );
+      } catch (e) {
+        // Undo the upload so a retry doesn't leave this MP3 orphaned in R2.
+        await deleteObject(key).catch(() => {});
+        throw e;
+      }
       return NextResponse.json({ status: 'done', generated: 'audio' });
     }
 

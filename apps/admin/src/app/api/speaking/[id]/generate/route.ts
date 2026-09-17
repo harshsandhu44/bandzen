@@ -6,7 +6,7 @@ import {
   updateSpeakingTest,
 } from '@bandzen/db/queries';
 import { synthesizeSpeech } from '@bandzen/ai/speech';
-import { uploadObject } from '@bandzen/storage/r2';
+import { deleteObject, uploadObject } from '@bandzen/storage/r2';
 import { requireAdminOrTeacher } from '@/lib/auth';
 
 // One ElevenLabs call per prompt without audio, ~10 prompts a test. The
@@ -52,12 +52,19 @@ export async function POST(
   try {
     for (const prompt of pending) {
       const mp3 = await synthesizeSpeech(prompt.text);
+      const key = `speaking/${crypto.randomUUID()}.mp3`;
       const audioUrl = await uploadObject({
-        key: `speaking/${crypto.randomUUID()}.mp3`,
+        key,
         body: mp3,
         contentType: 'audio/mpeg',
       });
-      await updateSpeakingPrompt(prompt.id, { audioUrl });
+      try {
+        await updateSpeakingPrompt(prompt.id, { audioUrl });
+      } catch (e) {
+        // Undo the upload so a retry doesn't leave this MP3 orphaned in R2.
+        await deleteObject(key).catch(() => {});
+        throw e;
+      }
     }
     await updateSpeakingTest(id, { generationStartedAt: null }, userId);
     return NextResponse.json({ status: 'done', generated: pending.length });

@@ -17,7 +17,11 @@
  */
 import { readFileSync, readdirSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
-import { computePeaks, synthesizeConversation } from '@bandzen/ai/speech';
+import {
+  computePeaks,
+  synthesizeConversation,
+  wholeSeconds,
+} from '@bandzen/ai/speech';
 import { uploadObject } from '@bandzen/storage/r2';
 import type { GeneratedListeningTrack as Track } from '../src/lib/ai/schemas.ts';
 
@@ -60,7 +64,7 @@ async function run(force: boolean) {
     });
     const { peaks, durationSeconds } = await computePeaks(audio);
     track.peaks = peaks;
-    track.durationSeconds = durationSeconds;
+    track.durationSeconds = wholeSeconds(durationSeconds);
     writeFileSync(path, `${JSON.stringify(track, null, 2)}\n`);
     console.log(`  ✓ ${track.slug} — ${track.audioUrl}`);
   }

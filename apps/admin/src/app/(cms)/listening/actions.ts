@@ -16,7 +16,8 @@ import {
   duplicateTrack,
 } from '@bandzen/db/queries';
 import { ContentInUseError, PublishValidationError } from '@bandzen/db/errors';
-import { uploadObject } from '@bandzen/storage/r2';
+import { computePeaks, wholeSeconds } from '@bandzen/ai/speech';
+import { deleteObject, uploadObject } from '@bandzen/storage/r2';
 import { requireAdminOrTeacher } from '@/lib/auth';
 import { runBulk } from '@/lib/bulk';
 import { ok, fail, type ActionResult } from '@/lib/action-result';
@@ -25,39 +26,71 @@ import { saveTrackPayloadSchema, type SaveTrackPayload } from './[id]/schema';
 export type ActionState = { error: string | null };
 
 /**
- * Uploads the posted MP3 to R2 and returns its public URL, or null when no
+ * Decodes the posted MP3, uploads it to R2, and returns its public URL with
+ * the waveform peaks and duration read off the same decode — or null when no
  * file was attached. A fresh UUID key every time, so replacing a track's audio
  * never has to worry about a stale CDN copy under the old key.
+ *
+ * Decodes before uploading: a file that doesn't decode (duration 0) would
+ * otherwise reach mocks with a zero-length deadline, so it's rejected with
+ * nothing sent to R2.
  */
-async function uploadAudio(
-  file: FormDataEntryValue | null,
-): Promise<string | null> {
+async function uploadAudio(file: FormDataEntryValue | null) {
   if (!(file instanceof File) || file.size === 0) return null;
   const body = Buffer.from(await file.arrayBuffer());
-  return uploadObject({
-    key: `listening/${crypto.randomUUID()}.mp3`,
+  const { peaks, durationSeconds } = await computePeaks(body);
+  if (durationSeconds === 0) {
+    throw new Error("Couldn't read that MP3 — check the file.");
+  }
+  const key = `listening/${crypto.randomUUID()}.mp3`;
+  const audioUrl = await uploadObject({
+    key,
     body,
     contentType: file.type || 'audio/mpeg',
   });
+  return {
+    key,
+    audioUrl,
+    peaks,
+    durationSeconds: wholeSeconds(durationSeconds),
+  };
+}
+
+/** Runs the DB write for an upload; if it throws, deletes the object so it isn't orphaned in R2. */
+async function persistOrDelete<T>(
+  key: string | undefined,
+  write: () => Promise<T>,
+): Promise<T> {
+  try {
+    return await write();
+  } catch (e) {
+    if (key) await deleteObject(key).catch(() => {});
+    throw e;
+  }
 }
 
 export async function createTrackAction(formData: FormData) {
   const { userId } = await requireAdminOrTeacher();
   const transcript = String(formData.get('transcript') ?? '').trim() || null;
-  const audioUrl = await uploadAudio(formData.get('audio'));
-  if (!transcript && !audioUrl) {
+  const audio = await uploadAudio(formData.get('audio'));
+  if (!transcript && !audio) {
     throw new Error('Provide a transcript, an MP3, or both.');
   }
-  const track = await createTrack({
-    slug: String(formData.get('slug') ?? '').trim(),
-    title: String(formData.get('title') ?? '').trim(),
-    topic: String(formData.get('topic') ?? '').trim() || null,
-    transcript,
-    difficulty: Number(formData.get('difficulty') ?? 3),
-    audioUrl,
-    updatedBy: userId,
+  const track = await persistOrDelete(audio?.key, async () => {
+    const created = await createTrack({
+      slug: String(formData.get('slug') ?? '').trim(),
+      title: String(formData.get('title') ?? '').trim(),
+      topic: String(formData.get('topic') ?? '').trim() || null,
+      transcript,
+      difficulty: Number(formData.get('difficulty') ?? 3),
+      audioUrl: audio?.audioUrl ?? null,
+      peaks: audio?.peaks ?? null,
+      durationSeconds: audio?.durationSeconds ?? null,
+      updatedBy: userId,
+    });
+    if (!created) throw new Error('Failed to create track.');
+    return created;
   });
-  if (!track) throw new Error('Failed to create track.');
   await recordContentEvent('listening-track', track.id, userId, 'created');
   redirect(`/listening/${track.id}`);
 }
@@ -65,9 +98,10 @@ export async function createTrackAction(formData: FormData) {
 export async function replaceAudioAction(formData: FormData) {
   const { userId } = await requireAdminOrTeacher();
   const id = String(formData.get('id') ?? '');
-  const audioUrl = await uploadAudio(formData.get('audio'));
-  if (!audioUrl) throw new Error('Choose an MP3 file to upload.');
-  await updateTrack(id, { audioUrl }, userId);
+  const audio = await uploadAudio(formData.get('audio'));
+  if (!audio) throw new Error('Choose an MP3 file to upload.');
+  const { key, ...fields } = audio;
+  await persistOrDelete(key, () => updateTrack(id, fields, userId));
   revalidatePath(`/listening/${id}`);
 }
 
