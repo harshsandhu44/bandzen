@@ -1032,6 +1032,12 @@ export async function recordOfficialScore(values: {
   examKey: ExamKey;
   examVersion: string;
   score: number;
+  /** Per-skill official scores, where the candidate gave them. */
+  listening?: number | null;
+  reading?: number | null;
+  speaking?: number | null;
+  writing?: number | null;
+  source?: 'official' | 'official_practice';
   takenOn: string | null;
   /** The sitting this is the truth for, already checked to be theirs. */
   mockAttemptId?: string | null;
@@ -1039,9 +1045,12 @@ export async function recordOfficialScore(values: {
   estimatedScore?: number | null;
   scoringVersion?: string | null;
 }) {
-  const [row] = await db.insert(officialScores).values(values).returning({
-    id: officialScores.id,
-  });
+  // One pair per sitting (unique index): a repeat returns null, not a second row.
+  const [row] = await db
+    .insert(officialScores)
+    .values(values)
+    .onConflictDoNothing()
+    .returning({ id: officialScores.id });
   return row ?? null;
 }
 

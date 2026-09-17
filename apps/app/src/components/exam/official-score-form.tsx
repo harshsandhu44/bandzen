@@ -5,6 +5,7 @@ import type { ScoreScale } from '@bandzen/exams/registry';
 import { Button } from '@bandzen/ui/components/button';
 import { Input } from '@bandzen/ui/components/input';
 import { Label } from '@bandzen/ui/components/label';
+import { Select } from '@bandzen/ui/components/select';
 import { Panel } from '@/components/app/primitives';
 
 /**
@@ -16,21 +17,30 @@ import { Panel } from '@/components/app/primitives';
  */
 export function OfficialScoreForm({
   scale,
+  skills,
   action,
   recorded,
 }: {
   scale: ScoreScale;
-  action: (formData: FormData) => Promise<void>;
+  /** The exam's skills, each an optional field off the same score report. */
+  skills: { key: string; label: string }[];
+  /** Resolves to an error to show, or null once saved. */
+  action: (formData: FormData) => Promise<string | null>;
   /** What they have already told us, if anything. */
   recorded: { score: number; takenOn: string | null }[];
 }) {
-  const [, submit, pending] = useActionState(
-    async (_: null, data: FormData) => {
-      await action(data);
-      return null;
-    },
+  const [error, submit, pending] = useActionState(
+    (_: string | null, data: FormData) => action(data),
     null,
   );
+  const scoreInput = {
+    type: 'number',
+    inputMode: 'numeric',
+    min: scale.min,
+    max: scale.max,
+    step: scale.step,
+    className: 'w-24 font-mono',
+  } as const;
 
   return (
     <Panel headingId="official" title="Sat the real test?">
@@ -48,24 +58,28 @@ export function OfficialScoreForm({
       ) : null}
 
       <p className="mb-4 text-sm text-muted-foreground text-pretty">
-        Tell us your real score and we can check our estimate against it. It is
-        stored on its own — it never becomes one of your Bandzen scores.
+        Tell us your real score and we can check our estimate against it. The
+        skill scores are optional but help most. It is stored on its own — it
+        never becomes one of your Bandzen scores.
       </p>
 
       <form action={submit} className="flex flex-wrap items-end gap-3">
         <div className="space-y-1">
           <Label htmlFor="score">Your score</Label>
-          <Input
-            id="score"
-            name="score"
-            type="number"
-            inputMode="numeric"
-            min={scale.min}
-            max={scale.max}
-            step={scale.step}
-            required
-            className="w-28 font-mono"
-          />
+          <Input id="score" name="score" required {...scoreInput} />
+        </div>
+        {skills.map((s) => (
+          <div key={s.key} className="space-y-1">
+            <Label htmlFor={s.key}>{s.label}</Label>
+            <Input id={s.key} name={s.key} {...scoreInput} />
+          </div>
+        ))}
+        <div className="space-y-1">
+          <Label htmlFor="source">From</Label>
+          <Select id="source" name="source" defaultValue="official">
+            <option value="official">The real test</option>
+            <option value="official_practice">Official practice test</option>
+          </Select>
         </div>
         <div className="space-y-1">
           <Label htmlFor="takenOn">Date taken</Label>
@@ -74,6 +88,11 @@ export function OfficialScoreForm({
         <Button type="submit" disabled={pending}>
           {pending ? 'Saving…' : 'Save'}
         </Button>
+        {error ? (
+          <p role="alert" className="w-full text-sm text-destructive">
+            {error}
+          </p>
+        ) : null}
       </form>
     </Panel>
   );

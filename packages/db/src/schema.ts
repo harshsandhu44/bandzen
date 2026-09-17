@@ -921,6 +921,12 @@ export const examScoreReports = pgTable(
  * the candidate was actually shown. A calibration row that moved with the code
  * it is meant to calibrate would measure nothing.
  */
+/** Where a reported real score came from: the exam itself, or its publisher's scored practice test. */
+export const officialScoreSource = pgEnum('official_score_source', [
+  'official',
+  'official_practice',
+]);
+
 export const officialScores = pgTable(
   'official_scores',
   {
@@ -932,6 +938,17 @@ export const officialScores = pgTable(
       scale: 1,
       mode: 'number',
     }).notNull(),
+    /**
+     * The per-skill scores off the same score report, where the candidate gave
+     * them. Optional: overall alone still pairs, but only these can calibrate
+     * how the overall is built from skills (#121). Numeric, like `score`, so
+     * any exam's scale fits.
+     */
+    listening: numeric('listening', { precision: 5, scale: 1, mode: 'number' }),
+    reading: numeric('reading', { precision: 5, scale: 1, mode: 'number' }),
+    speaking: numeric('speaking', { precision: 5, scale: 1, mode: 'number' }),
+    writing: numeric('writing', { precision: 5, scale: 1, mode: 'number' }),
+    source: officialScoreSource('source').notNull().default('official'),
     takenOn: date('taken_on'),
     /**
      * The sitting this is the truth for. Null when a candidate volunteers a
@@ -952,7 +969,12 @@ export const officialScores = pgTable(
       .notNull()
       .defaultNow(),
   },
-  (t) => [index('official_scores_user_idx').on(t.userId, t.examKey)],
+  (t) => [
+    index('official_scores_user_idx').on(t.userId, t.examKey),
+    // One truth per sitting: a second pair for the same mock would double its
+    // weight in calibration.
+    uniqueIndex('official_scores_mock_attempt_key').on(t.mockAttemptId),
+  ],
 );
 
 /**
