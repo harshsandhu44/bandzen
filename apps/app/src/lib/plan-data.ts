@@ -5,6 +5,7 @@ import { dayBounds } from '@/lib/dates';
 import {
   accuracyByQuestionKind,
   attemptsSubmittedOn,
+  latestAttemptInProgress,
   latestBand,
   latestReport,
   latestScoreReports,
@@ -20,6 +21,7 @@ import {
   buildPlan,
   derivePlanState,
   tasksOn,
+  testDayState,
   type PlanInput,
 } from '@/lib/study-plan';
 
@@ -77,6 +79,7 @@ export async function loadPlanData(
     lessonForKind,
     examTaskTypes,
     scoreReports,
+    inProgress,
   ] = await Promise.all([
     latestBand(userId, 'reading', examKey),
     latestBand(userId, 'writing', examKey),
@@ -95,9 +98,13 @@ export async function loadPlanData(
     examKey === 'pte_academic'
       ? latestScoreReports(userId, examKey, 1)
       : Promise.resolve([]),
+    latestAttemptInProgress(userId, examKey),
   ]);
 
   const completedLessonIds = lessons.map((l) => l.lessonId);
+  const lessonsCompletedToday = lessons
+    .filter((l) => l.completedAt >= start && l.completedAt < end)
+    .map((l) => l.lessonId);
 
   const planInput: PlanInput | null = strategy && {
     strategy,
@@ -111,6 +118,7 @@ export async function loadPlanData(
     },
     targetScore: profile.targetScore,
     testDate: profile.testDate,
+    today,
     weaknesses: report?.weaknesses ?? undefined,
     weakKinds: [...kindAccuracy]
       .sort((a, b) => a.accuracy - b.accuracy)
@@ -122,6 +130,7 @@ export async function loadPlanData(
       examTaskTypes,
       lessonForKind,
       completedLessonIds,
+      lessonsCompletedToday,
     },
   };
 
@@ -132,6 +141,7 @@ export async function loadPlanData(
     {
       completedToday: doneToday,
       completedLessonIds,
+      inProgress,
     },
     profile.studyMinutes,
   );
@@ -147,6 +157,7 @@ export async function loadPlanData(
     planInput,
     plan,
     progress,
+    testDay: testDayState(today, profile.testDate),
     estimated,
     readingBand,
     writingBand,

@@ -2628,6 +2628,30 @@ export async function attemptsSubmittedOn(
 }
 
 /**
+ * The newest attempt this user has open in one exam, for the plan's Resume
+ * state. Only practice: a mock or diagnostic section resumes from its sitting.
+ */
+export async function latestAttemptInProgress(
+  userId: string,
+  examKey: ExamKey,
+) {
+  const [row] = await db
+    .select({ module: attempts.module, taskType: attempts.taskType })
+    .from(attempts)
+    .where(
+      and(
+        eq(attempts.userId, userId),
+        eq(attempts.examKey, examKey),
+        eq(attempts.status, 'in_progress'),
+        eq(attempts.kind, 'practice'),
+      ),
+    )
+    .orderBy(desc(attempts.startedAt))
+    .limit(1);
+  return row ?? null;
+}
+
+/**
  * Accuracy per question kind. Feeds the skill matrix, the dashboard insight
  * and review's pattern detection -- one query, because they are three views
  * of the same fact and should never disagree.

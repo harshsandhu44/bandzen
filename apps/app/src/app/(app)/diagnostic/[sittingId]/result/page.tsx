@@ -11,8 +11,8 @@ import { requireUserId } from '@/lib/auth';
 import { todayIso } from '@/lib/dates';
 import { getDiagnosticResult, getProfile } from '@/lib/db/queries';
 import { overallBand } from '@/lib/grading';
-import { planStrategyFor } from '@/lib/plan-strategies';
-import { buildPlan, nextAction } from '@/lib/study-plan';
+import { loadPlanData } from '@/lib/plan-data';
+import { nextAction } from '@/lib/study-plan';
 import { addDiagnosticSpeaking } from '../../actions';
 
 export const metadata = { title: 'Diagnostic result' };
@@ -78,17 +78,11 @@ export default async function DiagnosticResultPage({
       </div>
     );
 
-  const planInput = {
-    strategy: planStrategyFor(data.mock.examKey)!,
-    scores: {
-      reading: bands.reading,
-      writing: bands.writing,
-      listening: bands.listening,
-    },
-    targetScore: profile?.targetScore ?? null,
-    testDate: profile?.testDate ?? null,
-    weaknesses: data.weaknesses,
-  };
+  // The same plan the dashboard shows, built from the same queries: this
+  // sitting's bands are now the latest ones, and the catalogue gives every
+  // task something to open.
+  const today = todayIso(profile?.timezone);
+  const planData = profile ? await loadPlanData(userId, profile, today) : null;
 
   return (
     <div className="max-w-2xl space-y-10">
@@ -107,10 +101,12 @@ export default async function DiagnosticResultPage({
 
       <section className="space-y-4">
         <h2 className="font-title text-title">What to do next</h2>
-        <p className="text-sm">{nextAction(planInput)}</p>
+        {planData?.planInput ? (
+          <p className="text-sm">{nextAction(planData.planInput)}</p>
+        ) : null}
         <ComingUp
-          plan={buildPlan(planInput)}
-          today={todayIso(profile?.timezone)}
+          plan={planData?.plan ?? []}
+          today={today}
           heading="Your plan from here"
         />
       </section>
