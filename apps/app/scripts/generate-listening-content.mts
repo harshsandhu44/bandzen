@@ -22,6 +22,7 @@ import {
   listeningTrackSchema,
   type GeneratedListeningTrack as Track,
 } from '@bandzen/ai/schemas';
+import { wholeSeconds } from '@bandzen/ai/speech';
 import { CURRENT_EXAM_VERSION } from '@bandzen/exams/registry';
 
 /** Every file states its exam and format, and passes the CMS import schema. */
@@ -110,7 +111,7 @@ function toSql() {
     out.push(
       `-- ${t.title}`,
       `insert into public.listening_tracks (slug, title, topic, transcript, audio_url, matching_options, peaks, duration_seconds, difficulty, exam_key, exam_version)`,
-      `values (${quote(t.slug)}, ${quote(t.title)}, ${quote(t.topic)}, ${quote(t.transcript)}, ${quote(t.audioUrl)}, ${t.matchingOptions?.length ? jsonb(t.matchingOptions) : 'null'}, ${t.peaks?.length ? jsonb(t.peaks) : 'null'}, ${t.durationSeconds ?? 'null'}, ${t.difficulty}, 'ielts'::public.exam_key, ${quote(OWNERSHIP.examVersion)})`,
+      `values (${quote(t.slug)}, ${quote(t.title)}, ${quote(t.topic)}, ${quote(t.transcript)}, ${quote(t.audioUrl)}, ${t.matchingOptions?.length ? jsonb(t.matchingOptions) : 'null'}, ${t.peaks?.length ? jsonb(t.peaks) : 'null'}, ${t.durationSeconds != null ? wholeSeconds(t.durationSeconds) : 'null'}, ${t.difficulty}, 'ielts'::public.exam_key, ${quote(OWNERSHIP.examVersion)})`,
       `on conflict (slug) do update set`,
       `  title = excluded.title, topic = excluded.topic, transcript = excluded.transcript,`,
       `  audio_url = excluded.audio_url, matching_options = excluded.matching_options,`,

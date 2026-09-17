@@ -1001,6 +1001,9 @@ export async function createTrack(input: {
   /** At least one of transcript / audioUrl. The CMS generates whichever is absent. */
   transcript?: string | null;
   audioUrl?: string | null;
+  /** Set with audioUrl when the CMS decoded an uploaded MP3. */
+  peaks?: number[] | null;
+  durationSeconds?: number | null;
   topic?: string | null;
   matchingOptions?: string[] | null;
   difficulty?: number;

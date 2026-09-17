@@ -193,6 +193,16 @@ export function peaksFromSamples(
 }
 
 /**
+ * The one rounding policy for a decoded duration before it's stored in an
+ * integer `duration_seconds` column: always up. The mock test's Listening
+ * deadline sums these, and rounding down would make the section fractionally
+ * shorter than its audio.
+ */
+export function wholeSeconds(seconds: number): number {
+  return Math.ceil(seconds);
+}
+
+/**
  * Downsamples an MP3 to a fixed-length amplitude array (0-1) for the
  * listening runner's waveform display, and reads its duration off the same
  * decode — the mock test's Listening section sums these to know how long its
