@@ -1,3 +1,10 @@
+## app [1.25.3](https://github.com/harshsandhu44/bandzen/compare/app@1.25.2...app@1.25.3) (2026-09-17)
+
+
+### Bug Fixes
+
+* **app:** score PTE tasks by their published raw-scoring contracts ([#132](https://github.com/harshsandhu44/bandzen/issues/132)) ([fb629f8](https://github.com/harshsandhu44/bandzen/commit/fb629f88416114c1296cbfe9b0112e4e9116a5b8))
+
 ## app [1.25.2](https://github.com/harshsandhu44/bandzen/compare/app@1.25.1...app@1.25.2) (2026-09-16)
 
 
