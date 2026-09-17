@@ -1,3 +1,10 @@
+## app [1.26.1](https://github.com/harshsandhu44/bandzen/compare/app@1.26.0...app@1.26.1) (2026-09-17)
+
+
+### Bug Fixes
+
+* **app:** anchor the study plan to the candidate's day and drop dead tasks ([#139](https://github.com/harshsandhu44/bandzen/issues/139)) ([1c0d849](https://github.com/harshsandhu44/bandzen/commit/1c0d84944d58959d5f4dc000fbaa8f84114b6067)), closes [#131](https://github.com/harshsandhu44/bandzen/issues/131)
+
 # app [1.26.0](https://github.com/harshsandhu44/bandzen/compare/app@1.25.7...app@1.26.0) (2026-09-17)
 
 
