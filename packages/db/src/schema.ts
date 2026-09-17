@@ -697,18 +697,20 @@ export const attempts = pgTable(
     ...examOwnership(),
     examVariant: text('exam_variant'),
     taskType: text('task_type'),
+    // Restrict, not set null: content a candidate sat is never deleted out
+    // from under their attempt (#120). A trigger also blocks editing it.
     passageId: uuid('passage_id').references(() => passages.id, {
-      onDelete: 'set null',
+      onDelete: 'restrict',
     }),
     promptId: uuid('prompt_id').references(() => writingPrompts.id, {
-      onDelete: 'set null',
+      onDelete: 'restrict',
     }),
     trackId: uuid('track_id').references(() => listeningTracks.id, {
-      onDelete: 'set null',
+      onDelete: 'restrict',
     }),
     speakingTestId: uuid('speaking_test_id').references(
       () => speakingTests.id,
-      { onDelete: 'set null' },
+      { onDelete: 'restrict' },
     ),
     /** Set on the writing half of a diagnostic, pointing at the reading half. */
     parentId: uuid('parent_id').references((): AnyPgColumn => attempts.id, {
@@ -758,7 +760,7 @@ export const attemptAnswers = pgTable(
       .references(() => attempts.id, { onDelete: 'cascade' }),
     questionId: uuid('question_id')
       .notNull()
-      .references(() => questions.id, { onDelete: 'cascade' }),
+      .references(() => questions.id, { onDelete: 'restrict' }),
     value: text('value'),
     flagged: boolean('flagged').notNull().default(false),
     updatedAt: timestamp('updated_at', { withTimezone: true })
@@ -789,7 +791,7 @@ export const examTaskResponses = pgTable(
       .references(() => attempts.id, { onDelete: 'cascade' }),
     taskId: uuid('task_id')
       .notNull()
-      .references(() => examTasks.id, { onDelete: 'cascade' }),
+      .references(() => examTasks.id, { onDelete: 'restrict' }),
     value: text('value'),
     audioUrl: text('audio_url'),
     flagged: boolean('flagged').notNull().default(false),
@@ -969,7 +971,7 @@ export const speakingResponses = pgTable(
       .references(() => attempts.id, { onDelete: 'cascade' }),
     promptId: uuid('prompt_id')
       .notNull()
-      .references(() => speakingPrompts.id, { onDelete: 'cascade' }),
+      .references(() => speakingPrompts.id, { onDelete: 'restrict' }),
     audioUrl: text('audio_url').notNull(),
     transcript: text('transcript'),
     durationSeconds: integer('duration_seconds'),

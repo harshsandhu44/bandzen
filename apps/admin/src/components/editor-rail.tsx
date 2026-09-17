@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import { listContentEvents, type ContentType } from '@bandzen/db/queries';
 import type { ContentStatus } from '@bandzen/db/schema';
+import { Button } from '@bandzen/ui/components/button';
 import { Eyebrow } from '@bandzen/ui/components/primitives';
 import {
   PublishControls,
@@ -41,6 +42,7 @@ export async function EditorRail({
   unpublishAction,
   deleteAction,
   previewHref,
+  duplicateAction,
 }: {
   type: ContentType;
   /**
@@ -58,6 +60,11 @@ export async function EditorRail({
   ) => Promise<ActionState>;
   unpublishAction: (formData: FormData) => void | Promise<void>;
   deleteAction: (prev: ActionState, formData: FormData) => Promise<ActionState>;
+  /**
+   * Pass only when candidates have sat the item (#120): it is locked, and a
+   * duplicate is the way to change it.
+   */
+  duplicateAction?: (formData: FormData) => Promise<void>;
 }) {
   const events = await listContentEvents(type, id, 12);
   const emails = await resolveEditorEmails(events.map((e) => e.actorId));
@@ -79,6 +86,23 @@ export async function EditorRail({
         unpublishAction={unpublishAction}
         deleteAction={deleteAction}
       />
+
+      {duplicateAction ? (
+        <div className="space-y-2">
+          <Eyebrow>Sat by candidates</Eyebrow>
+          <p className="text-xs text-muted-foreground">
+            Locked, so reviews and grades keep matching what was answered. To
+            change it, duplicate it, fix and publish the copy, then unpublish
+            this one.
+          </p>
+          <form action={duplicateAction}>
+            <input type="hidden" name="id" value={id} />
+            <Button type="submit" variant="outline" size="sm">
+              Duplicate as new draft
+            </Button>
+          </form>
+        </div>
+      ) : null}
 
       {issues ? <CompletenessPanel issues={issues} /> : null}
 

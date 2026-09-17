@@ -13,6 +13,7 @@ import {
   deleteQuestion,
   getTrackAdmin,
   recordContentEvent,
+  duplicateTrack,
 } from '@bandzen/db/queries';
 import { ContentInUseError, PublishValidationError } from '@bandzen/db/errors';
 import { uploadObject } from '@bandzen/storage/r2';
@@ -228,4 +229,14 @@ export async function bulkDeleteTracksAction(
   const result = await runBulk(ids, (id) => deleteTrack(id), 'Deleted');
   revalidatePath('/listening');
   return result;
+}
+
+/** Sat content is locked (#120); a fix starts from a fresh draft copy. */
+export async function duplicateTrackAction(formData: FormData) {
+  const { userId } = await requireAdminOrTeacher();
+  const copy = await duplicateTrack(String(formData.get('id') ?? ''), userId);
+  if (!copy) throw new Error('That track no longer exists.');
+  await recordContentEvent('listening-track', copy.id, userId, 'created');
+  revalidatePath('/listening');
+  redirect(`/listening/${copy.id}`);
 }

@@ -1,5 +1,5 @@
 import { notFound } from 'next/navigation';
-import { getWritingPromptById } from '@bandzen/db/queries';
+import { getWritingPromptById, isContentSat } from '@bandzen/db/queries';
 import { PageHeader } from '@bandzen/ui/components/primitives';
 import { requireAdminOrTeacher } from '@/lib/auth';
 import { StatusBadge } from '@/components/status-badge';
@@ -10,6 +10,7 @@ import {
   publishWritingPromptAction,
   unpublishWritingPromptAction,
   deleteWritingPromptAction,
+  duplicateWritingPromptAction,
 } from '../actions';
 import { PromptEditor } from './prompt-editor';
 import type { PromptFormValues } from './schema';
@@ -24,7 +25,10 @@ export default async function EditWritingPromptPage({
   const prompt = await getWritingPromptById(id);
   if (!prompt) notFound();
 
-  const editor = await resolveEditorEmail(prompt.updatedBy);
+  const [editor, sat] = await Promise.all([
+    resolveEditorEmail(prompt.updatedBy),
+    isContentSat('writing_prompts', id),
+  ]);
 
   const defaults: PromptFormValues = {
     task: prompt.task === 1 ? 1 : 2,
@@ -58,10 +62,11 @@ export default async function EditWritingPromptPage({
             publishAction={publishWritingPromptAction}
             unpublishAction={unpublishWritingPromptAction}
             deleteAction={deleteWritingPromptAction}
+            duplicateAction={sat ? duplicateWritingPromptAction : undefined}
           />
         }
       >
-        <PromptEditor id={prompt.id} defaults={defaults} />
+        <PromptEditor id={prompt.id} defaults={defaults} locked={sat} />
       </EditorShell>
     </div>
   );

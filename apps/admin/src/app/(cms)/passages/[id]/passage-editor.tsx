@@ -43,9 +43,11 @@ const blankQuestion = (
 export function PassageEditor({
   id,
   defaults,
+  locked = false,
 }: {
   id: string;
   defaults: PassageFormValues;
+  locked?: boolean;
 }) {
   const [saving, startSaving] = useTransition();
   const {
@@ -208,7 +210,7 @@ export function PassageEditor({
         </div>
       </Panel>
 
-      <SaveBar dirty={isDirty} saving={saving} />
+      <SaveBar dirty={isDirty} saving={saving} locked={locked} />
     </form>
   );
 }

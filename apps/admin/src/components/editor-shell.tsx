@@ -32,16 +32,23 @@ export function EditorShell({
 export function SaveBar({
   dirty,
   saving,
+  locked = false,
 }: {
   dirty: boolean;
   saving: boolean;
+  /** Candidates have sat the item, so it cannot be saved (#120). */
+  locked?: boolean;
 }) {
   return (
     <div className="sticky bottom-0 z-10 -mx-2 flex items-center gap-3 border-t border-border bg-background/95 px-2 py-3 backdrop-blur supports-backdrop-filter:bg-background/80">
-      <Button type="submit" disabled={!dirty || saving}>
+      <Button type="submit" disabled={locked || !dirty || saving}>
         {saving ? 'Saving…' : 'Save changes'}
       </Button>
-      {dirty && !saving ? (
+      {locked ? (
+        <span className="font-mono text-xs text-muted-foreground">
+          Sat by candidates. Duplicate it to make changes.
+        </span>
+      ) : dirty && !saving ? (
         <span className="font-mono text-xs text-muted-foreground">
           Unsaved changes
         </span>

@@ -33,9 +33,11 @@ const blankQuestion = (idx: number): TrackFormValues['questions'][number] => ({
 export function TrackEditor({
   id,
   defaults,
+  locked = false,
 }: {
   id: string;
   defaults: TrackFormValues;
+  locked?: boolean;
 }) {
   const [saving, startSaving] = useTransition();
   const {
@@ -182,7 +184,7 @@ export function TrackEditor({
         </div>
       </Panel>
 
-      <SaveBar dirty={isDirty} saving={saving} />
+      <SaveBar dirty={isDirty} saving={saving} locked={locked} />
     </form>
   );
 }

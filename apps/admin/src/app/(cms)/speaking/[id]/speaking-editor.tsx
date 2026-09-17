@@ -31,11 +31,13 @@ export function SpeakingEditor({
   id,
   defaults,
   audioByPromptId,
+  locked = false,
 }: {
   id: string;
   defaults: SpeakingFormValues;
   /** prompt id -> examiner audio URL, from the server. Cleared when text changes. */
   audioByPromptId: Record<string, string>;
+  locked?: boolean;
 }) {
   const [saving, startSaving] = useTransition();
   const {
@@ -171,7 +173,7 @@ export function SpeakingEditor({
         </div>
       </Panel>
 
-      <SaveBar dirty={isDirty} saving={saving} />
+      <SaveBar dirty={isDirty} saving={saving} locked={locked} />
     </form>
   );
 }

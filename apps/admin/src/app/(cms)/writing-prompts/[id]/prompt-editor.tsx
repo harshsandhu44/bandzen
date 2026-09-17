@@ -16,9 +16,11 @@ import { promptFormSchema, type PromptFormValues } from './schema';
 export function PromptEditor({
   id,
   defaults,
+  locked = false,
 }: {
   id: string;
   defaults: PromptFormValues;
+  locked?: boolean;
 }) {
   const [saving, startSaving] = useTransition();
   const {
@@ -72,7 +74,7 @@ export function PromptEditor({
           </Field>
         </div>
       </Panel>
-      <SaveBar dirty={isDirty} saving={saving} />
+      <SaveBar dirty={isDirty} saving={saving} locked={locked} />
     </form>
   );
 }
