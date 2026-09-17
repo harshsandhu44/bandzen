@@ -49,10 +49,11 @@ export type PlanCatalogue = {
   lessonForKind?: Readonly<Record<string, string>>;
   completedLessonIds?: readonly string[];
   /**
-   * Of those, the ones finished today. They keep their slot so Today shows
-   * them done rather than dropping them the moment they are finished.
+   * Target ids already in this candidate's ledger for the exam, oldest first.
+   * New work prefers content not yet assigned, and once the pool is spent
+   * repeats whatever was assigned longest ago.
    */
-  lessonsCompletedToday?: readonly string[];
+  assignedTargetIds?: readonly string[];
 };
 
 /**
@@ -186,15 +187,17 @@ export function weakestSkill(input: PlanInput): Skill | null {
  * yet produces a worse score and no understanding of why.
  */
 function lessonFirst(input: PlanInput): PlanTarget | null {
-  const { lessonForKind, completedLessonIds } = input.catalogue ?? {};
+  const { lessonForKind, completedLessonIds, assignedTargetIds } =
+    input.catalogue ?? {};
   if (!lessonForKind) return null;
 
-  const doneToday = input.catalogue?.lessonsCompletedToday ?? [];
   for (const kind of input.weakKinds ?? []) {
     const lessonId = lessonForKind[kind];
+    // Read, or already committed to a day: either way not scheduled again.
     if (
       lessonId &&
-      (!completedLessonIds?.includes(lessonId) || doneToday.includes(lessonId))
+      !completedLessonIds?.includes(lessonId) &&
+      !assignedTargetIds?.includes(lessonId)
     ) {
       return { kind: 'lesson', lessonId };
     }
@@ -331,12 +334,142 @@ export function nextAction(input: PlanInput): string {
 }
 
 // ---------------------------------------------------------------------------
-// Task state — derived, never stored
+// The ledger — what has been committed to the candidate (#131)
 // ---------------------------------------------------------------------------
+
+/** Bumped whenever the rules above change what a committed task would be. */
+export const PLANNER_VERSION = 'plan-2026-09.v1';
+
+/** Days written to the ledger ahead of time. Beyond them the plan is a projection. */
+export const COMMIT_DAYS = 7;
+
+export type AssignmentStatus =
+  'pending' | 'in_progress' | 'completed' | 'skipped' | 'deferred';
+
+export type TargetKind =
+  'passage' | 'prompt' | 'track' | 'lesson' | 'task_type';
+
+/** A `plan_assignments` row, as far as the plan reads it. */
+export type AssignmentRow = {
+  id: string;
+  date: string;
+  originalDate: string;
+  slot: number;
+  skill: Skill;
+  targetKind: TargetKind;
+  targetId: string;
+  label: string;
+  minutes: number;
+  status: AssignmentStatus;
+};
+
+export function targetRef(target: PlanTarget): {
+  targetKind: TargetKind;
+  targetId: string;
+} {
+  switch (target.kind) {
+    case 'reading':
+      return { targetKind: 'passage', targetId: target.passageId };
+    case 'writing':
+      return { targetKind: 'prompt', targetId: target.promptId };
+    case 'listening':
+      return { targetKind: 'track', targetId: target.trackId };
+    case 'lesson':
+      return { targetKind: 'lesson', targetId: target.lessonId };
+    case 'exam_task':
+      return { targetKind: 'task_type', targetId: target.taskType };
+  }
+}
+
+export function targetFromRef(kind: TargetKind, id: string): PlanTarget {
+  switch (kind) {
+    case 'passage':
+      return { kind: 'reading', passageId: id };
+    case 'prompt':
+      return { kind: 'writing', promptId: id };
+    case 'track':
+      return { kind: 'listening', trackId: id };
+    case 'lesson':
+      return { kind: 'lesson', lessonId: id };
+    case 'task_type':
+      return { kind: 'exam_task', taskType: id };
+  }
+}
+
+/** Whether the catalogue can still open a committed target. */
+export function targetAvailable(
+  kind: TargetKind,
+  id: string,
+  catalogue: PlanCatalogue,
+): boolean {
+  switch (kind) {
+    case 'passage':
+      return catalogue.passageIds?.includes(id) ?? false;
+    case 'prompt':
+      return catalogue.prompts?.some((p) => p.id === id) ?? false;
+    case 'track':
+      return catalogue.trackIds?.includes(id) ?? false;
+    case 'lesson':
+      return Object.values(catalogue.lessonForKind ?? {}).includes(id);
+    case 'task_type':
+      return catalogue.examTaskTypes?.includes(id) ?? false;
+  }
+}
+
+/**
+ * Missed work: anything not finished from before today moves to today,
+ * after what today already holds, in the order it was due. It keeps its id,
+ * so its history survives the move; `originalDate` says it was carried over.
+ */
+export function rollForward(
+  rows: readonly AssignmentRow[],
+  today: string,
+): { id: string; date: string; slot: number }[] {
+  const missed = rows
+    .filter(
+      (r) =>
+        r.date < today &&
+        (r.status === 'pending' || r.status === 'in_progress'),
+    )
+    .sort((a, b) => a.date.localeCompare(b.date) || a.slot - b.slot);
+  let slot = Math.max(
+    -1,
+    ...rows.filter((r) => r.date === today).map((r) => r.slot),
+  );
+  return missed.map((r) => ({ id: r.id, date: today, slot: ++slot }));
+}
+
+/**
+ * The planned tasks to write: those on days inside the commit window that
+ * hold nothing yet. A day with any row, in any state, is already committed
+ * and is never regenerated by a read.
+ */
+export function tasksToCommit(
+  plan: readonly PlanTask[],
+  rows: readonly AssignmentRow[],
+  today: string,
+) {
+  const committed = new Set(rows.map((r) => r.date));
+  const last = addDays(today, COMMIT_DAYS - 1);
+  const slots = new Map<string, number>();
+  return plan
+    .filter((t) => t.target && t.date <= last && !committed.has(t.date))
+    .map((t) => {
+      const slot = slots.get(t.date) ?? 0;
+      slots.set(t.date, slot + 1);
+      return { ...t, target: t.target!, slot };
+    });
+}
 
 export type StudyTaskStatus = 'pending' | 'active' | 'completed';
 
-export type PlanTaskState = PlanTask & { status: StudyTaskStatus };
+export type PlanTaskState = PlanTask & {
+  /** The assignment id; projected days past the commit window have none. */
+  id: string | null;
+  status: StudyTaskStatus;
+  /** Set when this was due on an earlier day and carried over. */
+  carriedFrom: string | null;
+};
 
 export type PlanProgress = {
   tasks: PlanTaskState[];
@@ -345,101 +478,61 @@ export type PlanProgress = {
 };
 
 /**
- * What the candidate has actually done, expressed as the evidence we hold
- * rather than as a stored task status. A plan row and an attempt row cannot
- * contradict each other if there is only ever one of them.
+ * Ledger rows as plan tasks. Links carry the assignment id, so the attempt
+ * they start is filed against exactly this task. Skipped and deferred rows
+ * are history, not work, and are left out.
  */
-export type PlanEvidence = {
-  /**
-   * One entry per completed attempt submitted today, already scoped to the
-   * plan's exam. `taskType` is set on attempts at exam task items.
-   */
-  completedToday: readonly {
-    module: Skill;
-    kind: 'practice' | 'diagnostic' | 'mock';
-    taskType: string | null;
-  }[];
-  completedLessonIds: readonly string[];
-  /** An attempt left open, if any: what the task it belongs to would match. */
-  inProgress?: { module: Skill; taskType: string | null } | null;
-};
-
-/**
- * Label today's tasks against that evidence.
- *
- * A task's Nth occurrence today completes on its Nth matching attempt today,
- * so two reading tasks need two reading attempts rather than both lighting up
- * from one. What matches depends on the task:
- *
- * - An exam task drill matches only a **practice** attempt at the same task
- *   type. Read Aloud does not finish a Repeat Sentence drill just because both
- *   are Speaking, and a mock's children never tick drills.
- * - Anything else matches by skill. IELTS attempts carry a task type too
- *   (`reading_passage`, `writing_task_2`), so the skill key is counted for
- *   every attempt; an exam's plan is all one kind of task or the other.
- */
-export function derivePlanState(
-  tasks: PlanTask[],
-  evidence: PlanEvidence,
-  goalMinutes?: number | null,
-): PlanProgress {
-  const remaining = new Map<string, number>();
-  const count = (key: string) =>
-    remaining.set(key, (remaining.get(key) ?? 0) + 1);
-  for (const a of evidence.completedToday) {
-    count(`skill:${a.module}`);
-    if (a.taskType && a.kind === 'practice') count(`task:${a.taskType}`);
-  }
-
-  let activeTaken = false;
-
-  const stated = tasks.map((task): PlanTaskState => {
-    if (task.target?.kind === 'lesson') {
-      const done = evidence.completedLessonIds.includes(task.target.lessonId);
-      return { ...task, status: done ? 'completed' : 'pending' };
-    }
-
-    const key =
-      task.target?.kind === 'exam_task'
-        ? `task:${task.target.taskType}`
-        : `skill:${task.skill}`;
-    const left = remaining.get(key) ?? 0;
-    if (left > 0) {
-      remaining.set(key, left - 1);
-      return { ...task, status: 'completed' };
-    }
-
-    // Only one task is ever active: the first unfinished one, and only when a
-    // matching attempt is genuinely open.
-    const open = evidence.inProgress;
-    const openMatches =
-      open &&
-      (task.target?.kind === 'exam_task'
-        ? open.taskType === task.target.taskType
-        : open.module === task.skill);
-    if (!activeTaken && openMatches) {
-      activeTaken = true;
-      return { ...task, status: 'active' };
-    }
-    return { ...task, status: 'pending' };
-  });
-
-  const minutesDone = stated
-    .filter((t) => t.status === 'completed')
-    .reduce((sum, t) => sum + t.minutes, 0);
-
-  return {
-    tasks: stated,
-    minutesDone,
-    // Falls back to what the plan itself asks for, so the bar always has a
-    // denominator even before onboarding records a daily target.
-    minutesGoal: goalMinutes ?? stated.reduce((sum, t) => sum + t.minutes, 0),
-  };
+export function assignmentTasks(
+  rows: readonly AssignmentRow[],
+  strategy: PlanStrategy,
+  today: string,
+): PlanTaskState[] {
+  return rows
+    .filter((r) => r.status !== 'skipped' && r.status !== 'deferred')
+    .sort((a, b) => a.date.localeCompare(b.date) || a.slot - b.slot)
+    .map((r) => {
+      const target = targetFromRef(r.targetKind, r.targetId);
+      const href = strategy.href(r.skill, target);
+      return {
+        id: r.id,
+        day: daysUntil(today, r.date) + 1,
+        date: r.date,
+        skill: r.skill,
+        label: r.label,
+        minutes: r.minutes,
+        target,
+        // Lessons complete by slug on their own; everything else is linked.
+        href:
+          target.kind === 'lesson'
+            ? href
+            : `${href}${href.includes('?') ? '&' : '?'}a=${r.id}`,
+        status:
+          r.status === 'completed'
+            ? 'completed'
+            : r.status === 'in_progress'
+              ? 'active'
+              : 'pending',
+        carriedFrom: r.originalDate !== r.date ? r.originalDate : null,
+      };
+    });
 }
 
-/** The tasks scheduled for one calendar day. */
-export function tasksOn(tasks: PlanTask[], isoDate: string) {
-  return tasks.filter((t) => t.date === isoDate);
+/** Today's tasks and the minutes they account for. */
+export function planProgress(
+  tasks: readonly PlanTaskState[],
+  today: string,
+  goalMinutes?: number | null,
+): PlanProgress {
+  const todays = tasks.filter((t) => t.date === today);
+  return {
+    tasks: todays,
+    minutesDone: todays
+      .filter((t) => t.status === 'completed')
+      .reduce((sum, t) => sum + t.minutes, 0),
+    // Falls back to what the plan itself asks for, so the bar always has a
+    // denominator even before onboarding records a daily target.
+    minutesGoal: goalMinutes ?? todays.reduce((sum, t) => sum + t.minutes, 0),
+  };
 }
 
 /**

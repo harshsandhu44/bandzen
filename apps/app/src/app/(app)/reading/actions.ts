@@ -8,6 +8,7 @@ import { checkAwards } from '@/lib/award-check';
 import {
   createAttempt,
   findInProgress,
+  linkAttemptToAssignment,
   getAttempt,
   practiceAllowance,
   saveAnswer,
@@ -23,8 +24,20 @@ export async function startReadingAttempt(formData: FormData) {
   const userId = await requireUserId();
 
   // Resume rather than stack up abandoned attempts on the same passage.
+  // The plan assignment this was opened from, if any (#131).
+  const assignmentId = String(formData.get('a') ?? '') || null;
+  const planTarget = { targetKind: 'passage', targetId: passageId } as const;
+
   const existing = await findInProgress(userId, { passageId });
-  if (existing) redirect(`/reading/${existing.id}`);
+  if (existing) {
+    await linkAttemptToAssignment(
+      userId,
+      existing.id,
+      assignmentId,
+      planTarget,
+    );
+    redirect(`/reading/${existing.id}`);
+  }
 
   // The gate. The list page already blurs the rows past this point, so a Free
   // candidate only reaches here by posting the form directly — check anyway.
@@ -32,6 +45,7 @@ export async function startReadingAttempt(formData: FormData) {
   if (!quota.allowed) redirect('/upgrade?from=reading_wall');
 
   const attempt = await createAttempt({ userId, module: 'reading', passageId });
+  await linkAttemptToAssignment(userId, attempt.id, assignmentId, planTarget);
   after(() => capture(userId, 'attempt_started', { module: 'reading' }));
   redirect(`/reading/${attempt.id}`);
 }

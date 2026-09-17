@@ -8,6 +8,7 @@ import { checkAwards } from '@/lib/award-check';
 import {
   createAttempt,
   findInProgress,
+  linkAttemptToAssignment,
   getAttempt,
   practiceAllowance,
   saveAnswer,
@@ -24,8 +25,20 @@ export async function startListeningAttempt(formData: FormData) {
   const userId = await requireUserId();
 
   // Resume rather than stack up abandoned attempts on the same track.
+  // The plan assignment this was opened from, if any (#131).
+  const assignmentId = String(formData.get('a') ?? '') || null;
+  const planTarget = { targetKind: 'track', targetId: trackId } as const;
+
   const existing = await findInProgress(userId, { trackId });
-  if (existing) redirect(`/listening/${existing.id}`);
+  if (existing) {
+    await linkAttemptToAssignment(
+      userId,
+      existing.id,
+      assignmentId,
+      planTarget,
+    );
+    redirect(`/listening/${existing.id}`);
+  }
 
   // The gate. The list page already blurs the rows past this point, so a Free
   // candidate only reaches here by posting the form directly — check anyway.
@@ -33,6 +46,7 @@ export async function startListeningAttempt(formData: FormData) {
   if (!quota.allowed) redirect('/upgrade?from=listening_wall');
 
   const attempt = await createAttempt({ userId, module: 'listening', trackId });
+  await linkAttemptToAssignment(userId, attempt.id, assignmentId, planTarget);
   after(() => capture(userId, 'attempt_started', { module: 'listening' }));
   redirect(`/listening/${attempt.id}`);
 }

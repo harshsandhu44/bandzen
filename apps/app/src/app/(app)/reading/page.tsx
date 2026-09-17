@@ -58,6 +58,8 @@ export default async function ReadingPage({
   // The dashboard's Continue link narrows to one passage rather than starting
   // an attempt, because creating a row from a plain link would be wrong.
   const passageId = one(sp.passage);
+  // The plan assignment the link came from, passed on to the Start action.
+  const assignmentId = one(sp.a);
 
   const [passages, quota] = await Promise.all([
     listPassages({ kind, difficulty, id: passageId }),
@@ -176,6 +178,9 @@ export default async function ReadingPage({
                   {inner}
                   <form action={startReadingAttempt}>
                     <input type="hidden" name="passageId" value={p.id} />
+                    {assignmentId ? (
+                      <input type="hidden" name="a" value={assignmentId} />
+                    ) : null}
                     <Button type="submit" variant="outline" size="sm">
                       Start
                     </Button>

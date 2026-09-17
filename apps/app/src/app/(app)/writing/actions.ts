@@ -11,6 +11,7 @@ import {
   createAttempt,
   essayAllowance,
   findInProgress,
+  linkAttemptToAssignment,
   getAttempt,
   getMockSectionAttempts,
   saveEssay,
@@ -25,8 +26,20 @@ export async function startWritingAttempt(formData: FormData) {
 
   // Resuming is always free — the mark was charged when the attempt was
   // created, and charging again for finishing it would be charging twice.
+  // The plan assignment this was opened from, if any (#131).
+  const assignmentId = String(formData.get('a') ?? '') || null;
+  const planTarget = { targetKind: 'prompt', targetId: promptId } as const;
+
   const existing = await findInProgress(userId, { promptId });
-  if (existing) redirect(`/writing/${existing.id}`);
+  if (existing) {
+    await linkAttemptToAssignment(
+      userId,
+      existing.id,
+      assignmentId,
+      planTarget,
+    );
+    redirect(`/writing/${existing.id}`);
+  }
 
   // The gate, and the only one on this path. Never at submit: an essay that
   // exists is always graded, because taking forty minutes of a candidate's
@@ -41,6 +54,7 @@ export async function startWritingAttempt(formData: FormData) {
   if (!quota.allowed) redirect('/upgrade?from=writing_wall');
 
   const attempt = await createAttempt({ userId, module: 'writing', promptId });
+  await linkAttemptToAssignment(userId, attempt.id, assignmentId, planTarget);
   after(() => capture(userId, 'attempt_started', { module: 'writing' }));
   redirect(`/writing/${attempt.id}`);
 }

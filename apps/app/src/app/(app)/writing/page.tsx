@@ -41,6 +41,8 @@ export default async function WritingPage({
   const rawTask = one(sp.task);
   const task = rawTask === '1' || rawTask === '2' ? Number(rawTask) : undefined;
   const promptId = one(sp.prompt);
+  // The plan assignment the link came from, passed on to the Start action.
+  const assignmentId = one(sp.a);
 
   const [profile, prompts, quota] = await Promise.all([
     getProfile(userId),
@@ -150,6 +152,9 @@ export default async function WritingPage({
                   {quota.allowed ? (
                     <form action={startWritingAttempt}>
                       <input type="hidden" name="promptId" value={p.id} />
+                      {assignmentId ? (
+                        <input type="hidden" name="a" value={assignmentId} />
+                      ) : null}
                       <Button type="submit" variant="outline" size="sm">
                         Start
                       </Button>

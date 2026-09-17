@@ -55,6 +55,7 @@ export function TodaysPlan({ progress }: { progress: PlanProgress }) {
                 </p>
                 <p className="font-mono text-[0.6875rem] tracking-[0.18em] text-muted-foreground uppercase tabular-nums">
                   {MODULE_LABEL[task.skill]} · {task.minutes} min
+                  {task.carriedFrom ? ' · carried over' : null}
                 </p>
               </div>
 

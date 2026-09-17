@@ -10,10 +10,14 @@ export const metadata = { title: 'Practice task', robots: { index: false } };
 
 export default async function TaskStartPage({
   params,
+  searchParams,
 }: PageProps<'/practice/[exam]/[task]'>) {
   // Signed in, but no longer staff-only: this PR is what opens PTE to students.
   await requireUserId();
   const { exam: examKey, task: taskKey } = await params;
+  // The plan assignment the link came from, passed on to the Start action.
+  const { a } = await searchParams;
+  const assignmentId = typeof a === 'string' ? a : null;
 
   const exam = getExam(examKey);
   const task = getTask(examKey, taskKey);
@@ -34,6 +38,9 @@ export default async function TaskStartPage({
           <form action={startExamTaskAttempt} className="space-y-4">
             <input type="hidden" name="exam" value={exam.key} />
             <input type="hidden" name="task" value={task.key} />
+            {assignmentId ? (
+              <input type="hidden" name="a" value={assignmentId} />
+            ) : null}
             <p className="text-sm text-muted-foreground">
               {items.length} item{items.length === 1 ? '' : 's'}
               {task.timing.scope === 'task' && limit != null
