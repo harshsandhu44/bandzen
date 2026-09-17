@@ -27,11 +27,15 @@ import {
 } from '@/lib/entitlements';
 import { isAnswerCorrect, readingBand } from '@/lib/grading';
 import {
+  PTE_SCORING_VERSION,
   evaluatorFor,
   modelAssessment,
   objectiveAssessment,
+  pteScoreReport,
+  pteWeakestTaskTypes,
   type AssessmentResult,
 } from '@bandzen/exams/scoring';
+import { sittingReportState } from '@/lib/exam-sitting';
 import { preparationWrites, type PreparationValues } from '@/lib/enrollment';
 import { union } from 'drizzle-orm/pg-core';
 import { db } from './index';
@@ -43,6 +47,7 @@ import {
   coachMessages,
   essays,
   examEnrollments,
+  examScoreReports,
   examTaskAnswers,
   examTaskResponses,
   examTasks,
@@ -880,6 +885,12 @@ export async function latestBand(
   module: Skill,
   examKey?: ExamKey,
 ) {
+  // PTE writes no per-attempt score: a skill score exists only on a finished
+  // sitting's report, so that is where the latest one is read from.
+  if (examKey === 'pte_academic') {
+    const [report] = await latestScoreReports(userId, examKey, 1);
+    return report?.subscores[module] ?? null;
+  }
   const [row] = await db
     .select({ band: attempts.score })
     .from(attempts)
@@ -1144,6 +1155,113 @@ export async function getExamTaskSitting(userId: string, sittingId: string) {
   return { mock, sections: rows };
 }
 
+export type StoredScoreReport = typeof examScoreReports.$inferSelect;
+
+/** A sitting's finished report, if it has one. Scoped to its owner. */
+export async function getExamScoreReport(
+  userId: string,
+  mockAttemptId: string,
+) {
+  return firstRow(
+    await db
+      .select()
+      .from(examScoreReports)
+      .where(
+        and(
+          eq(examScoreReports.mockAttemptId, mockAttemptId),
+          eq(examScoreReports.userId, userId),
+        ),
+      ),
+  );
+}
+
+/** This candidate's finished reports for one exam, newest first. */
+export async function latestScoreReports(
+  userId: string,
+  examKey: ExamKey,
+  limit = 50,
+) {
+  return db
+    .select()
+    .from(examScoreReports)
+    .where(
+      and(
+        eq(examScoreReports.userId, userId),
+        eq(examScoreReports.examKey, examKey),
+      ),
+    )
+    .orderBy(desc(examScoreReports.createdAt))
+    .limit(limit);
+}
+
+/** The task types a sitting locked in, which its report must cover. */
+export async function sittingTaskTypes(taskIds: readonly string[]) {
+  if (!taskIds.length) return [];
+  const rows = await db
+    .selectDistinct({ taskType: examTasks.taskType })
+    .from(examTasks)
+    .where(inArray(examTasks.id, [...taskIds]));
+  return rows.map((r) => r.taskType);
+}
+
+/**
+ * Write a sitting's report if — and only if — it is now complete.
+ *
+ * Called after every attempt under a sitting reaches a terminal, scored
+ * state. Several graders can finish at once, so this is safe to race: each
+ * reads the same attempts, and the insert's conflict on the sitting's id
+ * turns every write after the first into a no-op. The report is assembled
+ * from the sitting's own exam, never the candidate's active one.
+ *
+ * Takes no userId: like the graders that call it, it runs for a sitting
+ * already known to exist.
+ */
+export async function finalizeExamTaskSitting(mockAttemptId: string) {
+  const mock = await firstRow(
+    await db
+      .select()
+      .from(mockAttempts)
+      .where(eq(mockAttempts.id, mockAttemptId)),
+  );
+  // Only PTE has a report to assemble; its scoring adapter is the only one.
+  if (!mock?.taskIds?.length || mock.examKey !== 'pte_academic') return null;
+
+  const [expected, children] = await Promise.all([
+    sittingTaskTypes(mock.taskIds),
+    db
+      .select({
+        taskType: attempts.taskType,
+        status: attempts.status,
+        assessment: attempts.assessment,
+      })
+      .from(attempts)
+      .where(eq(attempts.mockAttemptId, mockAttemptId)),
+  ]);
+
+  const state = sittingReportState(expected, children);
+  if (state !== 'complete') return state;
+
+  const outcomes = children
+    .map((c) => c.assessment)
+    .filter((a): a is AssessmentResult => a != null);
+  const report = pteScoreReport(outcomes);
+  await db
+    .insert(examScoreReports)
+    .values({
+      mockAttemptId,
+      userId: mock.userId,
+      examKey: mock.examKey,
+      examVersion: mock.examVersion,
+      scoringVersion: PTE_SCORING_VERSION,
+      overall: report.overall,
+      subscores: report.subscores ?? {},
+      sections: report.sections,
+      taskTypes: pteWeakestTaskTypes(outcomes),
+    })
+    .onConflictDoNothing();
+  return state;
+}
+
 // ---------------------------------------------------------------------------
 // Exam tasks
 //
@@ -1369,6 +1487,7 @@ export async function submitExamTaskAttempt(userId: string, attemptId: string) {
     })
     .where(eq(attempts.id, attemptId))
     .returning({ id: attempts.id, mockAttemptId: attempts.mockAttemptId });
+  if (row?.mockAttemptId) await finalizeExamTaskSitting(row.mockAttemptId);
   return row ? { ...row, needsModel: false } : null;
 }
 
@@ -1418,7 +1537,11 @@ export async function writeExamTaskAssessment(
     .update(attempts)
     .set({ status: 'complete', submittedAt: new Date(), assessment })
     .where(eq(attempts.id, attemptId))
-    .returning({ userId: attempts.userId });
+    .returning({
+      userId: attempts.userId,
+      mockAttemptId: attempts.mockAttemptId,
+    });
+  if (row?.mockAttemptId) await finalizeExamTaskSitting(row.mockAttemptId);
   return row?.userId ?? null;
 }
 
@@ -2497,6 +2620,22 @@ export async function bandHistory(
   module?: Skill,
   examKey?: ExamKey,
 ) {
+  // PTE's history is its reports, one point per skill per finished sitting.
+  if (examKey === 'pte_academic') {
+    const reports = await latestScoreReports(userId, examKey);
+    return reports.reverse().flatMap((r) =>
+      Object.entries(r.subscores)
+        .filter(
+          (e): e is [Skill, number] =>
+            e[1] != null && (!module || e[0] === module),
+        )
+        .map(([skill, band]) => ({
+          module: skill,
+          band,
+          submittedAt: r.createdAt as Date | null,
+        })),
+    );
+  }
   return db
     .select({
       module: attempts.module,

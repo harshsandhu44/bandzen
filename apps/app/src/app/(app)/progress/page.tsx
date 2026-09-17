@@ -33,6 +33,7 @@ import {
   accuracyByQuestionKind,
   activitySummary,
   bandHistory,
+  latestScoreReports,
   getProfile,
   isPro,
   listAwards,
@@ -104,7 +105,7 @@ export default async function ProgressPage({
       </nav>
     ) : null;
 
-  const [history, accuracy, activity, lessons, attempts, pro, awards] =
+  const [history, accuracy, activity, lessons, attempts, pro, awards, reports] =
     await Promise.all([
       bandHistory(userId, undefined, examKey),
       accuracyByQuestionKind(userId, 'reading'),
@@ -113,6 +114,9 @@ export default async function ProgressPage({
       listCompletedAttempts(userId, 50, examKey),
       isPro(userId),
       listAwards(userId),
+      examKey === 'pte_academic'
+        ? latestScoreReports(userId, examKey, 1)
+        : Promise.resolve([]),
     ]);
   const scale = exam.scoreScale;
 
@@ -146,7 +150,12 @@ export default async function ProgressPage({
   const writing = latest('writing');
   const listening = latest('listening');
   const speaking = latest('speaking');
-  const overall = meanBand(reading, writing, listening, speaking);
+  // PTE's overall is its latest report's — the result page's number — not a
+  // mean of skills re-derived on IELTS's half-band grid.
+  const overall =
+    examKey === 'pte_academic'
+      ? (reports[0]?.overall ?? null)
+      : meanBand(reading, writing, listening, speaking);
 
   if (!points.length) {
     if (!(await examHasContent(examKey))) {

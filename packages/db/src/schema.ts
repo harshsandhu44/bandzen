@@ -843,6 +843,54 @@ export const reports = pgTable('reports', {
 });
 
 /**
+ * The finished score report of an exam-task sitting: the one number a
+ * candidate is shown for a mock, and the one Today, Progress and the plan read.
+ *
+ * Written once, when the last expected section attempt has a valid
+ * assessment, and never updated — there is no update path in the app. A
+ * report assembled on every page load moves when the arithmetic or a re-grade
+ * moves, so the historical result a candidate saw would silently change. A
+ * sitting still being marked, or with a failed grader, has no row: pending and
+ * failed are read off its attempts, and a partial report is never stored.
+ *
+ * `exam_key`/`exam_version` are the sitting's, never the active exam's.
+ */
+export const examScoreReports = pgTable(
+  'exam_score_reports',
+  {
+    mockAttemptId: uuid('mock_attempt_id')
+      .primaryKey()
+      .references(() => mockAttempts.id, { onDelete: 'cascade' }),
+    userId: uuid('user_id').notNull(),
+    ...examOwnership(),
+    /** `PTE_SCORING_VERSION` and its kin: which arithmetic produced this. */
+    scoringVersion: text('scoring_version').notNull(),
+    overall: numeric('overall', { precision: 5, scale: 1, mode: 'number' }),
+    /** Per skill, on the exam's scale; null where the sitting measured none. */
+    subscores: jsonb('subscores')
+      .$type<Record<string, number | null>>()
+      .notNull(),
+    sections: jsonb('sections')
+      .$type<Record<string, number | null>>()
+      .notNull(),
+    /** Raw fraction per task type, weakest first. */
+    taskTypes: jsonb('task_types')
+      .$type<{ taskType: string; fraction: number }[]>()
+      .notNull(),
+    createdAt: timestamp('created_at', { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+  },
+  (t) => [
+    index('exam_score_reports_user_idx').on(
+      t.userId,
+      t.examKey,
+      desc(t.createdAt),
+    ),
+  ],
+);
+
+/**
  * A real score a candidate reports back from the actual exam, paired with what
  * Bandzen had guessed.
  *

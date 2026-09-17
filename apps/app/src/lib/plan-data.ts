@@ -7,6 +7,7 @@ import {
   attemptsSubmittedOn,
   latestBand,
   latestReport,
+  latestScoreReports,
   listLessonProgress,
   listPassages,
   listTracks,
@@ -75,6 +76,7 @@ export async function loadPlanData(
     tracks,
     lessonForKind,
     examTaskTypes,
+    scoreReports,
   ] = await Promise.all([
     latestBand(userId, 'reading', examKey),
     latestBand(userId, 'writing', examKey),
@@ -90,6 +92,9 @@ export async function loadPlanData(
     listTracks(),
     lessonForKindMap(),
     publishedExamTaskTypes(examKey),
+    examKey === 'pte_academic'
+      ? latestScoreReports(userId, examKey, 1)
+      : Promise.resolve([]),
   ]);
 
   const completedLessonIds = lessons.map((l) => l.lessonId);
@@ -131,12 +136,12 @@ export async function loadPlanData(
     profile.studyMinutes,
   );
 
-  const estimated = meanBand(
-    readingBand,
-    writingBand,
-    listeningBand,
-    speakingBand,
-  );
+  // PTE's overall is its latest sitting report's, the same number the result
+  // page shows — not a mean re-derived here on IELTS's half-band grid.
+  const estimated =
+    examKey === 'pte_academic'
+      ? (scoreReports[0]?.overall ?? null)
+      : meanBand(readingBand, writingBand, listeningBand, speakingBand);
 
   return {
     planInput,

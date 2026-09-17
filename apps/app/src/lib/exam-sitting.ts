@@ -4,6 +4,7 @@ import {
   getTask,
   type ExamDefinition,
 } from '@bandzen/exams/registry';
+import { taskFraction, type TaskOutcome } from '@bandzen/exams/scoring';
 import type { Skill } from './db/schema';
 
 /**
@@ -114,4 +115,44 @@ export function skillsInSitting(
     .flatMap((s) => s.skills)
     .filter((skill, i, all) => all.indexOf(skill) === i)
     .filter((skill) => covered.has(skill));
+}
+
+/** One section attempt under a sitting, as far as its report cares. */
+export type SittingChild = {
+  taskType: string | null;
+  status: string;
+  assessment: TaskOutcome | null;
+};
+
+export type SittingReportState = 'pending' | 'failed' | 'complete';
+
+/**
+ * Whether a sitting's report can be written yet.
+ *
+ * `complete` only when every task type the sitting locked in has an attempt
+ * that finished with an assessment that yields a score. Anything a grader
+ * gave up on is `failed` — including an attempt that finished with an
+ * assessment the scorer cannot read, which would otherwise wait forever and
+ * never be offered a retry. Everything else is still `pending`, and a report
+ * written then would be a partial one.
+ */
+export function sittingReportState(
+  expectedTaskTypes: readonly string[],
+  children: readonly SittingChild[],
+): SittingReportState {
+  const expected = new Set(expectedTaskTypes);
+  const relevant = children.filter(
+    (c) => c.taskType != null && expected.has(c.taskType),
+  );
+  const unreadable = (c: SittingChild) =>
+    c.status === 'complete' &&
+    (!c.assessment || taskFraction(c.assessment) == null);
+
+  if (relevant.some((c) => c.status === 'failed' || unreadable(c))) {
+    return 'failed';
+  }
+  const done = new Set(
+    relevant.filter((c) => c.status === 'complete').map((c) => c.taskType),
+  );
+  return [...expected].every((t) => done.has(t)) ? 'complete' : 'pending';
 }

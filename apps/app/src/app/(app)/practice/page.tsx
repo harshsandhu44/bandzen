@@ -135,7 +135,13 @@ export default async function PracticePage() {
                   />
                 ) : null}
                 <p className="text-sm text-muted-foreground text-pretty">
-                  {!started ? (
+                  {/* PTE scores a skill only from a finished mock, never
+                      from a practice set. */}
+                  {exam.key === 'pte_academic' && m.band == null ? (
+                    <span className="text-foreground">
+                      Sit a mock test to get a score.{' '}
+                    </span>
+                  ) : !started ? (
                     <span className="text-foreground">Not started. </span>
                   ) : null}
                   {MODULE_BLURB[m.module]}
