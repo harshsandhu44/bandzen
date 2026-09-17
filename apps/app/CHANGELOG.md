@@ -1,3 +1,10 @@
+# app [1.28.0](https://github.com/harshsandhu44/bandzen/compare/app@1.27.0...app@1.28.0) (2026-09-17)
+
+
+### Features
+
+* **app:** plan each day to the candidate's minutes and study days ([#141](https://github.com/harshsandhu44/bandzen/issues/141)) ([c3bc29f](https://github.com/harshsandhu44/bandzen/commit/c3bc29f60654e018a3be188f8091e17781541a8e)), closes [#131](https://github.com/harshsandhu44/bandzen/issues/131)
+
 # app [1.27.0](https://github.com/harshsandhu44/bandzen/compare/app@1.26.1...app@1.27.0) (2026-09-17)
 
 
