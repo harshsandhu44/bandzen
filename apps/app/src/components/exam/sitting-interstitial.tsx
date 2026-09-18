@@ -1,12 +1,12 @@
 import { notFound, redirect } from 'next/navigation';
 import { ArrowRight } from 'lucide-react';
-import { Button } from '@bandzen/ui/components/button';
 import { PageHeader, Panel } from '@/components/app/primitives';
 import { getMockAttempt, getMockSiblings } from '@/lib/db/queries';
 import type { Skill } from '@/lib/db/schema';
 import { mockPosition, mockSectionUrl, type MockChild } from '@/lib/mock';
 import { enterMockSection } from '@/app/(app)/mock/actions';
 import { MicGate } from '@/components/exam/mic-gate';
+import { SubmitButton } from '@/components/app/submit-button';
 
 /**
  * The one interstitial shown before every section of a sitting — mock or
@@ -125,9 +125,9 @@ export async function SittingInterstitial({
           {mock.taskIds && position === 'speaking' ? (
             <MicGate />
           ) : (
-            <Button type="submit">
+            <SubmitButton pendingLabel="Continuing…">
               Continue <ArrowRight />
-            </Button>
+            </SubmitButton>
           )}
         </form>
       </Panel>

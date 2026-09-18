@@ -3,6 +3,7 @@ import { Input } from '@bandzen/ui/components/input';
 import { Label } from '@bandzen/ui/components/label';
 import { Button } from '@bandzen/ui/components/button';
 import { EmptyState } from '@/components/app/primitives';
+import { SubmitButton } from '@/components/app/submit-button';
 import { requireUserId } from '@/lib/auth';
 import {
   diagnosticCount,
@@ -114,9 +115,9 @@ export default async function DiagnosticPage() {
           </p>
         </div>
 
-        <Button type="submit" size="lg" className="w-full">
+        <SubmitButton size="lg" className="w-full">
           Start the diagnostic
-        </Button>
+        </SubmitButton>
       </form>
 
       <p className="text-xs leading-5 text-muted-foreground">

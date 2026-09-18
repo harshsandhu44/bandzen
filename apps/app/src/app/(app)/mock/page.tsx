@@ -2,6 +2,7 @@ import { ArrowRight } from 'lucide-react';
 import { Button } from '@bandzen/ui/components/button';
 import { Eyebrow, PageHeader, Panel } from '@/components/app/primitives';
 import { ProTag, QuotaMeter } from '@/components/billing/pro';
+import { SubmitButton } from '@/components/app/submit-button';
 import { capture } from '@/lib/analytics';
 import { requireUserId } from '@/lib/auth';
 import {
@@ -100,10 +101,10 @@ export default async function MockPage() {
           ) : (
             <>
               <form action={startMock}>
-                <Button type="submit" disabled={!open && !cap.allowed}>
+                <SubmitButton disabled={!open && !cap.allowed}>
                   {open ? 'Resume mock test' : 'Start mock test'}
                   <ArrowRight />
-                </Button>
+                </SubmitButton>
               </form>
               {!open ? (
                 <QuotaMeter

@@ -10,6 +10,7 @@ import {
   listWritingPrompts,
 } from '@/lib/db/queries';
 import { QuotaMeter } from '@/components/billing/pro';
+import { SubmitButton } from '@/components/app/submit-button';
 import { capture } from '@/lib/analytics';
 import { startWritingAttempt } from './actions';
 import { taskRules } from '@/lib/timing';
@@ -155,9 +156,13 @@ export default async function WritingPage({
                       {assignmentId ? (
                         <input type="hidden" name="a" value={assignmentId} />
                       ) : null}
-                      <Button type="submit" variant="outline" size="sm">
+                      <SubmitButton
+                        variant="outline"
+                        size="sm"
+                        pendingLabel="Opening…"
+                      >
                         Start
-                      </Button>
+                      </SubmitButton>
                     </form>
                   ) : (
                     /* Disabled and visible, not hidden. Someone who cannot see

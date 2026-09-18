@@ -2,12 +2,12 @@ import type { ReactNode } from 'react';
 import type { ScoreScale } from '@bandzen/exams/registry';
 import { ESTIMATE_NOTE, formatScore } from '@bandzen/exams/scoring';
 import { BandScale } from '@bandzen/ui/components/band-scale';
-import { Button } from '@bandzen/ui/components/button';
 import { Progress } from '@bandzen/ui/components/progress';
 import { cn } from '@bandzen/ui/lib/utils';
 import { GradingWatch } from '@/components/app/grading-watch';
 import { InsightBar, Watermark } from '@/components/app/primitives';
 import { ScoreReveal } from '@/components/exam/score-reveal';
+import { SubmitButton } from '@/components/app/submit-button';
 import type { Annotation } from '@/lib/db/schema';
 
 /**
@@ -99,7 +99,7 @@ export function GradedReport({
         </p>
         <form action={retryAction}>
           <input type="hidden" name="attemptId" value={attemptId} />
-          <Button type="submit">Mark it again</Button>
+          <SubmitButton pendingLabel="Marking…">Mark it again</SubmitButton>
         </form>
         {children}
       </div>

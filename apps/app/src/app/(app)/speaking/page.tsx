@@ -4,6 +4,7 @@ import { Button } from '@bandzen/ui/components/button';
 import { EmptyState, PageHeader, Panel } from '@/components/app/primitives';
 import { FilterBar } from '@/components/app/filter-bar';
 import { ProLocked } from '@/components/billing/pro';
+import { SubmitButton } from '@/components/app/submit-button';
 import { capture } from '@/lib/analytics';
 import { requireUserId } from '@/lib/auth';
 import { DIFFICULTY_RANGE, isPro, listSpeakingTests } from '@/lib/db/queries';
@@ -123,9 +124,13 @@ export default async function SpeakingPage({
                 </div>
                 <form action={startSpeakingAttempt}>
                   <input type="hidden" name="testId" value={t.id} />
-                  <Button type="submit" variant="outline" size="sm">
+                  <SubmitButton
+                    variant="outline"
+                    size="sm"
+                    pendingLabel="Opening…"
+                  >
                     Start
-                  </Button>
+                  </SubmitButton>
                 </form>
               </li>
             ))}

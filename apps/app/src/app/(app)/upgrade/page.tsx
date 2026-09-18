@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import { Check, Clock } from 'lucide-react';
+import { ArrowRight, Check, Clock } from 'lucide-react';
 import { Badge } from '@bandzen/ui/components/badge';
 import { Button } from '@bandzen/ui/components/button';
 import { cn } from '@bandzen/ui/lib/utils';
@@ -9,6 +9,7 @@ import {
   PageHeader,
   SectionHeader,
 } from '@/components/app/primitives';
+import { SubmitButton } from '@/components/app/submit-button';
 import { capture } from '@/lib/analytics';
 import { requireUserId } from '@/lib/auth';
 import { daysUntil } from '@/lib/dates';
@@ -39,7 +40,6 @@ import {
 } from '@bandzen/pricing/plans';
 import { foundingPrice } from '@bandzen/pricing/polar';
 import { startCheckout } from './actions';
-import { CheckoutButton } from './checkout-button';
 import { CurrencyPicker } from './currency-picker';
 
 export const metadata = { title: 'Bandzen Pro' };
@@ -268,10 +268,14 @@ export default async function UpgradePage(props: PageProps<'/upgrade'>) {
                   </div>
 
                   <form action={startCheckout.bind(null, plan.key, source)}>
-                    <CheckoutButton
-                      label={`Choose ${plan.label.toLowerCase()}`}
+                    <SubmitButton
+                      pendingLabel="Opening…"
                       variant={plan.featured ? 'default' : 'outline'}
-                    />
+                      className="w-full"
+                    >
+                      {`Choose ${plan.label.toLowerCase()}`}
+                      <ArrowRight />
+                    </SubmitButton>
                   </form>
                 </div>
               );
