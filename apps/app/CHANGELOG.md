@@ -1,3 +1,10 @@
+## app [1.29.2](https://github.com/harshsandhu44/bandzen/compare/app@1.29.1...app@1.29.2) (2026-09-18)
+
+
+### Bug Fixes
+
+* **app:** show a pending state while a form's server action runs ([#145](https://github.com/harshsandhu44/bandzen/issues/145)) ([5f7547a](https://github.com/harshsandhu44/bandzen/commit/5f7547aab5f6cd681046970bcd3b85cf22453313))
+
 ## app [1.29.1](https://github.com/harshsandhu44/bandzen/compare/app@1.29.0...app@1.29.1) (2026-09-17)
 
 
