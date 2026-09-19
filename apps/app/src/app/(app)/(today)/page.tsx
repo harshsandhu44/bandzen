@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import { Button } from '@bandzen/ui/components/button';
+import { SubmitButton } from '@/components/app/submit-button';
 import { resumePlan } from '@/app/(app)/plan/actions';
 import { redirect } from 'next/navigation';
 import { Card, CardContent } from '@bandzen/ui/components/card';
@@ -181,9 +181,9 @@ export default async function DashboardPage() {
             Your plan is paused. Nothing new is scheduled and nothing rolls
             over.
           </p>
-          <Button type="submit" size="sm" variant="outline">
+          <SubmitButton size="sm" variant="outline" pendingLabel="Resuming…">
             Resume plan
-          </Button>
+          </SubmitButton>
         </form>
       ) : revision ? (
         <p className="text-sm text-muted-foreground">

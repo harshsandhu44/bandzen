@@ -35,3 +35,22 @@ export function SubmitButton({
     </Button>
   );
 }
+
+/**
+ * The timer-expiry twin of `SubmitButton`: an exam's hidden auto-submit form
+ * has no button to relabel, so this banner is the only sign the submit landed.
+ * Renders nothing until the form is pending.
+ */
+export function SubmittingNotice() {
+  const { pending } = useFormStatus();
+  if (!pending) return null;
+
+  return (
+    <p
+      role="status"
+      className="shrink-0 border-b border-chrome bg-secondary/40 px-6 py-2 text-sm"
+    >
+      Time is up — submitting your answers…
+    </p>
+  );
+}

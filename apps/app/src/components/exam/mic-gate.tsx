@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { ArrowRight, Mic } from 'lucide-react';
 import { Button } from '@bandzen/ui/components/button';
+import { SubmitButton } from '@/components/app/submit-button';
 
 /**
  * The microphone check before a mock's spoken part. In a mock each spoken
@@ -29,9 +30,9 @@ export function MicGate() {
 
   if (state === 'ok') {
     return (
-      <Button type="submit">
+      <SubmitButton pendingLabel="Continuing…">
         Continue <ArrowRight />
-      </Button>
+      </SubmitButton>
     );
   }
 

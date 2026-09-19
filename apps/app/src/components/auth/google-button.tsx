@@ -1,5 +1,5 @@
-import { Button } from '@bandzen/ui/components/button';
 import { Separator } from '@bandzen/ui/components/separator';
+import { SubmitButton } from '@/components/app/submit-button';
 import { signInWithGoogle } from '@/app/(auth)/actions';
 
 /**
@@ -40,10 +40,14 @@ export async function GoogleButton() {
         <Separator className="flex-1" />
       </div>
       <form action={signInWithGoogle}>
-        <Button type="submit" variant="outline" className="w-full gap-2">
+        <SubmitButton
+          variant="outline"
+          className="w-full gap-2"
+          pendingLabel="Redirecting…"
+        >
           <GoogleMark />
           Continue with Google
-        </Button>
+        </SubmitButton>
       </form>
     </div>
   );

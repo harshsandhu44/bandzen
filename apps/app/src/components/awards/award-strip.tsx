@@ -1,5 +1,6 @@
 import { getAward } from '@/lib/awards';
 import type { Award } from '@/lib/db/schema';
+import { SubmitButton } from '@/components/app/submit-button';
 import { acknowledgeAwards } from '@/app/(app)/(today)/actions';
 
 /**
@@ -52,12 +53,13 @@ export function AwardStrip({ awards }: { awards: Award[] }) {
       </div>
 
       <form action={acknowledgeAwards} className="shrink-0">
-        <button
-          type="submit"
-          className="font-mono text-xs tracking-[0.14em] uppercase underline underline-offset-4"
+        <SubmitButton
+          variant="link"
+          pendingLabel="Saving…"
+          className="h-auto p-0 font-mono text-xs tracking-[0.14em] text-foreground uppercase underline underline-offset-4"
         >
           Got it
-        </button>
+        </SubmitButton>
       </form>
     </section>
   );

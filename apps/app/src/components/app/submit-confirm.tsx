@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { Button } from '@bandzen/ui/components/button';
+import { SubmitButton } from '@/components/app/submit-button';
 import {
   Dialog,
   DialogClose,
@@ -72,9 +73,12 @@ export function SubmitConfirm({
           />
           <form action={action}>
             <input type="hidden" name="attemptId" value={attemptId} />
-            <Button type="submit" variant={unsaved ? 'destructive' : 'default'}>
+            <SubmitButton
+              variant={unsaved ? 'destructive' : 'default'}
+              pendingLabel="Submitting…"
+            >
               Submit now
-            </Button>
+            </SubmitButton>
           </form>
         </DialogFooter>
       </DialogContent>

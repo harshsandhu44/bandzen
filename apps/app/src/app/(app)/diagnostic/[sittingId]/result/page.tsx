@@ -3,7 +3,7 @@ import { ESTIMATE_NOTE } from '@bandzen/exams/scoring';
 import { after } from 'next/server';
 import { notFound } from 'next/navigation';
 import { ArrowRight } from 'lucide-react';
-import { Button } from '@bandzen/ui/components/button';
+import { SubmitButton } from '@/components/app/submit-button';
 import { ComingUp } from '@/components/dashboard/coming-up';
 import { SittingResult, sittingBands } from '@/components/exam/sitting-result';
 import { capture } from '@/lib/analytics';
@@ -71,9 +71,9 @@ export default async function DiagnosticResultPage({
         </div>
         <form action={addDiagnosticSpeaking}>
           <input type="hidden" name="sittingId" value={data.mock.id} />
-          <Button type="submit" size="sm">
+          <SubmitButton size="sm">
             Take your speaking assessment <ArrowRight />
-          </Button>
+          </SubmitButton>
         </form>
       </div>
     );
