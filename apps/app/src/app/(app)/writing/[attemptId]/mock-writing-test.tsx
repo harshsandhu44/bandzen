@@ -7,6 +7,7 @@ import type { WritingChartData } from '@bandzen/db/schema';
 import { SaveStatus } from '@/components/app/save-status';
 import { MockBlurBanner } from '@/components/exam/mock-blur-banner';
 import { SubmitConfirm } from '@/components/app/submit-confirm';
+import { SubmittingNotice } from '@/components/app/submit-button';
 import { Timer } from '@/components/app/timer';
 import { PromptChart } from '@/components/exam/prompt-chart';
 import { useAutosave } from '@/lib/use-autosave';
@@ -101,7 +102,8 @@ export function MockWritingTest({ startedAt, minutes, task1, task2 }: Props) {
         </div>
       </header>
 
-      <form ref={autoFormRef} action={submitMockWriting} className="hidden">
+      <form ref={autoFormRef} action={submitMockWriting}>
+        <SubmittingNotice />
         <input type="hidden" name="attemptId" value={submitAttemptId} />
       </form>
 

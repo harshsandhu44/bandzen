@@ -5,6 +5,7 @@ import { cn } from '@bandzen/ui/lib/utils';
 import type { WritingChartData } from '@bandzen/db/schema';
 import { SaveStatus } from '@/components/app/save-status';
 import { SubmitConfirm } from '@/components/app/submit-confirm';
+import { SubmittingNotice } from '@/components/app/submit-button';
 import { useAutosave } from '@/lib/use-autosave';
 import { Timer } from '@/components/app/timer';
 import { PromptChart } from '@/components/exam/prompt-chart';
@@ -91,7 +92,8 @@ export function WritingTest({
         </p>
       ) : null}
 
-      <form ref={autoFormRef} action={submitEssay} className="hidden">
+      <form ref={autoFormRef} action={submitEssay}>
+        <SubmittingNotice />
         <input type="hidden" name="attemptId" value={attemptId} />
       </form>
 

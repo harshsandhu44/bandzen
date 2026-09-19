@@ -16,6 +16,7 @@ import {
 } from '@bandzen/ui/components/resizable';
 import { SaveStatus } from '@/components/app/save-status';
 import { SubmitConfirm } from '@/components/app/submit-confirm';
+import { SubmittingNotice } from '@/components/app/submit-button';
 import { Timer } from '@/components/app/timer';
 import { ExamNavigator, type NavItem } from '@/components/exam/exam-navigator';
 import type { AutosaveStatus } from '@/lib/use-autosave';
@@ -184,7 +185,8 @@ export function TaskShell({
         )}
       </ExamNavigator>
 
-      <form ref={autoFormRef} action={submitAction} className="hidden">
+      <form ref={autoFormRef} action={submitAction}>
+        <SubmittingNotice />
         <input type="hidden" name="attemptId" value={attemptId} />
       </form>
     </div>
