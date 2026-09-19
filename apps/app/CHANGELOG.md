@@ -1,3 +1,10 @@
+## app [1.29.3](https://github.com/harshsandhu44/bandzen/compare/app@1.29.2...app@1.29.3) (2026-09-19)
+
+
+### Bug Fixes
+
+* **app:** show a pending state on every remaining form submit ([#146](https://github.com/harshsandhu44/bandzen/issues/146)) ([a25e46a](https://github.com/harshsandhu44/bandzen/commit/a25e46a2533755d0ba12073fb79fbef744903607)), closes [#145](https://github.com/harshsandhu44/bandzen/issues/145) [#145](https://github.com/harshsandhu44/bandzen/issues/145)
+
 ## app [1.29.2](https://github.com/harshsandhu44/bandzen/compare/app@1.29.1...app@1.29.2) (2026-09-18)
 
 
