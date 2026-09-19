@@ -2,6 +2,7 @@ import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { ArrowRight, Check } from 'lucide-react';
 import { Button } from '@bandzen/ui/components/button';
+import { SubmitButton } from '@/components/app/submit-button';
 import { Breadcrumb } from '@/components/app/breadcrumb';
 import { SectionHeader } from '@/components/app/primitives';
 import { LessonBlockView } from '@/components/learning/lesson-blocks';
@@ -119,7 +120,7 @@ export default async function LessonPage({
             ) : (
               <form action={completeLesson}>
                 <input type="hidden" name="lessonId" value={lesson.id} />
-                <Button type="submit">Mark as read</Button>
+                <SubmitButton pendingLabel="Saving…">Mark as read</SubmitButton>
               </form>
             )}
 

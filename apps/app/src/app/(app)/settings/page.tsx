@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import { Button } from '@bandzen/ui/components/button';
+import { SubmitButton } from '@/components/app/submit-button';
 import {
   Tabs,
   TabsContent,
@@ -131,9 +132,13 @@ export default async function SettingsPage() {
             ) : null}
             {billed ? (
               <form action={manageBilling}>
-                <Button variant="outline" size="sm" type="submit">
+                <SubmitButton
+                  variant="outline"
+                  size="sm"
+                  pendingLabel="Opening…"
+                >
                   Invoices
-                </Button>
+                </SubmitButton>
               </form>
             ) : null}
             {pro ? null : (
@@ -201,9 +206,13 @@ export default async function SettingsPage() {
           </dl>
 
           <form action={signOut}>
-            <Button type="submit" variant="outline" size="sm">
+            <SubmitButton
+              variant="outline"
+              size="sm"
+              pendingLabel="Signing out…"
+            >
               Sign out
-            </Button>
+            </SubmitButton>
           </form>
         </TabsContent>
       </Tabs>
